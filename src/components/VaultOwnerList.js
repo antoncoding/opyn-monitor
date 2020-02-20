@@ -1,10 +1,12 @@
 import React, { Component } from 'react'
 import { LoadingRing, 
   DataView,
+  Button,
   IdentityBadge,
 } from '@aragon/ui'
 import { getAllVaultOwners } from '../utils/graph'
 import { getLiquidationInfo } from '../utils/infura'
+import { liquidate } from '../utils/web3'
 class VaultOwnerList extends Component {
 
   state = {
@@ -19,7 +21,6 @@ class VaultOwnerList extends Component {
       owners,
       isLoading: false
     })
-
   }
 
   render() {
@@ -29,7 +30,12 @@ class VaultOwnerList extends Component {
       fields={['Owner', 'Max oToken Liquidatable']}
       entries={ this.state.owners }
       renderEntry={({ account, maxLiquidatable }) => {
-        return [<IdentityBadge entity={account} shorten={false} />, <div>{maxLiquidatable}</div>]
+        return [
+        <IdentityBadge entity={account} shorten={false} />, 
+        maxLiquidatable > 0 ?
+        <Button onClick={ ()=> liquidate(account, maxLiquidatable)} >{maxLiquidatable}</Button> :
+        <div> {maxLiquidatable} </div>
+      ]
       }}
       />
     
