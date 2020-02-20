@@ -10,13 +10,15 @@ const ocDAIToken = new web3.eth.Contract(OTOKEN_ABI, mainnet.ocDAI)
 export const getVaults = async(owners) => {
   const vaults = await Promise.map(owners, async(owner) => {
     const res = await ocDAIToken.methods.getVault(owner).call()
-    const collateral = res[0]
+    const collateral = web3.utils.fromWei(res[0])
     const oTokensIssued = res[1]
     const underlying = res[2]
     const owned = res[3]
     return { collateral, oTokensIssued, underlying, owned, owner }
   })
-  .filter(vault => vault.owned)
+  .filter(
+    vault => vault.owned && vault.collateral > 0
+  )
   .map(async(vault) => {
     const maxLiquidatable = await ocDAIToken.methods.maxOTokensLiquidatable(vault.owner).call()
     vault.maxLiquidatable = maxLiquidatable

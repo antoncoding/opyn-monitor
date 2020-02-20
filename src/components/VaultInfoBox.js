@@ -28,7 +28,7 @@ class VaultBox extends Component {
         }
         secondary={
           <Box heading={'supply'} padding={30}>
-            {this.state.supply}{' '}
+            {this.state.supply} ocDai
           </Box>
         }
       />
