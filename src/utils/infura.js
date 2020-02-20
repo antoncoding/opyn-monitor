@@ -48,7 +48,7 @@ export const getVaultsWithLiquidatable = async(vaults, oToken) => {
     vault.maxLiquidatable = maxLiquidatable
     return vault
   })
-  return NewVaults
+  return NewVaults.sort(compare);
 }
 
 /**
@@ -74,13 +74,13 @@ export const getTotalSupply = async (address) => {
 };
 
 function compare(ownerA, ownerB) {
-  const amountA = ownerA.maxLiquidatable;
-  const amountB = ownerB.maxLiquidatable;
+  const rateA = ownerA.ratio;
+  const rateB = ownerB.ratio;
 
   let comparison = 0;
-  if (amountA > amountB) {
+  if (rateA > rateB) {
     comparison = 1;
-  } else if (amountA < amountB) {
+  } else if (rateA < rateB) {
     comparison = -1;
   }
   return comparison;
