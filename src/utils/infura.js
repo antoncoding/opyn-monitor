@@ -15,5 +15,18 @@ export const getLiquidationInfo = async(owners) => {
       maxLiquidatable
     }
   })
-  return info
+  return info.sort(compare).reverse()
+}
+
+function compare(ownerA, ownerB) {
+  const amountA = ownerA.maxLiquidatable;
+  const amountB = ownerB.maxLiquidatable;
+
+  let comparison = 0;
+  if (amountA > amountB) {
+    comparison = 1;
+  } else if (amountA < amountB) {
+    comparison = -1;
+  }
+  return comparison;
 }
