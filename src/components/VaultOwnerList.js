@@ -5,20 +5,20 @@ import { LoadingRing,
   IdentityBadge,
 } from '@aragon/ui'
 import { getAllVaultOwners } from '../utils/graph'
-import { getLiquidationInfo } from '../utils/infura'
+import { getVaults } from '../utils/infura'
 import { liquidate } from '../utils/web3'
 class VaultOwnerList extends Component {
 
   state = {
     isLoading: true,
-    owners: []
+    vaults: [] // { account, maxLiquidatable } []
   }
 
   componentDidMount = async() => {
     const ownerAddrs = await getAllVaultOwners()
-    const owners = await getLiquidationInfo(ownerAddrs)
+    const vaults = await getVaults(ownerAddrs)
     this.setState({
-      owners,
+      vaults,
       isLoading: false
     })
   }
@@ -27,14 +27,16 @@ class VaultOwnerList extends Component {
     return (
       this.state.isLoading?  <LoadingRing/> : 
       <DataView
-      fields={['Owner', 'Max oToken Liquidatable']}
-      entries={ this.state.owners }
-      renderEntry={({ account, maxLiquidatable }) => {
+      fields={['Owner', 'Status']}
+      entries={ this.state.vaults }
+      renderEntry={({ owner, maxLiquidatable }) => {
         return [
-        <IdentityBadge entity={account} shorten={false} />, 
+        <IdentityBadge entity={owner} shorten={false} />, 
         maxLiquidatable > 0 ?
-        <Button onClick={ ()=> liquidate(account, maxLiquidatable)} >{maxLiquidatable}</Button> :
-        <div> {maxLiquidatable} </div>
+        <Button onClick={ ()=> liquidate(owner, maxLiquidatable)} >
+          Can Liquidate {maxLiquidatable}
+        </Button> :
+        <div> safe </div>
       ]
       }}
       />

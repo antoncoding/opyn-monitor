@@ -1,4 +1,4 @@
-const prefix = 'https://cors-anywhere.herokuapp.com/';
+const prefix = 'https://cors-anywhere-anton.herokuapp.com/';
 const opynGraphEndpoint = 'https://api.thegraph.com/subgraphs/name/aparnakr/opyn'
 
 /**
