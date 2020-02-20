@@ -26,6 +26,21 @@ export const getVaults = async(owners) => {
   return vaults.sort(compare).reverse()
 }
 
+/**
+ * Get balance of accounts
+ * @param {string} address 
+ */
+export const getBalance = async(address) => {
+  const balance = await web3.eth.getBalance(address)
+  return web3.utils.fromWei(balance)
+}
+
+export const getTotalSupply = async(address) => {
+  const token = new web3.eth.Contract(OTOKEN_ABI, address)
+  const totalSupply = await token.methods.totalSupply().call()
+  const decimals = await token.methods.decimals().call()
+  return parseInt(totalSupply)/10**parseInt(decimals)
+}
 
 function compare(ownerA, ownerB) {
   const amountA = ownerA.maxLiquidatable;
