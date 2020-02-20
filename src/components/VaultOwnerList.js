@@ -4,7 +4,7 @@ import { LoadingRing,
   IdentityBadge,
 } from '@aragon/ui'
 import { getAllVaultOwners } from '../utils/graph'
-
+import { getLiquidationInfo } from '../utils/infura'
 class VaultOwnerList extends Component {
 
   state = {
@@ -13,7 +13,8 @@ class VaultOwnerList extends Component {
   }
 
   componentDidMount = async() => {
-    const owners = await getAllVaultOwners()
+    const ownerAddrs = await getAllVaultOwners()
+    const owners = await getLiquidationInfo(ownerAddrs)
     this.setState({
       owners,
       isLoading: false
@@ -25,14 +26,10 @@ class VaultOwnerList extends Component {
     return (
       this.state.isLoading?  <LoadingRing/> : 
       <DataView
-      fields={['Owner', 'Status']}
-      entries={
-        this.state.owners.map(owner => { return {
-          account: owner, status: "Safe"
-        } })
-    }
-      renderEntry={({ account, status }) => {
-        return [<IdentityBadge entity={account} />, <div>{status}</div>]
+      fields={['Owner', 'Max oToken Liquidatable']}
+      entries={ this.state.owners }
+      renderEntry={({ account, maxLiquidatable }) => {
+        return [<IdentityBadge entity={account} shorten={false} />, <div>{maxLiquidatable}</div>]
       }}
       />
     
