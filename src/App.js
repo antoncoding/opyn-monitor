@@ -1,23 +1,19 @@
 import React from 'react';
-import { getAllVaultOwners } from './utils/graph'
+
+import { Main, Header } from '@aragon/ui'
+import VaultOwnerList from './components/VaultOwnerList'
+import ConnectButton from './components/ConnectButton'
 import './App.css';
 
 function App() {
-
-  const onClickSearch = async () => {
-    const owners = await getAllVaultOwners()
-    console.log(`owners = ${owners}`)
-  }
-
   return (
-    <div className="App">
-      <header className="App-header">
-        <h3>
-          Opyn Liquidator
-        </h3>
-        <button onClick = {onClickSearch}> Search </button>
-      </header>
-    </div>
+    <Main>
+      <Header
+        primary="Opyn Liquidator"
+        secondary={<ConnectButton />}
+      />
+      <VaultOwnerList/>
+    </Main>
   );
 }
 
