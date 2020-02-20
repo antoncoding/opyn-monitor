@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { Box, Split } from '@aragon/ui';
 // import { getAllVaultOwners } from '../utils/graph'
-import { getBalance, getTotalSupply } from '../utils/infura';
+import { getOptionContractDetail } from '../utils/infura';
 // import { liquidate } from '../utils/web3'
 
 class VaultBox extends Component {
@@ -11,11 +11,8 @@ class VaultBox extends Component {
   };
 
   async componentDidMount() {
-    const [balance, supply] = await Promise.all([
-      getBalance(this.props.tokenAddress),
-      getTotalSupply(this.props.tokenAddress),
-    ]);
-    this.setState({ balance, supply });
+    const { balance, totalSupply } = await getOptionContractDetail(this.props.oToken)
+    this.setState({ balance, supply: totalSupply });
   }
 
   render() {

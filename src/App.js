@@ -7,7 +7,7 @@ import ConnectButton from './components/ConnectButton'
 import './App.css';
 
 import { mainnet } from './constants/addresses'
-
+import { mainnet as mainnetParams } from './constants/parameters'
 function App() {
   return (
     <Main>
@@ -16,9 +16,15 @@ function App() {
         secondary={<ConnectButton />}
       />
       <Overview
-        tokenAddress={mainnet.ocDAI}
+        oToken={mainnet.ocDAI}
       />
-      <VaultOwnerList/>
+      <VaultOwnerList
+        oToken={mainnet.ocDAI}
+        decimals={mainnetParams.ocDAI.decimals}
+        underlying={mainnetParams.ocDAI.underlying}
+        minRatio={mainnetParams.ocDAI.minCollateralizationRatio}
+        oracle={mainnetParams.ocDAI.oracle}
+      />
     </Main>
   );
 }
