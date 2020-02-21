@@ -1,8 +1,6 @@
 import React, { Component } from 'react';
 import { Box, Split } from '@aragon/ui';
-// import { getAllVaultOwners } from '../utils/graph'
 import { getOptionContractDetail } from '../utils/infura';
-// import { liquidate } from '../utils/web3'
 
 class VaultBox extends Component {
   state = {
@@ -25,7 +23,7 @@ class VaultBox extends Component {
         }
         secondary={
           <Box heading={'supply'} padding={30}>
-            {this.state.supply} ocDai
+            {this.state.supply} {this.props.tokenName}
           </Box>
         }
       />

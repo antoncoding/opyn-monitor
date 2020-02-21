@@ -1,6 +1,8 @@
 import Web3 from 'web3';
 import { oToken as OTOKEN_ABI, oracle as ORACLE_ABI } from '../constants/abi';
 
+import { formatDigits } from './common'
+
 const Promise = require('bluebird');
 const web3 = new Web3('https://mainnet.infura.io/v3/44fd23cda65746a699a5d3c0e2fa45d5');
 
@@ -26,7 +28,7 @@ export const getVaults = async (owners, oToken) => {
 
   const vaults = await Promise.map(owners, async (owner) => {
     const res = await oTokenContract.methods.getVault(owner).call();
-    const collateral = web3.utils.fromWei(res[0]);
+    const collateral = formatDigits(web3.utils.fromWei(res[0]), 6);
     const oTokensIssued = res[1];
     const underlying = res[2];
     const owned = res[3];

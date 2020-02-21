@@ -1,8 +1,9 @@
 import React, { Component } from 'react';
-import { LoadingRing, DataView, Button, IdentityBadge } from '@aragon/ui';
+import { Tag, DataView, Button, IdentityBadge } from '@aragon/ui';
 import { getAllVaultOwners } from '../utils/graph';
 import { getVaults, getPrice, getVaultsWithLiquidatable } from '../utils/infura';
 import { liquidate } from '../utils/web3';
+import { formatDigits } from '../utils/common'
 class VaultOwnerList extends Component {
   state = {
     isLoading: true,
@@ -17,9 +18,9 @@ class VaultOwnerList extends Component {
     const underlyingPrice = await getPrice(this.props.oracle, this.props.underlying);
 
     const vaultDetail = vaults.map((vault) => {
-      const oTokensIssued = parseInt(vault.oTokensIssued) / 10 ** this.props.decimals;
+      const oTokensIssued = formatDigits((parseInt(vault.oTokensIssued) / 10 ** this.props.decimals), 4);
       const valueProtectingInEth = parseFloat(underlyingPrice) * oTokensIssued;
-      const ratio = parseFloat(vault.collateral) / valueProtectingInEth;
+      const ratio = formatDigits(parseFloat(vault.collateral) / valueProtectingInEth, 4);
       vault.oTokensIssued = oTokensIssued;
       vault.ratio = ratio;
       vault.isSafe = ratio > this.props.minRatio;
@@ -27,7 +28,6 @@ class VaultOwnerList extends Component {
     });
 
     const vaultWithLiquidatable = await getVaultsWithLiquidatable(vaultDetail);
-
     this.setState({
       vaults: vaultWithLiquidatable,
       isLoading: false,
@@ -43,18 +43,18 @@ class VaultOwnerList extends Component {
         fields={['Owner', 'Collecteral', 'Issued', 'RATIO', 'Status']}
         entries={this.state.vaults}
         entriesPerPage={6}
-        renderEntry={({ owner, collateral, oTokensIssued, ratio, maxLiquidatable }) => {
+        renderEntry={({ owner, collateral, oTokensIssued, ratio, maxLiquidatable, isSafe }) => {
           return [
             <IdentityBadge entity={owner} shorten={true} />,
             collateral,
             oTokensIssued,
             ratio,
-            maxLiquidatable > 0 ? (
-              <Button onClick={() => liquidate(owner, maxLiquidatable)}>
+            isSafe ? (
+              <Tag> safe </Tag>
+            ) : (
+              <Button onClick={() => liquidate(this.props.oToken, owner, maxLiquidatable)}>
                 Can Liquidate {maxLiquidatable}
               </Button>
-            ) : (
-              <div> safe </div>
             ),
           ];
         }}

@@ -17,6 +17,7 @@ function App() {
       />
       <Overview
         oToken={mainnet.ocDAI}
+        tokenName={mainnetParams.ocDAI.tokenName}
       />
       <VaultOwnerList
         oToken={mainnet.ocDAI}
