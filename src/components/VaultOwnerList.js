@@ -1,9 +1,9 @@
 import React, { Component } from 'react';
-import { Tag, DataView, Button, IdentityBadge } from '@aragon/ui';
+import { Tag, DataView, IdentityBadge, LinkBase } from '@aragon/ui';
 import { getAllVaultOwners } from '../utils/graph';
 import { getVaults, getPrice, getVaultsWithLiquidatable } from '../utils/infura';
 import { liquidate } from '../utils/web3';
-import { formatDigits } from '../utils/common'
+import { formatDigits } from '../utils/common';
 class VaultOwnerList extends Component {
   state = {
     isLoading: true,
@@ -18,7 +18,10 @@ class VaultOwnerList extends Component {
     const underlyingPrice = await getPrice(this.props.oracle, this.props.underlying);
 
     const vaultDetail = vaults.map((vault) => {
-      const oTokensIssued = formatDigits((parseInt(vault.oTokensIssued) / 10 ** this.props.decimals), 4);
+      const oTokensIssued = formatDigits(
+        parseInt(vault.oTokensIssued) / 10 ** this.props.decimals,
+        4
+      );
       const valueProtectingInEth = parseFloat(underlyingPrice) * oTokensIssued;
       const ratio = formatDigits(parseFloat(vault.collateral) / valueProtectingInEth, 4);
       vault.oTokensIssued = oTokensIssued;
@@ -43,6 +46,7 @@ class VaultOwnerList extends Component {
         fields={['Owner', 'Collecteral', 'Issued', 'RATIO', 'Status']}
         entries={this.state.vaults}
         entriesPerPage={6}
+        // onSelectEntries={ ()=> liquidate(this.props.oToken, owner, maxLiquidatable) }
         renderEntry={({ owner, collateral, oTokensIssued, ratio, maxLiquidatable, isSafe }) => {
           return [
             <IdentityBadge entity={owner} shorten={true} />,
@@ -50,11 +54,25 @@ class VaultOwnerList extends Component {
             oTokensIssued,
             ratio,
             isSafe ? (
-              <Tag> safe </Tag>
+              ratio < 1.7 ? (
+                <Tag
+                  background='#FFEBAD'
+                  color='#FEC100'
+                > Danger </Tag>
+              ) : (
+                <Tag mode='new'> safe </Tag>
+              )
             ) : (
-              <Button onClick={() => liquidate(this.props.oToken, owner, maxLiquidatable)}>
-                Can Liquidate {maxLiquidatable}
-              </Button>
+              <LinkBase
+                onClick={() => {
+                  console.log(`can liquidate max ${maxLiquidatable}`);
+                  liquidate(this.props.oToken, owner, maxLiquidatable);
+                }}
+              >
+                <Tag color='#E34343' background='#FFC6C6'>
+                  Unsafe!
+                </Tag>
+              </LinkBase>
             ),
           ];
         }}
