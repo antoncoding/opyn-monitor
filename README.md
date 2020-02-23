@@ -1,3 +1,3 @@
 # Opyn protocol Liquidator
 
-![screenshot](https://i.imgur.com/emorhVF.png)
+![screenshot](https://i.imgur.com/jc4XwC3.png)
