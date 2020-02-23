@@ -1,7 +1,8 @@
 import Web3 from 'web3';
-import { oToken as OTOKEN_ABI, oracle as ORACLE_ABI } from '../constants/abi';
-
 import { formatDigits } from './common'
+
+const optionContractABI = require('../constants/abi/OptionContract.json')
+const oracleABI = require('../constants/abi/Oracle.json')
 
 const Promise = require('bluebird');
 const web3 = new Web3('https://mainnet.infura.io/v3/44fd23cda65746a699a5d3c0e2fa45d5');
@@ -24,7 +25,7 @@ export const getOptionContractDetail = async (oToken) => {
  * @param {string} oToken
  */
 export const getVaults = async (owners, oToken) => {
-  const oTokenContract = new web3.eth.Contract(OTOKEN_ABI, oToken);
+  const oTokenContract = new web3.eth.Contract(optionContractABI, oToken);
 
   const vaults = await Promise.map(owners, async (owner) => {
     const res = await oTokenContract.methods.getVault(owner).call();
@@ -33,13 +34,13 @@ export const getVaults = async (owners, oToken) => {
     const underlying = res[2];
     const owned = res[3];
     return { collateral, oTokensIssued, underlying, owned, owner };
-  }).filter((vault) => vault.owned && vault.collateral > 0)
+  }).filter((vault) => vault.owned && parseFloat(vault.collateral) > 0)
   
     return vaults 
 };
 
 export const getVaultsWithLiquidatable = async(vaults, oToken) => {
-  const oTokenContract = new web3.eth.Contract(OTOKEN_ABI, oToken);
+  const oTokenContract = new web3.eth.Contract(optionContractABI, oToken);
   const NewVaults = await Promise.map(vaults, async(vault) => {
     let maxLiquidatable = 0
     if(vault.isUnsafe) {
@@ -63,13 +64,13 @@ export const getBalance = async (address) => {
 };
 
 export const getPrice = async (oracleAddr, token) => {
-  const oracle = new web3.eth.Contract(ORACLE_ABI, oracleAddr);
+  const oracle = new web3.eth.Contract(oracleABI, oracleAddr);
   const price = await oracle.methods.getPrice(token).call();
   return web3.utils.fromWei(price); // price base eth/ per token
 };
 
 export const getTotalSupply = async (address) => {
-  const token = new web3.eth.Contract(OTOKEN_ABI, address);
+  const token = new web3.eth.Contract(optionContractABI, address);
   const totalSupply = await token.methods.totalSupply().call();
   const decimals = await token.methods.decimals().call();
   return parseInt(totalSupply) / 10 ** parseInt(decimals);
