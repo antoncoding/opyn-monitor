@@ -1,9 +1,9 @@
 import React from 'react';
 
-import { Main, Header } from '@aragon/ui'
+import { Main } from '@aragon/ui'
 import VaultOwnerList from './components/VaultOwnerList'
 import Overview from './components/VaultInfoBox'
-import ConnectButton from './components/ConnectButton'
+// import ConnectButton from './components/ConnectButton'
 import './App.css';
 
 import { mainnet } from './constants/addresses'
@@ -11,10 +11,6 @@ import { mainnet as mainnetParams } from './constants/parameters'
 function App() {
   return (
     <Main>
-      <Header
-        primary={ "Opyn ocDai Monitor"}
-        secondary={<ConnectButton />}
-      />
       <Overview
         oToken={mainnet.ocDAI}
         tokenName={mainnetParams.ocDAI.tokenName}

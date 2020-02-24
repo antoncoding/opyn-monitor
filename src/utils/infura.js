@@ -12,8 +12,13 @@ const web3 = new Web3('https://mainnet.infura.io/v3/44fd23cda65746a699a5d3c0e2fa
  * @param {*} oToken
  */
 export const getOptionContractDetail = async (oToken) => {
-  const [balance, totalSupply] = await Promise.all([getBalance(oToken), getTotalSupply(oToken)]);
+  const [name, balance, totalSupply] = await Promise.all([
+    getOptionName(oToken),
+    getBalance(oToken), 
+    getTotalSupply(oToken)]
+  );
   return {
+    name,
     balance,
     totalSupply,
   };
@@ -52,6 +57,13 @@ export const getVaultsWithLiquidatable = async(vaults, oToken) => {
     return vault
   })
   return NewVaults.sort(compare);
+}
+
+export const getOptionName = async(address) => {
+  const token = new web3.eth.Contract(optionContractABI, address);
+  const name = await token.methods.name().call();
+  // const name = await web3.eth.name.call();
+  return name
 }
 
 /**
