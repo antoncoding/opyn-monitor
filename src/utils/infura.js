@@ -12,15 +12,20 @@ const web3 = new Web3('https://mainnet.infura.io/v3/44fd23cda65746a699a5d3c0e2fa
  * @param {*} oToken
  */
 export const getOptionContractDetail = async (oToken) => {
-  const [name, balance, totalSupply] = await Promise.all([
-    getOptionName(oToken),
+  const [tokenInfo, balance, optionInfo] = await Promise.all([
+    getERC20Info(oToken),
     getBalance(oToken), 
-    getTotalSupply(oToken)]
+    getAssetsAndOracle(oToken)]
   );
   return {
-    name,
+    name: tokenInfo.name,
+    decimals: tokenInfo.decimals,
+    totalSupply: tokenInfo.totalSupply,
+    oracle: optionInfo.oracle,
+    underlying: optionInfo.underlying,
+    strike: optionInfo.strike,
+    minRatio: optionInfo.minRatio,
     balance,
-    totalSupply,
   };
 };
 
@@ -59,11 +64,25 @@ export const getVaultsWithLiquidatable = async(vaults, oToken) => {
   return NewVaults.sort(compare);
 }
 
-export const getOptionName = async(address) => {
+export const getERC20Info = async(address) => {
   const token = new web3.eth.Contract(optionContractABI, address);
   const name = await token.methods.name().call();
-  // const name = await web3.eth.name.call();
-  return name
+  const totalSupplyDecimals = await token.methods.totalSupply().call();
+  const decimals = await token.methods.decimals().call();
+  const totalSupply = parseInt(totalSupplyDecimals) / 10 ** parseInt(decimals);
+  return { name, decimals, totalSupply }
+}
+
+export const getAssetsAndOracle = async(address) => {
+  const token = new web3.eth.Contract(optionContractABI, address);
+  const [oracle, underlying, strike, minRatioObj] = await Promise.all([
+    token.methods.COMPOUND_ORACLE().call(),
+    token.methods.underlying().call(),
+    token.methods.strike().call(),
+    token.methods.minCollateralizationRatio().call()
+  ]) 
+  const minRatio =  minRatioObj[0] * (10 ** minRatioObj[1])
+  return { oracle, underlying, strike, minRatio }
 }
 
 /**
@@ -81,12 +100,6 @@ export const getPrice = async (oracleAddr, token) => {
   return web3.utils.fromWei(price); // price base eth/ per token
 };
 
-export const getTotalSupply = async (address) => {
-  const token = new web3.eth.Contract(optionContractABI, address);
-  const totalSupply = await token.methods.totalSupply().call();
-  const decimals = await token.methods.decimals().call();
-  return parseInt(totalSupply) / 10 ** parseInt(decimals);
-};
 
 function compare(ownerA, ownerB) {
   const rateA = ownerA.ratio;
