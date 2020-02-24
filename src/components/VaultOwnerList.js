@@ -46,7 +46,6 @@ class VaultOwnerList extends Component {
         fields={['Owner', 'Collecteral', 'Issued', 'RATIO', 'Status']}
         entries={this.state.vaults}
         entriesPerPage={6}
-        // onSelectEntries={ ()=> liquidate(this.props.oToken, owner, maxLiquidatable) }
         renderEntry={({ owner, collateral, oTokensIssued, ratio, maxLiquidatable, isSafe }) => {
           return [
             <IdentityBadge entity={owner} shorten={true} />,
