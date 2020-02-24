@@ -1,9 +1,15 @@
 import React, { Component } from 'react';
 import { Tag, DataView, IdentityBadge, LinkBase } from '@aragon/ui';
-import { getAllVaultOwners } from '../utils/graph';
-import { getVaults, getPrice, getVaultsWithLiquidatable } from '../utils/infura';
-import { liquidate } from '../utils/web3';
-import { formatDigits } from '../utils/common';
+import { getAllVaultOwners } from '../../utils/graph';
+import {
+  getOptionContractDetail,
+  getVaults,
+  getPrice,
+  getVaultsWithLiquidatable,
+} from '../../utils/infura';
+import { liquidate } from '../../utils/web3';
+import { formatDigits } from '../../utils/common';
+
 class VaultOwnerList extends Component {
   state = {
     isLoading: true,
@@ -13,20 +19,20 @@ class VaultOwnerList extends Component {
 
   componentDidMount = async () => {
     const owners = await getAllVaultOwners();
+    const { oracle, underlying, decimals, minRatio } = await getOptionContractDetail(
+      this.props.oToken
+    );
     const vaults = await getVaults(owners, this.props.oToken);
 
-    const underlyingPrice = await getPrice(this.props.oracle, this.props.underlying);
+    const underlyingPrice = await getPrice(oracle, underlying);
 
     const vaultDetail = vaults.map((vault) => {
-      const oTokensIssued = formatDigits(
-        parseInt(vault.oTokensIssued) / 10 ** this.props.decimals,
-        4
-      );
+      const oTokensIssued = formatDigits(parseInt(vault.oTokensIssued) / 10 ** decimals, 4);
       const valueProtectingInEth = parseFloat(underlyingPrice) * oTokensIssued;
       const ratio = formatDigits(parseFloat(vault.collateral) / valueProtectingInEth, 4);
       vault.oTokensIssued = oTokensIssued;
       vault.ratio = ratio;
-      vault.isSafe = ratio > this.props.minRatio;
+      vault.isSafe = ratio > minRatio;
       return vault;
     });
 
@@ -54,10 +60,10 @@ class VaultOwnerList extends Component {
             ratio,
             isSafe ? (
               ratio < 1.7 ? (
-                <Tag
-                  background='#FFEBAD'
-                  color='#FEC100'
-                > Danger </Tag>
+                <Tag background='#FFEBAD' color='#FEC100'>
+                  {' '}
+                  Danger{' '}
+                </Tag>
               ) : (
                 <Tag mode='new'> safe </Tag>
               )
