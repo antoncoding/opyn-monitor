@@ -24,6 +24,7 @@ export const getOptionContractDetail = async (oToken) => {
     oracle: optionInfo.oracle,
     underlying: optionInfo.underlying,
     strike: optionInfo.strike,
+    strikePrice: optionInfo.strikePrice,
     minRatio: optionInfo.minRatio,
     balance,
   };
@@ -75,14 +76,22 @@ export const getERC20Info = async(address) => {
 
 export const getAssetsAndOracle = async(address) => {
   const token = new web3.eth.Contract(optionContractABI, address);
-  const [oracle, underlying, strike, minRatioObj] = await Promise.all([
+  const [
+    oracle, 
+    underlying, 
+    strike, 
+    minRatioObj, 
+    strikePriceObj
+  ] = await Promise.all([
     token.methods.COMPOUND_ORACLE().call(),
     token.methods.underlying().call(),
     token.methods.strike().call(),
-    token.methods.minCollateralizationRatio().call()
+    token.methods.minCollateralizationRatio().call(),
+    token.methods.strikePrice().call()
   ]) 
+  const strikePrice = strikePriceObj[0] * (10 ** strikePriceObj[1])
   const minRatio =  minRatioObj[0] * (10 ** minRatioObj[1])
-  return { oracle, underlying, strike, minRatio }
+  return {  underlying, strike, minRatio, strikePrice, oracle }
 }
 
 /**

@@ -13,23 +13,26 @@ import { formatDigits } from '../../utils/common';
 class VaultOwnerList extends Component {
   state = {
     isLoading: true,
-    underlyingPrice: '0',
+    strikePrice: '0',
     vaults: [], // { account, maxLiquidatable, collateral, oTokensIssued, ratio } []
   };
 
   componentDidMount = async () => {
     const owners = await getAllVaultOwners();
-    const { oracle, underlying, decimals, minRatio } = await getOptionContractDetail(
+    const { strike, decimals, minRatio, strikePrice, oracle } = await getOptionContractDetail(
       this.props.oToken
     );
     const vaults = await getVaults(owners, this.props.oToken);
 
-    const underlyingPrice = await getPrice(oracle, underlying);
-
+    const ethValueInStrike = 1 / (await getPrice(oracle, strike));
     const vaultDetail = vaults.map((vault) => {
+      const valueProtectingInEth = parseFloat(strikePrice) * vault.oTokensIssued;
+      const ratio = formatDigits(
+        (parseFloat(vault.collateral) * ethValueInStrike) / valueProtectingInEth,
+        4
+      );
+
       const oTokensIssued = formatDigits(parseInt(vault.oTokensIssued) / 10 ** decimals, 4);
-      const valueProtectingInEth = parseFloat(underlyingPrice) * oTokensIssued;
-      const ratio = formatDigits(parseFloat(vault.collateral) / valueProtectingInEth, 4);
       vault.oTokensIssued = oTokensIssued;
       vault.ratio = ratio;
       vault.isSafe = ratio > minRatio;
@@ -40,7 +43,7 @@ class VaultOwnerList extends Component {
     this.setState({
       vaults: vaultWithLiquidatable,
       isLoading: false,
-      underlyingPrice,
+      strikePrice,
     });
   };
 
