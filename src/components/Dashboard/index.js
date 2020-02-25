@@ -7,7 +7,7 @@ import { Header, DataView, IdentityBadge, Button } from '@aragon/ui'
 function DashBoard() {
     const history = useHistory();
     const goToToken = (addr) =>{
-      history.push(`/token/${addr}`)
+      history.push(`token/${addr}`)
     }
     return (
       <>
