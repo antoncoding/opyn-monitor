@@ -15,7 +15,7 @@ function App() {
     <Main>
       <Router>
         <Switch>
-          <Route path='/token/:addr' children={<TokenView/>}/>
+          <Route path='token/:addr' children={<TokenView/>}/>
           <Route path='/' children={<Dashboard/>}/>
         </Switch>
       </Router>
