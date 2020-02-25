@@ -16,7 +16,7 @@
     "styled-components": "^5.0.1",
     "web3": "^1.2.6"
   },
-  "homepage": "https://antoncoding.github.io/opyn-liquidator",
+  "homepage": "https://antoncoding.github.io/opyn-liquidator/",
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
