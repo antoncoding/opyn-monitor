@@ -11,13 +11,14 @@ function DashBoard() {
     }
     return (
       <>
-        <Header primary='All Opyn Options' />
+        <Header primary='All Insurances' />
         <DataView
-        fields={['Contract', 'Detail']}
+        fields={[ 'Name', 'Contract', 'Detail']}
         entries={supportedList}
         entriesPerPage={6}
-        renderEntry={( addr ) => {
+        renderEntry={( {addr, name} ) => {
           return [
+            <>{name}</>,
             <IdentityBadge entity={addr} shorten={false} />,
             <Button onClick={() => goToToken(addr)}> Manage </Button>
           ];
