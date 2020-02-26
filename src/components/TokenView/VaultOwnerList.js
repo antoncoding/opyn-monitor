@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { Tag, DataView, IdentityBadge, LinkBase } from '@aragon/ui';
+import PositsionModal from './ManageModal'
 import { getAllVaultOwners } from '../../utils/graph';
 import {
   getOptionContractDetail,
@@ -35,7 +36,7 @@ class VaultOwnerList extends Component {
       const oTokensIssued = formatDigits(parseInt(vault.oTokensIssued) / 10 ** decimals, 4);
       vault.oTokensIssued = oTokensIssued;
       vault.ratio = ratio;
-      vault.isSafe = ratio > minRatio;
+      vault.isSafe = ratio >   minRatio;
       return vault;
     });
 
@@ -52,7 +53,7 @@ class VaultOwnerList extends Component {
       <DataView
         heading={<h3> All Vaults </h3>}
         status={this.state.isLoading ? 'loading' : 'default'}
-        fields={['Owner', 'Collecteral', 'Issued', 'RATIO', 'Status']}
+        fields={['Owner', 'collateral', 'Issued', 'RATIO', 'Status', 'Manage']}
         entries={this.state.vaults}
         entriesPerPage={6}
         renderEntry={({ owner, collateral, oTokensIssued, ratio, isSafe }) => {
@@ -71,17 +72,25 @@ class VaultOwnerList extends Component {
                 <Tag mode='new'> safe </Tag>
               )
             ) : (
-              <LinkBase
-                onClick={() => {
+              // <LinkBase
+                // onClick={() => {
                   // console.log(`can liquidate max ${maxLiquidatable}`);
-                  liquidate(this.props.oToken, owner);
-                }}
-              >
+                  // liquidate(this.props.oToken, owner);
+                // }}
+              // >
                 <Tag color='#E34343' background='#FFC6C6'>
                   Unsafe!
                 </Tag>
-              </LinkBase>
+              // </LinkBase>
             ),
+            <PositsionModal 
+              tokenAddress={this.props.oToken}
+              vaultOwner={owner} 
+              collateral={collateral} 
+              isSafe={isSafe}
+              oTokensIssued={oTokensIssued}
+              ratio={ratio}
+            />
           ];
         }}
       />

@@ -65,6 +65,34 @@ export const getVaultsWithLiquidatable = async(vaults, oToken) => {
   return NewVaults.sort(compare);
 }
 
+export const getMaxLiquidatable = async(oToken, owner, liquidator) => {
+  const oTokenContract = new web3.eth.Contract(optionContractABI, oToken);
+  const maxVaultLiquidatable =  await oTokenContract.methods
+    .maxOTokensLiquidatable(owner)
+    .call();
+      
+  const userbalance = liquidator 
+    ? await oTokenContract.methods.balanceOf(liquidator).call()
+    : 0
+
+  console.log(`max liquidatable`, maxVaultLiquidatable)
+  console.log(`userb`, userbalance)
+    
+  const maxLiquidatable = Math.min(
+      parseInt(userbalance, 10), 
+      parseInt(maxVaultLiquidatable, 10)
+  ).toString();
+  
+  return  parseInt(maxLiquidatable)
+  
+}
+
+export const getDecimals = async(oToken) => {
+  const oTokenContract = new web3.eth.Contract(optionContractABI, oToken);
+  const decimals = await oTokenContract.methods.decimals().call()
+  return parseInt(decimals)
+}
+
 export const getERC20Info = async(address) => {
   const token = new web3.eth.Contract(optionContractABI, address);
   const name = await token.methods.name().call();
