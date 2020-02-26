@@ -18,8 +18,9 @@
   },
   "homepage": "https://antoncoding.github.io/opyn-liquidator/",
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
+    "sync-assets": "copy-aragon-ui-assets ./public",
+    "start": "npm run sync-assets && react-scripts start",
+    "build": "npm run sync-assets && react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "predeploy": "npm run build",

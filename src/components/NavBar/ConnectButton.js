@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Button, IdentityBadge } from '@aragon/ui';
+import { Button, IdentityBadge, IconConnect } from '@aragon/ui';
 
 class ConnectButton extends Component {
   constructor(props) {
@@ -21,9 +21,14 @@ class ConnectButton extends Component {
 
   render() {
     return this.state.isConnected ? (
-      <IdentityBadge entity={this.state.account} connectedAccount />
+      <Button>
+        <IdentityBadge entity={this.state.account} connectedAccount />
+      </Button>
     ) : (
-      <Button onClick={this.connectWeb3}> Connect </Button>
+      <Button 
+        icon={<IconConnect/>} 
+        label={'Connect'} 
+        onClick={this.connectWeb3}/> 
     );
   }
 }
