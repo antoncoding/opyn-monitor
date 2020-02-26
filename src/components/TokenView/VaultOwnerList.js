@@ -1,6 +1,11 @@
 import React, { Component } from 'react';
-import { Tag, DataView, IdentityBadge, LinkBase } from '@aragon/ui';
-import PositsionModal from './ManageModal'
+import {
+  Tag,
+  DataView,
+  IdentityBadge,
+  // LinkBase
+} from '@aragon/ui';
+import PositsionModal from './ManageModal';
 import { getAllVaultOwners } from '../../utils/graph';
 import {
   getOptionContractDetail,
@@ -8,7 +13,7 @@ import {
   getPrice,
   getVaultsWithLiquidatable,
 } from '../../utils/infura';
-import { liquidate } from '../../utils/web3';
+// import { liquidate } from '../../utils/web3';
 import { formatDigits } from '../../utils/common';
 
 class VaultOwnerList extends Component {
@@ -36,7 +41,7 @@ class VaultOwnerList extends Component {
       const oTokensIssued = formatDigits(parseInt(vault.oTokensIssued) / 10 ** decimals, 4);
       vault.oTokensIssued = oTokensIssued;
       vault.ratio = ratio;
-      vault.isSafe = ratio >   minRatio;
+      vault.isSafe = ratio > minRatio;
       return vault;
     });
 
@@ -72,25 +77,18 @@ class VaultOwnerList extends Component {
                 <Tag mode='new'> safe </Tag>
               )
             ) : (
-              // <LinkBase
-                // onClick={() => {
-                  // console.log(`can liquidate max ${maxLiquidatable}`);
-                  // liquidate(this.props.oToken, owner);
-                // }}
-              // >
-                <Tag color='#E34343' background='#FFC6C6'>
-                  Unsafe!
-                </Tag>
-              // </LinkBase>
+              <Tag color='#E34343' background='#FFC6C6'>
+                Unsafe!
+              </Tag>
             ),
-            <PositsionModal 
+            <PositsionModal
               tokenAddress={this.props.oToken}
-              vaultOwner={owner} 
-              collateral={collateral} 
+              vaultOwner={owner}
+              collateral={collateral}
               isSafe={isSafe}
               oTokensIssued={oTokensIssued}
               ratio={ratio}
-            />
+            />,
           ];
         }}
       />

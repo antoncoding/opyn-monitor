@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import { Box, Split, Header, IdentityBadge } from '@aragon/ui';
-// import ConnectButton from '../NavBar/ConnectButton';
 import { getOptionContractDetail } from '../../utils/infura';
 
 class VaultBox extends Component {
@@ -18,8 +17,8 @@ class VaultBox extends Component {
   render() {
     return (
       <>
-        <Header primary={this.state.name} 
-        // secondary={<ConnectButton />} 
+        <Header
+          primary={this.state.name}
         />
         <Split
           primary={
