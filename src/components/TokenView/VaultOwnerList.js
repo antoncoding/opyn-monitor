@@ -55,7 +55,7 @@ class VaultOwnerList extends Component {
         fields={['Owner', 'Collecteral', 'Issued', 'RATIO', 'Status']}
         entries={this.state.vaults}
         entriesPerPage={6}
-        renderEntry={({ owner, collateral, oTokensIssued, ratio, maxLiquidatable, isSafe }) => {
+        renderEntry={({ owner, collateral, oTokensIssued, ratio, isSafe }) => {
           return [
             <IdentityBadge entity={owner} shorten={true} />,
             collateral,
@@ -73,8 +73,8 @@ class VaultOwnerList extends Component {
             ) : (
               <LinkBase
                 onClick={() => {
-                  console.log(`can liquidate max ${maxLiquidatable}`);
-                  liquidate(this.props.oToken, owner, maxLiquidatable);
+                  // console.log(`can liquidate max ${maxLiquidatable}`);
+                  liquidate(this.props.oToken, owner);
                 }}
               >
                 <Tag color='#E34343' background='#FFC6C6'>

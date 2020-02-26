@@ -2,10 +2,12 @@ import Web3 from 'web3'
 import { notify } from './blockNative'
 const oTokenABI = require('../constants/abi/OptionContract.json')
 
-export const liquidate = async(oTokenAddr, owner, maxLiquidatable) => {
+export const liquidate = async(oTokenAddr, owner) => {
+  
   const accounts = await window.ethereum.enable();
   const web3 = new Web3(window.ethereum);
   const oToken = new web3.eth.Contract(oTokenABI, oTokenAddr)
+  const maxLiquidatable = await oToken.methods.maxOTokensLiquidatable(owner).call();
   const userbalance = await oToken.methods.balanceOf(accounts[0]).call()
   const maxToSend = Math.min(
       parseInt(userbalance, 10), 
