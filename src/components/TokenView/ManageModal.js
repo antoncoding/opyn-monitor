@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
 
-import { addETHCollateral, liquidate, getAccounts } from '../../utils/web3';
-import { getMaxLiquidatable, getDecimals } from '../../utils/infura';
+import {  addETHCollateral, burnOToken } from '../../utils/web3';
+
+import { getDecimals } from '../../utils/infura';
+import { createTag } from './common'
 
 import {
   Button,
@@ -10,41 +12,53 @@ import {
   TextInput,
   IdentityBadge,
   IconEthereum,
-  IconFundraising,
+  IconCirclePlus,
+  IconCircleMinus,
+  Header,
+  DataView,
+  Split
 } from '@aragon/ui';
 
-function PositionModal({ tokenAddress, vaultOwner, collateral, isSafe, oTokensIssued, ratio }) {
+function ManageModal({ oToken, owner, collateral, isSafe, oTokensIssued, ratio }) {
   const [opened, setOpened] = useState(false);
-  const [decimals, setTokenDecimals] = useState(0)
   const [addValue, setAddValue] = useState(0);
-  const [liquidateAmt, setLiquidateAmt] = useState(0);
+
+  const [decimals, setTokenDecimals] = useState(0)
+  const [burnAmt, setBurnAmt] = useState(0);
   const open = () => setOpened(true);
   const close = () => setOpened(false);
 
   useEffect(
     () =>
       async function() {
-        const accounts = await getAccounts();
-        const maxLiquidatable = await getMaxLiquidatable(tokenAddress, vaultOwner, accounts[0]);
-        const _decimals = await getDecimals(tokenAddress)
+        const _decimals = await getDecimals(oToken)
         setTokenDecimals(_decimals)
-        setLiquidateAmt(maxLiquidatable / 10 ** _decimals );
       }
   );
 
   return (
     <>
-      <Button onClick={open} label='Manage'></Button>
-      <Modal 
-        width={Math.min(window.innerWidth - 48, 750)}
-      padding={50} visible={opened} onClose={close}>
+    <Button onClick={open} label='Manage'></Button>
+    <Modal width={800} padding={50} visible={opened} onClose={close}>
+      <Header> Manage My Position </Header>
         <Box heading={'Owner'}>
-          <IdentityBadge entity={vaultOwner} shorten={false} />
+          <IdentityBadge entity={owner} shorten={false} />
         </Box>
+        <DataView
+          fields={['Collateral', 'Issued', 'ratio', 'Status']}
+          entries={[{ collateral, isSafe, oTokensIssued, ratio }]}
+          entriesPerPage={1}
+          renderEntry={({ collateral, isSafe, oTokensIssued, ratio }) => {
+            return [collateral, oTokensIssued, ratio, createTag(isSafe, ratio)];
+          }}
+        />
         <br></br>
-        <Box heading={'Add Collateral'}>
-          <TextInput
+        <Box heading={ <> Increase Ratio <IconCirclePlus/>  </> }>
+        <Split
+          primary={
+            <TextInput
             type='number'
+            wide={true}
             adornment={<IconEthereum />}
             adornmentPosition='end'
             value={addValue}
@@ -52,36 +66,47 @@ function PositionModal({ tokenAddress, vaultOwner, collateral, isSafe, oTokensIs
               setAddValue(event.target.value);
             }}
           />
-          <Button
-            label='Add Collateral'
+          }
+          secondary={
+            <Button
+            wide={true}
+            label= {'Add Collateral'}
             onClick={() => {
-              addETHCollateral(tokenAddress, vaultOwner, addValue);
+              addETHCollateral(oToken, owner, addValue);
             }}
           />
-        </Box>
+          }
+        />
 
-        <br></br>
-        <Box heading={'Liquidate'}>
-          <TextInput
+        <Split
+          primary={
+            <TextInput
             type='number'
-            adornment={<IconFundraising />}
+            wide={true}
+            adornment={<IconCircleMinus />}
             adornmentPosition='end'
-            value={ liquidateAmt }
+            value={burnAmt}
             onChange={(event) => {
-              setLiquidateAmt(event.target.value);
+              setBurnAmt(event.target.value);
             }}
           />
-          <Button
-            disabled={isSafe}
-            label='Liquidate'
+          }
+          secondary={
+            <Button
+            wide={true}
+            label='Burn oToken'
             onClick={() => {
-              liquidate(tokenAddress, vaultOwner, liquidateAmt * (10 ** decimals) );
+              burnOToken(oToken, burnAmt*10**decimals);
             }}
           />
+          }
+        />
+          
         </Box>
+        
       </Modal>
     </>
   );
 }
 
-export default PositionModal;
+export default ManageModal;
