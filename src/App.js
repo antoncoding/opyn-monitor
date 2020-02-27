@@ -8,11 +8,17 @@ import { Main } from '@aragon/ui';
 import './App.css';
 
 function App() {
-  const [theme, setTheme] = useState('light')
+  const storedTheme = window.localStorage.getItem('theme') || 'light'
+  const [theme, setTheme] = useState(storedTheme)
+  
+  const updateTheme = (theme) => {
+    setTheme(theme)
+    window.localStorage.setItem('theme', theme)
+  }
   return (
     <Router>
       <Main theme={theme}>
-        <NavBar theme={theme} updateTheme={setTheme}/>
+        <NavBar theme={theme} updateTheme={updateTheme}/>
 
         <Switch>
           <Route path='/token/:addr' children={<TokenView />} />

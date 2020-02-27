@@ -4,6 +4,9 @@ import { supportedList } from '../../constants/addresses';
 
 import { Header, DataView, IdentityBadge, Button } from '@aragon/ui';
 
+// import AragonUILogog from '../../aragonui.png';
+// import OpynLogo from '../../opyn.png';
+
 function DashBoard() {
   const history = useHistory();
   const goToToken = (addr) => {
