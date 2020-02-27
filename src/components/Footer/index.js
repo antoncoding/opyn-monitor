@@ -3,7 +3,6 @@ import React from 'react'
 import { Link } from '@aragon/ui'
 
 function Footer({theme}) {
-  console.log(theme)
   var style = {
     backgroundColor: theme === 'light' ? "#F8F8F8" : '#35425e' ,
     textAlign: "center",
