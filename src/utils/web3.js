@@ -8,12 +8,23 @@ export const getAccounts = async() => {
 }
 
 export const liquidate = async(oTokenAddr, owner, liquidateAmt) => {
-  
+
   const accounts = await window.ethereum.enable();
   const web3 = new Web3(window.ethereum);
   const oToken = new web3.eth.Contract(oTokenABI, oTokenAddr)
   
   await oToken.methods.liquidate(owner, liquidateAmt).send({from: accounts[0]})
+    .on('transactionHash', (hash)=>{
+      notify.hash(hash)
+    })
+}
+
+export const burnOToken = async(oTokenAddr, burnAmt) => {
+  const accounts = await window.ethereum.enable();
+  const web3 = new Web3(window.ethereum);
+  const oToken = new web3.eth.Contract(oTokenABI, oTokenAddr)
+  
+  await oToken.methods.burnOTokens(burnAmt).send({from: accounts[0]})
     .on('transactionHash', (hash)=>{
       notify.hash(hash)
     })
