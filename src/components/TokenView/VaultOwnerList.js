@@ -1,11 +1,7 @@
 import React, { Component } from 'react';
 import {
-  Tag,
-  DataView,
-  IdentityBadge,
-  // LinkBase
+  DataView
 } from '@aragon/ui';
-import PositsionModal from './ManageModal';
 import { getAllVaultOwners } from '../../utils/graph';
 import {
   getOptionContractDetail,
@@ -13,8 +9,10 @@ import {
   getPrice,
   getVaultsWithLiquidatable,
 } from '../../utils/infura';
-// import { liquidate } from '../../utils/web3';
+
+import { renderListEntry } from './common'
 import { formatDigits } from '../../utils/common';
+import MyVault from './MyVault';
 
 class VaultOwnerList extends Component {
   state = {
@@ -33,7 +31,7 @@ class VaultOwnerList extends Component {
     const { strike, decimals, minRatio, strikePrice, oracle } = await getOptionContractDetail(
       this.props.oToken
     );
-    const vaults = await getVaults(owners, this.props.oToken);
+    const vaults = await getVaults(owners, this.props.oToken)
 
     const ethValueInStrike = 1 / (await getPrice(oracle, strike));
     const vaultDetail = vaults.map((vault) => {
@@ -60,43 +58,16 @@ class VaultOwnerList extends Component {
 
   render() {
     return (
+      <>
+      <MyVault vaults={this.state.vaults} oToken={this.props.oToken} user={this.props.user} />
       <DataView
-        heading={<h3> All Vaults </h3>}
         status={this.state.isLoading ? 'loading' : 'default'}
         fields={['Owner', 'collateral', 'Issued', 'RATIO', 'Status', 'Manage']}
         entries={this.state.vaults}
-        entriesPerPage={6}
-        renderEntry={({ owner, collateral, oTokensIssued, ratio, isSafe }) => {
-          return [
-            <IdentityBadge entity={owner} shorten={true} />,
-            collateral,
-            oTokensIssued,
-            ratio,
-            isSafe ? (
-              ratio < 1.7 ? (
-                <Tag background='#FFEBAD' color='#FEC100'>
-                  {' '}
-                  Danger{' '}
-                </Tag>
-              ) : (
-                <Tag mode='new'> safe </Tag>
-              )
-            ) : (
-              <Tag color='#E34343' background='#FFC6C6'>
-                Unsafe!
-              </Tag>
-            ),
-            <PositsionModal
-              tokenAddress={this.props.oToken}
-              vaultOwner={owner}
-              collateral={collateral}
-              isSafe={isSafe}
-              oTokensIssued={oTokensIssued}
-              ratio={ratio}
-            />,
-          ];
-        }}
+        entriesPerPage={5}
+        renderEntry={renderListEntry}
       />
+      </>
     );
   }
 }

@@ -5,12 +5,12 @@ import { useParams } from 'react-router-dom';
 import VaultOwnerList from './VaultOwnerList';
 import Overview from './VaultInfoBox';
 
-function TokenView() {
+function TokenView({user}) {
   let { addr } = useParams();
   return (
     <>
-      <Overview oToken={addr} />
-      <VaultOwnerList oToken={addr} />
+      <Overview oToken={addr} user={user} />
+      <VaultOwnerList oToken={addr} user={user}/>
     </>
   );
 }
