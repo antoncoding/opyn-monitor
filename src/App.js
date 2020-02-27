@@ -33,7 +33,7 @@ function App() {
           <Route path='/' children={<Dashboard />} />
         </Switch>
 
-        <Footer/>
+        <Footer theme={theme}/>
       </Main>
     </Router>
   );

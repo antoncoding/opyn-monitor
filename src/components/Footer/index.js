@@ -2,20 +2,20 @@ import React from 'react'
 
 import { Link } from '@aragon/ui'
 
-var style = {
-  backgroundColor: "#F8F8F8",
-  borderTop: "1px solid #E7E7E7",
-  textAlign: "center",
-  padding: "17px",
-  position: "fixed",
-  left: "0",
-  bottom: "0",
-  height: "50px",
-  width: "100%",
-  fontSize: "12px"
-}
+function Footer({theme}) {
+  console.log(theme)
+  var style = {
+    backgroundColor: theme === 'light' ? "#F8F8F8" : '#35425e' ,
+    textAlign: "center",
+    padding: "17px",
+    position: "fixed",
+    left: "0",
+    bottom: "0",
+    height: "50px",
+    width: "100%",
+    fontSize: "12px"
+  }
 
-function Footer() {
   return (  
     <div style={style}>
       Powered By {' '}
