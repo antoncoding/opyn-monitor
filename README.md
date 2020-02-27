@@ -1,6 +1,6 @@
 # Opyn protocol Liquidator
 
-Now hosted on https://antoncoding.github.io/opyn-liquidator/;
+Now hosted on https://antoncoding.github.io/opyn-liquidator/#/;
 
 ## Install & Run
 
@@ -14,4 +14,4 @@ npm install && npm start
 npm run deploy
 ```
 
-![screenshot](https://i.imgur.com/jc4XwC3.png)
+![screenshot](https://i.imgur.com/SN6TDIr.png)
