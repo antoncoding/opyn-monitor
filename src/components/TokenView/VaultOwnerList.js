@@ -24,6 +24,7 @@ class VaultOwnerList extends Component {
   };
 
   componentDidMount = async () => {
+    await this.updateInfo()
     setInterval(this.updateInfo, 15000)
   };
 
