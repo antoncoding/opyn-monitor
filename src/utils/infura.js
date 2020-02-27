@@ -140,9 +140,9 @@ function compare(ownerA, ownerB) {
   const rateB = ownerB.ratio;
 
   let comparison = 0;
-  if (rateA > rateB) {
+  if (parseFloat(rateA) > parseFloat(rateB)) {
     comparison = 1;
-  } else if (rateA < rateB) {
+  } else if (parseFloat(rateA) < parseFloat(rateB)) {
     comparison = -1;
   }
   return comparison;
