@@ -4,6 +4,7 @@ import { HashRouter as Router, Switch, Route } from 'react-router-dom';
 import NavBar from './components/NavBar';
 import Dashboard from './components/Dashboard';
 import TokenView from './components/TokenView';
+import Footer from './components/Footer'
 import { Main } from '@aragon/ui';
 import './App.css';
 
@@ -31,6 +32,8 @@ function App() {
           <Route path='/token/:addr' children={<TokenView user={user} />} />
           <Route path='/' children={<Dashboard />} />
         </Switch>
+
+        <Footer/>
       </Main>
     </Router>
   );
