@@ -62,7 +62,7 @@ class VaultOwnerList extends Component {
       <MyVault vaults={this.state.vaults} oToken={this.props.oToken} user={this.props.user} />
       <DataView
         status={this.state.isLoading ? 'loading' : 'default'}
-        fields={['Owner', 'collateral', 'Issued', 'RATIO', 'Status', 'Manage']}
+        fields={['Owner', 'collateral', 'Issued', 'RATIO', 'Status', '']}
         entries={this.state.vaults}
         entriesPerPage={5}
         renderEntry={renderListEntry}

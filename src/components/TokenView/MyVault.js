@@ -13,7 +13,7 @@ function MyVault({ vaults, oToken, user }) {
   ) : (
     <DataView
       heading={'Your Vault'}
-      fields={['Owner', 'collateral', 'Issued', 'RATIO', 'Status', 'Manage']}
+      fields={['Owner', 'collateral', 'Issued', 'RATIO', 'Status', '']}
       entries={[myVault]}
       entriesPerPage={1}
       renderEntry={renderMyVaultRow}
