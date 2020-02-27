@@ -1,36 +1,28 @@
-import React, { Component } from 'react';
-import { Button, IdentityBadge, IconConnect } from '@aragon/ui';
+import React, { useState } from 'react';
+import { Button, IdentityBadge, IconConnect, Box } from '@aragon/ui';
 
-class ConnectButton extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      isConnected: false,
-      account: '',
-    };
-  }
+function ConnectButton({user, setUser}){
+  const [isConnected, setIsConnected] = useState(false)
 
-  connectWeb3 = async () => {
+  const connectWeb3 = async () => {
     const accounts = await window.ethereum.enable();
-    this.setState({
-      isConnected: true,
-      account: accounts[0],
-    });
+    setIsConnected(true)
+    setUser(accounts[0])
     return true;
   };
-
-  render() {
-    return this.state.isConnected ? (
-      <Button>
-        <IdentityBadge entity={this.state.account} connectedAccount />
-      </Button>
+  
+    return isConnected ? (
+      <Box padding={6}>
+        <IdentityBadge entity={user} connectedAccount />
+      </Box>
     ) : (
       <Button 
         icon={<IconConnect/>} 
         label={'Connect'} 
-        onClick={this.connectWeb3}/> 
+        onClick={connectWeb3}
+      /> 
     );
-  }
+  
 }
 
 export default ConnectButton;

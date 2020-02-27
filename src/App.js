@@ -9,6 +9,8 @@ import './App.css';
 
 function App() {
   const storedTheme = window.localStorage.getItem('theme') || 'light'
+
+  const [user, setUser] = useState('') // the current connected user  
   const [theme, setTheme] = useState(storedTheme)
   
   const updateTheme = (theme) => {
@@ -18,10 +20,15 @@ function App() {
   return (
     <Router>
       <Main theme={theme}>
-        <NavBar theme={theme} updateTheme={updateTheme}/>
+        <NavBar 
+          user = {user}
+          setUser = {setUser}
+          theme={theme} 
+          updateTheme={updateTheme}
+        />
 
         <Switch>
-          <Route path='/token/:addr' children={<TokenView />} />
+          <Route path='/token/:addr' children={<TokenView user={user} />} />
           <Route path='/' children={<Dashboard />} />
         </Switch>
       </Main>
