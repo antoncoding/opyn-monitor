@@ -24,19 +24,19 @@ class VaultBox extends Component {
           primary={
             <Split
               primary={
-                <Box heading={'contract'} padding={30}>
+                <Box heading={'contract'} padding={20}>
                   <IdentityBadge entity={this.props.oToken} shorten={false} />
                 </Box>
               }
               secondary={
-                <Box heading={'balance'} padding={30}>
+                <Box heading={'balance'} padding={20}>
                   {this.state.balance}
                 </Box>
               }
             />
           }
           secondary={
-            <Box heading={'supply'} padding={30}>
+            <Box heading={'supply'} padding={20}>
               {this.state.supply} {this.props.tokenName}
             </Box>
           }
