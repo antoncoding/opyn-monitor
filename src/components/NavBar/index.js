@@ -7,7 +7,6 @@ import { Bar, BackButton } from '@aragon/ui';
 
 function NavBar({theme, updateTheme}) {
   const history = useHistory();
-  console.log(theme)
   const [isHome, updateIsHome] = useState(true)
   
   useEffect(()=>{

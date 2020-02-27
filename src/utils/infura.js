@@ -74,10 +74,7 @@ export const getMaxLiquidatable = async(oToken, owner, liquidator) => {
   const userbalance = liquidator 
     ? await oTokenContract.methods.balanceOf(liquidator).call()
     : 0
-
-  console.log(`max liquidatable`, maxVaultLiquidatable)
-  console.log(`userb`, userbalance)
-    
+  
   const maxLiquidatable = Math.min(
       parseInt(userbalance, 10), 
       parseInt(maxVaultLiquidatable, 10)

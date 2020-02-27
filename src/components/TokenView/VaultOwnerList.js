@@ -24,6 +24,10 @@ class VaultOwnerList extends Component {
   };
 
   componentDidMount = async () => {
+    setInterval(this.updateInfo, 3000)
+  };
+
+  updateInfo = async() => {
     const owners = await getAllVaultOwners();
     const { strike, decimals, minRatio, strikePrice, oracle } = await getOptionContractDetail(
       this.props.oToken
@@ -51,7 +55,7 @@ class VaultOwnerList extends Component {
       isLoading: false,
       strikePrice,
     });
-  };
+  }
 
   render() {
     return (
