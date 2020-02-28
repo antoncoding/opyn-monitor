@@ -209,7 +209,6 @@ function ManageVault ({token, owner, user}) {
             invert='horizontal'
           />
         </Box>
-        <Box heading={'Exchange'}></Box>
       </>
     );
   

@@ -10,7 +10,7 @@ import {
 
 import { renderListEntry } from './common';
 import { formatDigits } from '../../utils/common';
-import MyVault from './MyVault';
+import MyVault from './MyVaultBox';
 
 function VaultOwnerList({ oToken, user }) {
   const [isLoading, setIsLoading] = useState(true);

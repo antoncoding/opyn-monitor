@@ -4,19 +4,8 @@ import {
   Tag,
   IdentityBadge,
 } from '@aragon/ui';
-import VaultModal from './VaultModal';
-import MangeButton from './MangeButton'
 
-export const renderMyVaultRow = ({ owner, collateral, oTokensIssued, ratio, isSafe, oToken }) => {
-  return [
-    <IdentityBadge entity={owner} shorten={true} connectedAccount={true} />,
-    collateral,
-    oTokensIssued,
-    ratio,
-    createTag(isSafe, ratio),
-    MangeButton({oToken, owner})
-  ]
-}
+import VaultModal from './VaultModal';
 
 export const renderListEntry = ({ owner, collateral, oTokensIssued, ratio, isSafe, oToken }) => {
   return [
