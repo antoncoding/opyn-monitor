@@ -21,10 +21,15 @@ class VaultOwnerList extends Component {
     vaults: [], // { account, maxLiquidatable, collateral, oTokensIssued, ratio } []
   };
 
-  componentDidMount = async () => {
-    await this.updateInfo()
-    setInterval(this.updateInfo, 15000)
+  intervalID
+
+  componentDidMount(){
+    this.updateInfo()
   };
+
+  componentWillUnmount(){
+    clearTimeout(this.intervalID)
+  }
 
   updateInfo = async() => {
     const owners = await getAllVaultOwners();
@@ -54,6 +59,8 @@ class VaultOwnerList extends Component {
       isLoading: false,
       strikePrice,
     });
+
+    this.intervalID = setTimeout(this.updateInfo.bind(this), 10000)
   }
 
   render() {
