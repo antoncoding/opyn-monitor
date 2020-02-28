@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { useState, useEffect } from 'react';
 import { DataView } from '@aragon/ui';
 import { getAllVaultOwners } from '../../utils/graph';
 import {
@@ -12,73 +12,64 @@ import { renderListEntry } from './common';
 import { formatDigits } from '../../utils/common';
 import MyVault from './MyVault';
 
-class VaultOwnerList extends Component {
-  state = {
-    isLoading: true,
-    strikePrice: '0',
-    vaults: [], // { account, maxLiquidatable, collateral, oTokensIssued, ratio } []
-  };
+function VaultOwnerList({ oToken, user }) {
+  const [isLoading, setIsLoading] = useState(true);
+  const [vaults, setVaults] = useState([]);
 
-  _isMonted = false;
-  intervalID;
+  const [isCancelled, setCancelled] = useState(false);
 
-  componentDidMount() {
-    this._isMonted = true;
-    this.updateInfo();
-  }
-
-  componentWillUnmount() {
-    this._isMonted = false;
-    clearTimeout(this.intervalID);
-  }
-
-  updateInfo = async () => {
-    const owners = await getAllVaultOwners();
-    const { strike, decimals, minRatio, strikePrice, oracle } = await getOptionContractDetail(
-      this.props.oToken
-    );
-    const vaults = await getVaults(owners, this.props.oToken);
-
-    const ethValueInStrike = 1 / (await getPrice(oracle, strike));
-    const vaultDetail = vaults.map((vault) => {
-      const valueProtectingInEth = parseFloat(strikePrice) * vault.oTokensIssued;
-      const ratio = formatDigits(
-        (parseFloat(vault.collateral) * ethValueInStrike) / valueProtectingInEth,
-        4
+  useEffect(() => {
+    const updateInfo = async () => {
+      const owners = await getAllVaultOwners();
+      const { strike, decimals, minRatio, strikePrice, oracle } = await getOptionContractDetail(
+        oToken
       );
+      const vaults = await getVaults(owners, oToken);
 
-      const oTokensIssued = formatDigits(parseInt(vault.oTokensIssued) / 10 ** decimals, 4);
-      vault.oTokensIssued = oTokensIssued;
-      vault.ratio = ratio;
-      vault.isSafe = ratio > minRatio;
-      return vault;
-    });
+      const ethValueInStrike = 1 / (await getPrice(oracle, strike));
+      const vaultDetail = vaults.map((vault) => {
+        const valueProtectingInEth = parseFloat(strikePrice) * vault.oTokensIssued;
+        const ratio = formatDigits(
+          (parseFloat(vault.collateral) * ethValueInStrike) / valueProtectingInEth,
+          4
+        );
 
-    const vaultWithLiquidatable = await getVaultsWithLiquidatable(vaultDetail);
-    if (this._isMonted)
-      this.setState({
-        vaults: vaultWithLiquidatable,
-        isLoading: false,
-        strikePrice,
+        const oTokensIssued = formatDigits(parseInt(vault.oTokensIssued) / 10 ** decimals, 4);
+        vault.oTokensIssued = oTokensIssued;
+        vault.ratio = ratio;
+        vault.isSafe = ratio > minRatio;
+        return vault;
       });
 
-    this.intervalID = setTimeout(this.updateInfo.bind(this), 10000);
-  };
+      const vaultWithLiquidatable = await getVaultsWithLiquidatable(vaultDetail);
 
-  render() {
-    return (
-      <>
-        <MyVault vaults={this.state.vaults} oToken={this.props.oToken} user={this.props.user} />
-        <DataView
-          status={this.state.isLoading ? 'loading' : 'default'}
-          fields={['Owner', 'collateral', 'Issued', 'RATIO', 'Status', '']}
-          entries={this.state.vaults}
-          entriesPerPage={5}
-          renderEntry={renderListEntry}
-        />
-      </>
-    );
-  }
+      if (!isCancelled) {
+        setVaults(vaultWithLiquidatable);
+        setIsLoading(false);
+      }
+    };
+
+    updateInfo();
+    const id = setInterval(updateInfo, 15000);
+
+    return () => {
+      setCancelled(true);
+      clearInterval(id);
+    };
+  }, [isCancelled, oToken, setCancelled]);
+
+  return (
+    <>
+      <MyVault vaults={vaults} oToken={oToken} user={user} />
+      <DataView
+        status={isLoading ? 'loading' : 'default'}
+        fields={['Owner', 'collateral', 'Issued', 'RATIO', 'Status', '']}
+        entries={vaults}
+        entriesPerPage={5}
+        renderEntry={renderListEntry}
+      />
+    </>
+  );
 }
 
 export default VaultOwnerList;
