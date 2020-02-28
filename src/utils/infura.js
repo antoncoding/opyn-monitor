@@ -100,9 +100,10 @@ export const getERC20Info = async(address) => {
   const token = new web3.eth.Contract(optionContractABI, address);
   const name = await token.methods.name().call();
   const totalSupplyDecimals = await token.methods.totalSupply().call();
+  const symbol = await token.methods.symbol().call();
   const decimals = await token.methods.decimals().call();
   const totalSupply = parseInt(totalSupplyDecimals) / 10 ** parseInt(decimals);
-  return { name, decimals, totalSupply }
+  return { name, decimals, totalSupply, symbol }
 }
 
 export const getAssetsAndOracle = async(address) => {

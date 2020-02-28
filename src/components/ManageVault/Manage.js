@@ -5,7 +5,7 @@ import {
   getVaultsWithLiquidatable,
   getTokenBalance,
   getBalance,
-  getDecimals,
+  getERC20Info,
 } from '../../utils/infura';
 
 import { Split, IconCirclePlus, IconCircleMinus, Button, TextInput, Header, Box } from '@aragon/ui';
@@ -17,6 +17,8 @@ class ManageVault extends Component {
     isLoading: true,
     vault: {},
     tokenDecimal: 0,
+    tokenSymbol: 'oToken',
+
     tokenBalance: 0,
     ethBalance: 0,
 
@@ -40,13 +42,19 @@ class ManageVault extends Component {
 
     const vaults = await getVaults([owner], token);
     const vault = (await getVaultsWithLiquidatable(vaults))[0];
-    const [ownerBalance, tokenDecimal, ethBalance] = await Promise.all([
+    const [ownerBalance, tokenInfo, ethBalance] = await Promise.all([
       getTokenBalance(token, owner),
-      getDecimals(token),
+      getERC20Info(token),
       getBalance(owner),
     ]);
-    const tokenBalance = ownerBalance / 10 ** tokenDecimal;
-    this.setState({ vault, tokenBalance, ethBalance, tokenDecimal });
+    const tokenBalance = ownerBalance / 10 ** tokenInfo.decimals;
+    this.setState({ 
+      vault, 
+      tokenBalance, 
+      ethBalance, 
+      tokenDecimal: tokenInfo.decimals, 
+      tokenSymbol: tokenInfo.symbol
+    });
 
     this.intervalID = setTimeout(this.updateInfo.bind(this), 15000);
   };
@@ -62,7 +70,7 @@ class ManageVault extends Component {
         <Box heading={'Balance'}>
           <Split
             primary={balanceBlock('ETH', this.state.ethBalance)}
-            secondary={balanceBlock('oToken', this.state.tokenBalance)}
+            secondary={balanceBlock(this.state.tokenSymbol, this.state.tokenBalance)}
           />
         </Box>
 
@@ -164,7 +172,7 @@ class ManageVault extends Component {
               </div>
             }
             secondary={balanceBlock(
-              'oToken',
+              this.state.tokenSymbol,
               this.state.vault.oTokensIssued
                 ? this.state.vault.oTokensIssued / 10 ** this.state.tokenDecimal
                 : 0
