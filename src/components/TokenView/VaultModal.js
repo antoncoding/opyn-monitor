@@ -26,16 +26,16 @@ function PositionModal({ oToken, owner, collateral, isSafe, oTokensIssued, ratio
   const open = () => setOpened(true);
   const close = () => setOpened(false);
 
-  useEffect(
-    () =>
-      async function() {
-        const accounts = await getAccounts();
-        const maxLiquidatable = await getMaxLiquidatable(oToken, owner, accounts[0]);
-        const _decimals = await getDecimals(oToken);
-        setTokenDecimals(_decimals);
-        setLiquidateAmt(maxLiquidatable / 10 ** _decimals);
-      }
-  );
+  useEffect(() =>{
+    async function getData(){    
+      const accounts = await getAccounts();
+      const maxLiquidatable = await getMaxLiquidatable(oToken, owner, accounts[0]);
+      const _decimals = await getDecimals(oToken);
+      setTokenDecimals(_decimals);
+      setLiquidateAmt(maxLiquidatable / 10 ** _decimals);
+    }
+    getData()
+  }, [oToken, owner]);
 
   return (
     <>

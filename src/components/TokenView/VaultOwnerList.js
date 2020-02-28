@@ -1,7 +1,5 @@
 import React, { Component } from 'react';
-import {
-  DataView
-} from '@aragon/ui';
+import { DataView } from '@aragon/ui';
 import { getAllVaultOwners } from '../../utils/graph';
 import {
   getOptionContractDetail,
@@ -10,7 +8,7 @@ import {
   getVaultsWithLiquidatable,
 } from '../../utils/infura';
 
-import { renderListEntry } from './common'
+import { renderListEntry } from './common';
 import { formatDigits } from '../../utils/common';
 import MyVault from './MyVault';
 
@@ -21,22 +19,25 @@ class VaultOwnerList extends Component {
     vaults: [], // { account, maxLiquidatable, collateral, oTokensIssued, ratio } []
   };
 
-  intervalID
+  _isMonted = false;
+  intervalID;
 
-  componentDidMount(){
-    this.updateInfo()
-  };
-
-  componentWillUnmount(){
-    clearTimeout(this.intervalID)
+  componentDidMount() {
+    this._isMonted = true;
+    this.updateInfo();
   }
 
-  updateInfo = async() => {
+  componentWillUnmount() {
+    this._isMonted = false;
+    clearTimeout(this.intervalID);
+  }
+
+  updateInfo = async () => {
     const owners = await getAllVaultOwners();
     const { strike, decimals, minRatio, strikePrice, oracle } = await getOptionContractDetail(
       this.props.oToken
     );
-    const vaults = await getVaults(owners, this.props.oToken)
+    const vaults = await getVaults(owners, this.props.oToken);
 
     const ethValueInStrike = 1 / (await getPrice(oracle, strike));
     const vaultDetail = vaults.map((vault) => {
@@ -54,26 +55,27 @@ class VaultOwnerList extends Component {
     });
 
     const vaultWithLiquidatable = await getVaultsWithLiquidatable(vaultDetail);
-    this.setState({
-      vaults: vaultWithLiquidatable,
-      isLoading: false,
-      strikePrice,
-    });
+    if (this._isMonted)
+      this.setState({
+        vaults: vaultWithLiquidatable,
+        isLoading: false,
+        strikePrice,
+      });
 
-    this.intervalID = setTimeout(this.updateInfo.bind(this), 10000)
-  }
+    this.intervalID = setTimeout(this.updateInfo.bind(this), 10000);
+  };
 
   render() {
     return (
       <>
-      <MyVault vaults={this.state.vaults} oToken={this.props.oToken} user={this.props.user} />
-      <DataView
-        status={this.state.isLoading ? 'loading' : 'default'}
-        fields={['Owner', 'collateral', 'Issued', 'RATIO', 'Status', '']}
-        entries={this.state.vaults}
-        entriesPerPage={5}
-        renderEntry={renderListEntry}
-      />
+        <MyVault vaults={this.state.vaults} oToken={this.props.oToken} user={this.props.user} />
+        <DataView
+          status={this.state.isLoading ? 'loading' : 'default'}
+          fields={['Owner', 'collateral', 'Issued', 'RATIO', 'Status', '']}
+          entries={this.state.vaults}
+          entriesPerPage={5}
+          renderEntry={renderListEntry}
+        />
       </>
     );
   }

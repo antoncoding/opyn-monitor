@@ -3,6 +3,8 @@ import { Box, Split, Header, IdentityBadge } from '@aragon/ui';
 import { getOptionContractDetail } from '../../utils/infura';
 
 class VaultBox extends Component {
+  _isMounted = false;
+
   state = {
     name: 'oToken',
     balance: '0',
@@ -10,9 +12,15 @@ class VaultBox extends Component {
   };
 
   async componentDidMount() {
+    this._isMounted = true
     const { balance, totalSupply, name } = await getOptionContractDetail(this.props.oToken);
+    if(this._isMounted)
     this.setState({ balance, supply: totalSupply, name });
   }
+
+  componentWillUnmount(){
+    this._isMounted = false
+  }  
 
   render() {
     return (
