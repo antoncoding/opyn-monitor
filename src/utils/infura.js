@@ -19,6 +19,7 @@ export const getOptionContractDetail = async (oToken) => {
   );
   return {
     name: tokenInfo.name,
+    symbol: tokenInfo.symbol,
     decimals: tokenInfo.decimals,
     totalSupply: tokenInfo.totalSupply,
     oracle: optionInfo.oracle,
