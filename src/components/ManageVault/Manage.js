@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { useState, useEffect } from 'react';
 
 import {
   getVaults,
@@ -15,72 +15,65 @@ import { addETHCollateral, removeETHCollateral, burnOToken, issueOToken } from '
 
 import { formatDigits } from '../../utils/common'
 import { createTag } from '../TokenView/common'
-class ManageVault extends Component {
-  state = {
-    isLoading: true,
-    vault: {},
-    tokenDecimal: 0,
-    tokenSymbol: 'oToken',
-    strikePrice: 0,
-    strike: '',
-    oracle: '',
-    ratio: 0,
-    minRatio: 1.6,
 
-    tokenBalance: 0,
-    ethBalance: 0,
+function ManageVault ({token, owner, user}) {
 
-    collateralAmt: 0, // input
-    issueOrBurnAmt: 0, //
-  };
+  const [vault, setVault] = useState({})
+  const [tokenDecimals, setTokenDecimals] = useState(0)
+  const [tokenSymbol, setTokenSymbol] = useState('oToken')
 
-  intervalID;
+  const [ratio, setRatio] = useState(0)
+  const [minRatio, setMinRatio] = useState(1.6)
 
-  componentDidMount() {
-    this.updateInfo();
-  }
+  const [tokenBalance, setTokenBalance] = useState(0)
+  const [ethBalance, setETHBalance] = useState(0)
 
-  componentWillUnmount() {
-    clearTimeout(this.intervalID);
-  }
+  const [collateralAmt, setCollateralAmt] = useState(0)
+  const [issueOrBurnAmt,  setIssueOrBurAmt] = useState(0)
 
-  updateInfo = async () => {
-    const token = this.props.token;
-    const owner = this.props.owner;
+  useEffect(()=>{
 
-    const vaults = await getVaults([owner], token);
-    const vault = (await getVaultsWithLiquidatable(vaults))[0];
-    const [ownerBalance, optionInfo, ethBalance] = await Promise.all([
-      getTokenBalance(token, owner),
-      getOptionContractDetail(token),
-      getBalance(owner),
-    ]);
+    let isCancelled = false
 
-    const { decimals, symbol, strikePrice, strike, oracle, minRatio } = optionInfo;
+    async function updateInfo () {
 
-    const tokenBalance = ownerBalance / 10 ** optionInfo.decimals;
-    const ethValueInStrike = 1 / (await getPrice(oracle, strike));
-    const valueProtectingInEth = parseFloat(strikePrice) * vault.oTokensIssued;
-    const ratio = formatDigits((parseFloat(vault.collateral) * ethValueInStrike) / valueProtectingInEth, 5);
+      const vaults = await getVaults([owner], token);
+      const vault = (await getVaultsWithLiquidatable(vaults))[0];
+      const [ownerBalance, optionInfo, ethBalance] = await Promise.all([
+        getTokenBalance(token, owner),
+        getOptionContractDetail(token),
+        getBalance(owner),
+      ]);
+  
+      const { decimals, symbol, strikePrice, strike, oracle, minRatio } = optionInfo;
+  
+      const tokenBalance = ownerBalance / 10 ** optionInfo.decimals;
+      const ethValueInStrike = 1 / (await getPrice(oracle, strike));
+      const valueProtectingInEth = parseFloat(strikePrice) * vault.oTokensIssued;
+      const ratio = formatDigits((parseFloat(vault.collateral) * ethValueInStrike) / valueProtectingInEth, 5);
+  
+      if (!isCancelled) {
+        setVault(vault);
+        setTokenBalance(tokenBalance)
+        setETHBalance(ethBalance)
+        setTokenDecimals(decimals)
+        setTokenSymbol(symbol)
+        setMinRatio(minRatio)
+        setRatio(ratio)
+      }
+    };
+    updateInfo()
+    const id = setInterval(updateInfo, 15000)
 
-    this.setState({
-      vault,
-      tokenBalance,
-      ethBalance,
-      tokenDecimal: decimals,
-      tokenSymbol: symbol,
-      strikePrice,
-      strike,
-      oracle,
-      minRatio,
-      ratio
-    });
+    // clean up function
+    return ()=>{
+      isCancelled = true
+      clearInterval(id)
+    }
+  })
 
-    this.intervalID = setTimeout(this.updateInfo.bind(this), 15000);
-  };
+  const isOwner = user === owner;
 
-  render() {
-    const isOwner = this.props.user === this.props.owner;
 
     return (
       <>
@@ -88,23 +81,23 @@ class ManageVault extends Component {
 
         <div style={{ padding: '2%', display: 'flex', alignItems: 'center' }}>
           <div style={{ width: '30%' }}>
-            {balanceBlock('Owner ETH Balance', this.state.ethBalance)}
+            {balanceBlock('Owner ETH Balance', ethBalance)}
           </div>
           <div style={{ width: '50%' }}>
-            {balanceBlock(`${this.state.tokenSymbol} Balance`, this.state.tokenBalance)}
+            {balanceBlock(`${tokenSymbol} Balance`, tokenBalance)}
           </div>
           <div style={{ width: '20%', }}>
             <>
               <div style={{ fontSize: 14, padding: 3 }}> 
                 Current Ratio {
-                  this.state.ratio > 0 ?
-                  createTag(this.state.ratio >= this.state.minRatio, this.state.ratio) : ''
+                  ratio > 0 ?
+                  createTag(ratio >= minRatio, ratio) : ''
                 } 
               </div>
               <div style={{ fontSize: 24, padding: 3 }}>
-                <span style={{ fontSize: 24 }}>{this.state.ratio.toString().split('.')[0]}</span>.
-                <span style={{ fontSize: 18 }}>{this.state.ratio.toString().split('.')[1]} </span>
-                { this.state.minRatio > 0 ? <span style={{ fontSize: 16 }}> / {this.state.minRatio} </span> : '' }
+                <span style={{ fontSize: 24 }}>{ratio.toString().split('.')[0]}</span>.
+                <span style={{ fontSize: 18 }}>{ratio.toString().split('.')[1]} </span>
+                { minRatio > 0 ? <span style={{ fontSize: 16 }}> / {minRatio} </span> : '' }
                 
                 {/* {balance} */}
               </div>
@@ -122,9 +115,9 @@ class ManageVault extends Component {
                     <TextInput
                       type='number'
                       wide={true}
-                      value={this.state.collateralAmt}
+                      value={collateralAmt}
                       onChange={(event) => {
-                        this.setState({ collateralAmt: event.target.value });
+                        setCollateralAmt(event.target.value)
                       }}
                     />
                   }
@@ -136,9 +129,9 @@ class ManageVault extends Component {
                         label='Add'
                         onClick={() => {
                           addETHCollateral(
-                            this.props.token,
-                            this.props.owner,
-                            this.state.collateralAmt
+                            token,
+                            owner,
+                            collateralAmt
                           );
                         }}
                       />
@@ -148,7 +141,7 @@ class ManageVault extends Component {
                         label='Remove'
                         disabled={!isOwner}
                         onClick={() => {
-                          removeETHCollateral(this.props.token, this.state.collateralAmt);
+                          removeETHCollateral(token, collateralAmt);
                         }}
                       />
                     </div>
@@ -156,7 +149,7 @@ class ManageVault extends Component {
                 />
               </div>
             }
-            secondary={balanceBlock('ETH', this.state.vault.collateral)}
+            secondary={balanceBlock('ETH', vault.collateral)}
             invert='horizontal'
           />
         </Box>
@@ -170,9 +163,9 @@ class ManageVault extends Component {
                     <TextInput
                       type='number'
                       wide={true}
-                      value={this.state.issueOrBurnAmt}
+                      value={issueOrBurnAmt}
                       onChange={(event) => {
-                        this.setState({ issueOrBurnAmt: event.target.value });
+                        setIssueOrBurAmt(event.target.value)
                       }}
                     />
                   }
@@ -185,8 +178,8 @@ class ManageVault extends Component {
                         disabled={!isOwner}
                         onClick={() => {
                           issueOToken(
-                            this.props.token,
-                            handleDecimals(this.state.issueOrBurnAmt, this.state.tokenDecimal)
+                            token,
+                            handleDecimals(issueOrBurnAmt, tokenDecimals)
                           );
                         }}
                       />
@@ -197,8 +190,8 @@ class ManageVault extends Component {
                         label='Burn'
                         onClick={() => {
                           burnOToken(
-                            this.props.token,
-                            handleDecimals(this.state.issueOrBurnAmt, this.state.tokenDecimal)
+                            token,
+                            handleDecimals(issueOrBurnAmt, tokenDecimals)
                           );
                         }}
                       />
@@ -208,9 +201,9 @@ class ManageVault extends Component {
               </div>
             }
             secondary={balanceBlock(
-              this.state.tokenSymbol,
-              this.state.vault.oTokensIssued
-                ? this.state.vault.oTokensIssued / 10 ** this.state.tokenDecimal
+              tokenSymbol,
+              vault.oTokensIssued
+                ? vault.oTokensIssued / 10 ** tokenDecimals
                 : 0
             )}
             invert='horizontal'
@@ -219,7 +212,7 @@ class ManageVault extends Component {
         <Box heading={'Exchange'}></Box>
       </>
     );
-  }
+  
 }
 
 const handleDecimals = (rawAmt, decimal) => {
