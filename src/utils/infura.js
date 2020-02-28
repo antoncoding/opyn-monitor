@@ -84,6 +84,12 @@ export const getMaxLiquidatable = async(oToken, owner, liquidator) => {
   
 }
 
+export const getTokenBalance = async(oToken, user) => {
+  const oTokenContract = new web3.eth.Contract(optionContractABI, oToken);
+  const balance = await oTokenContract.methods.balanceOf(user).call()
+  return parseInt(balance)
+}
+
 export const getDecimals = async(oToken) => {
   const oTokenContract = new web3.eth.Contract(optionContractABI, oToken);
   const decimals = await oTokenContract.methods.decimals().call()
