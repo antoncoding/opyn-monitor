@@ -1,57 +1,57 @@
-import React, { Component } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Box, Split, Header, IdentityBadge } from '@aragon/ui';
 import { getOptionContractDetail } from '../../utils/infura';
 
-class VaultBox extends Component {
-  _isMounted = false;
+function VaultBox({ oToken, tokenName }) {
+  const [name, setName] = useState('oToken');
+  const [balance, setBalance] = useState('0');
+  const [totalSupply, setTotalSupply] = useState('0');
 
-  state = {
-    name: 'oToken',
-    balance: '0',
-    supply: '0',
-  };
+  useEffect(() => {
+    
+    let isCancelled = false;
+    async function init() {
+      const { balance, totalSupply, name } = await getOptionContractDetail(oToken);
+      if(!isCancelled) {
+        setBalance(balance);
+        setTotalSupply(totalSupply);
+        setName(name);
+      }
+    }
+    init();
 
-  async componentDidMount() {
-    this._isMounted = true
-    const { balance, totalSupply, name } = await getOptionContractDetail(this.props.oToken);
-    if(this._isMounted)
-    this.setState({ balance, supply: totalSupply, name });
-  }
+    return () => {
+      isCancelled = true
+    }
+  }, [oToken]);
 
-  componentWillUnmount(){
-    this._isMounted = false
-  }  
 
-  render() {
-    return (
-      <>
-        <Header
-          primary={this.state.name}
-        />
-        <Split
-          primary={
-            <Split
-              primary={
-                <Box heading={'contract'} padding={20}>
-                  <IdentityBadge entity={this.props.oToken} shorten={false} />
-                </Box>
-              }
-              secondary={
-                <Box heading={'balance'} padding={20}>
-                  {this.state.balance}
-                </Box>
-              }
-            />
-          }
-          secondary={
-            <Box heading={'supply'} padding={20}>
-              {this.state.supply} {this.props.tokenName}
-            </Box>
-          }
-        />
-      </>
-    );
-  }
+  return (
+    <>
+      <Header primary={name} />
+      <Split
+        primary={
+          <Split
+            primary={
+              <Box heading={'contract'} padding={20}>
+                <IdentityBadge entity={oToken} shorten={false} />
+              </Box>
+            }
+            secondary={
+              <Box heading={'balance'} padding={20}>
+                {balance}
+              </Box>
+            }
+          />
+        }
+        secondary={
+          <Box heading={'total supply'} padding={20}>
+            {totalSupply} {tokenName}
+          </Box>
+        }
+      />
+    </>
+  );
 }
 
 export default VaultBox;

@@ -16,9 +16,8 @@ function VaultOwnerList({ oToken, user }) {
   const [isLoading, setIsLoading] = useState(true);
   const [vaults, setVaults] = useState([]);
 
-  const [isCancelled, setCancelled] = useState(false);
-
   useEffect(() => {
+    let isCancelled = false;
     const updateInfo = async () => {
       const owners = await getAllVaultOwners();
       const { strike, decimals, minRatio, strikePrice, oracle } = await getOptionContractDetail(
@@ -53,10 +52,10 @@ function VaultOwnerList({ oToken, user }) {
     const id = setInterval(updateInfo, 15000);
 
     return () => {
-      setCancelled(true);
+      isCancelled = true;
       clearInterval(id);
     };
-  }, [isCancelled, oToken, setCancelled]);
+  }, [oToken]);
 
   return (
     <>
