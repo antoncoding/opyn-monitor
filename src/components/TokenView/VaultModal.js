@@ -41,7 +41,7 @@ function PositionModal({ oToken, owner, collateral, isSafe, oTokensIssued, ratio
     <>
       <Button onClick={open} label='More'></Button>
       <Modal width={800} padding={50} visible={opened} onClose={close}>
-        <Header> Access Position </Header>
+        <Header primary={'Access Position'}/>
         <Box heading={'Owner'}>
           <IdentityBadge entity={owner} shorten={false} />
         </Box>
