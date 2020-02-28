@@ -10,6 +10,8 @@
 
 # production
 /build
+/public/aragon-ui
+
 
 # misc
 .DS_Store
