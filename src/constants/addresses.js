@@ -5,7 +5,7 @@ export const supportedList = [
   },
   {
     addr: '0x98cc3bd6af1880fcfda17ac477b2f612980e5e33',
-    name: 'cDai Insurance',
+    name: 'cDai Insurance (New)',
   },
   {
     addr: '0x8ed9f862363ffdfd3a07546e618214b6d59f03d4',

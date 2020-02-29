@@ -11,7 +11,8 @@ function DashBoard() {
   };
   return (
     <>
-      <Header primary='All Insurances' />
+      <Header primary='Welcome to Opyn Position Monitor' />
+      <div style={{padding: 5, opacity:0.5}}> Choose a option contract to start </div>
       <DataView
         fields={['Name', 'Contract', '']}
         entries={supportedList}
@@ -20,7 +21,7 @@ function DashBoard() {
           return [
             <>{name}</>,
             <IdentityBadge entity={addr} shorten={false} />,
-            <Button onClick={() => goToToken(addr)}> Access </Button>,
+            <Button onClick={() => goToToken(addr)}> Let's Go </Button>,
           ];
         }}
       />

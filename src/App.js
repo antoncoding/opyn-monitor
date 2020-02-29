@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 
 import { HashRouter as Router, Switch, Route } from 'react-router-dom';
 import NavBar from './components/NavBar';
-import Dashboard from './components/Dashboard';
+import Onboarding from './components/Onboarding';
 import TokenView from './components/TokenView';
 import ManageVault from './components/ManageVault'
 import Footer from './components/Footer';
@@ -27,7 +27,7 @@ function App() {
         <Switch>
           <Route path='/token/:addr' children={<TokenView user={user} />} />
           <Route path='/manage/:token/:owner' children={<ManageVault user={user}/>} />
-          <Route path='/' children={<Dashboard />} />
+          <Route path='/' children={<Onboarding />} />
         </Switch>
         <Footer theme={theme} />
       </Main>
