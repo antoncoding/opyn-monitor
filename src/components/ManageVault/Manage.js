@@ -9,34 +9,34 @@ import {
   getPrice,
 } from '../../utils/infura';
 
-import { Split, IconCirclePlus, IconCircleMinus, Button, TextInput, Header, Box } from '@aragon/ui';
+import { IconCirclePlus, IconCircleMinus, Button, TextInput, Header, Box } from '@aragon/ui';
 
 import { addETHCollateral, removeETHCollateral, burnOToken, issueOToken } from '../../utils/web3';
 
-import { formatDigits } from '../../utils/common'
-import { createTag } from '../TokenView/common'
+import { formatDigits } from '../../utils/common';
+import { createTag } from '../TokenView/common';
 
-function ManageVault ({token, owner, user}) {
+function ManageVault({ token, owner, user }) {
+  const [vault, setVault] = useState({});
+  const [tokenDecimals, setTokenDecimals] = useState(0);
+  const [tokenSymbol, setTokenSymbol] = useState('oToken');
 
-  const [vault, setVault] = useState({})
-  const [tokenDecimals, setTokenDecimals] = useState(0)
-  const [tokenSymbol, setTokenSymbol] = useState('oToken')
+  const [ratio, setRatio] = useState(0);
+  const [minRatio, setMinRatio] = useState(1.6);
 
-  const [ratio, setRatio] = useState(0)
-  const [minRatio, setMinRatio] = useState(1.6)
+  const [tokenBalance, setTokenBalance] = useState(0);
+  const [ethBalance, setETHBalance] = useState(0);
 
-  const [tokenBalance, setTokenBalance] = useState(0)
-  const [ethBalance, setETHBalance] = useState(0)
+  const [addCollateralAmt, setAddCollateralAmt] = useState(0);
+  const [removeCollateralAmt, setRemoveCollateralAmt] = useState(0)
 
-  const [collateralAmt, setCollateralAmt] = useState(0)
-  const [issueOrBurnAmt,  setIssueOrBurAmt] = useState(0)
+  const [issueAmt, setIssueAmt] = useState(0);
+  const [burnAmt, setBurnAmt] = useState(0);
 
-  useEffect(()=>{
+  useEffect(() => {
+    let isCancelled = false;
 
-    let isCancelled = false
-
-    async function updateInfo () {
-
+    async function updateInfo() {
       const vaults = await getVaults([owner], token);
       const vault = (await getVaultsWithLiquidatable(vaults))[0];
       const [ownerBalance, optionInfo, ethBalance] = await Promise.all([
@@ -44,174 +44,187 @@ function ManageVault ({token, owner, user}) {
         getOptionContractDetail(token),
         getBalance(owner),
       ]);
-  
+
       const { decimals, symbol, strikePrice, strike, oracle, minRatio } = optionInfo;
-  
+
       const tokenBalance = ownerBalance / 10 ** optionInfo.decimals;
       const ethValueInStrike = 1 / (await getPrice(oracle, strike));
       const valueProtectingInEth = parseFloat(strikePrice) * vault.oTokensIssued;
-      const ratio = formatDigits((parseFloat(vault.collateral) * ethValueInStrike) / valueProtectingInEth, 5);
-  
+      const ratio = formatDigits(
+        (parseFloat(vault.collateral) * ethValueInStrike) / valueProtectingInEth,
+        5
+      );
+
       if (!isCancelled) {
         setVault(vault);
-        setTokenBalance(tokenBalance)
-        setETHBalance(ethBalance)
-        setTokenDecimals(decimals)
-        setTokenSymbol(symbol)
-        setMinRatio(minRatio)
-        setRatio(ratio)
+        setTokenBalance(tokenBalance);
+        setETHBalance(ethBalance);
+        setTokenDecimals(decimals);
+        setTokenSymbol(symbol);
+        setMinRatio(minRatio);
+        setRatio(ratio);
       }
-    };
-    updateInfo()
-    const id = setInterval(updateInfo, 15000)
+    }
+    updateInfo();
+    const id = setInterval(updateInfo, 15000);
 
     // clean up function
-    return ()=>{
-      isCancelled = true
-      clearInterval(id)
-    }
-  })
+    return () => {
+      isCancelled = true;
+      clearInterval(id);
+    };
+  });
 
   const isOwner = user === owner;
 
+  return (
+    <>
+      <Header primary={isOwner ? 'Manage Your Vault' : 'Vault Detail'} />
 
-    return (
-      <>
-        <Header primary={isOwner ? 'Manage Your Vault' : 'Vault Detail'} />
-
-        <div style={{ padding: '2%', display: 'flex', alignItems: 'center' }}>
-          <div style={{ width: '30%' }}>
-            {balanceBlock('Owner ETH Balance', ethBalance)}
-          </div>
-          <div style={{ width: '50%' }}>
-            {balanceBlock(`${tokenSymbol} Balance`, tokenBalance)}
-          </div>
-          <div style={{ width: '20%', }}>
-            <>
-              <div style={{ fontSize: 14, padding: 3 }}> 
-                Current Ratio {
-                  ratio > 0 ?
-                  createTag(ratio >= minRatio, ratio) : ''
-                } 
-              </div>
-              <div style={{ fontSize: 24, padding: 3 }}>
-                <span style={{ fontSize: 24 }}>{ratio.toString().split('.')[0]}</span>.
-                <span style={{ fontSize: 18 }}>{ratio.toString().split('.')[1]} </span>
-                { minRatio > 0 ? <span style={{ fontSize: 16 }}> / {minRatio} </span> : '' }
-                
-                {/* {balance} */}
-              </div>
-            </>
-          </div>
+      <div style={{ padding: '2%', display: 'flex', alignItems: 'center' }}>
+        <div style={{ width: '30%' }}>{balanceBlock('Owner ETH Balance', ethBalance)}</div>
+        <div style={{ width: '50%' }}>{balanceBlock(`${tokenSymbol} Balance`, tokenBalance)}</div>
+        <div style={{ width: '20%' }}>
+          <>
+            <div style={{ fontSize: 14, padding: 3 }}>
+              Current Ratio {ratio > 0 ? createTag(ratio >= minRatio, ratio) : ''}
+            </div>
+            <div style={{ fontSize: 24, padding: 3 }}>
+              <span style={{ fontSize: 24 }}>{ratio.toString().split('.')[0]}</span>.
+              <span style={{ fontSize: 18 }}>{ratio.toString().split('.')[1]} </span>
+              {minRatio > 0 ? <span style={{ fontSize: 16 }}> / {minRatio} </span> : ''}
+              {/* {balance} */}
+            </div>
+          </>
         </div>
-        {/* </Box> */}
+      </div>
+      {/* </Box> */}
 
-        <Box heading={'Collateral'}>
-          <Split
-            primary={
-              <div style={{ paddingTop: '3%' }}>
-                <Split
-                  primary={
-                    <TextInput
-                      type='number'
-                      wide={true}
-                      value={collateralAmt}
-                      onChange={(event) => {
-                        setCollateralAmt(event.target.value)
-                      }}
-                    />
-                  }
-                  secondary={
-                    <div style={{ display: 'flex', alignItems: 'center' }}>
-                      <Button
-                        wide={true}
-                        icon={<IconCirclePlus />}
-                        label='Add'
-                        onClick={() => {
-                          addETHCollateral(
-                            token,
-                            owner,
-                            collateralAmt
-                          );
-                        }}
-                      />
-                      <Button
-                        wide={true}
-                        icon={<IconCircleMinus />}
-                        label='Remove'
-                        disabled={!isOwner}
-                        onClick={() => {
-                          removeETHCollateral(token, collateralAmt);
-                        }}
-                      />
-                    </div>
-                  }
+      <Box heading={'Collateral'}>
+        <div style={{ display: 'flex' }}>
+          {/* balance */}
+          <div style={{ width: '30%' }}>{balanceBlock('ETH', vault.collateral)}</div>
+          {/* Add collateral */}
+          <div style={{ width: '32%', paddingTop: '2%' }}>
+            <div style={{ display: 'flex' }}>
+              <div style={{ width: '50%' }}>
+                <TextInput
+                  type='number'
+                  wide={true}
+                  value={addCollateralAmt}
+                  onChange={(event) => {
+                    setAddCollateralAmt(event.target.value);
+                  }}
                 />
               </div>
-            }
-            secondary={balanceBlock('ETH', vault.collateral)}
-            invert='horizontal'
-          />
-        </Box>
-
-        <Box heading={'Issued'}>
-          <Split
-            primary={
-              <div style={{ paddingTop: '3%' }}>
-                <Split
-                  primary={
-                    <TextInput
-                      type='number'
-                      wide={true}
-                      value={issueOrBurnAmt}
-                      onChange={(event) => {
-                        setIssueOrBurAmt(event.target.value)
-                      }}
-                    />
-                  }
-                  secondary={
-                    <div style={{ display: 'flex', alignItems: 'center' }}>
-                      <Button
-                        wide={true}
-                        icon={<IconCirclePlus />}
-                        label='Issue'
-                        disabled={!isOwner}
-                        onClick={() => {
-                          issueOToken(
-                            token,
-                            handleDecimals(issueOrBurnAmt, tokenDecimals)
-                          );
-                        }}
-                      />
-                      <Button
-                        wide={true}
-                        icon={<IconCircleMinus />}
-                        disabled={!isOwner}
-                        label='Burn'
-                        onClick={() => {
-                          burnOToken(
-                            token,
-                            handleDecimals(issueOrBurnAmt, tokenDecimals)
-                          );
-                        }}
-                      />
-                    </div>
-                  }
+              <div style={{ width: '50%' }}>
+                <Button
+                  wide={true}
+                  icon={<IconCirclePlus />}
+                  label='Add'
+                  onClick={() => {
+                    addETHCollateral(token, owner, addCollateralAmt);
+                  }}
                 />
               </div>
-            }
-            secondary={balanceBlock(
+            </div>
+          </div> 
+          <div style={{ width: '6%'}}></div>
+          {/* Remove collateral */}
+          <div style={{ width: '32%', paddingTop: '2%' }}>
+            <div style={{ display: 'flex' }}>
+              <div style={{ width: '50%' }}>
+                <TextInput
+                  type='number'
+                  wide={true}
+                  value={removeCollateralAmt}
+                  onChange={(event) => {
+                    setRemoveCollateralAmt(event.target.value);
+                  }}
+                />
+              </div>
+              <div style={{ width: '50%' }}>
+                <Button
+                  wide={true}
+                  icon={<IconCircleMinus />}
+                  label='Remove'
+                  onClick={() => {
+                    removeETHCollateral(token, removeCollateralAmt)
+                  }}
+                />
+              </div>
+            </div>
+          </div> 
+
+          </div>
+      </Box>
+
+      <Box heading={'Total Issued'}>
+        <div style={{ display: 'flex' }}>
+          {/* total Issued */}
+          <div style={{ width: '30%' }}>{
+            balanceBlock(
               tokenSymbol,
-              vault.oTokensIssued
-                ? vault.oTokensIssued / 10 ** tokenDecimals
-                : 0
-            )}
-            invert='horizontal'
-          />
-        </Box>
-      </>
-    );
-  
+              vault.oTokensIssued ? vault.oTokensIssued / 10 ** tokenDecimals : 0
+              )}
+          </div>
+          {/* Issue More Token */}
+          <div style={{ width: '32%', paddingTop: '2%' }}>
+            <div style={{ display: 'flex' }}>
+              <div style={{ width: '50%' }}>
+                <TextInput
+                  type='number'
+                  wide={true}
+                  value={issueAmt}
+                  onChange={(event) => {
+                    setIssueAmt(event.target.value);
+                  }}
+                />
+              </div>
+              <div style={{ width: '50%' }}>
+                <Button
+                  wide={true}
+                  icon={<IconCirclePlus />}
+                  label='Issue'
+                  onClick={() => {
+                    issueOToken(token, handleDecimals(issueAmt, tokenDecimals));
+                    // addETHCollateral(token, owner, addCollateralAmt);
+                  }}
+                />
+              </div>
+            </div>
+          </div> 
+          <div style={{ width: '6%'}}></div>
+          {/* Remove collateral */}
+          <div style={{ width: '32%', paddingTop: '2%' }}>
+            <div style={{ display: 'flex' }}>
+              <div style={{ width: '50%' }}>
+                <TextInput
+                  type='number'
+                  wide={true}
+                  value={burnAmt}
+                  onChange={(event) => {
+                    setBurnAmt(event.target.value);
+                  }}
+                />
+              </div>
+              <div style={{ width: '50%' }}>
+                <Button
+                  wide={true}
+                  icon={<IconCircleMinus />}
+                  label='Burn'
+                  onClick={() => {
+                    burnOToken(token, handleDecimals(burnAmt, tokenDecimals));
+                  }}
+                />
+              </div>
+            </div>
+          </div> 
+
+          </div>
+      </Box>
+    </>
+  );
 }
 
 const handleDecimals = (rawAmt, decimal) => {
