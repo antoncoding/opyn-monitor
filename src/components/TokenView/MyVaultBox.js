@@ -2,7 +2,7 @@ import React from 'react';
 import { useHistory } from 'react-router-dom';
 
 import { DataView, Button, IdentityBadge } from '@aragon/ui';
-import { createTag } from './common';
+import { createTag, SectionTitle } from './common';
 
 function MangeButton({ oToken, owner }) {
   const history = useHistory();
@@ -14,27 +14,27 @@ function MangeButton({ oToken, owner }) {
 
 function MyVault({ vaults, oToken, user }) {
   const myVault = vaults.find((vault) => vault.owner === user);
-  return user === '' ? (
-    <></> // not login
-  ) : myVault === undefined ? (
-    <></> // has no open vault
+  return myVault === undefined ? (
+    <> </> // has no open vault
   ) : (
-    <DataView
-      heading={'My Vault'}
-      fields={['Owner', 'collateral', 'Issued', 'RATIO', 'Status', '']}
-      entries={[myVault]}
-      entriesPerPage={1}
-      renderEntry={({ owner, collateral, oTokensIssued, ratio, isSafe, oToken }) => {
-        return [
-          <IdentityBadge entity={owner} shorten={true} connectedAccount={true} />,
-          collateral,
-          oTokensIssued,
-          ratio,
-          createTag(isSafe, ratio),
-          MangeButton({ oToken, owner }),
-        ];
-      }}
-    />
+    <>
+      <SectionTitle title={'My Vault'} />
+      <DataView
+        fields={['Owner', 'collateral', 'Issued', 'RATIO', 'Status', '']}
+        entries={[myVault]}
+        entriesPerPage={1}
+        renderEntry={({ owner, collateral, oTokensIssued, ratio, isSafe, oToken }) => {
+          return [
+            <IdentityBadge entity={owner} shorten={true} connectedAccount={true} />,
+            collateral,
+            oTokensIssued,
+            ratio,
+            createTag(isSafe, ratio),
+            MangeButton({ oToken, owner }),
+          ];
+        }}
+      />
+    </>
   );
 }
 

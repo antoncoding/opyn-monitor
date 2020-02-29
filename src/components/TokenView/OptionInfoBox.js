@@ -33,19 +33,19 @@ function VaultBox({ oToken, tokenName }) {
         primary={
           <Split
             primary={
-              <Box heading={'contract'} padding={20}>
+              <Box heading={'contract'} padding={15}>
                 <IdentityBadge entity={oToken} shorten={false} />
               </Box>
             }
             secondary={
-              <Box heading={'balance'} padding={20}>
+              <Box heading={'balance'} padding={15}>
                 {balance}
               </Box>
             }
           />
         }
         secondary={
-          <Box heading={'total supply'} padding={20}>
+          <Box heading={'total supply'} padding={15}>
             {totalSupply} {tokenName}
           </Box>
         }

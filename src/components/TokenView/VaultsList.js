@@ -8,7 +8,7 @@ import {
   getVaultsWithLiquidatable,
 } from '../../utils/infura';
 
-import { renderListEntry } from './common';
+import { renderListEntry, SectionTitle } from './common';
 import { formatDigits } from '../../utils/common';
 import MyVault from './MyVaultBox';
 
@@ -60,6 +60,7 @@ function VaultOwnerList({ oToken, user }) {
   return (
     <>
       <MyVault vaults={vaults} oToken={oToken} user={user} />
+      <SectionTitle title={'All Vaults'} />
       <DataView
         status={isLoading ? 'loading' : 'default'}
         fields={['Owner', 'collateral', 'Issued', 'RATIO', 'Status', '']}

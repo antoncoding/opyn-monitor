@@ -1,9 +1,6 @@
-import React from 'react'
+import React from 'react';
 
-import {
-  Tag,
-  IdentityBadge,
-} from '@aragon/ui';
+import { Tag, IdentityBadge } from '@aragon/ui';
 
 import VaultModal from './VaultModal';
 
@@ -23,7 +20,7 @@ export const renderListEntry = ({ owner, collateral, oTokensIssued, ratio, isSaf
       ratio={ratio}
     />,
   ];
-}
+};
 
 export const createTag = (isSafe, ratio) => {
   return isSafe ? (
@@ -39,5 +36,9 @@ export const createTag = (isSafe, ratio) => {
     <Tag color='#E34343' background='#FFC6C6'>
       Unsafe!
     </Tag>
-  )
+  );
+};
+
+export function SectionTitle({ title }) {
+  return <div style={{ padding: 10, fontSize: 20 }}>{title}</div>;
 }
