@@ -1,69 +1,62 @@
 import React, { useState, useEffect } from 'react';
 
-import {
-  getVaults,
-  getVaultsWithLiquidatable,
-  getTokenBalance,
-  getBalance,
-  getOptionContractDetail,
-  getPrice,
-} from '../../utils/infura';
+import { getVaults, getTokenBalance, getBalance, getPrice } from '../../utils/infura';
 
-import { 
-  LinkBase,
-  IconCirclePlus, 
-  IconCircleMinus, 
-  Button, 
-  TextInput, 
-  Header, 
-  Box
+import {
+  ButtonBase,
+  IconCirclePlus,
+  IconCircleMinus,
+  Button,
+  TextInput,
+  Header,
+  Box,
 } from '@aragon/ui';
 
 import { addETHCollateral, removeETHCollateral, burnOToken, issueOToken } from '../../utils/web3';
-
+import { options } from '../../constants/options';
 import { formatDigits } from '../../utils/common';
 import { createTag } from '../TokenView/common';
 
 function ManageVault({ token, owner, user }) {
-  const [vault, setVault] = useState({});
-  const [tokenDecimals, setTokenDecimals] = useState(0);
-  const [tokenSymbol, setTokenSymbol] = useState('oToken');
+  const option = options.find((option) => option.addr === token);
+  const { decimals, symbol, oracle, strike, strikePrice, minRatio } = option;
 
-  const [strike, setStrike] = useState('')
-  const [strikePrice, setStrikePrice] = useState('')
-  const [lastETHValueInStrike, setLastETHValue] = useState(0)
+  const [vault, setVault] = useState({});
+  const [lastETHValueInStrike, setLastETHValue] = useState(0);
 
   const [ratio, setRatio] = useState(0);
-  const [minRatio, setMinRatio] = useState(1.6);
 
   const [tokenBalance, setTokenBalance] = useState(0);
   const [ethBalance, setETHBalance] = useState(0);
 
   const [addCollateralAmt, setAddCollateralAmt] = useState(0);
-  const [removeCollateralAmt, setRemoveCollateralAmt] = useState(0)
+  const [removeCollateralAmt, setRemoveCollateralAmt] = useState(0);
 
   const [issueAmt, setIssueAmt] = useState(0);
   const [burnAmt, setBurnAmt] = useState(0);
+
+  // status
+  const [noVault, setNoVault] = useState(true);
 
   useEffect(() => {
     let isCancelled = false;
 
     async function updateInfo() {
-      const vaults = await getVaults([owner], token);
-      const vault = (await getVaultsWithLiquidatable(vaults))[0];
-      const [ownerBalance, optionInfo, ethBalance] = await Promise.all([
+      console.debug('Updating Page...');
+      const vault = (await getVaults([owner], token))[0];
+      if (vault === undefined) {
+        return;
+      }
+      setNoVault(false);
+      const [ownerBalance, ethBalance] = await Promise.all([
         getTokenBalance(token, owner),
-        getOptionContractDetail(token),
         getBalance(owner),
       ]);
 
-      // todo: remove regetting these params
-      const { decimals, symbol, strikePrice, strike, oracle, minRatio } = optionInfo;
+      const tokenBalance = ownerBalance / 10 ** decimals;
 
-      const tokenBalance = ownerBalance / 10 ** optionInfo.decimals;
-
-      const lastStrikeValue = await getPrice(oracle, strike)
-      const ethValueInStrike = 1 / (lastStrikeValue);
+      const lastStrikeValue = await getPrice(oracle, strike);
+      const ethValueInStrike = 1 / lastStrikeValue;
       const valueProtectingInEth = parseFloat(strikePrice) * vault.oTokensIssued;
       const ratio = formatDigits(
         (parseFloat(vault.collateral) * ethValueInStrike) / valueProtectingInEth,
@@ -71,37 +64,33 @@ function ManageVault({ token, owner, user }) {
       );
 
       if (!isCancelled) {
-        setStrike(strike);
-        setStrikePrice(parseFloat(strikePrice));
         setLastETHValue(ethValueInStrike);
         setVault(vault);
         setTokenBalance(tokenBalance);
         setETHBalance(ethBalance);
-        setTokenDecimals(decimals);
-        setTokenSymbol(symbol);
-        setMinRatio(minRatio);
         setRatio(ratio);
       }
     }
     updateInfo();
-    const id = setInterval(updateInfo, 15000);
+    const id = setInterval(updateInfo, 10000);
 
-    // clean up function
     return () => {
       isCancelled = true;
       clearInterval(id);
     };
-  });
+  }, [decimals, oracle, owner, strike, strikePrice, token]);
 
   const isOwner = user === owner;
 
-  return (
+  return noVault ? (
+    <div style={{ padding: 100, textAlign: 'center' }}> No Vault Found for this user </div>
+  ) : (
     <>
       <Header primary={isOwner ? 'Manage Your Vault' : 'Vault Detail'} />
 
       <div style={{ padding: '2%', display: 'flex', alignItems: 'center' }}>
         <div style={{ width: '30%' }}>{balanceBlock('Owner ETH Balance', ethBalance)}</div>
-        <div style={{ width: '50%' }}>{balanceBlock(`${tokenSymbol} Balance`, tokenBalance)}</div>
+        <div style={{ width: '50%' }}>{balanceBlock(`${symbol} Balance`, tokenBalance)}</div>
         <div style={{ width: '20%' }}>
           <>
             <div style={{ fontSize: 14, padding: 3 }}>
@@ -126,19 +115,19 @@ function ManageVault({ token, owner, user }) {
             <div style={{ display: 'flex' }}>
               <div style={{ width: '60%' }}>
                 <>
-                <TextInput
-                  type='number'
-                  wide={true}
-                  value={addCollateralAmt}
-                  onChange={(event) => {
-                    setAddCollateralAmt(event.target.value);
-                  }}
-                />
-                <MaxButton
-                  onClick={()=>{
-                    setAddCollateralAmt(ethBalance)
-                  }}
-                />
+                  <TextInput
+                    type='number'
+                    wide={true}
+                    value={addCollateralAmt}
+                    onChange={(event) => {
+                      setAddCollateralAmt(event.target.value);
+                    }}
+                  />
+                  <MaxButton
+                    onClick={() => {
+                      setAddCollateralAmt(ethBalance);
+                    }}
+                  />
                 </>
               </div>
               <div style={{ width: '40%' }}>
@@ -152,30 +141,30 @@ function ManageVault({ token, owner, user }) {
                 />
               </div>
             </div>
-          </div> 
-          <div style={{ width: '6%'}}></div>
+          </div>
+          <div style={{ width: '6%' }}></div>
           {/* Remove collateral */}
           <div style={{ width: '32%', paddingTop: '2%' }}>
             <div style={{ display: 'flex' }}>
               <div style={{ width: '60%' }}>
                 <>
-                <TextInput
-                  type='number'
-                  wide={true}
-                  value={removeCollateralAmt}
-                  onChange={(event) => {
-                    setRemoveCollateralAmt(event.target.value);
-                  }}
-                />
-                <MaxButton
-                  onClick={()=>{
-                    if(lastETHValueInStrike <= 0) return
-                    const minValueInStrike = strikePrice * vault.oTokensIssued  * minRatio
-                    const minCollateral = (minValueInStrike / lastETHValueInStrike )
-                    const maxToRemove = vault.collateral - minCollateral
-                    setRemoveCollateralAmt(maxToRemove)
-                  }}
-                />
+                  <TextInput
+                    type='number'
+                    wide={true}
+                    value={removeCollateralAmt}
+                    onChange={(event) => {
+                      setRemoveCollateralAmt(event.target.value);
+                    }}
+                  />
+                  <MaxButton
+                    onClick={() => {
+                      if (lastETHValueInStrike <= 0) return;
+                      const minValueInStrike = strikePrice * vault.oTokensIssued * minRatio;
+                      const minCollateral = minValueInStrike / lastETHValueInStrike;
+                      const maxToRemove = vault.collateral - minCollateral;
+                      setRemoveCollateralAmt(maxToRemove);
+                    }}
+                  />
                 </>
               </div>
               <div style={{ width: '40%' }}>
@@ -184,50 +173,46 @@ function ManageVault({ token, owner, user }) {
                   icon={<IconCircleMinus />}
                   label='Remove'
                   onClick={() => {
-                    removeETHCollateral(token, removeCollateralAmt)
+                    removeETHCollateral(token, removeCollateralAmt);
                   }}
                 />
               </div>
             </div>
-          </div> 
-
           </div>
+        </div>
       </Box>
 
       <Box heading={'Total Issued'}>
         <div style={{ display: 'flex' }}>
           {/* total Issued */}
-          <div style={{ width: '30%' }}>{
-            balanceBlock(
-              tokenSymbol,
-              vault.oTokensIssued ? vault.oTokensIssued / 10 ** tokenDecimals : 0
-              )}
+          <div style={{ width: '30%' }}>
+            {balanceBlock(symbol, vault.oTokensIssued ? vault.oTokensIssued / 10 ** decimals : 0)}
           </div>
           {/* Issue More Token */}
           <div style={{ width: '32%', paddingTop: '2%' }}>
             <div style={{ display: 'flex' }}>
               <div style={{ width: '60%' }}>
                 <>
-                <TextInput
-                  type='number'
-                  wide={true}
-                  value={issueAmt}
-                  onChange={(event) => {
-                    setIssueAmt(event.target.value);
-                  }}
-                />
-                <MaxButton onClick={()=>{
-                  
-                  if(strikePrice <= 0) return
+                  <TextInput
+                    type='number'
+                    wide={true}
+                    value={issueAmt}
+                    onChange={(event) => {
+                      setIssueAmt(event.target.value);
+                    }}
+                  />
+                  <MaxButton
+                    onClick={() => {
+                      if (strikePrice <= 0) return;
 
-                  const maxTotal = vault.collateral * lastETHValueInStrike / (minRatio * strikePrice)
-                  const maxToIssueRaw = maxTotal - vault.oTokensIssued
-                  const maxToIssue = maxToIssueRaw / 10 ** tokenDecimals
-                  setIssueAmt(maxToIssue);
-
-                }} />
+                      const maxTotal =
+                        (vault.collateral * lastETHValueInStrike) / (minRatio * strikePrice);
+                      const maxToIssueRaw = maxTotal - vault.oTokensIssued;
+                      const maxToIssue = maxToIssueRaw / 10 ** decimals;
+                      setIssueAmt(maxToIssue);
+                    }}
+                  />
                 </>
-                
               </div>
               <div style={{ width: '40%' }}>
                 <Button
@@ -235,29 +220,31 @@ function ManageVault({ token, owner, user }) {
                   icon={<IconCirclePlus />}
                   label='Issue'
                   onClick={() => {
-                    issueOToken(token, handleDecimals(issueAmt, tokenDecimals));
+                    issueOToken(token, handleDecimals(issueAmt, decimals));
                   }}
                 />
               </div>
             </div>
-          </div> 
-          <div style={{ width: '6%'}}></div>
+          </div>
+          <div style={{ width: '6%' }}></div>
           {/* Remove collateral */}
           <div style={{ width: '32%', paddingTop: '2%' }}>
             <div style={{ display: 'flex' }}>
               <div style={{ width: '60%' }}>
                 <>
-                <TextInput
-                  type='number'
-                  wide={true}
-                  value={burnAmt}
-                  onChange={(event) => {
-                    setBurnAmt(event.target.value);
-                  }}
-                />
-                <MaxButton onClick={()=>{
-                    setBurnAmt(tokenBalance)
-                }} />
+                  <TextInput
+                    type='number'
+                    wide={true}
+                    value={burnAmt}
+                    onChange={(event) => {
+                      setBurnAmt(event.target.value);
+                    }}
+                  />
+                  <MaxButton
+                    onClick={() => {
+                      setBurnAmt(tokenBalance);
+                    }}
+                  />
                 </>
               </div>
               <div style={{ width: '40%' }}>
@@ -266,27 +253,26 @@ function ManageVault({ token, owner, user }) {
                   icon={<IconCircleMinus />}
                   label='Burn'
                   onClick={() => {
-                    burnOToken(token, handleDecimals(burnAmt, tokenDecimals));
+                    burnOToken(token, handleDecimals(burnAmt, decimals));
                   }}
                 />
               </div>
             </div>
-          </div> 
-
           </div>
+        </div>
       </Box>
     </>
   );
 }
 
-function MaxButton({onClick}) {
+function MaxButton({ onClick }) {
   return (
-    <div style={{padding:3}}>
-      <LinkBase onClick={onClick}>
-        <span style={{opacity: 0.5}}> Max </span>
-      </LinkBase>
+    <div style={{ padding: 3 }}>
+      <ButtonBase onClick={onClick}>
+        <span style={{ opacity: 0.5 }}> Max </span>
+      </ButtonBase>
     </div>
-  )
+  );
 }
 
 const handleDecimals = (rawAmt, decimal) => {

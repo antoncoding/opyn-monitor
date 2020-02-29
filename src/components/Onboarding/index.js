@@ -1,6 +1,6 @@
 import React from 'react';
 import { useHistory } from 'react-router-dom';
-import { supportedList } from '../../constants/addresses';
+import { options } from '../../constants/options';
 
 import { Header, DataView, IdentityBadge, Button } from '@aragon/ui';
 
@@ -15,11 +15,11 @@ function DashBoard() {
       <div style={{padding: 5, opacity:0.5}}> Choose a option contract to start </div>
       <DataView
         fields={['Name', 'Contract', '']}
-        entries={supportedList}
+        entries={options}
         entriesPerPage={6}
-        renderEntry={({ addr, name }) => {
+        renderEntry={({ addr, title }) => {
           return [
-            <>{name}</>,
+            <>{title}</>,
             <IdentityBadge entity={addr} shorten={false} />,
             <Button onClick={() => goToToken(addr)}> Let's Go </Button>,
           ];

@@ -1,34 +1,34 @@
 import React, { useState, useEffect } from 'react';
 import { Box, Split, Header, IdentityBadge } from '@aragon/ui';
-import { getOptionContractDetail } from '../../utils/infura';
+import { getERC20Info, getBalance } from '../../utils/infura';
 
-function VaultBox({ oToken, tokenName }) {
-  const [name, setName] = useState('oToken');
+import { options } from '../../constants/options';
+
+function OptionOverview({ oToken, tokenName }) {
+  const option = options.find((option) => option.addr === oToken);
   const [balance, setBalance] = useState('0');
   const [totalSupply, setTotalSupply] = useState('0');
 
   useEffect(() => {
-    
     let isCancelled = false;
     async function init() {
-      const { balance, totalSupply, name } = await getOptionContractDetail(oToken);
-      if(!isCancelled) {
+      const [balance, tokenInfo] = await Promise.all([getBalance(oToken), getERC20Info(oToken)]);
+      const { totalSupply } = tokenInfo;
+      if (!isCancelled) {
         setBalance(balance);
         setTotalSupply(totalSupply);
-        setName(name);
       }
     }
     init();
 
     return () => {
-      isCancelled = true
-    }
+      isCancelled = true;
+    };
   }, [oToken]);
-
 
   return (
     <>
-      <Header primary={name} />
+      <Header primary={option.name} />
       <Split
         primary={
           <Split
@@ -54,4 +54,4 @@ function VaultBox({ oToken, tokenName }) {
   );
 }
 
-export default VaultBox;
+export default OptionOverview;

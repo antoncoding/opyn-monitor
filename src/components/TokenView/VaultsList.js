@@ -1,18 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { DataView } from '@aragon/ui';
 import { getAllVaultOwners } from '../../utils/graph';
-import {
-  getOptionContractDetail,
-  getVaults,
-  getPrice,
-  getVaultsWithLiquidatable,
-} from '../../utils/infura';
-
+import { getVaults, getPrice, getVaultsWithLiquidatable } from '../../utils/infura';
+import { options } from '../../constants/options';
 import { renderListEntry, SectionTitle } from './common';
 import { formatDigits } from '../../utils/common';
 import MyVault from './MyVaultBox';
 
 function VaultOwnerList({ oToken, user }) {
+  const option = options.find((option) => option.addr === oToken);
   const [isLoading, setIsLoading] = useState(true);
   const [vaults, setVaults] = useState([]);
 
@@ -20,9 +16,7 @@ function VaultOwnerList({ oToken, user }) {
     let isCancelled = false;
     const updateInfo = async () => {
       const owners = await getAllVaultOwners();
-      const { strike, decimals, minRatio, strikePrice, oracle } = await getOptionContractDetail(
-        oToken
-      );
+      const { strike, decimals, minRatio, strikePrice, oracle } = option;
       const vaults = await getVaults(owners, oToken);
 
       const ethValueInStrike = 1 / (await getPrice(oracle, strike));
@@ -49,13 +43,13 @@ function VaultOwnerList({ oToken, user }) {
     };
 
     updateInfo();
-    const id = setInterval(updateInfo, 15000);
+    const id = setInterval(updateInfo, 12000);
 
     return () => {
       isCancelled = true;
       clearInterval(id);
     };
-  }, [oToken]);
+  }, [oToken, option, user]);
 
   return (
     <>

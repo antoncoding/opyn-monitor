@@ -8,30 +8,6 @@ const Promise = require('bluebird');
 const web3 = new Web3('https://mainnet.infura.io/v3/44fd23cda65746a699a5d3c0e2fa45d5');
 
 /**
- * Call only once
- * @param {*} oToken
- */
-export const getOptionContractDetail = async (oToken) => {
-  const [tokenInfo, balance, optionInfo] = await Promise.all([
-    getERC20Info(oToken),
-    getBalance(oToken), 
-    getAssetsAndOracle(oToken)]
-  );
-  return {
-    name: tokenInfo.name,
-    symbol: tokenInfo.symbol,
-    decimals: tokenInfo.decimals,
-    totalSupply: tokenInfo.totalSupply,
-    oracle: optionInfo.oracle,
-    underlying: optionInfo.underlying,
-    strike: optionInfo.strike,
-    strikePrice: optionInfo.strikePrice,
-    minRatio: optionInfo.minRatio,
-    balance,
-  };
-};
-
-/**
  *
  * @param {Array<string>} owners
  * @param {string} oToken
@@ -99,12 +75,10 @@ export const getDecimals = async(oToken) => {
 
 export const getERC20Info = async(address) => {
   const token = new web3.eth.Contract(optionContractABI, address);
-  const name = await token.methods.name().call();
   const totalSupplyDecimals = await token.methods.totalSupply().call();
-  const symbol = await token.methods.symbol().call();
   const decimals = await token.methods.decimals().call();
   const totalSupply = parseInt(totalSupplyDecimals) / 10 ** parseInt(decimals);
-  return { name, decimals, totalSupply, symbol }
+  return { decimals, totalSupply }
 }
 
 export const getAssetsAndOracle = async(address) => {
