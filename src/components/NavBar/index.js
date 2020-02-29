@@ -15,7 +15,7 @@ function NavBar({ theme, updateTheme, user, setUser }) {
   }, [history.location.pathname]);
 
   const handleBack = (addr) => {
-    history.push(`/`);
+    history.goBack()
   };
 
   return (
