@@ -24,7 +24,7 @@ export const renderListEntry = ({ owner, collateral, oTokensIssued, ratio, isSaf
 
 export const createTag = (isSafe, ratio) => {
   return isSafe ? (
-    ratio < 1.7 ? (
+    ratio < 1.6 ? (
       <Tag background='#FFEBAD' color='#FEC100'>
         {' '}
         Danger{' '}
