@@ -29,6 +29,7 @@ function PositionModal({ oToken, owner, collateral, isSafe, oTokensIssued, ratio
   useEffect(() =>{
     let isCancelled = false
     async function getData(){    
+      if(!opened) return
       const accounts = await getAccounts();
       const maxLiquidatable = await getMaxLiquidatable(oToken, owner, accounts[0]);
       const _decimals = await getDecimals(oToken);
@@ -43,7 +44,7 @@ function PositionModal({ oToken, owner, collateral, isSafe, oTokensIssued, ratio
     return ()=>{
       isCancelled = true
     }
-  }, [oToken, owner]);
+  }, [oToken, opened, owner]);
 
   return (
     <>
