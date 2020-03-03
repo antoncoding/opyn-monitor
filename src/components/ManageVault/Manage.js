@@ -162,7 +162,7 @@ function ManageVault({ token, owner, user }) {
                       const minValueInStrike = strikePrice * vault.oTokensIssued * minRatio;
                       const minCollateral = minValueInStrike / lastETHValueInStrike;
                       const maxToRemove = vault.collateral - minCollateral;
-                      setRemoveCollateralAmt(maxToRemove);
+                      setRemoveCollateralAmt(maxToRemove.toPrecision(18));
                     }}
                   />
                 </>
