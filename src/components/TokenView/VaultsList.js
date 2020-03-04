@@ -17,7 +17,7 @@ function VaultOwnerList({ oToken, user }) {
     const updateInfo = async () => {
       const owners = await getAllVaultOwners();
       const { strike, decimals, minRatio, strikePrice, oracle } = option;
-      const vaults = await getVaults(owners, oToken);
+      const vaults = (await getVaults(owners, oToken)).filter(vault => vault.collateral > 0);
 
       const ethValueInStrike = 1 / (await getPrice(oracle, strike));
       const vaultDetail = vaults.map((vault) => {

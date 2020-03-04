@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import Web3 from 'web3'
+
 import {
   getVaults,
   getTokenBalance,
@@ -30,7 +30,6 @@ import {
 import { options } from '../../constants/options';
 import { formatDigits } from '../../utils/common';
 import { createTag } from '../TokenView/common';
-const web3 = new Web3()
 
 function ManageVault({ token, owner, user }) {
   const option = options.find((option) => option.addr === token);
