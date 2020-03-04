@@ -4,7 +4,7 @@ import { burnOToken, issueOToken, } from '../../utils/web3';
 
 import { BalanceBlock, MaxButton } from '../common';
 
-import { handleDecimals } from '../../utils/number'
+import { handleDecimals, formatDigits } from '../../utils/number'
 
 import { Box, TextInput, Button, IconCirclePlus, IconCircleMinus } from '@aragon/ui';
 
@@ -16,10 +16,19 @@ function IssuedTokenManagement({
   strikePrice,
   minRatio,
   decimals,
-  symbol
+  symbol,
+  setNewRatio
 }) {
   const [issueAmt, setIssueAmt] = useState(0);
   const [burnAmt, setBurnAmt] = useState(0);
+
+  const updateNewRatio = (newAmt) => {
+    const newRatio = formatDigits(
+      vault.collateral * lastETHValueInStrike / (strikePrice * newAmt),
+      5
+    )
+    setNewRatio(newRatio)
+  }
 
   return (
     <Box heading={'Total Issued'}>
@@ -42,7 +51,9 @@ function IssuedTokenManagement({
                     wide={true}
                     value={issueAmt}
                     onChange={(event) => {
-                      setIssueAmt(event.target.value);
+                      const amt = event.target.value
+                      setIssueAmt(amt);
+                      updateNewRatio(parseInt(vault.oTokensIssued) + handleDecimals(amt, decimals))
                     }}
                   />
                   <MaxButton
@@ -54,6 +65,7 @@ function IssuedTokenManagement({
                       const maxToIssueRaw = maxTotal - vault.oTokensIssued;
                       const maxToIssue = maxToIssueRaw / 10 ** decimals;
                       setIssueAmt(maxToIssue);
+                      setNewRatio(minRatio)
                     }}
                   />
                 </>
@@ -81,7 +93,9 @@ function IssuedTokenManagement({
                     wide={true}
                     value={burnAmt}
                     onChange={(event) => {
-                      setBurnAmt(event.target.value);
+                      const amt = event.target.value
+                      updateNewRatio(parseInt(vault.oTokensIssued) - handleDecimals(amt, decimals))
+                      setBurnAmt(amt);
                     }}
                   />
                   <MaxButton

@@ -3,8 +3,9 @@ import React, { useState } from 'react';
 import { addETHCollateral, removeETHCollateral } from '../../utils/web3';
 
 import { BalanceBlock, MaxButton } from '../common';
-
 import { Box, TextInput, Button, IconCirclePlus, IconCircleMinus } from '@aragon/ui';
+
+import { formatDigits } from '../../utils/number'
 
 function CollateralManagement({
   vault,
@@ -14,9 +15,19 @@ function CollateralManagement({
   lastETHValueInStrike,
   strikePrice,
   minRatio,
+  setNewRatio
 }) {
   const [addCollateralAmt, setAddCollateralAmt] = useState(0);
   const [removeCollateralAmt, setRemoveCollateralAmt] = useState(0);
+
+  const updateNewRatio = (newCollateral) => {
+    if(newCollateral <= 0) return
+    const newRatio = formatDigits(
+      newCollateral * lastETHValueInStrike / (strikePrice * vault.oTokensIssued),
+      5
+    )
+    setNewRatio(newRatio)
+  }
 
   return (
     <Box heading={'Collateral'}>
@@ -35,12 +46,15 @@ function CollateralManagement({
                   wide={true}
                   value={addCollateralAmt}
                   onChange={(event) => {
-                    setAddCollateralAmt(event.target.value);
+                    const amt = event.target.value
+                    setAddCollateralAmt(amt);
+                    updateNewRatio(parseFloat(vault.collateral) + parseFloat(amt))
                   }}
                 />
                 <MaxButton
                   onClick={() => {
                     setAddCollateralAmt(ethBalance);
+                    updateNewRatio(parseFloat(vault.collateral) + parseFloat(ethBalance))
                   }}
                 />
               </>
@@ -68,7 +82,9 @@ function CollateralManagement({
                   wide={true}
                   value={removeCollateralAmt}
                   onChange={(event) => {
-                    setRemoveCollateralAmt(event.target.value);
+                    const amt = event.target.value
+                    setRemoveCollateralAmt(amt);
+                    updateNewRatio(parseFloat(vault.collateral) - parseFloat(amt))
                   }}
                 />
                 <MaxButton
@@ -78,6 +94,7 @@ function CollateralManagement({
                     const minCollateral = minValueInStrike / lastETHValueInStrike;
                     const maxToRemove = vault.collateral - minCollateral;
                     setRemoveCollateralAmt(maxToRemove);
+                    setNewRatio(minRatio)
                   }}
                 />
               </>

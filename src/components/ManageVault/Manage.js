@@ -35,7 +35,7 @@ function ManageVault({ token, owner, user }) {
 
   // status
   const [noVault, setNoVault] = useState(true);
-
+  const [newRatio, setNewRatio] = useState(ratio)
   
 
   useEffect(() => {
@@ -91,6 +91,7 @@ function ManageVault({ token, owner, user }) {
       <HeaderDashboard
         owner={owner} user={user} ratio={ratio} minRatio={minRatio} 
         symbol={symbol} ethBalance={ethBalance} tokenBalance={tokenBalance}
+        newRatio={newRatio}
       />
 
       <CollateralManagement
@@ -101,6 +102,7 @@ function ManageVault({ token, owner, user }) {
         lastETHValueInStrike={lastETHValueInStrike}
         strikePrice={strikePrice}
         minRatio={minRatio}
+        setNewRatio={setNewRatio}
       />
 
       <IssuedTokenManagement
@@ -112,6 +114,7 @@ function ManageVault({ token, owner, user }) {
         minRatio={minRatio}
         decimals={decimals}
         symbol={symbol}
+        setNewRatio={setNewRatio}
       />
       
       <OptionExchange
