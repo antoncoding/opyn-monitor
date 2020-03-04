@@ -106,8 +106,6 @@ export const sellOTokensFromExchange = async(oTokenAddr, exchangeAddr, sellAmt) 
   const accounts = await window.ethereum.enable();
   const web3 = new Web3(window.ethereum);
   const allowance = await getAllowance(oTokenAddr, accounts[0], exchangeAddr)
-  // console.log(`allowance ${allowance}`)
-  // console.log(`to buy ${buyAmt}`)
   if (allowance < sellAmt) {
     await approve(oTokenAddr, exchangeAddr, sellAmt)
   }
