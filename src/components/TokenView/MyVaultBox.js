@@ -2,7 +2,9 @@ import React from 'react';
 import { useHistory } from 'react-router-dom';
 
 import { DataView, Button, IdentityBadge } from '@aragon/ui';
-import { createTag, SectionTitle } from './common';
+
+// import { createTag } from '../common/RatioTag'
+import { SectionTitle, RatioTag } from '../common';
 
 import { openVault } from '../../utils/web3'
 
@@ -65,7 +67,7 @@ function MyVault({ vaults, oToken, user }) {
             collateral,
             oTokensIssued,
             ratio,
-            createTag(isSafe, ratio),
+            <RatioTag isSafe={isSafe} ratio={ratio}/>,
             MangeButton({ oToken, owner }),
           ];
         }}

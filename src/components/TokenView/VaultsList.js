@@ -1,11 +1,31 @@
 import React, { useState, useEffect } from 'react';
-import { DataView } from '@aragon/ui';
+import { DataView, IdentityBadge } from '@aragon/ui';
 import { getAllVaultOwners } from '../../utils/graph';
 import { getVaults, getPrice, getVaultsWithLiquidatable } from '../../utils/infura';
 import { options } from '../../constants/options';
-import { renderListEntry, SectionTitle } from './common';
+import { SectionTitle, RatioTag } from '../common';
 import { formatDigits } from '../../utils/common';
+import VaultModal from './VaultModal'
 import MyVault from './MyVaultBox';
+
+const renderListEntry = ({ owner, collateral, oTokensIssued, ratio, isSafe, oToken }) => {
+  return [
+    <IdentityBadge entity={owner} shorten={true} />,
+    collateral,
+    oTokensIssued,
+    ratio,
+    RatioTag({isSafe, ratio}),
+    <VaultModal
+      oToken={oToken}
+      owner={owner}
+      collateral={collateral}
+      isSafe={isSafe}
+      oTokensIssued={oTokensIssued}
+      ratio={ratio}
+    />,
+  ];
+};
+
 
 function VaultOwnerList({ oToken, user }) {
   const option = options.find((option) => option.addr === oToken);

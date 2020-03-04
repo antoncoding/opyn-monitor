@@ -29,7 +29,8 @@ import {
 } from '../../utils/web3';
 import { options } from '../../constants/options';
 import { formatDigits } from '../../utils/common';
-import { createTag } from '../TokenView/common';
+
+import HeaderDashboard from './HeaderDashboard'
 
 function ManageVault({ token, owner, user }) {
   const option = options.find((option) => option.addr === token);
@@ -127,23 +128,10 @@ function ManageVault({ token, owner, user }) {
     <>
       <Header primary={isOwner ? 'Manage Your Vault' : 'Vault Detail'} />
 
-      <div style={{ padding: '2%', display: 'flex', alignItems: 'center' }}>
-        <div style={{ width: '30%' }}>{balanceBlock('Owner ETH Balance', ethBalance)}</div>
-        <div style={{ width: '50%' }}>{balanceBlock(`${symbol} Balance`, tokenBalance)}</div>
-        <div style={{ width: '20%' }}>
-          <>
-            <div style={{ fontSize: 14, padding: 3 }}>
-              Current Ratio {ratio > 0 ? createTag(ratio >= minRatio, ratio) : ''}
-            </div>
-            <div style={{ fontSize: 24, padding: 3 }}>
-              <span style={{ fontSize: 24 }}>{ratio.toString().split('.')[0]}</span>.
-              <span style={{ fontSize: 18 }}>{ratio.toString().split('.')[1]} </span>
-              {minRatio > 0 ? <span style={{ fontSize: 16 }}> / {minRatio} </span> : ''}
-              {/* {balance} */}
-            </div>
-          </>
-        </div>
-      </div>
+      <HeaderDashboard
+        owner={owner} user={user} ratio={ratio} minRatio={minRatio} 
+        symbol={symbol} ethBalance={ethBalance} tokenBalance={tokenBalance}
+      />
 
       <Box heading={'Collateral'}>
         <div style={{ display: 'flex' }}>

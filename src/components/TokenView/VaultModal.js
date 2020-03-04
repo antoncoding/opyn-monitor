@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { addETHCollateral, liquidate, getAccounts } from '../../utils/web3';
 import { getMaxLiquidatable, getDecimals } from '../../utils/infura';
 
-import { createTag } from './common';
+import { RatioTag } from '../common';
 
 import {
   Header,
@@ -59,7 +59,7 @@ function PositionModal({ oToken, owner, collateral, isSafe, oTokensIssued, ratio
           entries={[{ collateral, isSafe, oTokensIssued, ratio }]}
           entriesPerPage={1}
           renderEntry={({ collateral, isSafe, oTokensIssued, ratio }) => {
-            return [collateral, oTokensIssued, ratio, createTag(isSafe, ratio)];
+            return [collateral, oTokensIssued, ratio, RatioTag({isSafe, ratio})];
           }}
         />
 
