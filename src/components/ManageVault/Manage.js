@@ -63,7 +63,6 @@ function ManageVault({ token, owner, user }) {
       return;
     }
     const amount = handleDecimals(buyAmt, decimals);
-    console.log(`amt`, amount)
     const premium = await getPremiumToPay(exchange, token, amount);
     setPremiumToPay(premium);
   };
