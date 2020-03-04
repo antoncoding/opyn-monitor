@@ -1,5 +1,5 @@
 import Web3 from 'web3';
-import { formatDigits } from './common'
+import { formatDigits } from './number'
 
 const optionContractABI = require('../constants/abi/OptionContract.json')
 const optionExchangeABI = require('../constants/abi/OptionExchange.json')

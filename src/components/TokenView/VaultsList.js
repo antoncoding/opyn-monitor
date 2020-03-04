@@ -4,7 +4,7 @@ import { getAllVaultOwners } from '../../utils/graph';
 import { getVaults, getPrice, getVaultsWithLiquidatable } from '../../utils/infura';
 import { options } from '../../constants/options';
 import { SectionTitle, RatioTag } from '../common';
-import { formatDigits } from '../../utils/common';
+import { formatDigits } from '../../utils/number';
 import VaultModal from './VaultModal'
 import MyVault from './MyVaultBox';
 
