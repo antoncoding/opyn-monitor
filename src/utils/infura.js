@@ -2,6 +2,7 @@ import Web3 from 'web3';
 import { formatDigits } from './common'
 
 const optionContractABI = require('../constants/abi/OptionContract.json')
+const optionExchangeABI = require('../constants/abi/OptionExchange.json')
 const oracleABI = require('../constants/abi/Oracle.json')
 
 const Promise = require('bluebird');
@@ -101,6 +102,12 @@ export const getAssetsAndOracle = async(address) => {
   return {  underlying, strike, minRatio, strikePrice, oracle }
 }
 
+export const getAllowance = async(contract, user, spender) => {
+  const token = new web3.eth.Contract(optionContractABI, contract);
+  const allowance = await token.methods.allowance(user, spender).call()
+  return allowance
+}
+
 /**
  * Get balance of accounts
  * @param {string} address
@@ -115,6 +122,21 @@ export const getPrice = async (oracleAddr, token) => {
   const price = await oracle.methods.getPrice(token).call();
   return web3.utils.fromWei(price); // price base eth/ per token
 };
+
+// Exchange
+export const getPremiumToPay = async(exchangeAddr, tokenToBuy, buyAmt) => {
+  const exchange = new web3.eth.Contract(optionExchangeABI, exchangeAddr)
+  const paymentToken = '0x0000000000000000000000000000000000000000';
+  const premiumToPay = await exchange.methods.premiumToPay(tokenToBuy, paymentToken, buyAmt).call()
+  return web3.utils.fromWei(premiumToPay)
+}
+
+export const getPremiumReceived = async(exchangeAddr, tokenToSell, sellAmt) => {
+  const exchange = new web3.eth.Contract(optionExchangeABI, exchangeAddr)
+  const payoutToken = '0x0000000000000000000000000000000000000000';
+  const premiumReceived = await exchange.methods.premiumReceived(tokenToSell, payoutToken, sellAmt).call()
+  return web3.utils.fromWei(premiumReceived)
+}
 
 
 function compare(ownerA, ownerB) {

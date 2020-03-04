@@ -1,6 +1,8 @@
 import Web3 from 'web3'
 import { notify } from './blockNative'
+import { getAllowance } from './infura'
 const oTokenABI = require('../constants/abi/OptionContract.json')
+const exchangeABI = require('../constants/abi/OptionExchange.json')
 
 export const getAccounts = async() => {
   const accounts = await window.ethereum.enable();
@@ -59,4 +61,55 @@ export const removeETHCollateral = async (oTokenAddr, ethAmount) => {
     .on('transactionHash', (hash)=>{
       notify.hash(hash)
     })
+}
+
+export const approve = async(oTokenAddr, spender, amt) => {
+  const accounts = await window.ethereum.enable();
+  const web3 = new Web3(window.ethereum);
+  const oToken = new web3.eth.Contract(oTokenABI, oTokenAddr)
+  await oToken.methods.approve(spender, amt).send({from: accounts[0]})
+  .on('transactionHash', (hash)=>{
+    notify.hash(hash)
+  })
+}
+
+// Option Exchange
+
+
+export const buyOTokensFromExchange = async(oTokenAddr, exchangeAddr, buyAmt, ethAmt) => {
+  const accounts = await window.ethereum.enable();
+  const web3 = new Web3(window.ethereum);
+  const allowance = await getAllowance(oTokenAddr, accounts[0], exchangeAddr)
+  console.log(`allowance ${allowance}`)
+  console.log(`to buy ${buyAmt}`)
+  // if (allowance < buyAmt) {
+  //   await approve(oTokenAddr, exchangeAddr, buyAmt)
+  // }
+
+  const exchange = new web3.eth.Contract(exchangeABI, exchangeAddr)
+  await exchange.methods.buyOTokens(
+    accounts[0],
+    oTokenAddr,
+    '0x0000000000000000000000000000000000000000', // payment
+    buyAmt,
+  ).send({from: accounts[0], value: web3.utils.toWei(ethAmt)})
+  .on('transactionHash', (hash)=>{
+    notify.hash(hash)
+  })
+}
+
+export const sellOTokensFromExchange = async(oTokenAddr, exchangeAddr, sellAmt) => {
+  const accounts = await window.ethereum.enable();
+  const web3 = new Web3(window.ethereum);
+
+  const exchange = new web3.eth.Contract(exchangeABI, exchangeAddr)
+  await exchange.methods.sellOTokens(
+    accounts[0],
+    oTokenAddr,
+    '0x0000000000000000000000000000000000000000', // payment
+    sellAmt,
+  ).send({from: accounts[0]})
+  .on('transactionHash', (hash)=>{
+    notify.hash(hash)
+  })
 }

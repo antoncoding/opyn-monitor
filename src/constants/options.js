@@ -13,6 +13,7 @@ export const options = [
     strike: '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48',
     strikePrice: 1.859e-10,
     minRatio: 1.4,
+    exchange: '0x5778f2824a114f6115dc74d432685d3336216017'
   },
   {
     addr: '0x8ed9f862363ffdfd3a07546e618214b6d59f03d4',
@@ -28,6 +29,7 @@ export const options = [
     strike: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
     strikePrice: 2.08e-10,
     minRatio: 1.4,
+    exchange: '0x5778f2824a114f6115dc74d432685d3336216017'
   },
   {
     addr: '0x4ba8c6ce0e855c051e65dfc37883360efaf7c82b',
@@ -42,6 +44,7 @@ export const options = [
      strike: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
      strikePrice: 9.2e-16,
      minRatio: 1.6,
+     exchange: '0x5778f2824a114f6115dc74d432685d3336216017'
   },
   {
     addr: '0xddac4aed7c8f73032b388efe2c778fc194bc81ed',
@@ -56,5 +59,6 @@ export const options = [
     strike: '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48',
     strikePrice: 2e-10,
     minRatio: 1.6,
+    exchange: '0x5778f2824a114f6115dc74d432685d3336216017'
   },
 ]
