@@ -4,6 +4,8 @@ import { useHistory } from 'react-router-dom';
 import { DataView, Button, IdentityBadge } from '@aragon/ui';
 import { createTag, SectionTitle } from './common';
 
+import { openVault } from '../../utils/web3'
+
 function MangeButton({ oToken, owner }) {
   const history = useHistory();
   const goToManagePage = (oToken, owner) => {
@@ -12,10 +14,44 @@ function MangeButton({ oToken, owner }) {
   return <Button onClick={() => goToManagePage(oToken, owner)} label='Manage'></Button>;
 }
 
+function OpenVaultButton({ oToken, user }) {
+
+  const history = useHistory();
+
+  const openAndGoToVault = () => {
+    openVault(oToken)
+    history.push(`/manage/${oToken}/${user}`);
+  }
+
+  return <Button 
+    onClick={() => openAndGoToVault(oToken)} 
+    label='Open Vault'
+    />;
+}
+
 function MyVault({ vaults, oToken, user }) {
   const myVault = vaults.find((vault) => vault.owner === user);
-  return myVault === undefined ? (
-    <> </> // has no open vault
+  return user === '' ?
+  <></> :
+  myVault === undefined ? (
+    <>
+      <SectionTitle title={'No Vault Yet'} />
+      <DataView
+        fields={['Owner', 'collateral', 'Issued', 'RATIO', 'Status', '']}
+        entries={[{}]}
+        entriesPerPage={1}
+        renderEntry={() => {
+          return [
+            <IdentityBadge entity={user} shorten={true} connectedAccount={true} />,
+            '-',
+            '-',
+            '-',
+            '-',
+            OpenVaultButton({ oToken, user}),
+          ];
+        }}
+      />
+    </> // has no open vault
   ) : (
     <>
       <SectionTitle title={'My Vault'} />

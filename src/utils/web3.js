@@ -72,18 +72,23 @@ export const approve = async(oTokenAddr, spender, amt) => {
   })
 }
 
+export const openVault = async(oTokenAddr) => {
+  const accounts = await window.ethereum.enable();
+  const web3 = new Web3(window.ethereum);
+  const oToken = new web3.eth.Contract(oTokenABI, oTokenAddr)
+  await oToken.methods.openVault().send({from: accounts[0]})
+  .on('transactionHash', (hash)=>{
+    notify.hash(hash)
+  })
+}
+
 // Option Exchange
 
 
 export const buyOTokensFromExchange = async(oTokenAddr, exchangeAddr, buyAmt, ethAmt) => {
   const accounts = await window.ethereum.enable();
   const web3 = new Web3(window.ethereum);
-  const allowance = await getAllowance(oTokenAddr, accounts[0], exchangeAddr)
-  console.log(`allowance ${allowance}`)
-  console.log(`to buy ${buyAmt}`)
-  // if (allowance < buyAmt) {
-  //   await approve(oTokenAddr, exchangeAddr, buyAmt)
-  // }
+  
 
   const exchange = new web3.eth.Contract(exchangeABI, exchangeAddr)
   await exchange.methods.buyOTokens(
@@ -100,7 +105,12 @@ export const buyOTokensFromExchange = async(oTokenAddr, exchangeAddr, buyAmt, et
 export const sellOTokensFromExchange = async(oTokenAddr, exchangeAddr, sellAmt) => {
   const accounts = await window.ethereum.enable();
   const web3 = new Web3(window.ethereum);
-
+  const allowance = await getAllowance(oTokenAddr, accounts[0], exchangeAddr)
+  // console.log(`allowance ${allowance}`)
+  // console.log(`to buy ${buyAmt}`)
+  if (allowance < sellAmt) {
+    await approve(oTokenAddr, exchangeAddr, sellAmt)
+  }
   const exchange = new web3.eth.Contract(exchangeABI, exchangeAddr)
   await exchange.methods.sellOTokens(
     accounts[0],
