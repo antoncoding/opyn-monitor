@@ -25,7 +25,6 @@ export const burnOToken = async(oTokenAddr, burnAmt) => {
   const accounts = await window.ethereum.enable();
   const web3 = new Web3(window.ethereum);
   const oToken = new web3.eth.Contract(oTokenABI, oTokenAddr)
-  
   await oToken.methods.burnOTokens(burnAmt).send({from: accounts[0]})
     .on('transactionHash', (hash)=>{
       notify.hash(hash)
@@ -47,7 +46,7 @@ export const addETHCollateral = async (oTokenAddr, owner, ethAmount) => {
   const accounts = await window.ethereum.enable();
   const web3 = new Web3(window.ethereum);
   const oToken = new web3.eth.Contract(oTokenABI, oTokenAddr)
-  await oToken.methods.addETHCollateral(owner).send({from: accounts[0], value: web3.utils.toWei(ethAmount)})
+  await oToken.methods.addETHCollateral(owner).send({from: accounts[0], value: web3.utils.toWei(ethAmount.toString())})
     .on('transactionHash', (hash)=>{
       notify.hash(hash)
     })
@@ -57,7 +56,7 @@ export const removeETHCollateral = async (oTokenAddr, ethAmount) => {
   const accounts = await window.ethereum.enable();
   const web3 = new Web3(window.ethereum);
   const oToken = new web3.eth.Contract(oTokenABI, oTokenAddr)
-  await oToken.methods.removeCollateral(web3.utils.toWei(ethAmount)).send({from: accounts[0] })
+  await oToken.methods.removeCollateral(web3.utils.toWei(ethAmount.toString())).send({from: accounts[0] })
     .on('transactionHash', (hash)=>{
       notify.hash(hash)
     })
@@ -92,7 +91,7 @@ export const buyOTokensFromExchange = async(oTokenAddr, exchangeAddr, buyAmt, et
     oTokenAddr,
     '0x0000000000000000000000000000000000000000', // payment
     buyAmt,
-  ).send({from: accounts[0], value: web3.utils.toWei(ethAmt)})
+  ).send({from: accounts[0], value: web3.utils.toWei(ethAmt.toString())})
   .on('transactionHash', (hash)=>{
     notify.hash(hash)
   })

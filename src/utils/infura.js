@@ -23,7 +23,7 @@ export const getVaults = async (owners, oToken) => {
     const underlying = res[2];
     const owned = res[3];
     return { collateral, oTokensIssued, underlying, owned, owner, oToken };
-  }).filter((vault) => vault.owned && parseFloat(vault.collateral) > 0)
+  }).filter((vault) => vault.owned)
   
     return vaults 
 };

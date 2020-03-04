@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-
+import Web3 from 'web3'
 import {
   getVaults,
   getTokenBalance,
@@ -30,6 +30,7 @@ import {
 import { options } from '../../constants/options';
 import { formatDigits } from '../../utils/common';
 import { createTag } from '../TokenView/common';
+const web3 = new Web3()
 
 function ManageVault({ token, owner, user }) {
   const option = options.find((option) => option.addr === token);
@@ -201,7 +202,7 @@ function ManageVault({ token, owner, user }) {
                       const minValueInStrike = strikePrice * vault.oTokensIssued * minRatio;
                       const minCollateral = minValueInStrike / lastETHValueInStrike;
                       const maxToRemove = vault.collateral - minCollateral;
-                      setRemoveCollateralAmt(maxToRemove.toPrecision(18));
+                      setRemoveCollateralAmt(maxToRemove);
                     }}
                   />
                 </>
@@ -306,7 +307,7 @@ function ManageVault({ token, owner, user }) {
       <Box heading={'Exchange'}>
         <div style={{ display: 'flex' }}>
           {/* total Issued */}
-          <div style={{ width: '30%' }}>{balanceBlock(symbol, tokenBalance)}</div>
+          <div style={{ width: '30%' }}>{balanceBlock( `${symbol} Balance`, tokenBalance)}</div>
           {/* Buy Token from Uniswap */}
           <div style={{ width: '32%', paddingTop: '2%' }}>
             <div style={{ display: 'flex' }}>
@@ -410,7 +411,7 @@ function PriceSection({ label, amt, symbol = '' }) {
 }
 
 const handleDecimals = (rawAmt, decimal) => {
-  return parseInt(parseFloat(rawAmt) * 10 ** decimal);
+  return Math.round(parseFloat(rawAmt) * 10 ** decimal);
 };
 
 const balanceBlock = (asset, balance) => {
