@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { Box, Split, Header, IdentityBadge } from '@aragon/ui';
+import { useHistory } from 'react-router-dom'
+import { Box, Split, Header, IdentityBadge, Button } from '@aragon/ui';
 import { getERC20Info, getBalance } from '../../utils/infura';
 
 import { options } from '../../constants/options';
 
 function OptionOverview({ oToken, tokenName }) {
+  const history = useHistory()
   const option = options.find((option) => option.addr === oToken);
   const [balance, setBalance] = useState('0');
   const [totalSupply, setTotalSupply] = useState('0');
@@ -28,7 +30,7 @@ function OptionOverview({ oToken, tokenName }) {
 
   return (
     <>
-      <Header primary={option.name} />
+      <Header primary={option.name} secondary={<Button label={'Exchange'} onClick={()=>{history.push(`/exchange/${oToken}`)}} />} />
       <Split
         primary={
           <Split

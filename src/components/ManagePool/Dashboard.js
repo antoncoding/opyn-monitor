@@ -14,7 +14,7 @@ const HeaderDashboard = ({ symbol, poolETHBalance, poolTokenBalance, uniswapExch
       </div>
       <div style={{ width: '40%' }}>
         <>
-          <AddressBlock label="Exchange" address={uniswapExchange} />
+          <AddressBlock label="Uniswap Contract" address={uniswapExchange} />
         </>
       </div>
     </div>

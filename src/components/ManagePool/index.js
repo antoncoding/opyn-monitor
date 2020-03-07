@@ -85,7 +85,7 @@ function ManagePool({ user }) {
 
   return (
     <>
-      <Header primary='Manage Uniswap Pool' />
+      <Header primary='Exchange' />
 
       <DashBoard
         user={user}
@@ -102,6 +102,8 @@ function ManagePool({ user }) {
         exchange={exchange}
         decimals={decimals}
       />
+
+      <Header primary='Pool' />
 
       <AddLiquidity
         user={user}
