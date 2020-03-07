@@ -5,19 +5,19 @@ import { getTokenBalance, getBalance, getERC20Info } from '../../utils/infura';
 
 import { Header } from '@aragon/ui';
 
-import AddLiquidity from './AddLiquidity';
-
 import { options } from '../../constants/options';
 
 import DashBoard from './Dashboard';
+import OptionExchange from './OptionExchange'
 
+import AddLiquidity from './AddLiquidity';
 
 function ManagePool({ user }) {
 
   let { token } = useParams();
 
   const option = options.find((option) => option.addr === token);
-  const { uniswapExchange, decimals, symbol } = option;
+  const { uniswapExchange, decimals, symbol, exchange } = option;
 
   const [poolTokenBalance, setPoolTokenBalance] = useState(0);
   const [userTokenBalance, setUserTokenBalance] = useState(0);
@@ -92,6 +92,15 @@ function ManagePool({ user }) {
         symbol={symbol}
         poolETHBalance={poolETHBalance}
         poolTokenBalance={poolTokenBalance}
+        uniswapExchange={uniswapExchange}
+      />
+
+      <OptionExchange
+        symbol={symbol}
+        tokenBalance={userTokenBalance}
+        token={token}
+        exchange={exchange}
+        decimals={decimals}
       />
 
       <AddLiquidity

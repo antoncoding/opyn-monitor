@@ -1,18 +1,20 @@
 import React from 'react';
 
-import { BalanceBlock } from '../common';
+import { BalanceBlock, AddressBlock } from '../common';
+// import { AddressBlock } from '@aragon/ui'
 
-const HeaderDashboard = ({ symbol, poolETHBalance, poolTokenBalance }) => {
+const HeaderDashboard = ({ symbol, poolETHBalance, poolTokenBalance, uniswapExchange }) => {
   return (
     <div style={{ padding: '2%', display: 'flex',  alignItems: 'center' }}>
       <div style={{ width: '30%' }}>
         <BalanceBlock asset='Total ETH Liquidity' balance={poolETHBalance} />
       </div>
-      <div style={{ width: '50%' }}>
+      <div style={{ width: '30%' }}>
         <BalanceBlock asset={`${symbol} Liquidity`} balance={poolTokenBalance} />
       </div>
-      <div style={{ width: '20%' }}>
+      <div style={{ width: '40%' }}>
         <>
+          <AddressBlock label="Exchange" address={uniswapExchange} />
         </>
       </div>
     </div>

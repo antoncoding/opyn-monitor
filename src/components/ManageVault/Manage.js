@@ -13,7 +13,6 @@ import {
 
 import CollateralManagement from './CollateralManagement'
 import IssuedTokenManagement from './IssuedTokenManagement'
-import OptionExchange from './OptionExchange'
 
 import { options } from '../../constants/options';
 import { formatDigits } from '../../utils/number';
@@ -22,7 +21,7 @@ import HeaderDashboard from './HeaderDashboard'
 
 function ManageVault({ token, owner, user }) {
   const option = options.find((option) => option.addr === token);
-  const { exchange, decimals, symbol, oracle, strike, strikePrice, minRatio } = option;
+  const { decimals, symbol, oracle, strike, strikePrice, minRatio } = option;
 
   const [vault, setVault] = useState({});
   const [lastETHValueInStrike, setLastETHValue] = useState(0);
@@ -114,14 +113,6 @@ function ManageVault({ token, owner, user }) {
         decimals={decimals}
         symbol={symbol}
         setNewRatio={setNewRatio}
-      />
-      
-      <OptionExchange
-        symbol={symbol}
-        tokenBalance={tokenBalance}
-        token={token}
-        exchange={exchange}
-        decimals={decimals}
       />
       
     </>

@@ -48,7 +48,7 @@ function UniswapPool({
   };
 
   return (
-    <Box heading={'Uniswap Pool'}>
+    <Box heading={'Add Liquidity'}>
       <div style={{ display: 'flex' }}>
         {/* Pool Status */}
         <div style={{ width: '30%' }}>
