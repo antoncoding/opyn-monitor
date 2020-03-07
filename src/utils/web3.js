@@ -3,6 +3,9 @@ import { notify } from './blockNative'
 import { getAllowance } from './infura'
 const oTokenABI = require('../constants/abi/OptionContract.json')
 const exchangeABI = require('../constants/abi/OptionExchange.json')
+const uniswapExchangeABI = require('../constants/abi/UniswapExchange.json')
+
+const DEADLINE_FROM_NOW = 60 * 15
 
 export const getAccounts = async() => {
   const accounts = await window.ethereum.enable();
@@ -119,4 +122,35 @@ export const sellOTokensFromExchange = async(oTokenAddr, exchangeAddr, sellAmt) 
   .on('transactionHash', (hash)=>{
     notify.hash(hash)
   })
+}
+
+// Uniswap Exchange
+
+/**
+ * 
+ */
+export const addLiquidity = async(oToken, uniswapAddr, maxToken, minLiquidity, ethValue ) => {
+  const accounts = await window.ethereum.enable();
+  const web3 = new Web3(window.ethereum);
+  const allowance = await getAllowance(oToken, accounts[0], uniswapAddr)
+  if (allowance < maxToken) {
+    await approve(oToken, uniswapAddr, maxToken)
+  }
+  const uniswapExchange = new web3.eth.Contract(uniswapExchangeABI, uniswapAddr)
+  const deadline = Math.ceil(Date.now() / 1000) + DEADLINE_FROM_NOW
+  await uniswapExchange.methods.addLiquidity(
+    minLiquidity,// min_liquidity
+    maxToken,// max_tokens
+    deadline,// deadline
+  ).send({from: accounts[0], value: web3.utils.toWei(ethValue)})
+  .on('transactionHash', (hash)=>{
+    notify.hash(hash)
+  })
+}
+
+/**
+ * 
+ */
+export const removeLiquidity = async() => {
+
 }

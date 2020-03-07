@@ -42,7 +42,6 @@ function ManageVault({ token, owner, user }) {
     let isCancelled = false;
 
     async function updateInfo() {
-      console.debug('Updating Page...');
       const vault = (await getVaults([owner], token))[0];
       if (vault === undefined) {
         return;

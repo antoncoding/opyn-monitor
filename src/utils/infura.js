@@ -8,6 +8,30 @@ const oracleABI = require('../constants/abi/Oracle.json')
 const Promise = require('bluebird');
 const web3 = new Web3('https://mainnet.infura.io/v3/44fd23cda65746a699a5d3c0e2fa45d5');
 
+// ERC20 Info
+
+export const getTokenBalance = async(oToken, user) => {
+  const oTokenContract = new web3.eth.Contract(optionContractABI, oToken);
+  const balance = await oTokenContract.methods.balanceOf(user).call()
+  return parseInt(balance)
+}
+
+export const getDecimals = async(oToken) => {
+  const oTokenContract = new web3.eth.Contract(optionContractABI, oToken);
+  const decimals = await oTokenContract.methods.decimals().call()
+  return parseInt(decimals)
+}
+
+export const getERC20Info = async(address) => {
+  const token = new web3.eth.Contract(optionContractABI, address);
+  const totalSupplyDecimals = await token.methods.totalSupply().call();
+  const decimals = await token.methods.decimals().call();
+  const totalSupply = parseInt(totalSupplyDecimals) / 10 ** parseInt(decimals);
+  return { decimals, totalSupply }
+}
+
+// Option Contract
+
 /**
  *
  * @param {Array<string>} owners
@@ -62,26 +86,6 @@ export const getMaxLiquidatable = async(oToken, owner, liquidator) => {
   
 }
 
-export const getTokenBalance = async(oToken, user) => {
-  const oTokenContract = new web3.eth.Contract(optionContractABI, oToken);
-  const balance = await oTokenContract.methods.balanceOf(user).call()
-  return parseInt(balance)
-}
-
-export const getDecimals = async(oToken) => {
-  const oTokenContract = new web3.eth.Contract(optionContractABI, oToken);
-  const decimals = await oTokenContract.methods.decimals().call()
-  return parseInt(decimals)
-}
-
-export const getERC20Info = async(address) => {
-  const token = new web3.eth.Contract(optionContractABI, address);
-  const totalSupplyDecimals = await token.methods.totalSupply().call();
-  const decimals = await token.methods.decimals().call();
-  const totalSupply = parseInt(totalSupplyDecimals) / 10 ** parseInt(decimals);
-  return { decimals, totalSupply }
-}
-
 export const getAssetsAndOracle = async(address) => {
   const token = new web3.eth.Contract(optionContractABI, address);
   const [
@@ -123,7 +127,7 @@ export const getPrice = async (oracleAddr, token) => {
   return web3.utils.fromWei(price); // price base eth/ per token
 };
 
-// Exchange
+// Option Exchange
 export const getPremiumToPay = async(exchangeAddr, tokenToBuy, buyAmt) => {
   const exchange = new web3.eth.Contract(optionExchangeABI, exchangeAddr)
   const paymentToken = '0x0000000000000000000000000000000000000000';
@@ -138,6 +142,9 @@ export const getPremiumReceived = async(exchangeAddr, tokenToSell, sellAmt) => {
   return web3.utils.fromWei(premiumReceived)
 }
 
+// uniswapExchange
+
+// export const getTokenToETHPrice()
 
 function compare(ownerA, ownerB) {
   const rateA = ownerA.ratio;
