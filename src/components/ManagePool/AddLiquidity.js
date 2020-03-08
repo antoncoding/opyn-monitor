@@ -10,12 +10,12 @@ import { BalanceBlock, MaxButton } from '../common';
 import { handleDecimals, formatETHAmtToStr } from '../../utils/number';
 import { Box, TextInput, Button, IconCirclePlus, IconEthereum } from '@aragon/ui';
 
-function UniswapPool({ 
+function AddLiquidity({ 
   otoken, 
   otokenSymbol, 
   otokenDecimals, 
   userTokenBalance, 
-  userliquidityTokenBalance,
+  userETHBalance,
   uniswapExchange, 
   user, 
   poolTokenBalance, 
@@ -52,25 +52,12 @@ function UniswapPool({
       <div style={{ display: 'flex' }}>
         {/* Pool Status */}
         <div style={{ width: '30%' }}>
-          <BalanceBlock asset={`Liquidity Token Balance`} balance={userliquidityTokenBalance} />
+          <BalanceBlock asset={`ETH Balance`} balance={userETHBalance} />
         </div>
         {/* Add Liquidity too pool */}
         <div style={{ width: '70%', paddingTop: '2%' }}>
           <div style={{ display: 'flex' }}>
-            <div style={{ width: '40%', marginRight: '5%' }}>
-              <TextInput
-                adornmentPosition='end'
-                adornment={<IconEthereum />}
-                type='number'
-                wide={true}
-                value={amtETHToAdd}
-                onChange={(event) => {
-                  onChangeETHAmtToSend(event.target.value);
-                }}
-              />
-              <PriceSection label='Liquidity Token Minted:' amt={liquidityMinted} symbol='' />
-            </div>
-            <div style={{ width: '40%', marginRight: '5%' }}>
+            <div style={{ width: '35%', marginRight: '5%' }}>
               <>
                 <TextInput
                   adornmentPosition='end'
@@ -84,17 +71,29 @@ function UniswapPool({
                 />
                 <MaxButton
                   onClick={() => {
-                    console.log(`user token ${userTokenBalance}`);
                     onChangeTokenAmtToSend(userTokenBalance);
                   }}
                 />
               </>
             </div>
-            <div style={{ width: '20%' }}>
+            <div style={{ width: '35%', marginRight: '5%' }}>
+              <TextInput
+                adornmentPosition='end'
+                adornment={<IconEthereum />}
+                type='number'
+                wide={true}
+                value={amtETHToAdd}
+                onChange={(event) => {
+                  onChangeETHAmtToSend(event.target.value);
+                }}
+              />
+              <PriceSection label='Mint' amt={liquidityMinted} symbol='Pool Tokens' />
+            </div>
+            <div style={{ width: '30%' }}>
               <Button
                 wide={true}
                 icon={<IconCirclePlus />}
-                label='Invest'
+                label='Add Liquidity'
                 onClick={() => {
                   const maxToken = handleDecimals(amtTokenToAdd, otokenDecimals).toString();
                   const minLiquidity = handleDecimals(
@@ -130,4 +129,4 @@ function PriceSection({ label, amt, symbol = '' }) {
   } else return <div style={{ padding: 3, opacity: 0.5 }}></div>;
 }
 
-export default UniswapPool;
+export default AddLiquidity;

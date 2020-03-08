@@ -11,6 +11,7 @@ import DashBoard from './Dashboard';
 import OptionExchange from './OptionExchange'
 
 import AddLiquidity from './AddLiquidity';
+import RemoveLiquidity from './RemoveLiquidity'
 
 function ManagePool({ user }) {
 
@@ -106,6 +107,21 @@ function ManagePool({ user }) {
       <Header primary='Pool' />
 
       <AddLiquidity
+        user={user}
+        otoken={token}
+        otokenDecimals={decimals}
+        otokenSymbol={symbol}
+        userTokenBalance={userTokenBalance}
+        userliquidityTokenBalance={userliquidityTokenBalance}
+        userETHBalance={userETHBalance}
+        uniswapExchange={uniswapExchange}
+        poolETHBalance={poolETHBalance}
+        poolTokenBalance={poolTokenBalance}
+        liquidityTokenDecimals={liquidityTokenDecimals}
+        liquidityTokenSupply={liquidityTokenSupply}
+      />
+
+      <RemoveLiquidity
         user={user}
         otoken={token}
         otokenDecimals={decimals}
