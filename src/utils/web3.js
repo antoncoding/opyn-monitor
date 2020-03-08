@@ -1,11 +1,13 @@
 import Web3 from 'web3';
 import { notify } from './blockNative';
 import { getAllowance } from './infura';
+import BN from 'bn.js'
 const oTokenABI = require('../constants/abi/OptionContract.json');
 const exchangeABI = require('../constants/abi/OptionExchange.json');
 const uniswapExchangeABI = require('../constants/abi/UniswapExchange.json');
 
 const DEADLINE_FROM_NOW = 60 * 15;
+const UINT256_MAX = '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff'
 
 export const getAccounts = async () => {
   const accounts = await window.ethereum.enable();
@@ -122,8 +124,8 @@ export const sellOTokensFromExchange = async (oTokenAddr, exchangeAddr, sellAmt)
   const accounts = await window.ethereum.enable();
   const web3 = new Web3(window.ethereum);
   const allowance = await getAllowance(oTokenAddr, accounts[0], exchangeAddr);
-  if (allowance < sellAmt) {
-    await approve(oTokenAddr, exchangeAddr, sellAmt);
+  if (new BN(allowance).lt(new BN(sellAmt))) { 
+    await approve(oTokenAddr, exchangeAddr, UINT256_MAX);
   }
   const exchange = new web3.eth.Contract(exchangeABI, exchangeAddr);
   await exchange.methods
@@ -148,8 +150,8 @@ export const addLiquidity = async (oToken, uniswapAddr, maxToken, minLiquidity, 
   const accounts = await window.ethereum.enable();
   const web3 = new Web3(window.ethereum);
   const allowance = await getAllowance(oToken, accounts[0], uniswapAddr);
-  if (allowance < maxToken) {
-    await approve(oToken, uniswapAddr, maxToken);
+  if (new BN(allowance).lt(new BN(maxToken))) {
+    await approve(oToken, uniswapAddr, UINT256_MAX);
   }
   const uniswapExchange = new web3.eth.Contract(uniswapExchangeABI, uniswapAddr);
   const deadline = Math.ceil(Date.now() / 1000) + DEADLINE_FROM_NOW;
@@ -159,7 +161,7 @@ export const addLiquidity = async (oToken, uniswapAddr, maxToken, minLiquidity, 
       maxToken, // max_tokens
       deadline // deadline
     )
-    .send({ from: accounts[0], value: web3.utils.toWei(ethValue) })
+    .send({ from: accounts[0], value: web3.utils.toWei(ethValue)-1 })
     .on('transactionHash', (hash) => {
       notify.hash(hash);
     });

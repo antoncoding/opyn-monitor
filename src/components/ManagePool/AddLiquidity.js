@@ -23,7 +23,7 @@ function AddLiquidity({
   liquidityTokenDecimals,
   liquidityTokenSupply
 }) {
-  const SLIPPAGE_RATE = 3;
+  const SLIPPAGE_RATE = 2;
 
 
   const [amtETHToAdd, setAmtETHToAdd] = useState(0);
@@ -31,7 +31,6 @@ function AddLiquidity({
 
   const liquidityMinted = (liquidityTokenSupply * amtETHToAdd) / poolETHBalance;
   const liquidityMintedMin = (liquidityMinted * (100 - SLIPPAGE_RATE)) / 100;
-
   const ethToTokenRatio = poolETHBalance / poolTokenBalance;
   const tokenToEthRatio = poolTokenBalance / poolETHBalance;
 
