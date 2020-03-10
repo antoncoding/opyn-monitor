@@ -55,7 +55,6 @@ export const getVaultsWithLiquidatable = async (vaults, oToken) => {
     let maxLiquidatable = 0;
     if (vault.isUnsafe) {
       maxLiquidatable = await oTokenContract.methods.maxOTokensLiquidatable(vault.owner).call();
-      console.log(`max liquidatable ${vault.owner} ${maxLiquidatable} `)
     }
     vault.maxLiquidatable = maxLiquidatable;
     return vault;
@@ -106,10 +105,15 @@ export const getBalance = async (address) => {
   return web3.utils.fromWei(balance);
 };
 
+/**
+ * Get price of token in unit of wei
+ * @param {string} oracleAddr 
+ * @param {string} token 
+ */
 export const getPrice = async (oracleAddr, token) => {
   const oracle = new web3.eth.Contract(oracleABI, oracleAddr);
   const price = await oracle.methods.getPrice(token).call();
-  return web3.utils.fromWei(price); // price base eth/ per token
+  return price; // unit: wei/ per token
 };
 
 // Option Exchange
