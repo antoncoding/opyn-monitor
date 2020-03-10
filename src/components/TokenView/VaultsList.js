@@ -35,7 +35,7 @@ function VaultOwnerList({ oToken, user }) {
   useEffect(() => {
     let isCancelled = false;
     const updateInfo = async () => {
-      const owners = await getAllVaultOwners();
+      const owners = await getAllVaultOwners(oToken);
       const { strike, decimals, minRatio, strikePrice, oracle } = option;
       const vaults = (await getVaults(owners, oToken));
 
