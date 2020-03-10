@@ -11,8 +11,8 @@ import MyVault from './MyVaultBox';
 const renderListEntry = ({ owner, collateral, oTokensIssued, ratio, isSafe, oToken }) => {
   return [
     <IdentityBadge entity={owner} shorten={true} />,
-    collateral,
-    oTokensIssued,
+    formatDigits(collateral, 6),
+    formatDigits(oTokensIssued, 6),
     ratio,
     RatioTag({isSafe, ratio}),
     <VaultModal

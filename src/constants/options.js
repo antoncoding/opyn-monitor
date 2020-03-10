@@ -61,7 +61,7 @@ export const options = [
     underlying: '0x5d3a536E4D6DbD6114cc1Ead35777bAB948E3643',
     strike: '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48',
     strikePrice: 2e-10,
-    minRatio: 1.6,
+    minRatio: 1.4,
     exchange: '0x5778f2824a114f6115dc74d432685d3336216017',
     uniswapExchange: '0x8a0976500EED661202810bAB030a057DF15c4CC9'
   },

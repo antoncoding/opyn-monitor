@@ -1,5 +1,4 @@
 import Web3 from 'web3';
-import { formatDigits } from './number';
 
 const optionContractABI = require('../constants/abi/OptionContract.json');
 const optionExchangeABI = require('../constants/abi/OptionExchange.json');
@@ -42,7 +41,7 @@ export const getVaults = async (owners, oToken) => {
 
   const vaults = await Promise.map(owners, async (owner) => {
     const res = await oTokenContract.methods.getVault(owner).call();
-    const collateral = formatDigits(web3.utils.fromWei(res[0]), 6);
+    const collateral = web3.utils.fromWei(res[0]);
     const oTokensIssued = res[1];
     const underlying = res[2];
     return { collateral, oTokensIssued, underlying, owner, oToken };
@@ -56,6 +55,7 @@ export const getVaultsWithLiquidatable = async (vaults, oToken) => {
     let maxLiquidatable = 0;
     if (vault.isUnsafe) {
       maxLiquidatable = await oTokenContract.methods.maxOTokensLiquidatable(vault.owner).call();
+      console.log(`max liquidatable ${vault.owner} ${maxLiquidatable} `)
     }
     vault.maxLiquidatable = maxLiquidatable;
     return vault;
