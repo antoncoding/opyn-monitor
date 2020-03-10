@@ -18,7 +18,7 @@ import {
   DataView,
 } from '@aragon/ui';
 
-function PositionModal({ oToken, owner, collateral, isSafe, oTokensIssued, ratio }) {
+function VaultModal({ oToken, owner, collateral, isSafe, oTokensIssued, ratio }) {
   const [opened, setOpened] = useState(false);
   const [decimals, setTokenDecimals] = useState(0);
   const [addValue, setAddValue] = useState(0);
@@ -122,4 +122,4 @@ function PositionModal({ oToken, owner, collateral, isSafe, oTokensIssued, ratio
   );
 }
 
-export default PositionModal;
+export default VaultModal;

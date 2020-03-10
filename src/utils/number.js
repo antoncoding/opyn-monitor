@@ -1,3 +1,6 @@
+import Web3 from 'web3'
+const web3 = new Web3()
+
 export function formatDigits(num, percision) {
   return parseFloat(num).toFixed(percision)
 }
@@ -5,6 +8,9 @@ export function formatDigits(num, percision) {
 export const handleDecimals = (rawAmt, decimal) => {
   return Math.round(parseFloat(rawAmt) * 10 ** decimal);
 };
+
+export const fromWei = web3.utils.fromWei
+export const toWei = web3.utils.toWei
 
 /**
  * 

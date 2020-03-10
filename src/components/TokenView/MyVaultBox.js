@@ -1,12 +1,9 @@
 import React from 'react';
 import { useHistory } from 'react-router-dom';
-
 import { DataView, Button, IdentityBadge } from '@aragon/ui';
-
-// import { createTag } from '../common/RatioTag'
 import { SectionTitle, RatioTag } from '../common';
-
 import { openVault } from '../../utils/web3'
+import { fromWei, formatDigits } from '../../utils/number'
 
 function MangeButton({ oToken, owner }) {
   const history = useHistory();
@@ -64,7 +61,7 @@ function MyVault({ vaults, oToken, user }) {
         renderEntry={({ owner, collateral, oTokensIssued, ratio, isSafe, oToken }) => {
           return [
             <IdentityBadge entity={owner} shorten={true} connectedAccount={true} />,
-            collateral,
+            formatDigits(fromWei(collateral), 6),
             oTokensIssued,
             ratio,
             <RatioTag isSafe={isSafe} ratio={ratio}/>,

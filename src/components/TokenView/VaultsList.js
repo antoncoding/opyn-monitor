@@ -1,24 +1,24 @@
 import React, { useState, useEffect } from 'react';
 import { DataView, IdentityBadge } from '@aragon/ui';
-import { getAllVaultOwners } from '../../utils/graph';
-import { getVaults, getPrice, getVaultsWithLiquidatable } from '../../utils/infura';
+import { getAllVaultOwners, getVaultsDetails } from '../../utils/graph';
+import { getPrice, getVaultsWithLiquidatable } from '../../utils/infura';
 import { options } from '../../constants/options';
 import { SectionTitle, RatioTag } from '../common';
-import { formatDigits } from '../../utils/number';
+import { formatDigits, fromWei } from '../../utils/number';
 import VaultModal from './VaultModal'
 import MyVault from './MyVaultBox';
 
 const renderListEntry = ({ owner, collateral, oTokensIssued, ratio, isSafe, oToken }) => {
   return [
     <IdentityBadge entity={owner} shorten={true} />,
-    formatDigits(collateral, 6),
+    formatDigits(fromWei(collateral), 6),
     formatDigits(oTokensIssued, 6),
     ratio,
     RatioTag({isSafe, ratio}),
     <VaultModal
       oToken={oToken}
       owner={owner}
-      collateral={collateral}
+      collateral={fromWei(collateral)}
       isSafe={isSafe}
       oTokensIssued={oTokensIssued}
       ratio={ratio}
@@ -36,8 +36,8 @@ function VaultOwnerList({ oToken, user }) {
     let isCancelled = false;
     const updateInfo = async () => {
       const owners = await getAllVaultOwners(oToken);
+      const vaults = await getVaultsDetails(oToken, owners)
       const { strike, decimals, minRatio, strikePrice, oracle } = option;
-      const vaults = (await getVaults(owners, oToken));
 
       const ethValueInStrike = 1 / (await getPrice(oracle, strike));
       const vaultDetail = vaults.map((vault) => {
@@ -52,10 +52,11 @@ function VaultOwnerList({ oToken, user }) {
           4
         );
 
-        const oTokensIssued = formatDigits(parseInt(vault.oTokensIssued) / 10 ** decimals, 4);
+        const oTokensIssued = formatDigits(parseInt(vault.oTokensIssued) / 10 ** decimals, 6);
         vault.oTokensIssued = oTokensIssued;
         vault.ratio = ratio;
         vault.isSafe = ratio > minRatio;
+        vault.oToken = oToken
         return vault;
       });
 
