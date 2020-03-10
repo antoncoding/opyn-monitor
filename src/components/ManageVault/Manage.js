@@ -15,7 +15,7 @@ import CollateralManagement from './CollateralManagement'
 import IssuedTokenManagement from './IssuedTokenManagement'
 
 import { options } from '../../constants/options';
-import { formatDigits } from '../../utils/number';
+import { formatDigits, fromWei } from '../../utils/number';
 
 import HeaderDashboard from './HeaderDashboard'
 
@@ -42,6 +42,7 @@ function ManageVault({ token, owner, user }) {
 
     async function updateInfo() {
       const vault = (await getVaults([owner], token))[0];
+      // vault.collateral here in unit of eth.
       if (vault === undefined) {
         return;
       }
@@ -53,7 +54,7 @@ function ManageVault({ token, owner, user }) {
 
       const tokenBalance = ownerBalance / 10 ** decimals;
 
-      const lastStrikeValue = await getPrice(oracle, strike);
+      const lastStrikeValue = fromWei(await getPrice(oracle, strike));
       const ethValueInStrike = 1 / lastStrikeValue;
       const valueProtectingInEth = parseFloat(strikePrice) * vault.oTokensIssued;
       const ratio = formatDigits(
