@@ -20,7 +20,7 @@ export const liquidate = async (oTokenAddr, owner, liquidateAmt) => {
   const oToken = new web3.eth.Contract(oTokenABI, oTokenAddr);
 
   await oToken.methods
-    .liquidate(owner, liquidateAmt)
+    .liquidate(owner, parseInt(liquidateAmt))
     .send({ from: accounts[0] })
     .on('transactionHash', (hash) => {
       notify.hash(hash);

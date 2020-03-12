@@ -65,7 +65,7 @@ export const getVaultsWithLiquidatable = async (vaults, oToken) => {
 export const getMaxLiquidatable = async (oToken, owner, liquidator) => {
   const oTokenContract = new web3.eth.Contract(optionContractABI, oToken);
   const maxVaultLiquidatable = await oTokenContract.methods.maxOTokensLiquidatable(owner).call();
-
+  console.log(`maxVaultLiquidatable`, maxVaultLiquidatable)
   const userbalance = liquidator ? await oTokenContract.methods.balanceOf(liquidator).call() : 0;
 
   const maxLiquidatable = Math.min(

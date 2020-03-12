@@ -14,7 +14,6 @@ function MangeButton({ oToken, owner }) {
 }
 
 function OpenVaultButton({ oToken, user }) {
-
   const history = useHistory();
 
   const openAndGoToVault = () => {
@@ -58,14 +57,14 @@ function MyVault({ vaults, oToken, user }) {
         fields={['Owner', 'collateral', 'Issued', 'RATIO', 'Status', '']}
         entries={[myVault]}
         entriesPerPage={1}
-        renderEntry={({ owner, collateral, oTokensIssued, ratio, isSafe, oToken }) => {
+        renderEntry={({ owner, collateral, oTokensIssued, ratio, isSafe }) => {
           return [
             <IdentityBadge entity={owner} shorten={true} connectedAccount={true} />,
             formatDigits(fromWei(collateral), 6),
             oTokensIssued,
             ratio,
             <RatioTag isSafe={isSafe} ratio={ratio}/>,
-            MangeButton({ oToken, owner }),
+            <MangeButton oToken={oToken} owner={owner} />
           ];
         }}
       />

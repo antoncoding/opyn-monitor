@@ -77,7 +77,7 @@ function VaultOwnerList({ oToken, user }) {
     };
   }, [oToken, option, user]);
 
-  return (
+  return (    
     <>
       <MyVault vaults={vaults} oToken={oToken} user={user} />
       <SectionTitle title={'All Vaults'} />
