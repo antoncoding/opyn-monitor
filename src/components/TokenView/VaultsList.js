@@ -1,31 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { DataView, IdentityBadge } from '@aragon/ui';
-import { getAllVaultOwners, getVaultsDetails } from '../../utils/graph';
-import { getPrice, getVaultsWithLiquidatable } from '../../utils/infura';
+import { getAllVaultsForOption } from '../../utils/graph';
+import { getPrice } from '../../utils/infura';
 import { options } from '../../constants/options';
-import { SectionTitle, RatioTag } from '../common';
-import { formatDigits, fromWei } from '../../utils/number';
-import VaultModal from './VaultModal'
-import MyVault from './MyVaultBox';
-
-const renderListEntry = ({ owner, collateral, oTokensIssued, ratio, isSafe, oToken }) => {
-  return [
-    <IdentityBadge entity={owner} shorten={true} />,
-    formatDigits(fromWei(collateral), 6),
-    formatDigits(oTokensIssued, 6),
-    ratio,
-    RatioTag({isSafe, ratio}),
-    <VaultModal
-      oToken={oToken}
-      owner={owner}
-      collateral={fromWei(collateral)}
-      isSafe={isSafe}
-      oTokensIssued={oTokensIssued}
-      ratio={ratio}
-    />,
-  ];
-};
-
+import { SectionTitle, RatioTag, ManageVaultButton } from '../common';
+import { formatDigits, fromWei, compareVaultRatio, calculateRatio, toTokenUnits } from '../../utils/number';
 
 function VaultOwnerList({ oToken, user }) {
   const option = options.find((option) => option.addr === oToken);
@@ -35,35 +14,27 @@ function VaultOwnerList({ oToken, user }) {
   useEffect(() => {
     let isCancelled = false;
     const updateInfo = async () => {
-      const owners = await getAllVaultOwners(oToken);
-      const vaults = await getVaultsDetails(oToken, owners)
+      const vaults = await getAllVaultsForOption(oToken)
       const { strike, decimals, minRatio, strikePrice, oracle } = option;
 
-      const ethValueInStrike = 1 / (await getPrice(oracle, strike));
+      const tokenPriceInWei = await getPrice(oracle, strike);
       const vaultDetail = vaults.map((vault) => {
         if (vault.oTokensIssued === '0') {
           vault.ratio = Infinity
           vault.isSafe = true
           return vault
         } 
-        const valueProtectingInEth = parseFloat(strikePrice) * vault.oTokensIssued;
-        const ratio = formatDigits(
-          (parseFloat(vault.collateral) * ethValueInStrike) / valueProtectingInEth,
-          4
-        );
-
-        const oTokensIssued = formatDigits(parseInt(vault.oTokensIssued) / 10 ** decimals, 6);
+        const ratio = calculateRatio(vault.collateral, vault.oTokensIssued, strikePrice, tokenPriceInWei) 
+        const oTokensIssued = toTokenUnits(vault.oTokensIssued, decimals);
         vault.oTokensIssued = oTokensIssued;
         vault.ratio = ratio;
         vault.isSafe = ratio > minRatio;
         vault.oToken = oToken
         return vault;
-      });
-
-      const vaultWithLiquidatable = await getVaultsWithLiquidatable(vaultDetail);
+      }).sort(compareVaultRatio);
 
       if (!isCancelled) {
-        setVaults(vaultWithLiquidatable);
+        setVaults(vaultDetail);
         setIsLoading(false);
       }
     };
@@ -79,14 +50,22 @@ function VaultOwnerList({ oToken, user }) {
 
   return (    
     <>
-      <MyVault vaults={vaults} oToken={oToken} user={user} />
       <SectionTitle title={'All Vaults'} />
       <DataView
         status={isLoading ? 'loading' : 'default'}
         fields={['Owner', 'collateral', 'Issued', 'RATIO', 'Status', '']}
         entries={vaults}
         entriesPerPage={5}
-        renderEntry={renderListEntry}
+        renderEntry={({ owner, collateral, oTokensIssued, ratio, isSafe }) => {
+          return [
+            <IdentityBadge entity={owner} shorten={true} />,
+            formatDigits(fromWei(collateral), 6),
+            formatDigits(oTokensIssued, 6),
+            formatDigits(ratio, 5),
+            RatioTag({isSafe, ratio}),
+            <ManageVaultButton oToken={oToken} owner={owner} />
+          ];
+        }}
       />
     </>
   );
