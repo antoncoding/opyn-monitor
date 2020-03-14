@@ -30,7 +30,7 @@ function OptionOverview({ oToken, tokenName }) {
 
   return (
     <>
-      <Header primary={option.name} secondary={<Button label={'Exchange'} onClick={()=>{history.push(`/exchange/${oToken}`)}} />} />
+      <Header primary={option.name} />
       <Split
         primary={
           <Split
