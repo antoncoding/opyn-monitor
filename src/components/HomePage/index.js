@@ -1,14 +1,10 @@
 import React from 'react';
 import { useHistory } from 'react-router-dom';
-import { Header, Box, Card, LinkBase, Button } from '@aragon/ui';
+import { Header, Box, LinkBase } from '@aragon/ui';
 
 function HomePage() {
   const history = useHistory();
 
-  const goToAllContracts = () => {
-    history.push(`/options/`);
-  };
-  // const goToTrade = ()
   return (
     <>
       <Header primary='Welcome to Opyn Dashboard' />
