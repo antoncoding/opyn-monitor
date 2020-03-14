@@ -2,51 +2,64 @@
 const opynGraphEndpoint = 'https://api.thegraph.com/subgraphs/name/aparnakr/opyn'
 
 /**
- * @return {Promise<Array<string>>}
+ * @return {Promise<Array<{colalteral: string, oTokensIssued: string, owner: string}>>}
  */
-export async function getAllVaultOwners(optionAddress){
-  const query = allVaultQuery(optionAddress)
-  const response = await postQuery(query)
-  const actions = response.data.vaultOpenedActions
-  const owners = actions.map(action => action.owner)
-  return owners
-}
-
-const allVaultQuery = (option_contract) => `
-{
-  vaultOpenedActions(where: {
-    optionsContract: "${option_contract}"
-  }) {
-    owner
-  }
-}`
-
-/**
- * 
- * @param {string} optionAddress 
- * @param {Array<string>} owners 
- * @return {Promise<Array<{oTokenIssued: string, collateral: string, owner: string}>>}
- */
-export async function getVaultsDetails(optionAddress, owners) {
-  const concatedOwners =  owners.join(`","`);
-  const query = vaultDetailsQuery(optionAddress, concatedOwners)
+export async function getAllVaultsForOption(optionAddress){
+  const query = `
+  {
+    vaults(where: {
+      optionsContract: "${optionAddress}"
+    }) {
+      owner
+      oTokensIssued,
+      collateral,
+    }
+  }`
   const response = await postQuery(query)
   const vaults = response.data.vaults
   return vaults
 }
 
-const vaultDetailsQuery = (optionAddress, owners) => `{
-  vaults (where: {
-    owner_in: ["${owners}"]
-    optionsContract: "${optionAddress}"
-  } ) {
-    oTokensIssued,
-    collateral,
-    owner
+export async function getAllVaultsForUser(owner){
+  const query = `{
+    vaults (where: {owner: "${owner}"}) {
+      optionsContract {
+        address
+      }
+      oTokensIssued,
+      collateral,
+    }
+  }`
+  const response = await postQuery(query)
+  const actions = response.data.vaults
+  return actions
+}
+
+export async function getLiquidationHistory(owner) {
+  const query = liquidationActionsQuery(owner);
+  const response = await postQuery(query)
+  return response.data.liquidateActions
+}
+
+const liquidationActionsQuery = (owner) => `{
+  liquidateActions(where: {
+    vault_contains: "${owner}"
+  }) {
+    vault {
+      owner,
+      optionsContract {
+        address
+      }
+    },
+    liquidator,
+    collateralToPay,
+    timestamp
+    transactionHash
   }
 }
 
 `
+
 
 const postQuery = async (query) => {
   const options = {
