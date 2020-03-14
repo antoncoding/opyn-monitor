@@ -10,6 +10,7 @@ const web3 = new Web3('https://mainnet.infura.io/v3/44fd23cda65746a699a5d3c0e2fa
 // ERC20 Info
 
 export const getTokenBalance = async (oToken, user) => {
+  if (user === '') return '0'
   const oTokenContract = new web3.eth.Contract(optionContractABI, oToken);
   const balance = await oTokenContract.methods.balanceOf(user).call();
   return parseInt(balance);
@@ -49,23 +50,15 @@ export const getVaults = async (owners, oToken) => {
   return vaults;
 };
 
-export const getVaultsWithLiquidatable = async (vaults, oToken) => {
+/**
+ * Compare user balance with max liquidatable and decide max liquidatable
+ * @param {string} oToken 
+ * @param {string} owner 
+ * @param {string} liquidator 
+ */
+export const getMaxToLiquidate = async (oToken, owner, liquidator) => {
+  const maxVaultLiquidatable = await getMaxLiquidatable(oToken, owner)
   const oTokenContract = new web3.eth.Contract(optionContractABI, oToken);
-  const NewVaults = await Promise.map(vaults, async (vault) => {
-    let maxLiquidatable = 0;
-    if (vault.isUnsafe) {
-      maxLiquidatable = await oTokenContract.methods.maxOTokensLiquidatable(vault.owner).call();
-    }
-    vault.maxLiquidatable = maxLiquidatable;
-    return vault;
-  });
-  return NewVaults.sort(compare);
-};
-
-export const getMaxLiquidatable = async (oToken, owner, liquidator) => {
-  const oTokenContract = new web3.eth.Contract(optionContractABI, oToken);
-  const maxVaultLiquidatable = await oTokenContract.methods.maxOTokensLiquidatable(owner).call();
-  console.log(`maxVaultLiquidatable`, maxVaultLiquidatable)
   const userbalance = liquidator ? await oTokenContract.methods.balanceOf(liquidator).call() : 0;
 
   const maxLiquidatable = Math.min(
@@ -75,6 +68,18 @@ export const getMaxLiquidatable = async (oToken, owner, liquidator) => {
 
   return parseInt(maxLiquidatable);
 };
+
+/**
+ * Max liquidatable for given vault
+ * @param {string} oToken 
+ * @param {string} owner 
+ * @return {Promise<number>}
+ */
+export const getMaxLiquidatable = async (oToken, vaultOwner) => {
+  const oTokenContract = new web3.eth.Contract(optionContractABI, oToken);
+  const maxVaultLiquidatable = await oTokenContract.methods.maxOTokensLiquidatable(vaultOwner).call();
+  return parseInt(maxVaultLiquidatable)
+}
 
 export const getAssetsAndOracle = async (address) => {
   const token = new web3.eth.Contract(optionContractABI, address);
@@ -101,6 +106,7 @@ export const getAllowance = async (contract, user, spender) => {
  * @param {string} address
  */
 export const getBalance = async (address) => {
+  if (address === '') return '0'
   const balance = await web3.eth.getBalance(address);
   return web3.utils.fromWei(balance);
 };
@@ -134,15 +140,3 @@ export const getPremiumReceived = async (exchangeAddr, tokenToSell, sellAmt) => 
 };
 
 // uniswapExchange
-function compare(ownerA, ownerB) {
-  const rateA = ownerA.ratio;
-  const rateB = ownerB.ratio;
-
-  let comparison = 0;
-  if (parseFloat(rateA) > parseFloat(rateB)) {
-    comparison = 1;
-  } else if (parseFloat(rateA) < parseFloat(rateB)) {
-    comparison = -1;
-  }
-  return comparison;
-}

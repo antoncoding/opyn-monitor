@@ -3,7 +3,7 @@ import { useHistory } from 'react-router-dom';
 
 import ConnectButton from './ConnectButton';
 import ChangeModeButton from './SettingsButton';
-import { Bar, BackButton } from '@aragon/ui';
+import { Bar, BackButton, LinkBase } from '@aragon/ui';
 
 function NavBar({ theme, updateTheme, user, setUser }) {
   const history = useHistory();
@@ -14,13 +14,24 @@ function NavBar({ theme, updateTheme, user, setUser }) {
     updateIsHome(home);
   }, [history.location.pathname]);
 
-  const handleBack = (addr) => {
-    history.goBack()
-  };
-
   return (
     <Bar
-      primary={isHome ? <></> : <BackButton onClick={handleBack} />}
+      primary={
+        isHome ? (
+          <></>
+        ) : (
+          <>
+            <div style={{ height: '100%' }}>
+              <BackButton onClick={()=>{
+                history.goBack();
+              }} />
+            </div>
+            <LinkButton title='My Vaults' onClick={()=>{history.push('/myvaults/')}} />
+            <LinkButton title='All Contracts' onClick={()=>{history.push('/options/')}} />
+            <LinkButton title='Trade' onClick={()=>{history.push('/trade/')}} />
+          </>
+        )
+      }
       secondary={
         <>
           <ConnectButton user={user} setUser={setUser} />
@@ -29,6 +40,18 @@ function NavBar({ theme, updateTheme, user, setUser }) {
       }
     ></Bar>
   );
+}
+
+function LinkButton ({title, onClick}){
+  return(
+    <div style={{ paddingLeft: 40 }}>
+      <LinkBase onClick={onClick}> 
+        <div style={{padding: '1%', opacity:0.5, fontSize: 17}}>
+            {title}
+        </div>
+        </LinkBase>
+    </div>
+  )
 }
 
 export default NavBar;
