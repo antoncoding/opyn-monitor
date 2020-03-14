@@ -1,7 +1,6 @@
 import React from 'react';
 
 import { BalanceBlock, AddressBlock } from '../common';
-// import { AddressBlock } from '@aragon/ui'
 
 const HeaderDashboard = ({ symbol, poolETHBalance, poolTokenBalance, uniswapExchange }) => {
   return (

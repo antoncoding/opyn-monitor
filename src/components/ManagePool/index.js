@@ -7,7 +7,7 @@ import { Header } from '@aragon/ui';
 
 import { options } from '../../constants/options';
 
-import DashBoard from './Dashboard';
+import DashBoard from './Header';
 import OptionExchange from './OptionExchange'
 
 import AddLiquidity from './AddLiquidity';
@@ -104,7 +104,7 @@ function ManagePool({ user }) {
         decimals={decimals}
       />
 
-      <Header primary='Pool' />
+      <Header primary='Provide Liquidity' />
 
       <AddLiquidity
         user={user}
