@@ -1,15 +1,18 @@
 import React from 'react';
 
 import { BalanceBlock, RatioTag, HelperText } from '../common';
+import { formatDigits } from '../../utils/number';
 
-const HeaderDashboard = ({ ratio, minRatio, symbol, ethBalance, tokenBalance, newRatio }) => {
+const HeaderDashboard = ({ ratio, minRatio, symbol, vault, decimals, newRatio }) => {
+  const tokenInUnit = vault.oTokensIssued ? vault.oTokensIssued / 10 ** decimals : 0;
+
   return (
     <div style={{ padding: '2%', display: 'flex', alignItems: 'center' }}>
       <div style={{ width: '30%' }}>
-        <BalanceBlock asset='Owner ETH Balance' balance={ethBalance} />
+        <BalanceBlock asset='Total Collateral' balance={formatDigits(vault.collateral, 6)} />
       </div>
       <div style={{ width: '50%' }}>
-        <BalanceBlock asset={`${symbol} Balance`} balance={tokenBalance} />
+        <BalanceBlock asset={`${symbol} Issued`} balance={tokenInUnit} />
       </div>
       <div style={{ width: '20%' }}>
         <>
@@ -22,7 +25,7 @@ const HeaderDashboard = ({ ratio, minRatio, symbol, ethBalance, tokenBalance, ne
             <span style={{ fontSize: 18 }}>{ratio.toString().split('.')[1]} </span>
             {minRatio > 0 ? <span style={{ fontSize: 16 }}> / {minRatio} </span> : ''}
           </div>
-          <> { newRatio === ratio ? '' :  <HelperText label='New Ratio' amt={newRatio}/>  } </>
+          <> {newRatio === ratio ? '' : <HelperText label='New Ratio' amt={newRatio} />} </>
         </>
       </div>
     </div>

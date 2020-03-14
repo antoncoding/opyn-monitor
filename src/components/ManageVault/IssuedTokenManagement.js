@@ -1,14 +1,11 @@
 import React, { useState } from 'react';
-
 import { burnOToken, issueOToken } from '../../utils/web3';
-
 import { BalanceBlock, MaxButton } from '../common';
-
 import { handleDecimals, formatDigits } from '../../utils/number';
-
 import { Box, TextInput, Button, IconCirclePlus, IconCircleMinus } from '@aragon/ui';
 
 function IssuedTokenManagement({
+  isOwner,
   vault,
   tokenBalance,
   token,
@@ -30,16 +27,35 @@ function IssuedTokenManagement({
     setNewRatio(newRatio);
   };
 
+  const onChangeIssueAmt = (event) => {
+    const amt = event.target.value;
+    setIssueAmt(amt);
+    updateNewRatio(parseInt(vault.oTokensIssued) + handleDecimals(amt, decimals));
+  }
+
+  const onClickIssueToken = () => {
+    issueOToken(token, handleDecimals(issueAmt, decimals));
+  }
+
+  const onChangeBurnAmt = (event) => {
+    const amt = event.target.value;
+    updateNewRatio(parseInt(vault.oTokensIssued) - handleDecimals(amt, decimals));
+    setBurnAmt(amt);
+  }
+
+  const onClickBurnToken = () => {
+    burnOToken(token, handleDecimals(burnAmt, decimals));
+  }
+
   return (
     <Box heading={'Total Issued'}>
       <div style={{ display: 'flex' }}>
         {/* total Issued */}
         <div style={{ width: '30%' }}>
           <BalanceBlock
-            asset={symbol}
-            balance={vault.oTokensIssued ? vault.oTokensIssued / 10 ** decimals : 0}
+            asset={`Owner ${symbol} Balance `}
+            balance={tokenBalance}
           />
-          {/* {balanceBlock(symbol, )} */}
         </div>
         {/* Issue More Token */}
         <div style={{ width: '32%', paddingTop: '2%' }}>
@@ -50,11 +66,7 @@ function IssuedTokenManagement({
                   type='number'
                   wide={true}
                   value={issueAmt}
-                  onChange={(event) => {
-                    const amt = event.target.value;
-                    setIssueAmt(amt);
-                    updateNewRatio(parseInt(vault.oTokensIssued) + handleDecimals(amt, decimals));
-                  }}
+                  onChange={onChangeIssueAmt}
                 />
                 <MaxButton
                   onClick={() => {
@@ -72,12 +84,11 @@ function IssuedTokenManagement({
             </div>
             <div style={{ width: '40%' }}>
               <Button
+                disabled={!isOwner}
                 wide={true}
                 icon={<IconCirclePlus />}
                 label='Issue'
-                onClick={() => {
-                  issueOToken(token, handleDecimals(issueAmt, decimals));
-                }}
+                onClick={onClickIssueToken}
               />
             </div>
           </div>
@@ -92,11 +103,7 @@ function IssuedTokenManagement({
                   type='number'
                   wide={true}
                   value={burnAmt}
-                  onChange={(event) => {
-                    const amt = event.target.value;
-                    updateNewRatio(parseInt(vault.oTokensIssued) - handleDecimals(amt, decimals));
-                    setBurnAmt(amt);
-                  }}
+                  onChange={onChangeBurnAmt}
                 />
                 <MaxButton
                   onClick={() => {
@@ -108,12 +115,11 @@ function IssuedTokenManagement({
             </div>
             <div style={{ width: '40%' }}>
               <Button
+                disabled={!isOwner}
                 wide={true}
                 icon={<IconCircleMinus />}
                 label='Burn'
-                onClick={() => {
-                  burnOToken(token, handleDecimals(burnAmt, decimals));
-                }}
+                onClick={onClickBurnToken}
               />
             </div>
           </div>

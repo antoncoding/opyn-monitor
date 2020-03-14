@@ -8,6 +8,7 @@ import { Box, TextInput, Button, IconCirclePlus, IconCircleMinus } from '@aragon
 import { formatDigits } from '../../utils/number'
 
 function CollateralManagement({
+  isOwner,
   vault,
   ethBalance,
   token,
@@ -34,7 +35,7 @@ function CollateralManagement({
       <div style={{ display: 'flex' }}>
         {/* balance */}
         <div style={{ width: '30%' }}>
-          {BalanceBlock({ asset: 'ETH', balance: vault.collateral })}
+          {BalanceBlock({ asset: 'Your ETH Balance', balance: formatDigits(ethBalance,6) })}
         </div>
         {/* Add collateral */}
         <div style={{ width: '32%', paddingTop: '2%' }}>
@@ -101,6 +102,7 @@ function CollateralManagement({
             </div>
             <div style={{ width: '40%' }}>
               <Button
+                disabled={!isOwner}
                 wide={true}
                 icon={<IconCircleMinus />}
                 label='Remove'
