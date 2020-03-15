@@ -3,7 +3,8 @@ import { DataView, IdentityBadge } from '@aragon/ui';
 import { getAllVaultsForOption } from '../../utils/graph';
 import { getPrice } from '../../utils/infura';
 import { options } from '../../constants/options';
-import { SectionTitle, RatioTag, ManageVaultButton } from '../common';
+import VaultModal from './VaultModal'
+import { SectionTitle, RatioTag } from '../common';
 import { formatDigits, fromWei, compareVaultRatio, calculateRatio, toTokenUnits } from '../../utils/number';
 
 function VaultOwnerList({ oToken, user }) {
@@ -63,7 +64,13 @@ function VaultOwnerList({ oToken, user }) {
             formatDigits(oTokensIssued, 6),
             formatDigits(ratio, 5),
             RatioTag({isSafe, ratio}),
-            <ManageVaultButton oToken={oToken} owner={owner} />
+            <VaultModal 
+              oToken={oToken} owner={owner} 
+              collateral={collateral}
+              isSafe={isSafe}
+              oTokensIssued={oTokensIssued}
+              ratio={ratio}
+            />
           ];
         }}
       />
