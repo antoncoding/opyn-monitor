@@ -1,100 +1,152 @@
 import Web3 from 'web3';
+import Onboard from 'bnc-onboard';
+
 import { notify } from './blockNative';
 import { getAllowance } from './infura';
-import BN from 'bn.js'
+import BN from 'bn.js';
 const oTokenABI = require('../constants/abi/OptionContract.json');
 const exchangeABI = require('../constants/abi/OptionExchange.json');
 const uniswapExchangeABI = require('../constants/abi/UniswapExchange.json');
 
 const DEADLINE_FROM_NOW = 60 * 15;
-const UINT256_MAX = '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff'
+const UINT256_MAX = '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff';
 
-export const getAccounts = async () => {
-  const accounts = await window.ethereum.enable();
-  return accounts;
+const storedTheme = window.localStorage.getItem('theme')
+
+const onboard = Onboard({
+  darkMode: storedTheme==='dark',
+  dappId: '7e7c9d55-dd5e-4ee1-bc38-edf27b59ce06', // [String] The API key created by step one above
+  networkId: 1, // [Integer] The Ethereum network ID your Dapp uses.
+  subscriptions: {
+    wallet: (wallet) => {
+      web3 = new Web3(wallet.provider);
+    },
+  },
+  walletSelect: {
+    description: "Please select a wallet to connect to Opyn Dashboard",
+    wallets: [
+      { walletName: 'metamask' },
+      {
+        walletName: 'walletConnect',
+        infuraKey: '44fd23cda65746a699a5d3c0e2fa45d5'
+      },
+      {
+        walletName: 'fortmatic',
+        apiKey: 'pk_live_3009900A5E842CD5'
+      },
+      { walletName: 'trust' },
+      { walletName: 'coinbase' },
+      { walletName: "status" },
+    ]
+  }
+});
+
+let web3;
+
+export const updateModalMode = async(theme) => {
+  const darkMode = theme === 'dark'
+  onboard.config({ darkMode })
+}
+
+export const connect = async () => {
+  const selected = await onboard.walletSelect();
+  if (!selected) return false
+  const checked = await onboard.walletCheck();
+  if(!checked) return false
+  return onboard.getState().address;
 };
 
+export const disconnect = async() => {
+  onboard.walletReset()
+}
+
+export const checkConnectedAndGetAddress = async() => {
+  let checked = false
+  try {
+    checked = await onboard.walletCheck();
+  } catch (error) {
+    await onboard.walletSelect()
+    checked = await onboard.walletCheck();
+    
+  } finally {
+    if (checked) return onboard.getState().address;
+  }
+}
+
 export const liquidate = async (oTokenAddr, owner, liquidateAmt) => {
-  const accounts = await window.ethereum.enable();
-  const web3 = new Web3(window.ethereum);
+  const account = await checkConnectedAndGetAddress()
   const oToken = new web3.eth.Contract(oTokenABI, oTokenAddr);
 
   await oToken.methods
     .liquidate(owner, parseInt(liquidateAmt))
-    .send({ from: accounts[0] })
+    .send({ from: account })
     .on('transactionHash', (hash) => {
       notify.hash(hash);
     });
 };
 
 export const burnOToken = async (oTokenAddr, burnAmt) => {
-  const accounts = await window.ethereum.enable();
-  const web3 = new Web3(window.ethereum);
+  const account = await checkConnectedAndGetAddress()
   const oToken = new web3.eth.Contract(oTokenABI, oTokenAddr);
   await oToken.methods
     .burnOTokens(burnAmt)
-    .send({ from: accounts[0] })
+    .send({ from: account })
     .on('transactionHash', (hash) => {
       notify.hash(hash);
     });
 };
 
 export const issueOToken = async (oTokenAddr, issueAmt) => {
-  const accounts = await window.ethereum.enable();
-  const web3 = new Web3(window.ethereum);
+  const account = await checkConnectedAndGetAddress()
   const oToken = new web3.eth.Contract(oTokenABI, oTokenAddr);
 
   await oToken.methods
-    .issueOTokens(issueAmt, accounts[0])
-    .send({ from: accounts[0] })
+    .issueOTokens(issueAmt, account)
+    .send({ from: account })
     .on('transactionHash', (hash) => {
       notify.hash(hash);
     });
 };
 
 export const addETHCollateral = async (oTokenAddr, owner, ethAmount) => {
-  const accounts = await window.ethereum.enable();
-  const web3 = new Web3(window.ethereum);
+  const account = await checkConnectedAndGetAddress()
   const oToken = new web3.eth.Contract(oTokenABI, oTokenAddr);
   await oToken.methods
     .addETHCollateral(owner)
-    .send({ from: accounts[0], value: web3.utils.toWei(ethAmount.toString()) })
+    .send({ from: account, value: web3.utils.toWei(ethAmount.toString()) })
     .on('transactionHash', (hash) => {
       notify.hash(hash);
     });
 };
 
 export const removeETHCollateral = async (oTokenAddr, ethAmount) => {
-  const accounts = await window.ethereum.enable();
-  const web3 = new Web3(window.ethereum);
+  const account = await checkConnectedAndGetAddress()
   const oToken = new web3.eth.Contract(oTokenABI, oTokenAddr);
   await oToken.methods
     .removeCollateral(web3.utils.toWei(ethAmount.toString()))
-    .send({ from: accounts[0] })
+    .send({ from: account })
     .on('transactionHash', (hash) => {
       notify.hash(hash);
     });
 };
 
 export const approve = async (oTokenAddr, spender, amt) => {
-  const accounts = await window.ethereum.enable();
-  const web3 = new Web3(window.ethereum);
+  const account = await checkConnectedAndGetAddress()
   const oToken = new web3.eth.Contract(oTokenABI, oTokenAddr);
   await oToken.methods
     .approve(spender, amt)
-    .send({ from: accounts[0] })
+    .send({ from: account })
     .on('transactionHash', (hash) => {
       notify.hash(hash);
     });
 };
 
 export const openVault = async (oTokenAddr) => {
-  const accounts = await window.ethereum.enable();
-  const web3 = new Web3(window.ethereum);
+  const account = await checkConnectedAndGetAddress()
   const oToken = new web3.eth.Contract(oTokenABI, oTokenAddr);
   await oToken.methods
     .openVault()
-    .send({ from: accounts[0] })
+    .send({ from: account })
     .on('transactionHash', (hash) => {
       notify.hash(hash);
     });
@@ -103,39 +155,36 @@ export const openVault = async (oTokenAddr) => {
 // Option Exchange
 
 export const buyOTokensFromExchange = async (oTokenAddr, exchangeAddr, buyAmt, ethAmt) => {
-  const accounts = await window.ethereum.enable();
-  const web3 = new Web3(window.ethereum);
-
+  const account = await checkConnectedAndGetAddress()
   const exchange = new web3.eth.Contract(exchangeABI, exchangeAddr);
   await exchange.methods
     .buyOTokens(
-      accounts[0],
+      account,
       oTokenAddr,
       '0x0000000000000000000000000000000000000000', // payment
       buyAmt
     )
-    .send({ from: accounts[0], value: web3.utils.toWei(ethAmt.toString()) })
+    .send({ from: account, value: web3.utils.toWei(ethAmt.toString()) })
     .on('transactionHash', (hash) => {
       notify.hash(hash);
     });
 };
 
 export const sellOTokensFromExchange = async (oTokenAddr, exchangeAddr, sellAmt) => {
-  const accounts = await window.ethereum.enable();
-  const web3 = new Web3(window.ethereum);
-  const allowance = await getAllowance(oTokenAddr, accounts[0], exchangeAddr);
-  if (new BN(allowance).lt(new BN(sellAmt))) { 
+  const account = await checkConnectedAndGetAddress()  
+  const allowance = await getAllowance(oTokenAddr, account, exchangeAddr);
+  if (new BN(allowance).lt(new BN(sellAmt))) {
     await approve(oTokenAddr, exchangeAddr, UINT256_MAX);
   }
   const exchange = new web3.eth.Contract(exchangeABI, exchangeAddr);
   await exchange.methods
     .sellOTokens(
-      accounts[0],
+      account,
       oTokenAddr,
       '0x0000000000000000000000000000000000000000', // payment
       sellAmt
     )
-    .send({ from: accounts[0] })
+    .send({ from: account })
     .on('transactionHash', (hash) => {
       notify.hash(hash);
     });
@@ -147,9 +196,8 @@ export const sellOTokensFromExchange = async (oTokenAddr, exchangeAddr, sellAmt)
  *
  */
 export const addLiquidity = async (oToken, uniswapAddr, maxToken, minLiquidity, ethValue) => {
-  const accounts = await window.ethereum.enable();
-  const web3 = new Web3(window.ethereum);
-  const allowance = await getAllowance(oToken, accounts[0], uniswapAddr);
+  const account = await checkConnectedAndGetAddress()
+  const allowance = await getAllowance(oToken, account, uniswapAddr);
   if (new BN(allowance).lt(new BN(maxToken))) {
     await approve(oToken, uniswapAddr, UINT256_MAX);
   }
@@ -161,7 +209,7 @@ export const addLiquidity = async (oToken, uniswapAddr, maxToken, minLiquidity, 
       maxToken, // max_tokens
       deadline // deadline
     )
-    .send({ from: accounts[0], value: web3.utils.toWei(ethValue)-1 })
+    .send({ from: account, value: web3.utils.toWei(ethValue) - 1 })
     .on('transactionHash', (hash) => {
       notify.hash(hash);
     });
@@ -170,21 +218,15 @@ export const addLiquidity = async (oToken, uniswapAddr, maxToken, minLiquidity, 
 /**
  *
  */
-export const removeLiquidity = async (
-  uniswapAddr,
-  pool_token_amount,
-  min_eth,
-  min_tokens
-) => {
-  const accounts = await window.ethereum.enable();
-  const web3 = new Web3(window.ethereum);
-  const min_eth_wei = web3.utils.toWei(min_eth)
+export const removeLiquidity = async (uniswapAddr, pool_token_amount, min_eth, min_tokens) => {
+  const account = await checkConnectedAndGetAddress()
+  const min_eth_wei = web3.utils.toWei(min_eth);
   const uniswapExchange = new web3.eth.Contract(uniswapExchangeABI, uniswapAddr);
   const deadline = Math.ceil(Date.now() / 1000) + DEADLINE_FROM_NOW;
   await uniswapExchange.methods
     .removeLiquidity(pool_token_amount, min_eth_wei, min_tokens, deadline)
     .send({
-      from: accounts[0],
+      from: account,
     })
     .on('transactionHash', (hash) => {
       notify.hash(hash);

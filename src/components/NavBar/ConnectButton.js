@@ -1,28 +1,38 @@
 import React, { useState } from 'react';
-import { Button, IdentityBadge, IconConnect, Box } from '@aragon/ui';
+import { Button, IdentityBadge, IconConnect, Box, IconPower, LinkBase } from '@aragon/ui';
 
-function ConnectButton({user, setUser}){
-  const [isConnected, setIsConnected] = useState(false)
+import { connect, disconnect } from '../../utils/web3';
+
+function ConnectButton({ user, setUser }) {
+  const [isConnected, setIsConnected] = useState(false);
 
   const connectWeb3 = async () => {
-    const accounts = await window.ethereum.enable();
-    setIsConnected(true)
-    setUser(accounts[0])
+    const address = await connect();
+    if (address === false) return;
+    setIsConnected(true);
+    setUser(address);
     return true;
   };
-  
-    return isConnected ? (
+
+  const disconnectWeb3 = async () => {
+    await disconnect();
+    setIsConnected(false);
+    setUser('');
+  };
+
+  return isConnected ? (
+    <>
+      <div style={{paddingTop: 5, paddingRight: 5}}>
+      <LinkBase onClick={disconnectWeb3} size='small' > <IconPower /> </LinkBase>
+      </div>
       <Box padding={6}>
-        <IdentityBadge entity={user} connectedAccount />
+        <IdentityBadge entity={user} />
       </Box>
-    ) : (
-      <Button 
-        icon={<IconConnect/>} 
-        label={'Connect'} 
-        onClick={connectWeb3}
-      /> 
-    );
-  
+      
+    </>
+  ) : (
+    <Button icon={<IconConnect />} label={'Connect'} onClick={connectWeb3} />
+  );
 }
 
 export default ConnectButton;

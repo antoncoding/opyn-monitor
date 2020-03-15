@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 
 import { HashRouter as Router, Switch, Route } from 'react-router-dom';
+import { updateModalMode } from './utils/web3'
 import NavBar from './components/NavBar';
 import HomePage from './components/HomePage'
 import AllOptoins from './components/AllContracts';
@@ -20,6 +21,7 @@ function App() {
 
   const updateTheme = (theme) => {
     setTheme(theme);
+    updateModalMode(theme)
     window.localStorage.setItem('theme', theme);
   };
 
