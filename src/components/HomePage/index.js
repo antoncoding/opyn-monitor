@@ -37,7 +37,7 @@ function MainButton({ title, description, iconUrl, onClick }) {
     <LinkBase onClick={onClick} style={{ width: '100%' }}>
       <Box>
         <div style={{ padding:10, fontSize: 18 }}>{title}</div>
-        <img alt='icon' style={{ padding:10 }} src={iconUrl}></img>
+        <img alt='icon' style={{ padding:10, height:64 }} src={iconUrl}></img>
         <div style={{ paddingTop: 5, opacity: 0.5 }}> {description} </div>
         
       </Box>
