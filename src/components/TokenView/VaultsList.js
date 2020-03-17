@@ -67,7 +67,7 @@ function VaultOwnerList({ oToken, user }) {
             <VaultModal 
               decimals={option.decimals}
               oToken={oToken} owner={owner} 
-              collateral={collateral}
+              collateral={fromWei(collateral)}
               isSafe={isSafe}
               oTokensIssued={oTokensIssued}
               ratio={ratio}

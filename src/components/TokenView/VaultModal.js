@@ -1,7 +1,7 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect } from 'react';
 
 import { addETHCollateral, liquidate } from '../../utils/web3';
-import { getMaxLiquidatable, getDecimals } from '../../utils/infura';
+import { getMaxLiquidatable } from '../../utils/infura';
 import { toTokenUnits } from '../../utils/number';
 import { RatioTag } from '../common';
 
