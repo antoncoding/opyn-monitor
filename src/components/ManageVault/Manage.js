@@ -112,6 +112,7 @@ function ManageVault({ token, owner, user }) {
           isOwner={isOwner}
           vault={vault}
           collateralAssetBalance={userCollateralAssetBalance}
+          collateralAsset={option.collateral}
           token={token}
           owner={owner}
           strikeValue={strikeVauleInWei}

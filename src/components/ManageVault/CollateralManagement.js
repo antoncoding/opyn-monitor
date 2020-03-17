@@ -12,6 +12,7 @@ import { ETH_ADDRESS } from '../../constants/options';
 function CollateralManagement({
   isOwner,
   vault,
+  collateralAsset,
   collateralAssetBalance,
   token,
   owner,
@@ -26,14 +27,15 @@ function CollateralManagement({
   const [collateralDecimals, setCollateralDecimals] = useState(0)
   const [collateralSymbol, setCollateralSymbol] = useState(0)
 
-  const collateralIsETH = vault.collateral === ETH_ADDRESS
+  const collateralIsETH = collateralAsset === ETH_ADDRESS
 
   useMemo(async()=>{
-    const decimals = await getDecimals(token)
-    const symbol = await getERC20Symbol(token)
+    if(collateralIsETH) return
+    const decimals = await getDecimals(collateralAsset)
+    const symbol = await getERC20Symbol(collateralAsset)
     setCollateralDecimals(decimals)
     setCollateralSymbol(symbol)
-  }, [token])
+  }, [collateralAsset, collateralIsETH])
 
   /**
    * @param {number} newCollateral in wei
@@ -87,7 +89,7 @@ function CollateralManagement({
                 icon={<IconCirclePlus />}
                 label='Add'
                 onClick={() => {
-                  addCollateral(vault.collateral, token, owner, addCollateralAmt);
+                  addCollateral(collateralAsset, token, owner, addCollateralAmt);
                 }}
               />
             </div>
@@ -131,7 +133,7 @@ function CollateralManagement({
                 icon={<IconCircleMinus />}
                 label='Remove'
                 onClick={() => {
-                  removeCollateral(vault.collateral, token, removeCollateralAmt);
+                  removeCollateral(collateralAsset, token, removeCollateralAmt);
                 }}
               />
             </div>
