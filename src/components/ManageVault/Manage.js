@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 
-import { getVaults, getTokenBalance, getBalance, getPrice } from '../../utils/infura';
+import { getTokenBalance, getBalance, getPrice } from '../../utils/infura';
+
+import { getAllVaultsForUser } from '../../utils/graph'
 
 import { Header, Tabs } from '@aragon/ui';
 
@@ -9,7 +11,7 @@ import IssuedTokenManagement from './IssuedTokenManagement';
 import LiquidationHistory from './Liquidation';
 
 import { options } from '../../constants/options';
-import { formatDigits, fromWei, toTokenUnits } from '../../utils/number';
+import { formatDigits, calculateRatio, toTokenUnits } from '../../utils/number';
 
 import HeaderDashboard from './HeaderDashboard';
 
@@ -20,7 +22,8 @@ function ManageVault({ token, owner, user }) {
   const [tabSelected, setTabSelected] = useState(0);
 
   const [vault, setVault] = useState({});
-  const [lastETHValueInStrike, setLastETHValue] = useState(0);
+  // const [lastETHValueInStrike, setLastETHValue] = useState(0);
+  const [strikeVauleInWei, setStrikeValue] = useState(0)
 
   const [ratio, setRatio] = useState(0);
 
@@ -36,7 +39,8 @@ function ManageVault({ token, owner, user }) {
     let isCancelled = false;
 
     async function updateInfo() {
-      const vault = (await getVaults([owner], token))[0];
+      const vault = (await getAllVaultsForUser(owner)).find(vault => vault.optionsContract.address === token)
+      // const vault = (await getVaults([owner], token))[0];
       // vault.collateral here in unit of eth.
       if (vault === undefined) {
         return;
@@ -51,21 +55,26 @@ function ManageVault({ token, owner, user }) {
       _ownerTokenBalance = toTokenUnits(_ownerTokenBalance, decimals);
       _userTokenBalance = toTokenUnits(_userTokenBalance, decimals)
 
-      const lastStrikeValue = fromWei(await getPrice(oracle, strike));
-      const ethValueInStrike = 1 / lastStrikeValue;
-      const valueProtectingInEth = parseFloat(strikePrice) * vault.oTokensIssued;
-      const ratio = formatDigits(
-        (parseFloat(vault.collateral) * ethValueInStrike) / valueProtectingInEth,
-        5
-      );
+      const lastStrikeValue = await getPrice(oracle, strike);
+      const ratio = calculateRatio(vault.collateral, vault.oTokensIssued, strikePrice, lastStrikeValue)
+
+      // const lastStrikeValue = await getPrice(oracle, strike);
+      // const ethValueInStrike = 1 / lastStrikeValue;
+      // const valueProtectingInEth = parseFloat(strikePrice) * vault.oTokensIssued;
+
+      // const ratio = formatDigits(
+      //   (parseFloat(vault.collateral) * ethValueInStrike) / valueProtectingInEth,
+      //   5
+      // );
 
       if (!isCancelled) {
-        setLastETHValue(ethValueInStrike);
+        // setLastETHValue(ethValueInStrike);
+        setStrikeValue(lastStrikeValue)
         setVault(vault);
         setOwnerTokenBalance(_ownerTokenBalance);
         setUserTokenBalance(_userTokenBalance)
         setUserETHBalance(userETHBalance);
-        setRatio(ratio);
+        setRatio(formatDigits(ratio, 5));
       }
     }
     updateInfo();
@@ -109,7 +118,7 @@ function ManageVault({ token, owner, user }) {
           ethBalance={userETHBalance}
           token={token}
           owner={owner}
-          lastETHValueInStrike={lastETHValueInStrike}
+          strikeValue={strikeVauleInWei}
           strikePrice={strikePrice}
           minRatio={minRatio}
           setNewRatio={setNewRatio}
@@ -124,7 +133,7 @@ function ManageVault({ token, owner, user }) {
           vault={vault}
           tokenBalance={ownerTokenBalance}
           token={token}
-          lastETHValueInStrike={lastETHValueInStrike}
+          strikeValue={strikeVauleInWei}
           strikePrice={strikePrice}
           minRatio={minRatio}
           decimals={decimals}

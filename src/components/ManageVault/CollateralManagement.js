@@ -5,7 +5,7 @@ import { addETHCollateral, removeETHCollateral } from '../../utils/web3';
 import { BalanceBlock, MaxButton } from '../common';
 import { Box, TextInput, Button, IconCirclePlus, IconCircleMinus } from '@aragon/ui';
 
-import { formatDigits } from '../../utils/number'
+import { formatDigits, calculateRatio, toWei, fromWei } from '../../utils/number'
 
 function CollateralManagement({
   isOwner,
@@ -13,7 +13,7 @@ function CollateralManagement({
   ethBalance,
   token,
   owner,
-  lastETHValueInStrike,
+  strikeValue,
   strikePrice,
   minRatio,
   setNewRatio
@@ -21,13 +21,14 @@ function CollateralManagement({
   const [addCollateralAmt, setAddCollateralAmt] = useState(0);
   const [removeCollateralAmt, setRemoveCollateralAmt] = useState(0);
 
+  /**
+   * @param {number} newCollateral in wei
+   */
   const updateNewRatio = (newCollateral) => {
-    if(newCollateral <= 0) return
-    const newRatio = formatDigits(
-      newCollateral * lastETHValueInStrike / (strikePrice * vault.oTokensIssued),
-      5
-    )
-    setNewRatio(newRatio)
+    if(!newCollateral || newCollateral <= 0) return 0
+    const str = newCollateral.toString()
+    const newRatio = calculateRatio(str, vault.oTokensIssued, strikePrice, strikeValue)
+    setNewRatio(formatDigits(newRatio,5))
   }
 
   return (
@@ -49,13 +50,15 @@ function CollateralManagement({
                   onChange={(event) => {
                     const amt = event.target.value
                     setAddCollateralAmt(amt);
-                    updateNewRatio(parseFloat(vault.collateral) + parseFloat(amt))
+                    const newCollateralInWei = parseInt(vault.collateral) + parseInt(toWei(amt))
+                    updateNewRatio(newCollateralInWei)
                   }}
                 />
                 <MaxButton
                   onClick={() => {
                     setAddCollateralAmt(ethBalance);
-                    updateNewRatio(parseFloat(vault.collateral) + parseFloat(ethBalance))
+                    const newCollateral = parseInt(vault.collateral) + parseInt(toWei(ethBalance))
+                    updateNewRatio(newCollateral)
                   }}
                 />
               </>
@@ -85,16 +88,17 @@ function CollateralManagement({
                   onChange={(event) => {
                     const amt = event.target.value
                     setRemoveCollateralAmt(amt);
-                    updateNewRatio(parseFloat(vault.collateral) - parseFloat(amt))
+                    const newCollateralWei = parseInt(vault.collateral) - parseInt(toWei(amt))
+                    updateNewRatio(newCollateralWei)
                   }}
                 />
                 <MaxButton
                   onClick={() => {
-                    if (lastETHValueInStrike <= 0) return;
+                    if (strikeValue <= 0) return;
                     const minValueInStrike = strikePrice * vault.oTokensIssued * minRatio;
-                    const minCollateral = minValueInStrike / lastETHValueInStrike;
-                    const maxToRemove = vault.collateral - minCollateral;
-                    setRemoveCollateralAmt(maxToRemove);
+                    const minCollateral = minValueInStrike * strikeValue;
+                    const maxToRemoveWei = parseInt(vault.collateral - minCollateral).toString();
+                    setRemoveCollateralAmt(fromWei(maxToRemoveWei));
                     setNewRatio(minRatio)
                   }}
                 />

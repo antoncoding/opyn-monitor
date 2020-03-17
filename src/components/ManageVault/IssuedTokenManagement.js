@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { burnOToken, issueOToken } from '../../utils/web3';
 import { BalanceBlock, MaxButton } from '../common';
-import { handleDecimals, formatDigits } from '../../utils/number';
+import { handleDecimals, calculateRatio } from '../../utils/number';
 import { Box, TextInput, Button, IconCirclePlus, IconCircleMinus } from '@aragon/ui';
 
 function IssuedTokenManagement({
@@ -9,7 +9,7 @@ function IssuedTokenManagement({
   vault,
   tokenBalance,
   token,
-  lastETHValueInStrike,
+  strikeValue,
   strikePrice,
   minRatio,
   decimals,
@@ -19,11 +19,14 @@ function IssuedTokenManagement({
   const [issueAmt, setIssueAmt] = useState(0);
   const [burnAmt, setBurnAmt] = useState(0);
 
+  /**
+   * 
+   * @param {number} newAmt in raw amt
+   */
   const updateNewRatio = (newAmt) => {
-    const newRatio = formatDigits(
-      (vault.collateral * lastETHValueInStrike) / (strikePrice * newAmt),
-      5
-    );
+    if(newAmt <= 0) return
+    // const newTokenAmt = handleDecimals(newAmt, decimals)
+    const newRatio = calculateRatio(vault.collateral, newAmt, strikePrice, strikeValue)
     setNewRatio(newRatio);
   };
 
@@ -71,10 +74,9 @@ function IssuedTokenManagement({
                 <MaxButton
                   onClick={() => {
                     if (strikePrice <= 0) return;
-
                     const maxTotal =
-                      (vault.collateral * lastETHValueInStrike) / (minRatio * strikePrice);
-                    const maxToIssueRaw = maxTotal - vault.oTokensIssued;
+                      (vault.collateral) / (minRatio * strikePrice * strikeValue);
+                    const maxToIssueRaw = parseInt(maxTotal) - vault.oTokensIssued;
                     const maxToIssue = maxToIssueRaw / 10 ** decimals;
                     setIssueAmt(maxToIssue);
                     setNewRatio(minRatio);
@@ -108,7 +110,9 @@ function IssuedTokenManagement({
                 <MaxButton
                   onClick={() => {
                     const issued = Number(vault.oTokensIssued) / 10 ** decimals;
-                    setBurnAmt(Math.min(tokenBalance, issued));
+                    const maxToBurn = Math.min(tokenBalance, issued)
+                    setBurnAmt(maxToBurn);
+                    updateNewRatio(handleDecimals( issued - maxToBurn, decimals))
                   }}
                 />
               </>

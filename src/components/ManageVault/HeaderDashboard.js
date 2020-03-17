@@ -1,15 +1,18 @@
 import React from 'react';
 
 import { BalanceBlock, RatioTag, HelperText } from '../common';
-import { formatDigits } from '../../utils/number';
+import { formatDigits, fromWei } from '../../utils/number';
 
 const HeaderDashboard = ({ ratio, minRatio, symbol, vault, decimals, newRatio }) => {
   const tokenInUnit = vault.oTokensIssued ? vault.oTokensIssued / 10 ** decimals : 0;
-
+  let collateralInETH = '0'
+  if(vault.collateral)
+    collateralInETH = fromWei(vault.collateral)
+  
   return (
     <div style={{ padding: '2%', display: 'flex', alignItems: 'center' }}>
       <div style={{ width: '30%' }}>
-        <BalanceBlock asset='Total Collateral' balance={formatDigits(vault.collateral, 6)} />
+        <BalanceBlock asset='Total Collateral' balance={formatDigits(collateralInETH, 6)} />
       </div>
       <div style={{ width: '50%' }}>
         <BalanceBlock asset={`${symbol} Issued`} balance={tokenInUnit} />
