@@ -19,12 +19,11 @@ function ManageVault({ token, owner, user }) {
   const option = options.find((option) => option.addr === token);
   const { decimals, symbol, oracle, strike, strikePrice, minRatio } = option;
 
+  // Tab Navigation
   const [tabSelected, setTabSelected] = useState(0);
 
   const [vault, setVault] = useState({});
-  // const [lastETHValueInStrike, setLastETHValue] = useState(0);
   const [strikeVauleInWei, setStrikeValue] = useState(0)
-
   const [ratio, setRatio] = useState(0);
 
   const [ownerTokenBalance, setOwnerTokenBalance] = useState(0);
@@ -40,8 +39,6 @@ function ManageVault({ token, owner, user }) {
 
     async function updateInfo() {
       const vault = (await getAllVaultsForUser(owner)).find(vault => vault.optionsContract.address === token)
-      // const vault = (await getVaults([owner], token))[0];
-      // vault.collateral here in unit of eth.
       if (vault === undefined) {
         return;
       }
@@ -58,17 +55,7 @@ function ManageVault({ token, owner, user }) {
       const lastStrikeValue = await getPrice(oracle, strike);
       const ratio = calculateRatio(vault.collateral, vault.oTokensIssued, strikePrice, lastStrikeValue)
 
-      // const lastStrikeValue = await getPrice(oracle, strike);
-      // const ethValueInStrike = 1 / lastStrikeValue;
-      // const valueProtectingInEth = parseFloat(strikePrice) * vault.oTokensIssued;
-
-      // const ratio = formatDigits(
-      //   (parseFloat(vault.collateral) * ethValueInStrike) / valueProtectingInEth,
-      //   5
-      // );
-
       if (!isCancelled) {
-        // setLastETHValue(ethValueInStrike);
         setStrikeValue(lastStrikeValue)
         setVault(vault);
         setOwnerTokenBalance(_ownerTokenBalance);
