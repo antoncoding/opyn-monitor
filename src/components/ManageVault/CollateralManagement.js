@@ -1,16 +1,18 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 
-import { addETHCollateral, removeETHCollateral } from '../../utils/web3';
+import { getDecimals, getERC20Symbol } from '../../utils/infura'
+import { addCollateral, removeCollateral } from '../../utils/web3';
 
 import { BalanceBlock, MaxButton } from '../common';
 import { Box, TextInput, Button, IconCirclePlus, IconCircleMinus } from '@aragon/ui';
 
-import { formatDigits, calculateRatio, toWei, fromWei } from '../../utils/number'
+import { formatDigits, calculateRatio, toWei, fromWei, handleDecimals, toTokenUnits } from '../../utils/number'
+import { ETH_ADDRESS } from '../../constants/options';
 
 function CollateralManagement({
   isOwner,
   vault,
-  ethBalance,
+  collateralAssetBalance,
   token,
   owner,
   strikeValue,
@@ -18,8 +20,20 @@ function CollateralManagement({
   minRatio,
   setNewRatio
 }) {
-  const [addCollateralAmt, setAddCollateralAmt] = useState(0);
-  const [removeCollateralAmt, setRemoveCollateralAmt] = useState(0);
+  const [addCollateralAmt, setAddCollateralAmt] = useState(0); // in token unit
+  const [removeCollateralAmt, setRemoveCollateralAmt] = useState(0); // in token unit
+
+  const [collateralDecimals, setCollateralDecimals] = useState(0)
+  const [collateralSymbol, setCollateralSymbol] = useState(0)
+
+  const collateralIsETH = vault.collateral === ETH_ADDRESS
+
+  useMemo(async()=>{
+    const decimals = await getDecimals(token)
+    const symbol = await getERC20Symbol(token)
+    setCollateralDecimals(decimals)
+    setCollateralSymbol(symbol)
+  }, [token])
 
   /**
    * @param {number} newCollateral in wei
@@ -36,7 +50,9 @@ function CollateralManagement({
       <div style={{ display: 'flex' }}>
         {/* balance */}
         <div style={{ width: '30%' }}>
-          {BalanceBlock({ asset: 'Your ETH Balance', balance: formatDigits(ethBalance,6) })}
+          {BalanceBlock({ 
+            asset: collateralIsETH ? 'Your ETH Balance' : `Your ${collateralSymbol} Balance`, 
+            balance: formatDigits(collateralAssetBalance,6) })}
         </div>
         {/* Add collateral */}
         <div style={{ width: '32%', paddingTop: '2%' }}>
@@ -50,14 +66,16 @@ function CollateralManagement({
                   onChange={(event) => {
                     const amt = event.target.value
                     setAddCollateralAmt(amt);
-                    const newCollateralInWei = parseInt(vault.collateral) + parseInt(toWei(amt))
+                    const amtRaw = collateralIsETH ? parseInt(toWei(amt)) : handleDecimals(amt, collateralDecimals)
+                    const newCollateralInWei = parseInt(vault.collateral) + amtRaw
                     updateNewRatio(newCollateralInWei)
                   }}
                 />
                 <MaxButton
                   onClick={() => {
-                    setAddCollateralAmt(ethBalance);
-                    const newCollateral = parseInt(vault.collateral) + parseInt(toWei(ethBalance))
+                    setAddCollateralAmt(collateralAssetBalance);
+                    const collateralBalanceRaw = collateralIsETH ? parseInt(toWei(collateralAssetBalance)) : handleDecimals(collateralAssetBalance, collateralDecimals)
+                    const newCollateral = parseInt(vault.collateral) + collateralBalanceRaw
                     updateNewRatio(newCollateral)
                   }}
                 />
@@ -69,7 +87,7 @@ function CollateralManagement({
                 icon={<IconCirclePlus />}
                 label='Add'
                 onClick={() => {
-                  addETHCollateral(token, owner, addCollateralAmt);
+                  addCollateral(vault.collateral, token, owner, addCollateralAmt);
                 }}
               />
             </div>
@@ -88,7 +106,8 @@ function CollateralManagement({
                   onChange={(event) => {
                     const amt = event.target.value
                     setRemoveCollateralAmt(amt);
-                    const newCollateralWei = parseInt(vault.collateral) - parseInt(toWei(amt))
+                    const amtRaw = collateralIsETH ? parseInt(toWei(amt)) : handleDecimals(amt, collateralDecimals)
+                    const newCollateralWei = parseInt(vault.collateral) - amtRaw
                     updateNewRatio(newCollateralWei)
                   }}
                 />
@@ -97,8 +116,9 @@ function CollateralManagement({
                     if (strikeValue <= 0) return;
                     const minValueInStrike = strikePrice * vault.oTokensIssued * minRatio;
                     const minCollateral = minValueInStrike * strikeValue;
-                    const maxToRemoveWei = parseInt(vault.collateral - minCollateral).toString();
-                    setRemoveCollateralAmt(fromWei(maxToRemoveWei));
+                    const maxToRemove = parseInt(vault.collateral - minCollateral).toString();
+                    const maxToRemoveInTokenUnit = collateralIsETH ? fromWei(maxToRemove) : toTokenUnits(maxToRemove, collateralDecimals)
+                    setRemoveCollateralAmt(maxToRemoveInTokenUnit);
                     setNewRatio(minRatio)
                   }}
                 />
@@ -111,7 +131,7 @@ function CollateralManagement({
                 icon={<IconCircleMinus />}
                 label='Remove'
                 onClick={() => {
-                  removeETHCollateral(token, removeCollateralAmt);
+                  removeCollateral(vault.collateral, token, removeCollateralAmt);
                 }}
               />
             </div>

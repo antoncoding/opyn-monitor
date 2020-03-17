@@ -1,9 +1,11 @@
 import Web3 from 'web3';
+import BN from 'bn.js'
 import Onboard from 'bnc-onboard';
 
 import { notify } from './blockNative';
 import { getAllowance } from './infura';
-import BN from 'bn.js';
+import { ETH_ADDRESS } from '../constants/options'
+
 const oTokenABI = require('../constants/abi/OptionContract.json');
 const exchangeABI = require('../constants/abi/OptionExchange.json');
 const uniswapExchangeABI = require('../constants/abi/UniswapExchange.json');
@@ -108,26 +110,35 @@ export const issueOToken = async (oTokenAddr, issueAmt) => {
     });
 };
 
-export const addETHCollateral = async (oTokenAddr, owner, ethAmount) => {
+export const addCollateral = async (collateral, oTokenAddr, owner, ethAmount) => {
   const account = await checkConnectedAndGetAddress()
   const oToken = new web3.eth.Contract(oTokenABI, oTokenAddr);
-  await oToken.methods
-    .addETHCollateral(owner)
-    .send({ from: account, value: web3.utils.toWei(ethAmount.toString()) })
-    .on('transactionHash', (hash) => {
-      notify.hash(hash);
-    });
+  if(collateral === ETH_ADDRESS) {
+    await oToken.methods
+      .addETHCollateral(owner)
+      .send({ from: account, value: web3.utils.toWei(ethAmount.toString()) })
+      .on('transactionHash', (hash) => {
+        notify.hash(hash);
+      });
+  } else {
+    console.error(`not supported yet`)
+  }
+  
 };
 
-export const removeETHCollateral = async (oTokenAddr, ethAmount) => {
+export const removeCollateral = async (collateral, oTokenAddr, ethAmount) => {
   const account = await checkConnectedAndGetAddress()
   const oToken = new web3.eth.Contract(oTokenABI, oTokenAddr);
-  await oToken.methods
-    .removeCollateral(web3.utils.toWei(ethAmount.toString()))
-    .send({ from: account })
-    .on('transactionHash', (hash) => {
-      notify.hash(hash);
-    });
+  if(collateral === ETH_ADDRESS) {
+    await oToken.methods
+      .removeCollateral(web3.utils.toWei(ethAmount.toString()))
+      .send({ from: account })
+      .on('transactionHash', (hash) => {
+        notify.hash(hash);
+      });
+  } else {
+    console.error(`not supported yet`)
+  }
 };
 
 export const approve = async (oTokenAddr, spender, amt) => {

@@ -1,16 +1,29 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { DataView, IdentityBadge } from '@aragon/ui';
 import { getAllVaultsForOption } from '../../utils/graph';
-import { getPrice } from '../../utils/infura';
-import { options } from '../../constants/options';
+import { getPrice, getDecimals } from '../../utils/infura';
+import { options, ETH_ADDRESS } from '../../constants/options';
 import VaultModal from './VaultModal'
 import { SectionTitle, RatioTag } from '../common';
 import { formatDigits, fromWei, compareVaultRatio, calculateRatio, toTokenUnits } from '../../utils/number';
 
 function VaultOwnerList({ oToken, user }) {
   const option = options.find((option) => option.addr === oToken);
+  
+  
+  const [collateralDecimals, setCollateralDecimals] = useState(0)
+  const collateralIsETH = option.collateral === ETH_ADDRESS
+  
   const [isLoading, setIsLoading] = useState(true);
   const [vaults, setVaults] = useState([]);
+
+  // Get Collateral decimals if collateral is not eth
+  useMemo(async()=>{
+    if(collateralIsETH) {
+      const _decimals = await getDecimals(oToken)
+      setCollateralDecimals(_decimals)
+    }
+  }, [collateralIsETH, oToken])
 
   useEffect(() => {
     let isCancelled = false;
@@ -60,14 +73,18 @@ function VaultOwnerList({ oToken, user }) {
         renderEntry={({ owner, collateral, oTokensIssued, ratio, isSafe }) => {
           return [
             <IdentityBadge entity={owner} shorten={true} />,
-            formatDigits(fromWei(collateral), 6),
+            formatDigits(
+              collateralIsETH ? fromWei(collateral) : toTokenUnits(collateral, collateralDecimals),
+              6
+            ),
             formatDigits(oTokensIssued, 6),
             formatDigits(ratio, 5),
             RatioTag({isSafe, ratio}),
             <VaultModal 
               decimals={option.decimals}
               oToken={oToken} owner={owner} 
-              collateral={fromWei(collateral)}
+              collateral={collateralIsETH ? fromWei(collateral) : toTokenUnits(collateral, collateralDecimals)}
+              collateralAsset={option.collateral}
               isSafe={isSafe}
               oTokensIssued={oTokensIssued}
               ratio={ratio}

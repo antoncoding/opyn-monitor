@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 
-import { getTokenBalance, getBalance, getPrice } from '../../utils/infura';
+import { getTokenBalance, getBalance, getPrice, getDecimals } from '../../utils/infura';
 
 import { getAllVaultsForUser } from '../../utils/graph'
 
@@ -10,14 +10,14 @@ import CollateralManagement from './CollateralManagement';
 import IssuedTokenManagement from './IssuedTokenManagement';
 import LiquidationHistory from './Liquidation';
 
-import { options } from '../../constants/options';
+import { options, ETH_ADDRESS } from '../../constants/options';
 import { formatDigits, calculateRatio, toTokenUnits } from '../../utils/number';
 
 import HeaderDashboard from './HeaderDashboard';
 
 function ManageVault({ token, owner, user }) {
   const option = options.find((option) => option.addr === token);
-  const { decimals, symbol, oracle, strike, strikePrice, minRatio } = option;
+  const { decimals, symbol, oracle, strike, strikePrice, minRatio, collateral } = option;
 
   // Tab Navigation
   const [tabSelected, setTabSelected] = useState(0);
@@ -28,7 +28,7 @@ function ManageVault({ token, owner, user }) {
 
   const [ownerTokenBalance, setOwnerTokenBalance] = useState(0);
   const [userTokenBalance, setUserTokenBalance] = useState(0)
-  const [userETHBalance, setUserETHBalance] = useState(0);
+  const [userCollateralAssetBalance, setUserCollateralAssetBalance] = useState(0);
 
   // status
   const [noVault, setNoVault] = useState(true);
@@ -43,11 +43,20 @@ function ManageVault({ token, owner, user }) {
         return;
       }
       setNoVault(false);
-      let [_ownerTokenBalance, _userTokenBalance, userETHBalance] = await Promise.all([
+      let [_ownerTokenBalance, _userTokenBalance] = await Promise.all([
         getTokenBalance(token, owner),
-        getTokenBalance(token, user),
-        getBalance(user),
+        getTokenBalance(token, user)
       ]);
+
+      // SetUserCollateralAmount
+      let collateralBalance;
+      if (collateral === ETH_ADDRESS) {
+        collateralBalance = await getBalance(user)
+      } else {
+        const _tokenBalance = await getTokenBalance(user, token)
+        const _decimals = await getDecimals(token)
+        collateralBalance = toTokenUnits(_tokenBalance, _decimals)
+      }
 
       _ownerTokenBalance = toTokenUnits(_ownerTokenBalance, decimals);
       _userTokenBalance = toTokenUnits(_userTokenBalance, decimals)
@@ -60,8 +69,8 @@ function ManageVault({ token, owner, user }) {
         setVault(vault);
         setOwnerTokenBalance(_ownerTokenBalance);
         setUserTokenBalance(_userTokenBalance)
-        setUserETHBalance(userETHBalance);
         setRatio(formatDigits(ratio, 5));
+        setUserCollateralAssetBalance(collateralBalance);
       }
     }
     updateInfo();
@@ -71,7 +80,7 @@ function ManageVault({ token, owner, user }) {
       isCancelled = true;
       clearInterval(id);
     };
-  }, [decimals, oracle, owner, strike, strikePrice, token, user]);
+  }, [collateral, decimals, oracle, owner, strike, strikePrice, token, user]);
 
   const isOwner = user === owner;
 
@@ -102,7 +111,7 @@ function ManageVault({ token, owner, user }) {
         <CollateralManagement
           isOwner={isOwner}
           vault={vault}
-          ethBalance={userETHBalance}
+          collateralAssetBalance={userCollateralAssetBalance}
           token={token}
           owner={owner}
           strikeValue={strikeVauleInWei}

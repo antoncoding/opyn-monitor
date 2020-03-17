@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 
-import { addETHCollateral, liquidate } from '../../utils/web3';
+import { liquidate, addCollateral } from '../../utils/web3';
 import { getMaxLiquidatable } from '../../utils/infura';
 import { toTokenUnits } from '../../utils/number';
 import { RatioTag } from '../common';
@@ -18,7 +18,7 @@ import {
   DataView,
 } from '@aragon/ui';
 
-function VaultModal({ oToken, owner, collateral, isSafe, oTokensIssued, ratio, decimals }) {
+function VaultModal({ oToken, owner, collateral, isSafe, oTokensIssued, ratio, decimals, collateralAsset }) {
   const [opened, setOpened] = useState(false);
   const [addValue, setAddValue] = useState(0);
   const [liquidateAmt, setLiquidateAmt] = useState(0);
@@ -78,7 +78,7 @@ function VaultModal({ oToken, owner, collateral, isSafe, oTokensIssued, ratio, d
                 label='Add Collateral'
                 wide={true}
                 onClick={() => {
-                  addETHCollateral(oToken, owner, addValue);
+                  addCollateral(collateralAsset, oToken, owner, addValue);
                 }}
               />
             }
