@@ -66,7 +66,7 @@ function VaultOwnerList({ oToken, user }) {
             RatioTag({isSafe, ratio}),
             <VaultModal 
               oToken={oToken} owner={owner} 
-              collateral={collateral}
+              collateral={fromWei(collateral)}
               isSafe={isSafe}
               oTokensIssued={oTokensIssued}
               ratio={ratio}

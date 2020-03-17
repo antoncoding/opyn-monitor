@@ -32,8 +32,6 @@ function VaultModal({ oToken, owner, collateral, isSafe, oTokensIssued, ratio })
       if (!opened) return;
       const maxLiquidatable = await getMaxLiquidatable(oToken, owner);
       const _decimals = await getDecimals(oToken);
-      console.log(`max Liquidatable`, maxLiquidatable);
-      console.log(`decimals`, _decimals);
       if (!isCancelled) {
         setTokenDecimals(_decimals);
         setLiquidateAmt(toTokenUnits(maxLiquidatable, _decimals));
