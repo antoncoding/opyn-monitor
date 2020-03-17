@@ -70,6 +70,7 @@ export function compareVaultRatio(vaultA, vaultB) {
  * @param {string} tokenIssued 
  * @param {number} strikePrice 
  * @param {number} strikeValueInWei 
+ * @return {number}
  */
 export const calculateRatio = (collateral, tokenIssued, strikePrice, strikeValueInWei) => {
   if (tokenIssued === '0') return Infinity

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 
 import { addETHCollateral, liquidate } from '../../utils/web3';
 import { getMaxLiquidatable, getDecimals } from '../../utils/infura';
@@ -18,9 +18,8 @@ import {
   DataView,
 } from '@aragon/ui';
 
-function VaultModal({ oToken, owner, collateral, isSafe, oTokensIssued, ratio }) {
+function VaultModal({ oToken, owner, collateral, isSafe, oTokensIssued, ratio, decimals }) {
   const [opened, setOpened] = useState(false);
-  const [decimals, setTokenDecimals] = useState(0);
   const [addValue, setAddValue] = useState(0);
   const [liquidateAmt, setLiquidateAmt] = useState(0);
   const open = () => setOpened(true);
@@ -31,12 +30,8 @@ function VaultModal({ oToken, owner, collateral, isSafe, oTokensIssued, ratio })
     async function getData() {
       if (!opened) return;
       const maxLiquidatable = await getMaxLiquidatable(oToken, owner);
-      const _decimals = await getDecimals(oToken);
-      console.log(`max Liquidatable`, maxLiquidatable);
-      console.log(`decimals`, _decimals);
       if (!isCancelled) {
-        setTokenDecimals(_decimals);
-        setLiquidateAmt(toTokenUnits(maxLiquidatable, _decimals));
+        setLiquidateAmt(toTokenUnits(maxLiquidatable, decimals));
       }
     }
     getData();
@@ -44,7 +39,7 @@ function VaultModal({ oToken, owner, collateral, isSafe, oTokensIssued, ratio })
     return () => {
       isCancelled = true;
     };
-  }, [oToken, opened, owner]);
+  }, [decimals, oToken, opened, owner]);
 
   return (
     <>

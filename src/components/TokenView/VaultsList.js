@@ -65,6 +65,7 @@ function VaultOwnerList({ oToken, user }) {
             formatDigits(ratio, 5),
             RatioTag({isSafe, ratio}),
             <VaultModal 
+              decimals={option.decimals}
               oToken={oToken} owner={owner} 
               collateral={collateral}
               isSafe={isSafe}
