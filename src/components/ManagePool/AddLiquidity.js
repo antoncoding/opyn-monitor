@@ -7,7 +7,7 @@ import {
 } from '../../utils/infura';
 
 import { BalanceBlock, MaxButton } from '../common';
-import { handleDecimals, formatETHAmtToStr } from '../../utils/number';
+import { formatETHAmtToStr, toBaseUnitString } from '../../utils/number';
 import { Box, TextInput, Button, IconCirclePlus, IconEthereum } from '@aragon/ui';
 
 function AddLiquidity({ 
@@ -94,11 +94,8 @@ function AddLiquidity({
                 icon={<IconCirclePlus />}
                 label='Add Liquidity'
                 onClick={() => {
-                  const maxToken = handleDecimals(amtTokenToAdd, otokenDecimals).toString();
-                  const minLiquidity = handleDecimals(
-                    liquidityMintedMin,
-                    liquidityTokenDecimals
-                  ).toString(10);
+                  const maxToken = toBaseUnitString(amtTokenToAdd, otokenDecimals);
+                  const minLiquidity = toBaseUnitString(liquidityMintedMin, liquidityTokenDecimals);
                   addLiquidity(
                     otoken,
                     uniswapExchange,

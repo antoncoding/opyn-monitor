@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { burnOToken, issueOToken } from '../../utils/web3';
 import { BalanceBlock, MaxButton } from '../common';
-import { handleDecimals, calculateRatio } from '../../utils/number';
+import { toBaseUnitString, handleDecimals, calculateRatio } from '../../utils/number';
 import { Box, TextInput, Button, IconCirclePlus, IconCircleMinus } from '@aragon/ui';
 
 function IssuedTokenManagement({
@@ -25,7 +25,6 @@ function IssuedTokenManagement({
    */
   const updateNewRatio = (newAmt) => {
     if(newAmt <= 0) return
-    // const newTokenAmt = handleDecimals(newAmt, decimals)
     const newRatio = calculateRatio(vault.collateral, newAmt, strikePrice, strikeValue)
     setNewRatio(newRatio);
   };
@@ -37,7 +36,10 @@ function IssuedTokenManagement({
   }
 
   const onClickIssueToken = () => {
-    issueOToken(token, handleDecimals(issueAmt, decimals));
+    issueOToken(
+      token, 
+      toBaseUnitString(issueAmt, decimals)
+    );
   }
 
   const onChangeBurnAmt = (event) => {
@@ -47,7 +49,10 @@ function IssuedTokenManagement({
   }
 
   const onClickBurnToken = () => {
-    burnOToken(token, handleDecimals(burnAmt, decimals));
+    burnOToken(
+      token, 
+      toBaseUnitString(burnAmt, decimals)
+    );
   }
 
   return (
@@ -112,7 +117,7 @@ function IssuedTokenManagement({
                     const issued = Number(vault.oTokensIssued) / 10 ** decimals;
                     const maxToBurn = Math.min(tokenBalance, issued)
                     setBurnAmt(maxToBurn);
-                    updateNewRatio(handleDecimals( issued - maxToBurn, decimals))
+                    updateNewRatio(handleDecimals(issued - maxToBurn, decimals))
                   }}
                 />
               </>

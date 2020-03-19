@@ -6,7 +6,7 @@ import { BalanceBlock, MaxButton } from '../common';
 import { liquidate } from '../../utils/web3';
 import { getMaxLiquidatable } from '../../utils/infura';
 import { getLiquidationHistory } from '../../utils/graph';
-import { formatDigits, fromWei, toTokenUnits, timeSince, handleDecimals } from '../../utils/number';
+import { formatDigits, fromWei, toTokenUnits, timeSince, toBaseUnitString } from '../../utils/number';
 
 function LiquidationHistory({ owner, token, isOwner, tokenDecimals, userTokenBalance }) {
   const [maxLiquidatable, setMaxLiquidatable] = useState(0);
@@ -71,7 +71,7 @@ function LiquidationHistory({ owner, token, isOwner, tokenDecimals, userTokenBal
                       disabled={maxLiquidatable <= 0}
                       label='Liquidate'
                       onClick={() => {
-                        const amtToLiquidate = handleDecimals(amountToLiquidate, tokenDecimals);
+                        const amtToLiquidate = toBaseUnitString(amountToLiquidate, tokenDecimals);
                         liquidate(token, owner, amtToLiquidate);
                       }}
                     />
