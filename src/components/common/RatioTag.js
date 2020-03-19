@@ -1,9 +1,13 @@
-import React from 'react'
+import React from 'react';
 
 import { Tag } from '@aragon/ui';
 
-function RatioTag ({isSafe, ratio}) {
-  return isSafe ? (
+function RatioTag({ isSafe, ratio, useCollateral = true }) {
+  return !useCollateral ? (
+    <Tag color='#78827a' background='#c0c2c0'>
+      Cool
+    </Tag>
+  ) : isSafe ? (
     ratio < 1.6 ? (
       <Tag background='#FFEBAD' color='#FEC100'>
         {' '}
@@ -17,6 +21,6 @@ function RatioTag ({isSafe, ratio}) {
       Unsafe!
     </Tag>
   );
-};
+}
 
-export default RatioTag
+export default RatioTag;

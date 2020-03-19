@@ -1,5 +1,13 @@
 import Web3 from 'web3'
+import BigNumber from 'bignumber.js'
 const web3 = new Web3()
+
+export function toBaseUnitString(rawAmt, decimals) {
+  const raw = new BigNumber(rawAmt)
+  const base = new BigNumber(10)
+  const decimalsBN = new BigNumber(decimals)
+  return raw.times(base.pow(decimalsBN)).toString()
+}
 
 export function formatDigits(num, percision) {
   return parseFloat(num).toFixed(percision)
@@ -74,5 +82,11 @@ export function compareVaultRatio(vaultA, vaultB) {
  */
 export const calculateRatio = (collateral, tokenIssued, strikePrice, strikeValueInWei) => {
   if (tokenIssued === '0') return Infinity
-  return parseInt(collateral) / ( parseInt(tokenIssued) * strikePrice * strikeValueInWei  )
+  const colalteralBN = new BigNumber(collateral)
+  const tokenIssuedBN = new BigNumber(tokenIssued)
+  const strikePriceBN = new BigNumber(strikePrice)
+  const strikeValueInWeiBN = new BigNumber(strikeValueInWei.toString())
+  const result = (colalteralBN.div(tokenIssuedBN)).div(strikePriceBN).div(strikeValueInWeiBN)
+  return result.toNumber()
+  
 }

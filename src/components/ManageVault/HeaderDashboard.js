@@ -1,18 +1,20 @@
 import React from 'react';
 
 import { BalanceBlock, RatioTag, HelperText } from '../common';
-import { formatDigits, fromWei } from '../../utils/number';
+import { formatDigits, fromWei, toTokenUnits } from '../../utils/number';
 
-const HeaderDashboard = ({ ratio, minRatio, symbol, vault, decimals, newRatio }) => {
+const HeaderDashboard = ({ ratio, minRatio, symbol, vault, decimals, newRatio, collateralIsETH, collateralDecimals, useCollateral }) => {
   const tokenInUnit = vault.oTokensIssued ? vault.oTokensIssued / 10 ** decimals : 0;
-  let collateralInETH = '0'
-  if(vault.collateral)
-    collateralInETH = fromWei(vault.collateral)
+  const collateralBalance = vault.collateral ?
+    collateralIsETH
+      ? fromWei(vault.collateral)
+      : toTokenUnits(vault.collateral, collateralDecimals)
+    : '0'
   
   return (
     <div style={{ padding: '2%', display: 'flex', alignItems: 'center' }}>
       <div style={{ width: '30%' }}>
-        <BalanceBlock asset='Total Collateral' balance={formatDigits(collateralInETH, 6)} />
+        <BalanceBlock asset='Total Collateral' balance={formatDigits(collateralBalance, 6)} />
       </div>
       <div style={{ width: '50%' }}>
         <BalanceBlock asset={`${symbol} Issued`} balance={tokenInUnit} />
@@ -21,7 +23,7 @@ const HeaderDashboard = ({ ratio, minRatio, symbol, vault, decimals, newRatio })
         <>
           <div style={{ fontSize: 14, padding: 3 }}>
             Current Ratio{' '}
-            {ratio > 0 ? <RatioTag isSafe={ratio >= minRatio} ratio={ratio} /> : <></>}
+            {ratio > 0 ? <RatioTag isSafe={ratio >= minRatio} ratio={ratio} useCollateral={useCollateral} /> : <></>}
           </div>
           <div style={{ fontSize: 24, padding: 3 }}>
             <span style={{ fontSize: 24 }}>{ratio.toString().split('.')[0]}</span>.

@@ -1,9 +1,11 @@
 import Web3 from 'web3';
+import BigNumber from 'bignumber.js'
 import Onboard from 'bnc-onboard';
 
 import { notify } from './blockNative';
 import { getAllowance } from './infura';
-import BN from 'bn.js';
+import { ETH_ADDRESS } from '../constants/options'
+
 const oTokenABI = require('../constants/abi/OptionContract.json');
 const exchangeABI = require('../constants/abi/OptionExchange.json');
 const uniswapExchangeABI = require('../constants/abi/UniswapExchange.json');
@@ -108,27 +110,75 @@ export const issueOToken = async (oTokenAddr, issueAmt) => {
     });
 };
 
-export const addETHCollateral = async (oTokenAddr, owner, ethAmount) => {
+export const addETHCollateral = async (oTokenAddr, owner, ethAmt) => {
   const account = await checkConnectedAndGetAddress()
   const oToken = new web3.eth.Contract(oTokenABI, oTokenAddr);
   await oToken.methods
     .addETHCollateral(owner)
-    .send({ from: account, value: web3.utils.toWei(ethAmount.toString()) })
+    .send({ from: account, value: web3.utils.toWei(ethAmt.toString()) })
     .on('transactionHash', (hash) => {
       notify.hash(hash);
     });
 };
 
-export const removeETHCollateral = async (oTokenAddr, ethAmount) => {
+/**
+ * 
+ * @param {string} collaral 
+ * @param {string} oTokenAddr 
+ * @param {string} owner 
+ * @param {number} collateralAmt in min unit
+ */
+export const addERC20Collateral = async (collateral, oTokenAddr, owner, collateralAmt) => {
+  const collateralAmtBN = new BigNumber(collateralAmt)
   const account = await checkConnectedAndGetAddress()
   const oToken = new web3.eth.Contract(oTokenABI, oTokenAddr);
+  const allowance = await getAllowance(collateral, account, oTokenAddr);
+  // Approve to move collateral 
+  if (new BigNumber(allowance).lt(collateralAmtBN)) {
+    const collateralToken = new web3.eth.Contract(oTokenABI, collateral)
+    await collateralToken.methods
+      .approve(oTokenAddr, UINT256_MAX)
+      .send({ from: account })
+      .on('transactionHash', (hash) => {
+        notify.hash(hash);
+      });
+  } 
   await oToken.methods
-    .removeCollateral(web3.utils.toWei(ethAmount.toString()))
+    .addERC20Collateral(owner, collateralAmtBN.toString())
     .send({ from: account })
     .on('transactionHash', (hash) => {
       notify.hash(hash);
     });
+
+}
+
+/**
+ * 
+ * @param {*} collateral 
+ * @param {*} oTokenAddr 
+ * @param {number} collateralAmt eth: in eth. other: in base unit
+ */
+export const removeCollateral = async (collateral, oTokenAddr, collateralAmt) => {
+  const account = await checkConnectedAndGetAddress()
+  const oToken = new web3.eth.Contract(oTokenABI, oTokenAddr);
+  if(collateral === ETH_ADDRESS) {
+    const amtInETH = collateralAmt.toString()
+    await oToken.methods
+      .removeCollateral(web3.utils.toWei(amtInETH))
+      .send({ from: account })
+      .on('transactionHash', (hash) => {
+        notify.hash(hash);
+      });
+  } else {
+    await oToken.methods
+      .removeCollateral(collateralAmt.toString())
+      .send({ from: account })
+      .on('transactionHash', (hash) => {
+        notify.hash(hash);
+      });
+  }
 };
+
 
 export const approve = async (oTokenAddr, spender, amt) => {
   const account = await checkConnectedAndGetAddress()
@@ -173,7 +223,7 @@ export const buyOTokensFromExchange = async (oTokenAddr, exchangeAddr, buyAmt, e
 export const sellOTokensFromExchange = async (oTokenAddr, exchangeAddr, sellAmt) => {
   const account = await checkConnectedAndGetAddress()  
   const allowance = await getAllowance(oTokenAddr, account, exchangeAddr);
-  if (new BN(allowance).lt(new BN(sellAmt))) {
+  if (new BigNumber(allowance).lt(new BigNumber(sellAmt))) {
     await approve(oTokenAddr, exchangeAddr, UINT256_MAX);
   }
   const exchange = new web3.eth.Contract(exchangeABI, exchangeAddr);
@@ -198,7 +248,7 @@ export const sellOTokensFromExchange = async (oTokenAddr, exchangeAddr, sellAmt)
 export const addLiquidity = async (oToken, uniswapAddr, maxToken, minLiquidity, ethValue) => {
   const account = await checkConnectedAndGetAddress()
   const allowance = await getAllowance(oToken, account, uniswapAddr);
-  if (new BN(allowance).lt(new BN(maxToken))) {
+  if (new BigNumber(allowance).lt(new BigNumber(maxToken))) {
     await approve(oToken, uniswapAddr, UINT256_MAX);
   }
   const uniswapExchange = new web3.eth.Contract(uniswapExchangeABI, uniswapAddr);

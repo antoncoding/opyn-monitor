@@ -9,18 +9,23 @@ const web3 = new Web3('https://mainnet.infura.io/v3/44fd23cda65746a699a5d3c0e2fa
 
 // ERC20 Info
 
-export const getTokenBalance = async (oToken, user) => {
+export const getTokenBalance = async (erc20Token, user) => {
   if (user === '') return '0'
-  const oTokenContract = new web3.eth.Contract(optionContractABI, oToken);
+  const oTokenContract = new web3.eth.Contract(optionContractABI, erc20Token);
   const balance = await oTokenContract.methods.balanceOf(user).call();
   return parseInt(balance);
 };
 
-export const getDecimals = async (oToken) => {
-  const oTokenContract = new web3.eth.Contract(optionContractABI, oToken);
+export const getDecimals = async (erc20Token) => {
+  const oTokenContract = new web3.eth.Contract(optionContractABI, erc20Token);
   const decimals = await oTokenContract.methods.decimals().call();
   return parseInt(decimals);
 };
+
+export const getERC20Symbol = async (erc20Token) => {
+  const oTokenContract = new web3.eth.Contract(optionContractABI, erc20Token);
+  return await oTokenContract.methods.symbol().call();
+}
 
 export const getERC20Info = async (address) => {
   const token = new web3.eth.Contract(optionContractABI, address);
@@ -102,7 +107,7 @@ export const getAllowance = async (contract, user, spender) => {
 };
 
 /**
- * Get balance of accounts
+ * Get balance in eth for the account
  * @param {string} address
  */
 export const getBalance = async (address) => {

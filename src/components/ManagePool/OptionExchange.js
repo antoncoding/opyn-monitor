@@ -5,7 +5,7 @@ import { buyOTokensFromExchange, sellOTokensFromExchange } from '../../utils/web
 import { getPremiumToPay, getPremiumReceived } from '../../utils/infura';
 
 import { BalanceBlock, MaxButton } from '../common';
-import { handleDecimals } from '../../utils/number';
+import { toBaseUnitString } from '../../utils/number';
 import { Box, TextInput, Button, IconCirclePlus, IconCircleMinus } from '@aragon/ui';
 
 function OptionExchange({ symbol, tokenBalance, token, exchange, decimals }) {
@@ -19,7 +19,7 @@ function OptionExchange({ symbol, tokenBalance, token, exchange, decimals }) {
       setPremiumToPay(0);
       return;
     }
-    const amount = handleDecimals(buyAmt, decimals);
+    const amount = toBaseUnitString(buyAmt, decimals);
     const premium = await getPremiumToPay(exchange, token, amount);
     setPremiumToPay(premium);
   };
@@ -29,7 +29,7 @@ function OptionExchange({ symbol, tokenBalance, token, exchange, decimals }) {
       setPremiumReceived(0);
       return;
     }
-    const amount = handleDecimals(sellAmt, decimals);
+    const amount = toBaseUnitString(sellAmt, decimals);
     const premium = await getPremiumReceived(exchange, token, amount);
     setPremiumReceived(premium);
   };
@@ -66,7 +66,7 @@ function OptionExchange({ symbol, tokenBalance, token, exchange, decimals }) {
                   buyOTokensFromExchange(
                     token,
                     exchange,
-                    handleDecimals(buyAmt, decimals),
+                    toBaseUnitString(buyAmt, decimals),
                     premiumToPay
                   );
                 }}
@@ -104,7 +104,11 @@ function OptionExchange({ symbol, tokenBalance, token, exchange, decimals }) {
                 icon={<IconCircleMinus />}
                 label='Sell'
                 onClick={() => {
-                  sellOTokensFromExchange(token, exchange, handleDecimals(sellAmt, decimals));
+                  sellOTokensFromExchange(
+                    token, 
+                    exchange, 
+                    toBaseUnitString(sellAmt, decimals)
+                  );
                 }}
               />
             </div>
