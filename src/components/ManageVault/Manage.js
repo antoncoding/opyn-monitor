@@ -4,7 +4,7 @@ import { getTokenBalance, getBalance, getPrice, getDecimals } from '../../utils/
 
 import { getAllVaultsForUser } from '../../utils/graph'
 
-import { Header, Tabs } from '@aragon/ui';
+import { Header, Tabs, Box } from '@aragon/ui';
 
 import CollateralManagement from './CollateralManagement';
 import IssuedTokenManagement from './IssuedTokenManagement';
@@ -34,6 +34,11 @@ function ManageVault({ token, owner, user }) {
   const [noVault, setNoVault] = useState(true);
   const [newRatio, setNewRatio] = useState(ratio);
 
+  const [collateralDecimals, setCollateralDecimals] = useState(0)
+  const collateralIsETH = collateral === ETH_ADDRESS
+
+  const vaultUsesCollateral = collateral !== strike
+
   useEffect(() => {
     let isCancelled = false;
 
@@ -49,13 +54,13 @@ function ManageVault({ token, owner, user }) {
       ]);
 
       // SetUserCollateralAmount
-      let collateralBalance;
-      if (collateral === ETH_ADDRESS) {
+      let collateralBalance , _collateralDecimals = 0
+      if (collateralIsETH) {
         collateralBalance = await getBalance(user)
       } else {
-        const _tokenBalance = await getTokenBalance(user, token)
-        const _decimals = await getDecimals(token)
-        collateralBalance = toTokenUnits(_tokenBalance, _decimals)
+        const _tokenBalance = await getTokenBalance(collateral, user)
+        _collateralDecimals = await getDecimals(collateral)
+        collateralBalance = toTokenUnits(_tokenBalance, _collateralDecimals)
       }
 
       _ownerTokenBalance = toTokenUnits(_ownerTokenBalance, decimals);
@@ -67,6 +72,7 @@ function ManageVault({ token, owner, user }) {
       if (!isCancelled) {
         setStrikeValue(lastStrikeValue)
         setVault(vault);
+        setCollateralDecimals(_collateralDecimals)
         setOwnerTokenBalance(_ownerTokenBalance);
         setUserTokenBalance(_userTokenBalance)
         setRatio(formatDigits(ratio, 5));
@@ -80,7 +86,7 @@ function ManageVault({ token, owner, user }) {
       isCancelled = true;
       clearInterval(id);
     };
-  }, [collateral, decimals, oracle, owner, strike, strikePrice, token, user]);
+  }, [collateral, collateralIsETH, decimals, oracle, owner, strike, strikePrice, token, user]);
 
   const isOwner = user === owner;
 
@@ -99,6 +105,9 @@ function ManageVault({ token, owner, user }) {
         decimals={decimals}
         symbol={symbol}
         newRatio={newRatio}
+        useCollateral={vaultUsesCollateral}
+        collateralIsETH={collateralIsETH}
+        collateralDecimals={collateralDecimals}
       />
 
       <Tabs
@@ -142,13 +151,14 @@ function ManageVault({ token, owner, user }) {
       )}
 
       {tabSelected === 2 ? (
+        vaultUsesCollateral ?
         <LiquidationHistory
           userTokenBalance={userTokenBalance}
           isOwner={isOwner}
           owner={owner}
           token={token}
           tokenDecimals={decimals}
-        />
+        /> : <Box> This vault cannot be liquidated </Box>
       ) : (
         <></>
       )}

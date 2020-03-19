@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 
-import { liquidate, addCollateral } from '../../utils/web3';
+import { liquidate, addERC20Collateral, addETHCollateral } from '../../utils/web3';
 import { getMaxLiquidatable } from '../../utils/infura';
-import { toTokenUnits } from '../../utils/number';
+import { toTokenUnits, toBaseUnitString } from '../../utils/number';
 import { RatioTag } from '../common';
 
 import {
@@ -18,7 +18,7 @@ import {
   DataView,
 } from '@aragon/ui';
 
-function VaultModal({ oToken, owner, collateral, isSafe, oTokensIssued, ratio, decimals, collateralAsset }) {
+function VaultModal({ useCollateral, oToken, owner, collateral, isSafe, oTokensIssued, ratio, decimals, collateralAsset, collateralIsETH, collateralDecimals }) {
   const [opened, setOpened] = useState(false);
   const [addValue, setAddValue] = useState(0);
   const [liquidateAmt, setLiquidateAmt] = useState(0);
@@ -54,7 +54,7 @@ function VaultModal({ oToken, owner, collateral, isSafe, oTokensIssued, ratio, d
           entries={[{ collateral, isSafe, oTokensIssued, ratio }]}
           entriesPerPage={1}
           renderEntry={({ collateral, isSafe, oTokensIssued, ratio }) => {
-            return [collateral, oTokensIssued, ratio, RatioTag({ isSafe, ratio })];
+            return [collateral, oTokensIssued, ratio, RatioTag({ isSafe, ratio, useCollateral })];
           }}
         />
 
@@ -78,15 +78,16 @@ function VaultModal({ oToken, owner, collateral, isSafe, oTokensIssued, ratio, d
                 label='Add Collateral'
                 wide={true}
                 onClick={() => {
-                  addCollateral(collateralAsset, oToken, owner, addValue);
-                }}
+                  collateralIsETH 
+                  ? addETHCollateral(oToken, owner, addValue)
+                  : addERC20Collateral(collateralAsset, oToken, owner, toBaseUnitString(addValue, collateralDecimals))}}
               />
             }
           />
         </Box>
 
         <br></br>
-        <Box heading={'Liquidate'}>
+        { useCollateral ? <Box heading={'Liquidate'}>
           <Split
             primary={
               <>
@@ -114,7 +115,8 @@ function VaultModal({ oToken, owner, collateral, isSafe, oTokensIssued, ratio, d
               />
             }
           />
-        </Box>
+        </Box>  : <></>}
+        
       </Modal>
     </>
   );

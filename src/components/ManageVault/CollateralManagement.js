@@ -1,13 +1,14 @@
 import React, { useState, useMemo } from 'react';
 
 import { getDecimals, getERC20Symbol } from '../../utils/infura'
-import { addCollateral, removeCollateral } from '../../utils/web3';
+import { addETHCollateral, addERC20Collateral, removeCollateral,  } from '../../utils/web3';
 
 import { BalanceBlock, MaxButton } from '../common';
 import { Box, TextInput, Button, IconCirclePlus, IconCircleMinus } from '@aragon/ui';
 
-import { formatDigits, calculateRatio, toWei, fromWei, handleDecimals, toTokenUnits } from '../../utils/number'
+import { formatDigits, calculateRatio, toWei, fromWei, toTokenUnits, toBaseUnitString } from '../../utils/number'
 import { ETH_ADDRESS } from '../../constants/options';
+import BigNumber from 'bignumber.js';
 
 function CollateralManagement({
   isOwner,
@@ -67,17 +68,21 @@ function CollateralManagement({
                   value={addCollateralAmt}
                   onChange={(event) => {
                     const amt = event.target.value
+                    if (amt === '') {
+                      setAddCollateralAmt(0)
+                      return
+                    } 
                     setAddCollateralAmt(amt);
-                    const amtRaw = collateralIsETH ? parseInt(toWei(amt)) : handleDecimals(amt, collateralDecimals)
-                    const newCollateralInWei = parseInt(vault.collateral) + amtRaw
+                    const amtRaw = collateralIsETH ? toWei(amt) : toBaseUnitString(amt, collateralDecimals)
+                    const newCollateralInWei = new BigNumber(vault.collateral).plus( new BigNumber(amtRaw)).toNumber()
                     updateNewRatio(newCollateralInWei)
                   }}
                 />
                 <MaxButton
                   onClick={() => {
                     setAddCollateralAmt(collateralAssetBalance);
-                    const collateralBalanceRaw = collateralIsETH ? parseInt(toWei(collateralAssetBalance)) : handleDecimals(collateralAssetBalance, collateralDecimals)
-                    const newCollateral = parseInt(vault.collateral) + collateralBalanceRaw
+                    const collateralBalanceRaw = collateralIsETH ? toWei(collateralAssetBalance) : toBaseUnitString(collateralAssetBalance, collateralDecimals)
+                    const newCollateral = new BigNumber(vault.collateral).plus(new BigNumber(collateralBalanceRaw)).toNumber()
                     updateNewRatio(newCollateral)
                   }}
                 />
@@ -89,7 +94,9 @@ function CollateralManagement({
                 icon={<IconCirclePlus />}
                 label='Add'
                 onClick={() => {
-                  addCollateral(collateralAsset, token, owner, addCollateralAmt);
+                  collateralIsETH 
+                    ? addETHCollateral(token, owner, addCollateralAmt)
+                    : addERC20Collateral(collateralAsset, token, owner, toBaseUnitString(addCollateralAmt, collateralDecimals))
                 }}
               />
             </div>
@@ -107,9 +114,13 @@ function CollateralManagement({
                   value={removeCollateralAmt}
                   onChange={(event) => {
                     const amt = event.target.value
+                    if(amt === '') {
+                      setRemoveCollateralAmt(0)
+                      return
+                    }
                     setRemoveCollateralAmt(amt);
-                    const amtRaw = collateralIsETH ? parseInt(toWei(amt)) : handleDecimals(amt, collateralDecimals)
-                    const newCollateralWei = parseInt(vault.collateral) - amtRaw
+                    const amtRaw = collateralIsETH ? toWei(amt) : toBaseUnitString(amt, collateralDecimals)
+                    const newCollateralWei = new BigNumber(vault.collateral).minus(new BigNumber(amtRaw)).toNumber()
                     updateNewRatio(newCollateralWei)
                   }}
                 />
@@ -133,7 +144,9 @@ function CollateralManagement({
                 icon={<IconCircleMinus />}
                 label='Remove'
                 onClick={() => {
-                  removeCollateral(collateralAsset, token, removeCollateralAmt);
+                  collateralIsETH 
+                    ? removeCollateral(collateralAsset, token, removeCollateralAmt)
+                    : removeCollateral(collateralAsset, token, toBaseUnitString(removeCollateralAmt, collateralDecimals));
                 }}
               />
             </div>
