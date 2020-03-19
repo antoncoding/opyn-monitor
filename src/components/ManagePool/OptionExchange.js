@@ -19,7 +19,7 @@ function OptionExchange({ symbol, tokenBalance, token, exchange, decimals }) {
       setPremiumToPay(0);
       return;
     }
-    const amount = handleDecimals(buyAmt, decimals);
+    const amount = handleDecimals(buyAmt, decimals).toString();
     const premium = await getPremiumToPay(exchange, token, amount);
     setPremiumToPay(premium);
   };
@@ -29,7 +29,7 @@ function OptionExchange({ symbol, tokenBalance, token, exchange, decimals }) {
       setPremiumReceived(0);
       return;
     }
-    const amount = handleDecimals(sellAmt, decimals);
+    const amount = handleDecimals(sellAmt, decimals).toString();
     const premium = await getPremiumReceived(exchange, token, amount);
     setPremiumReceived(premium);
   };
@@ -66,7 +66,7 @@ function OptionExchange({ symbol, tokenBalance, token, exchange, decimals }) {
                   buyOTokensFromExchange(
                     token,
                     exchange,
-                    handleDecimals(buyAmt, decimals),
+                    handleDecimals(buyAmt, decimals).toString(),
                     premiumToPay
                   );
                 }}
@@ -104,7 +104,11 @@ function OptionExchange({ symbol, tokenBalance, token, exchange, decimals }) {
                 icon={<IconCircleMinus />}
                 label='Sell'
                 onClick={() => {
-                  sellOTokensFromExchange(token, exchange, handleDecimals(sellAmt, decimals));
+                  sellOTokensFromExchange(
+                    token, 
+                    exchange, 
+                    handleDecimals(sellAmt, decimals).toString()
+                  );
                 }}
               />
             </div>
