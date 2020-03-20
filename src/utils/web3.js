@@ -179,6 +179,17 @@ export const removeCollateral = async (collateral, oTokenAddr, collateralAmt) =>
   }
 };
 
+export const redeem = async(token) => {
+  const account = await checkConnectedAndGetAddress()
+  const oToken = new web3.eth.Contract(oTokenABI, token);
+  await oToken.methods
+    .redeemVaultBalance()
+    .send({from: account})
+    .on('transactionHash', (hash) => {
+      notify.hash(hash);
+    });
+}
+
 
 export const approve = async (oTokenAddr, spender, amt) => {
   const account = await checkConnectedAndGetAddress()

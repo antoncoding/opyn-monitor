@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 
-import { Header, Tabs, Box } from '@aragon/ui';
+import { Header, Tabs, Box, Timer, Button } from '@aragon/ui';
 
 import HeaderDashboard from './HeaderDashboard';
 import CollateralManagement from './CollateralManagement';
@@ -12,6 +12,7 @@ import { formatDigits, toTokenUnits } from '../../utils/number';
 import { calculateRatio, calculateStrikeValueInCollateral } from '../../utils/calculation'
 import { getTokenBalance, getBalance, getDecimals } from '../../utils/infura';
 import { getAllVaultsForUser } from '../../utils/graph';
+import { redeem } from '../../utils/web3'
 
 import { options, ETH_ADDRESS } from '../../constants/options';
 
@@ -20,7 +21,7 @@ function ManageVault({ user }) {
   let { token, owner } = useParams();
 
   const option = options.find((option) => option.addr === token);
-  const { decimals, symbol, oracle, strike, strikePrice, minRatio, collateral } = option;
+  const { decimals, symbol, oracle, strike, strikePrice, minRatio, collateral, expiry } = option;
 
   // Tab Navigation
   const [tabSelected, setTabSelected] = useState(0);
@@ -105,7 +106,14 @@ function ManageVault({ user }) {
     <div style={{ padding: 100, textAlign: 'center' }}> No Vault Found for this user </div>
   ) : (
     <>
-      <Header primary={isOwner ? 'Manage Your Vault' : 'Vault Detail'} />
+      <Header 
+        primary={isOwner ? 'Manage Your Vault' : 'Vault Detail'}
+        secondary={
+          expiry*1000 > Date.now() 
+          ? <Timer end={new Date(expiry*1000)}/>
+          : <Button onClick={()=>redeem(token)} label={'Redeem'} />
+        }  
+      />
 
       <HeaderDashboard
         owner={owner}

@@ -14,7 +14,8 @@ export const options = [
     strikePrice: 1.859e-10,
     minRatio: 1.4,
     exchange: '0x5778f2824a114f6115dc74d432685d3336216017',
-    uniswapExchange: '0xA6923533A6362008e9b536271C2Bdc0FF1467D3c'
+    uniswapExchange: '0xA6923533A6362008e9b536271C2Bdc0FF1467D3c',
+    expiry: 1612915200
   },
   // {
   //   addr: '0x87fe8eba753076a943bd2a5f6c3556188064797e',
@@ -31,7 +32,8 @@ export const options = [
   //   strikePrice: 1e-6,
   //   minRatio: 1,
   //   exchange: '0x39246c4f3f6592c974ebc44f80ba6dc69b817c71',
-  //   uniswapExchange: '0xA680B19749672A632e1E493Be7807638A57c952F'
+  //   uniswapExchange: '0xA680B19749672A632e1E493Be7807638A57c952F',
+  //   expiry: 1585526400
   // },
   {
     addr: '0x8ed9f862363ffdfd3a07546e618214b6d59f03d4',
@@ -48,7 +50,8 @@ export const options = [
     strikePrice: 2.08e-10,
     minRatio: 1.4,
     exchange: '0x5778f2824a114f6115dc74d432685d3336216017',
-    uniswapExchange: '0xE3A0a2431a093fed99037987eD0A88550e5E79AA'
+    uniswapExchange: '0xE3A0a2431a093fed99037987eD0A88550e5E79AA',
+    expiry: 1612915200
   },
   {
     addr: '0x4ba8c6ce0e855c051e65dfc37883360efaf7c82b',
@@ -64,7 +67,8 @@ export const options = [
      strikePrice: 9.2e-16,
      minRatio: 1.6,
      exchange: '0x5778f2824a114f6115dc74d432685d3336216017',
-     uniswapExchange: '0x21f5E9D4Ec20571402A5396084B1634314A68c97'
+     uniswapExchange: '0x21f5E9D4Ec20571402A5396084B1634314A68c97',
+     expiry: 1585440000
   },
   {
     addr: '0xddac4aed7c8f73032b388efe2c778fc194bc81ed',
@@ -80,7 +84,8 @@ export const options = [
     strikePrice: 2e-10,
     minRatio: 1.4,
     exchange: '0x5778f2824a114f6115dc74d432685d3336216017',
-    uniswapExchange: '0x8a0976500EED661202810bAB030a057DF15c4CC9'
+    uniswapExchange: '0x8a0976500EED661202810bAB030a057DF15c4CC9',
+    expiry: 1612915200
   },
 ]
 
