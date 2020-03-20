@@ -16,7 +16,7 @@ import { Main } from '@aragon/ui';
 function App() {
   const storedTheme = window.localStorage.getItem('theme') || 'light';
 
-  const [user, setUser] = useState('0x75b379238868ebb577ce9888524d3cd71ee4b236'); // the current connected user
+  const [user, setUser] = useState(''); // the current connected user
   const [theme, setTheme] = useState(storedTheme);
 
   const updateTheme = (theme) => {
