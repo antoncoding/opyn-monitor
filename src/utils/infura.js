@@ -120,6 +120,7 @@ export const getBalance = async (address) => {
  * Get price of token in unit of wei
  * @param {string} oracleAddr 
  * @param {string} token 
+ * @returns {Promise<string>}
  */
 export const getPrice = async (oracleAddr, token) => {
   const oracle = new web3.eth.Contract(oracleABI, oracleAddr);

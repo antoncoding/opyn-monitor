@@ -6,7 +6,8 @@ import { addETHCollateral, addERC20Collateral, removeCollateral,  } from '../../
 import { BalanceBlock, MaxButton } from '../common';
 import { Box, TextInput, Button, IconCirclePlus, IconCircleMinus } from '@aragon/ui';
 
-import { formatDigits, calculateRatio, toWei, fromWei, toTokenUnits, toBaseUnitString } from '../../utils/number'
+import { formatDigits, toWei, fromWei, toTokenUnits, toBaseUnitString } from '../../utils/number'
+import { calculateRatio } from '../../utils/calculation'
 import { ETH_ADDRESS } from '../../constants/options';
 import BigNumber from 'bignumber.js';
 

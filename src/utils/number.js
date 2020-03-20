@@ -71,22 +71,3 @@ export function compareVaultRatio(vaultA, vaultB) {
   }
   return comparison;
 }
-
-/**
- * 
- * @param {string} collateral 
- * @param {string} tokenIssued 
- * @param {number} strikePrice 
- * @param {number} strikeValueInWei 
- * @return {number}
- */
-export const calculateRatio = (collateral, tokenIssued, strikePrice, strikeValueInWei) => {
-  if (tokenIssued === '0') return Infinity
-  const colalteralBN = new BigNumber(collateral)
-  const tokenIssuedBN = new BigNumber(tokenIssued)
-  const strikePriceBN = new BigNumber(strikePrice)
-  const strikeValueInWeiBN = new BigNumber(strikeValueInWei.toString())
-  const result = (colalteralBN.div(tokenIssuedBN)).div(strikePriceBN).div(strikeValueInWeiBN)
-  return result.toNumber()
-  
-}

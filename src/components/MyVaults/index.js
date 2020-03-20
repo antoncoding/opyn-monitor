@@ -1,12 +1,12 @@
 import React, { useState, useMemo } from 'react';
 
 import { Header, DataView, IdentityBadge } from '@aragon/ui';
+import { options, ETH_ADDRESS } from '../../constants/options';
 import { SectionTitle, ManageVaultButton, OpenVaultButton } from '../common';
-
 import { getAllVaultsForUser } from '../../utils/graph';
-import { getPrice } from '../../utils/infura'
-import { options } from '../../constants/options';
-import { fromWei, formatDigits, calculateRatio, compareVaultRatio } from '../../utils/number';
+import { formatDigits, compareVaultRatio, toTokenUnits } from '../../utils/number';
+import { calculateRatio, calculateStrikeValueInCollateral } from '../../utils/calculation';
+import { getDecimals } from '../../utils/infura';
 
 const Promise = require('bluebird');
 
@@ -19,19 +19,31 @@ function MyVaults({ user }) {
   useMemo(async () => {
     if (!isConnected) return;
     const userVaults = await getAllVaultsForUser(user);
-    const opendVaults = [];
+    const openedVaults = [];
     const notOpenedTokens = [];
-    await Promise.map(options, async(option) => {
+    await Promise.map(options, async (option) => {
       const entry = userVaults.find((vault) => vault.optionsContract.address === option.addr);
       const isOpened = entry !== undefined;
+      const collatearlIsETH = option.collateral === ETH_ADDRESS;
       if (isOpened) {
-
-        const strikePriceInWei = await getPrice(option.oracle, option.strike);
-        const ratio = calculateRatio(entry.collateral, entry.oTokensIssued, option.strikePrice, strikePriceInWei)
-        opendVaults.push({
+        const collateralDecimals = collatearlIsETH ? 18 : await getDecimals(option.collateral);
+        const strikeValueInCollateral = await calculateStrikeValueInCollateral(
+          option.collateral,
+          option.strike,
+          option.oracle,
+          collateralDecimals
+        );
+        const ratio = calculateRatio(
+          entry.collateral,
+          entry.oTokensIssued,
+          option.strikePrice,
+          strikeValueInCollateral
+        );
+        openedVaults.push({
           oToken: option.addr,
           oTokenName: option.title,
           collateral: entry.collateral,
+          collateralDecimals: collateralDecimals,
           ratio,
         });
       } else {
@@ -40,28 +52,28 @@ function MyVaults({ user }) {
           oTokenName: option.title,
         });
       }
-    })
-    setOpenedVaults(opendVaults.sort(compareVaultRatio));
+    });
+    setOpenedVaults(openedVaults.sort(compareVaultRatio));
     setTokensToOpen(notOpenedTokens);
   }, [isConnected, user]);
 
   return (
     <>
-      <Header  primary={'My Vaults'} />
+      <Header primary={'My Vaults'} />
       {isConnected ? (
         <>
           {opendVaults.length > 0 ? (
-            <div style={{paddingBottom: '3%'}}>
+            <div style={{ paddingBottom: '3%' }}>
               <SectionTitle title={'Existing Vaults'} />
               <DataView
                 fields={['Token', 'contract', 'collateral', 'Ratio', '']}
                 entries={opendVaults}
                 entriesPerPage={6}
-                renderEntry={({ oToken, oTokenName, collateral, ratio, decimals }) => {
+                renderEntry={({ oToken, oTokenName, collateral, collateralDecimals, ratio }) => {
                   return [
                     oTokenName,
                     <IdentityBadge entity={oToken} />,
-                    formatDigits(fromWei(collateral), 5),
+                    formatDigits(toTokenUnits(collateral, collateralDecimals), 5),
                     formatDigits(ratio, 4),
                     <ManageVaultButton oToken={oToken} owner={user} />,
                   ];
@@ -73,7 +85,7 @@ function MyVaults({ user }) {
           )}
           {tokensToOpen.length > 0 ? (
             // Show vaults to open
-            <div >
+            <div>
               <SectionTitle title={'Open new vaults'} />
               <DataView
                 fields={['Token', 'contract', 'manage']}
@@ -93,7 +105,7 @@ function MyVaults({ user }) {
         </>
       ) : (
         // Not connected to wallet
-        <div style={{padding: 5, opacity:0.5}}> Please connect wallet to proceed </div>
+        <div style={{ padding: 5, opacity: 0.5 }}> Please connect wallet to proceed </div>
       )}
     </>
   );

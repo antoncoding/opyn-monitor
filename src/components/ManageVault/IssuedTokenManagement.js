@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { burnOToken, issueOToken } from '../../utils/web3';
 import { BalanceBlock, MaxButton } from '../common';
-import { toBaseUnitString, handleDecimals, calculateRatio } from '../../utils/number';
+import { toBaseUnitString, handleDecimals } from '../../utils/number';
+import { calculateRatio } from '../../utils/calculation'
 import { Box, TextInput, Button, IconCirclePlus, IconCircleMinus } from '@aragon/ui';
 
 function IssuedTokenManagement({

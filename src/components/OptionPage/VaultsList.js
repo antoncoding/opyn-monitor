@@ -1,18 +1,15 @@
 import React, { useState, useEffect, useMemo } from 'react';
+
 import { DataView, IdentityBadge } from '@aragon/ui';
-import { getAllVaultsForOption } from '../../utils/graph';
-import { getPrice, getDecimals } from '../../utils/infura';
-import { options, ETH_ADDRESS } from '../../constants/options';
 import VaultModal from './VaultModal';
 import { SectionTitle, RatioTag } from '../common';
-import {
-  formatDigits,
-  fromWei,
-  compareVaultRatio,
-  calculateRatio,
-  toTokenUnits,
-  handleDecimals,
-} from '../../utils/number';
+
+import { getAllVaultsForOption } from '../../utils/graph';
+import { getDecimals } from '../../utils/infura';
+import { formatDigits, fromWei, compareVaultRatio, toTokenUnits } from '../../utils/number';
+import { calculateRatio, calculateStrikeValueInCollateral } from '../../utils/calculation';
+
+import { options, ETH_ADDRESS } from '../../constants/options';
 
 function VaultOwnerList({ oToken, user }) {
   const option = options.find((option) => option.addr === oToken);
@@ -40,23 +37,11 @@ function VaultOwnerList({ oToken, user }) {
       const vaults = await getAllVaultsForOption(oToken);
       const { strike, decimals, minRatio, strikePrice, oracle, collateral } = option;
 
-      let strikeValueInCollateral;
-      if (collateralIsETH) {
-        const strikeValueInWei = await getPrice(oracle, strike);
-        strikeValueInCollateral = strikeValueInWei;
-      } else if (!vaultUsesCollateral) {
-        // No collateral, like ETH option
-        strikeValueInCollateral = 10 ** collateralDecimals;
-      } else {
-        // Use other ERC20 as collateral
-        const strikeValueInWei = await getPrice(oracle, strike);
-        const collateralValueInWei = await getPrice(oracle, collateral);
-        // Untested
-        strikeValueInCollateral = handleDecimals(
-          parseInt(strikeValueInWei) / parseInt(collateralValueInWei),
-          collateralDecimals
-        );
-      }
+      const strikeValueInCollateral = await calculateStrikeValueInCollateral(
+        collateral,
+        strike,
+        oracle
+      );
       const vaultDetail = vaults
         .map((vault) => {
           if (vault.oTokensIssued === '0') {

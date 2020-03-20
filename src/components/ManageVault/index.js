@@ -1,19 +1,20 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import { getTokenBalance, getBalance, getPrice, getDecimals } from '../../utils/infura';
-
-import { getAllVaultsForUser } from '../../utils/graph';
 
 import { Header, Tabs, Box } from '@aragon/ui';
 
+import HeaderDashboard from './HeaderDashboard';
 import CollateralManagement from './CollateralManagement';
 import IssuedTokenManagement from './IssuedTokenManagement';
 import LiquidationHistory from './Liquidation';
 
-import { options, ETH_ADDRESS } from '../../constants/options';
-import { formatDigits, calculateRatio, toTokenUnits } from '../../utils/number';
+import { formatDigits, toTokenUnits } from '../../utils/number';
+import { calculateRatio, calculateStrikeValueInCollateral } from '../../utils/calculation'
+import { getTokenBalance, getBalance, getDecimals } from '../../utils/infura';
+import { getAllVaultsForUser } from '../../utils/graph';
 
-import HeaderDashboard from './HeaderDashboard';
+import { options, ETH_ADDRESS } from '../../constants/options';
+
 
 function ManageVault({ user }) {
   let { token, owner } = useParams();
@@ -25,7 +26,7 @@ function ManageVault({ user }) {
   const [tabSelected, setTabSelected] = useState(0);
 
   const [vault, setVault] = useState({});
-  const [strikeVauleInWei, setStrikeValue] = useState(0);
+  const [strikeValueInCollateral, setStrikeValue] = useState(0);
   const [ratio, setRatio] = useState(0);
 
   const [ownerTokenBalance, setOwnerTokenBalance] = useState(0);
@@ -58,8 +59,8 @@ function ManageVault({ user }) {
       ]);
 
       // SetUserCollateralAmount
-      let collateralBalance,
-        _collateralDecimals = 0;
+      let collateralBalance, _collateralDecimals = 0;
+
       if (collateralIsETH) {
         collateralBalance = await getBalance(user);
       } else {
@@ -71,16 +72,16 @@ function ManageVault({ user }) {
       _ownerTokenBalance = toTokenUnits(_ownerTokenBalance, decimals);
       _userTokenBalance = toTokenUnits(_userTokenBalance, decimals);
 
-      const lastStrikeValue = await getPrice(oracle, strike);
+      const strikeValueInCollateral = await calculateStrikeValueInCollateral(collateral, strike, oracle)
       const ratio = calculateRatio(
         vault.collateral,
         vault.oTokensIssued,
         strikePrice,
-        lastStrikeValue
+        strikeValueInCollateral
       );
 
       if (!isCancelled) {
-        setStrikeValue(lastStrikeValue);
+        setStrikeValue(strikeValueInCollateral);
         setVault(vault);
         setCollateralDecimals(_collateralDecimals);
         setOwnerTokenBalance(_ownerTokenBalance);
@@ -96,7 +97,7 @@ function ManageVault({ user }) {
       isCancelled = true;
       clearInterval(id);
     };
-  }, [collateral, collateralIsETH, decimals, oracle, owner, strike, strikePrice, token, user]);
+  }, [collateral, collateralDecimals, collateralIsETH, decimals, oracle, owner, strike, strikePrice, token, user, vaultUsesCollateral]);
 
   const isOwner = user === owner;
 
@@ -134,7 +135,7 @@ function ManageVault({ user }) {
           collateralAsset={option.collateral}
           token={token}
           owner={owner}
-          strikeValue={strikeVauleInWei}
+          strikeValue={strikeValueInCollateral}
           strikePrice={strikePrice}
           minRatio={minRatio}
           setNewRatio={setNewRatio}
@@ -149,7 +150,7 @@ function ManageVault({ user }) {
           vault={vault}
           tokenBalance={ownerTokenBalance}
           token={token}
-          strikeValue={strikeVauleInWei}
+          strikeValue={strikeValueInCollateral}
           strikePrice={strikePrice}
           minRatio={minRatio}
           decimals={decimals}
