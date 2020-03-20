@@ -7,7 +7,7 @@ import { Header, DataView, IdentityBadge, Button } from '@aragon/ui';
 function AllContracts() {
   const history = useHistory();
   const goToTrade = (addr) => {
-    history.push(`/exchange/${addr}`);
+    history.push(`/trade/${addr}`);
   };
   return (
     <>

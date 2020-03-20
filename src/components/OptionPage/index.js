@@ -6,11 +6,11 @@ import VaultsList from './VaultsList';
 import OptionInfoBox from './OptionInfoBox';
 
 function OptionPage({user}) {
-  let { addr } = useParams();
+  let { token } = useParams();
   return (
     <>
-      <OptionInfoBox oToken={addr} user={user} />
-      <VaultsList oToken={addr} user={user}/>
+      <OptionInfoBox oToken={token} user={user} />
+      <VaultsList oToken={token} user={user}/>
     </>
   );
 }

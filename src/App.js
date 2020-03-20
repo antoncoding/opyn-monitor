@@ -31,12 +31,16 @@ function App() {
         <NavBar user={user} setUser={setUser} theme={theme} updateTheme={updateTheme} />
 
         <Switch>
-          <Route path='/option/:addr' children={<OptionPage user={user} />} />
+          {/* All Options */}
+          <Route path='/option/:token' children={<OptionPage user={user} />} />
           <Route path='/options/' children={<AllOptoins />} />
+          {/* My Vaults */}
           <Route path='/myvaults' children={<MyVaults user={user} />} />
           <Route path='/manage/:token/:owner' children={<ManageVault user={user}/>} />
+          {/* Trade */}
+          <Route path='/trade/:token/' children={<ManagePool user={user} />} />
           <Route path='/trade/' children={<Trade/>} />
-          <Route path='/exchange/:token/' children={<ManagePool user={user} />} />
+          {/* HomePage */}
           <Route path='/' children={<HomePage/>} />
         </Switch>
         <Footer theme={theme} />
