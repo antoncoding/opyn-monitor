@@ -5,7 +5,7 @@ import { useParams } from 'react-router-dom';
 import VaultsList from './VaultsList';
 import OptionInfoBox from './OptionInfoBox';
 
-function TokenView({user}) {
+function OptionPage({user}) {
   let { addr } = useParams();
   return (
     <>
@@ -15,4 +15,4 @@ function TokenView({user}) {
   );
 }
 
-export default TokenView;
+export default OptionPage;

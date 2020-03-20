@@ -7,7 +7,7 @@ import HomePage from './components/HomePage'
 import AllOptoins from './components/AllContracts';
 import Trade from './components/Trade'
 import MyVaults from './components/MyVaults'
-import TokenView from './components/TokenView';
+import OptionPage from './components/OptionPage';
 import ManageVault from './components/ManageVault'
 import ManagePool from './components/ManagePool'
 import Footer from './components/Footer';
@@ -31,7 +31,7 @@ function App() {
         <NavBar user={user} setUser={setUser} theme={theme} updateTheme={updateTheme} />
 
         <Switch>
-          <Route path='/token/:addr' children={<TokenView user={user} />} />
+          <Route path='/option/:addr' children={<OptionPage user={user} />} />
           <Route path='/options/' children={<AllOptoins />} />
           <Route path='/myvaults' children={<MyVaults user={user} />} />
           <Route path='/manage/:token/:owner' children={<ManageVault user={user}/>} />
