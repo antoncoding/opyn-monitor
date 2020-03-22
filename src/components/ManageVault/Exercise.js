@@ -7,16 +7,13 @@ import { getExerciseHistory } from '../../utils/graph';
 import { formatDigits, toTokenUnitsBN, timeSince } from '../../utils/number';
 
 function ExerciseHistory({ owner, token, collateralDecimals, tokenDecimals  }) {
-  console.log(collateralDecimals)
   const [isLoading, setIsLoading] = useState(true);
   const [entries, setEntries] = useState([]);
+  
   useMemo(async () => {
-    async function updateList() {
-      const actions = await getExerciseHistory(owner, token);
-      setEntries(actions);
-      setIsLoading(false);
-    }
-    updateList();
+    const actions = await getExerciseHistory(owner, token);
+    setEntries(actions);
+    setIsLoading(false);
   }, [owner, token]);
 
   return (
