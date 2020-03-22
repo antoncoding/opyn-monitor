@@ -38,9 +38,9 @@ export const calculateStrikeValueInCollateral = async(collateral, strike, oracle
 
 /**
  * 
- * @param {string} collateral number of collateral in base unit
- * @param {string} tokenIssued number of token in base unit
- * @param {number} strikePrice 
+ * @param {string|number|BigNumber} collateral number of collateral in base unit
+ * @param {string|number|BigNumber} tokenIssued number of token in base unit
+ * @param {string|number|BigNumber} strikePrice 
  * @param {BigNumber} strikeValueInCollateral 
  * @return {number}
  */

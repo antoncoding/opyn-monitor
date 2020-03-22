@@ -119,7 +119,11 @@ function VaultModal({ useCollateral, oToken, owner, collateral, isSafe, oTokensI
                 disabled={isSafe}
                 label='Liquidate'
                 onClick={() => {
-                  liquidate(oToken, owner, liquidateAmt * 10 ** decimals);
+                  liquidate(
+                    oToken, 
+                    owner, 
+                    toBaseUnitBN(liquidateAmt,decimals)
+                  );
                 }}
               />
             }

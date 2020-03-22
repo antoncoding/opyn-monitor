@@ -1,13 +1,20 @@
 import React, { useState } from 'react';
+import BigNumber from 'bignumber.js'
+
 import { burnOToken, issueOToken } from '../../utils/web3';
 import { BalanceBlock, MaxButton } from '../common';
-import { handleDecimals, toBaseUnitBN } from '../../utils/number';
+import { toBaseUnitBN, toTokenUnitsBN } from '../../utils/number';
 import { calculateRatio } from '../../utils/calculation'
 import { Box, TextInput, Button, IconCirclePlus, IconCircleMinus } from '@aragon/ui';
 
 /**
  * 
- * @param {{strikeValue: BigNumber, tokenBalance: BigNumber}} param0 
+ * @param {{
+ * strikeValue: BigNumber, 
+ * tokenBalance: BigNumber, 
+ * strikePrice: Number, 
+ * decimals: Number
+ * }} param0 
  */
 function IssuedTokenManagement({
   isOwner,
@@ -21,23 +28,27 @@ function IssuedTokenManagement({
   symbol,
   setNewRatio,
 }) {
-  const [issueAmt, setIssueAmt] = useState(0);
-  const [burnAmt, setBurnAmt] = useState(0);
+  const [issueAmt, setIssueAmt] = useState(new BigNumber(0));
+  const [burnAmt, setBurnAmt] = useState(new BigNumber(0));
 
   /**
    * 
-   * @param {number} newAmt in raw amt
+   * @param {BigNumber} newAmt in raw amt
    */
   const updateNewRatio = (newAmt) => {
-    if(newAmt <= 0) return
+    if(newAmt.lte(new BigNumber(0))) return
     const newRatio = calculateRatio(vault.collateral, newAmt, strikePrice, strikeValue)
     setNewRatio(newRatio);
   };
 
-  const onChangeIssueAmt = (event) => {
-    const amt = event.target.value;
-    setIssueAmt(amt);
-    updateNewRatio(parseInt(vault.oTokensIssued) + handleDecimals(amt, decimals));
+  const onChangeIssueAmt = (intputAmt) => {
+    if (!intputAmt){
+      setIssueAmt(new BigNumber(0))
+      return;
+    }
+    const amountBN = new BigNumber(intputAmt)
+    setIssueAmt(amountBN);
+    updateNewRatio(new BigNumber(vault.oTokensIssued).plus(toBaseUnitBN(amountBN, decimals)));
   }
 
   const onClickIssueToken = () => {
@@ -47,10 +58,14 @@ function IssuedTokenManagement({
     );
   }
 
-  const onChangeBurnAmt = (event) => {
-    const amt = event.target.value;
-    updateNewRatio(parseInt(vault.oTokensIssued) - handleDecimals(amt, decimals));
-    setBurnAmt(amt);
+  const onChangeBurnAmt = (intputAmt) => {
+    if(!intputAmt) {
+      setBurnAmt(new BigNumber(0))
+      return;
+    }
+    const amountBN = new BigNumber(intputAmt)
+    updateNewRatio(new BigNumber(vault.oTokensIssued).minus(toBaseUnitBN(amountBN, decimals)));
+    setBurnAmt(amountBN);
   }
 
   const onClickBurnToken = () => {
@@ -79,15 +94,18 @@ function IssuedTokenManagement({
                   type='number'
                   wide={true}
                   value={issueAmt}
-                  onChange={onChangeIssueAmt}
+                  onChange={(event) => onChangeIssueAmt(event.target.value)}
                 />
                 <MaxButton
                   onClick={() => {
                     if (strikePrice <= 0) return;
-                    const maxTotal =
-                      (vault.collateral) / (minRatio * strikePrice * strikeValue.toNumber());
-                    const maxToIssueRaw = parseInt(maxTotal) - vault.oTokensIssued;
-                    const maxToIssue = maxToIssueRaw / 10 ** decimals;
+                    // (vault.collateral) / (minRatio * strikePrice * strikeValue.toNumber());
+                    const maxTotal = new BigNumber(vault.collateral).div(
+                      new BigNumber(minRatio).times(new BigNumber(strikePrice)).times(strikeValue)
+                    )
+                      
+                    const maxToIssueRaw = maxTotal.minus(new BigNumber(vault.oTokensIssued));
+                    const maxToIssue = toTokenUnitsBN(maxToIssueRaw, decimals);
                     setIssueAmt(maxToIssue);
                     setNewRatio(minRatio);
                   }}
@@ -115,14 +133,14 @@ function IssuedTokenManagement({
                   type='number'
                   wide={true}
                   value={burnAmt}
-                  onChange={onChangeBurnAmt}
+                  onChange={(event) => onChangeBurnAmt(event.target.value)}
                 />
                 <MaxButton
                   onClick={() => {
-                    const issued = Number(vault.oTokensIssued) / 10 ** decimals;
-                    const maxToBurn = Math.min(tokenBalance.toNumber(), issued)
+                    const issued = toTokenUnitsBN(vault.oTokensIssued, decimals)
+                    const maxToBurn = tokenBalance.lt(issued) ? tokenBalance : issued; // min (issued, tokenBalance)
                     setBurnAmt(maxToBurn);
-                    updateNewRatio(handleDecimals(issued - maxToBurn, decimals))
+                    updateNewRatio(issued.minus(maxToBurn))
                   }}
                 />
               </>
