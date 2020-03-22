@@ -2,19 +2,29 @@ import React, { useState } from 'react';
 
 import { removeLiquidity } from '../../utils/web3';
 
-import {
-  // getTokenBalance,
-} from '../../utils/infura';
-
 import { BalanceBlock, MaxButton } from '../common';
-import { handleDecimals, formatETHAmtToStr } from '../../utils/number';
+import { toBaseUnitBN } from '../../utils/number';
 import { Box, TextInput, Button, IconCircleMinus, IconFundraising } from '@aragon/ui';
+import BigNumber from 'bignumber.js';
 
+/**
+ * 
+ * @param {{
+ *  otokenDecimals: number,
+ *  liquidityTokenDecimals: number,
+ *  otokenSymbol: string,
+ *  uniswapExchange: string
+ *  userliquidityTokenBalance: BigNumber
+ *  poolTokenBalance: BigNumber
+ *  poolETHBalance: BigNumber
+ *  liquidityTokenDecimals: BigNumber
+ *  liquidityTokenSupply: BigNumber
+ * 
+ * }} param0 
+ */
 function RemoveLiquidity({ 
-  otoken, 
   otokenSymbol, 
   otokenDecimals, 
-  userTokenBalance, 
   userliquidityTokenBalance,
   uniswapExchange, 
   poolTokenBalance, 
@@ -24,17 +34,22 @@ function RemoveLiquidity({
 }) {
   const SLIPPAGE_RATE = 3;
 
-  const [amtLiquidityTokenToSell, setAmtLiquidityTokenToSell] = useState(0);
+  const [amtLiquidityTokenToSell, setAmtLiquidityTokenToSell] = useState(new BigNumber(0));
 
-  const poolPortion = (amtLiquidityTokenToSell) / liquidityTokenSupply
-  const estETHRecieved = poolETHBalance * poolPortion
-  const estOTokenReceived = poolTokenBalance * poolPortion
+  const poolPortion = amtLiquidityTokenToSell.div(liquidityTokenSupply)
+  const estETHRecieved = poolETHBalance.times(poolPortion)
+  const estOTokenReceived = poolTokenBalance.times(poolPortion)
 
-  const minETHReceived = estETHRecieved * (100 - SLIPPAGE_RATE) / 100
-  const minTokenReceived = estOTokenReceived * (100 - SLIPPAGE_RATE) / 100
+  const minETHReceived = estETHRecieved.times( new BigNumber(100 - SLIPPAGE_RATE)).div(new BigNumber(100))
+  const minTokenReceived = estOTokenReceived.times( new BigNumber(100 - SLIPPAGE_RATE)).div(new BigNumber(100))
   
   const onChangeTokenAmtToSend = (tokenAmt) => {
-    setAmtLiquidityTokenToSell(tokenAmt)
+    if(!tokenAmt) {
+      setAmtLiquidityTokenToSell(new BigNumber(0))
+      return
+    }
+    const tokenAmtBN = new BigNumber(tokenAmt)
+    setAmtLiquidityTokenToSell(tokenAmtBN)
   };
 
   return (
@@ -53,7 +68,7 @@ function RemoveLiquidity({
                 adornment={<IconFundraising />}
                 type='number'
                 wide={true}
-                value={amtLiquidityTokenToSell}
+                value={amtLiquidityTokenToSell.toNumber()}
                 onChange={(event) => {
                   onChangeTokenAmtToSend(event.target.value);
                 }}
@@ -74,9 +89,9 @@ function RemoveLiquidity({
                 icon={<IconCircleMinus />}
                 label='Remove Liquidity'
                 onClick={() => {
-                  const amt = handleDecimals(amtLiquidityTokenToSell, liquidityTokenDecimals).toString()
-                  const min_eth = formatETHAmtToStr(minETHReceived)
-                  const min_token = handleDecimals(minTokenReceived, otokenDecimals)
+                  const amt = toBaseUnitBN(amtLiquidityTokenToSell, liquidityTokenDecimals).toString()
+                  const min_eth = toBaseUnitBN(minETHReceived, 18).toString()
+                  const min_token = toBaseUnitBN(minTokenReceived, otokenDecimals).toString()
                   
                   removeLiquidity(
                     uniswapExchange,

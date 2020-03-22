@@ -1,49 +1,67 @@
 import React, { useState } from 'react';
-
+import BigNumber from 'bignumber.js'
 import { addLiquidity } from '../../utils/web3';
 
-import {
-  // getTokenBalance,
-} from '../../utils/infura';
-
 import { BalanceBlock, MaxButton } from '../common';
-import { formatETHAmtToStr, toBaseUnitString } from '../../utils/number';
+import { toBaseUnitBN } from '../../utils/number';
 import { Box, TextInput, Button, IconCirclePlus, IconEthereum } from '@aragon/ui';
 
+/**
+ * 
+ * @param {{ 
+ * poolTokenBalance: BigNumber, 
+ * poolETHBalance:BigNumber, 
+ * liquidityTokenSupply: BigNumber, 
+ * userTokenBalance: BigNumber, 
+ * userETHBalance:BigNumber 
+ * uniswapExchange: string
+ * }} param0 
+ */
 function AddLiquidity({ 
   otoken, 
   otokenSymbol, 
   otokenDecimals, 
   userTokenBalance, 
   userETHBalance,
-  uniswapExchange, 
-  user, 
+  uniswapExchange,
   poolTokenBalance, 
   poolETHBalance,
   liquidityTokenDecimals,
   liquidityTokenSupply
 }) {
-  const SLIPPAGE_RATE = 2;
+  const SLIPPAGE_RATE = 3;
 
 
-  const [amtETHToAdd, setAmtETHToAdd] = useState(0);
-  const [amtTokenToAdd, setAmtTokenToAdd] = useState(0);
+  const [amtETHToAdd, setAmtETHToAdd] = useState(new BigNumber(0));
+  const [amtTokenToAdd, setAmtTokenToAdd] = useState(new BigNumber(0));
 
-  const liquidityMinted = (liquidityTokenSupply * amtETHToAdd) / poolETHBalance;
-  const liquidityMintedMin = (liquidityMinted * (100 - SLIPPAGE_RATE)) / 100;
-  const ethToTokenRatio = poolETHBalance / poolTokenBalance;
-  const tokenToEthRatio = poolTokenBalance / poolETHBalance;
+  const liquidityMinted = (liquidityTokenSupply.times( amtETHToAdd)).div(poolETHBalance);
+  const liquidityMintedMin = (liquidityMinted.times(new BigNumber(100 - SLIPPAGE_RATE))).div(new BigNumber(100))
+  const ethToTokenRatio = poolETHBalance.div(poolTokenBalance);
+  const tokenToEthRatio = poolTokenBalance.div(poolETHBalance);
 
   const onChangeETHAmtToSend = (ethAmt) => {
-    const newTokenAmt = (ethAmt * tokenToEthRatio);
-    setAmtETHToAdd(ethAmt);
+    if (!ethAmt) {
+      setAmtTokenToAdd(new BigNumber(0));
+      setAmtETHToAdd(new BigNumber(0));
+      return
+    }
+
+    const newTokenAmt = (new BigNumber(ethAmt).times(tokenToEthRatio));
+    setAmtETHToAdd(new BigNumber(ethAmt));
     setAmtTokenToAdd(newTokenAmt);
   };
 
   const onChangeTokenAmtToSend = (tokenAmt) => {
-    const newEthAmt = tokenAmt * ethToTokenRatio;
+    if (!tokenAmt) {
+      setAmtTokenToAdd(new BigNumber(0));
+      setAmtETHToAdd(new BigNumber(0));
+      return
+    }
+
+    const newEthAmt = new BigNumber(tokenAmt).times(ethToTokenRatio);
     setAmtETHToAdd(newEthAmt);
-    setAmtTokenToAdd(tokenAmt);
+    setAmtTokenToAdd(new BigNumber(tokenAmt));
   };
 
   return (
@@ -63,7 +81,7 @@ function AddLiquidity({
                   adornment={otokenSymbol}
                   type='number'
                   wide={true}
-                  value={amtTokenToAdd}
+                  value={amtTokenToAdd.toNumber()}
                   onChange={(event) => {
                     onChangeTokenAmtToSend(event.target.value);
                   }}
@@ -81,7 +99,7 @@ function AddLiquidity({
                 adornment={<IconEthereum />}
                 type='number'
                 wide={true}
-                value={amtETHToAdd}
+                value={amtETHToAdd.toNumber()}
                 onChange={(event) => {
                   onChangeETHAmtToSend(event.target.value);
                 }}
@@ -94,14 +112,15 @@ function AddLiquidity({
                 icon={<IconCirclePlus />}
                 label='Add Liquidity'
                 onClick={() => {
-                  const maxToken = toBaseUnitString(amtTokenToAdd, otokenDecimals);
-                  const minLiquidity = toBaseUnitString(liquidityMintedMin, liquidityTokenDecimals);
+                  const maxToken = toBaseUnitBN(amtTokenToAdd, otokenDecimals).toString();
+                  const minLiquidity = toBaseUnitBN(liquidityMintedMin, liquidityTokenDecimals).toString();
+                  const ethWei = toBaseUnitBN(amtETHToAdd, 18).toString()
                   addLiquidity(
                     otoken,
                     uniswapExchange,
                     maxToken,
                     minLiquidity,
-                    formatETHAmtToStr(amtETHToAdd)
+                    ethWei
                   );
                 }}
               />

@@ -2,18 +2,29 @@ import Web3 from 'web3'
 import BigNumber from 'bignumber.js'
 const web3 = new Web3()
 
-export function toBaseUnitString(rawAmt, decimals) {
-  const raw = new BigNumber(rawAmt)
-  const base = new BigNumber(10)
-  const decimalsBN = new BigNumber(decimals)
-  return raw.times(base.pow(decimalsBN)).toString()
-}
-
+/**
+ * Convert 10.999 to 10999000
+ * @param {number|string|BigNumber} rawAmt 
+ * @param {number} decimals 
+ * @returns {BigNumber}
+ */
 export function toBaseUnitBN(rawAmt, decimals) {
   const raw = new BigNumber(rawAmt)
   const base = new BigNumber(10)
   const decimalsBN = new BigNumber(decimals)
-  return raw.times(base.pow(decimalsBN))
+  return raw.times(base.pow(decimalsBN)).integerValue()
+}
+
+/**
+ * Convert 10999000 to 10.999
+ * @param {string | number | BigNumber} tokenAmount in base unit
+ * @param {number} tokenDecimals 
+ * @return {BigNumber}
+ */
+export const toTokenUnitsBN = (tokenAmount, tokenDecimals) => {
+  const _amt = new BigNumber(tokenAmount)
+  const _digits = new BigNumber(10).pow(new BigNumber(tokenDecimals))
+  return _amt.div(_digits)
 }
 
 export function formatDigits(num, percision) {
@@ -26,31 +37,6 @@ export const handleDecimals = (rawAmt, decimal) => {
 
 export const fromWei = web3.utils.fromWei
 export const toWei = web3.utils.toWei
-
-/**
- * 
- * @param {string | number} amtInEth 
- */
-export const formatETHAmtToStr = (amtInEth) => {
-  const strETHSegments = amtInEth.toString().split('.')
-  const int = strETHSegments[0]
-  if (strETHSegments.length === 1) return int
-  let digits = strETHSegments[1]
-  if(digits.length > 18) digits = digits.slice(0, 18)
-  const result = `${int}.${digits}`
-  return result
-}
-
-/**
- * 
- * @param {string} tokenAmount in base unit
- * @param {number} tokenDecimals 
- */
-export const toTokenUnitsBN = (tokenAmount, tokenDecimals) => {
-  const _amt = new BigNumber(tokenAmount)
-  const _digits = new BigNumber(10).pow(new BigNumber(tokenDecimals))
-  return _amt.div(_digits)
-}
 
 export function timeSince(timeStamp) {
   var now = new Date(),

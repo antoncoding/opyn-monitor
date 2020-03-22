@@ -1,7 +1,13 @@
 import React from 'react';
+// eslint-disable-next-line no-unused-vars
+import BigNumber from 'bignumber.js'
 
 import { BalanceBlock, AddressBlock } from '../common';
 
+/**
+ * 
+ * @param {{ poolTokenBalance: BigNumber, poolETHBalance: BigNumber }}  
+ */
 const HeaderDashboard = ({ symbol, poolETHBalance, poolTokenBalance, uniswapExchange }) => {
   return (
     <div style={{ padding: '2%', display: 'flex',  alignItems: 'center' }}>

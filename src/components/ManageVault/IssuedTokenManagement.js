@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { burnOToken, issueOToken } from '../../utils/web3';
 import { BalanceBlock, MaxButton } from '../common';
-import { toBaseUnitString, handleDecimals } from '../../utils/number';
+import { handleDecimals, toBaseUnitBN } from '../../utils/number';
 import { calculateRatio } from '../../utils/calculation'
 import { Box, TextInput, Button, IconCirclePlus, IconCircleMinus } from '@aragon/ui';
 
@@ -43,7 +43,7 @@ function IssuedTokenManagement({
   const onClickIssueToken = () => {
     issueOToken(
       token, 
-      toBaseUnitString(issueAmt, decimals)
+      toBaseUnitBN(issueAmt, decimals).toString()
     );
   }
 
@@ -56,7 +56,7 @@ function IssuedTokenManagement({
   const onClickBurnToken = () => {
     burnOToken(
       token, 
-      toBaseUnitString(burnAmt, decimals)
+      toBaseUnitBN(burnAmt, decimals).toString()
     );
   }
 

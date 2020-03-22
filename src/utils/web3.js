@@ -224,7 +224,7 @@ export const buyOTokensFromExchange = async (oTokenAddr, exchangeAddr, buyAmt, e
       '0x0000000000000000000000000000000000000000', // payment
       buyAmt
     )
-    .send({ from: account, value: web3.utils.toWei(ethAmt.toString()) })
+    .send({ from: account, value: ethAmt })
     .on('transactionHash', (hash) => {
       notify.hash(hash);
     });
@@ -255,7 +255,7 @@ export const sellOTokensFromExchange = async (oTokenAddr, exchangeAddr, sellAmt)
 /**
  *
  */
-export const addLiquidity = async (oToken, uniswapAddr, maxToken, minLiquidity, ethValue) => {
+export const addLiquidity = async (oToken, uniswapAddr, maxToken, minLiquidity, ethInWei) => {
   const account = await checkConnectedAndGetAddress()
   const allowance = await getAllowance(oToken, account, uniswapAddr);
   if (new BigNumber(allowance).lt(new BigNumber(maxToken))) {
@@ -269,7 +269,7 @@ export const addLiquidity = async (oToken, uniswapAddr, maxToken, minLiquidity, 
       maxToken, // max_tokens
       deadline // deadline
     )
-    .send({ from: account, value: web3.utils.toWei(ethValue) - 1 })
+    .send({ from: account, value: ethInWei - 1 })
     .on('transactionHash', (hash) => {
       notify.hash(hash);
     });
@@ -278,9 +278,8 @@ export const addLiquidity = async (oToken, uniswapAddr, maxToken, minLiquidity, 
 /**
  *
  */
-export const removeLiquidity = async (uniswapAddr, pool_token_amount, min_eth, min_tokens) => {
+export const removeLiquidity = async (uniswapAddr, pool_token_amount, min_eth_wei, min_tokens) => {
   const account = await checkConnectedAndGetAddress()
-  const min_eth_wei = web3.utils.toWei(min_eth);
   const uniswapExchange = new web3.eth.Contract(uniswapExchangeABI, uniswapAddr);
   const deadline = Math.ceil(Date.now() / 1000) + DEADLINE_FROM_NOW;
   await uniswapExchange.methods

@@ -5,33 +5,43 @@ import { buyOTokensFromExchange, sellOTokensFromExchange } from '../../utils/web
 import { getPremiumToPay, getPremiumReceived } from '../../utils/infura';
 
 import { BalanceBlock, MaxButton } from '../common';
-import { toBaseUnitString } from '../../utils/number';
+import { toBaseUnitBN } from '../../utils/number';
 import { Box, TextInput, Button, IconCirclePlus, IconCircleMinus } from '@aragon/ui';
+import BigNumber from 'bignumber.js';
 
+/**
+ * 
+ * @param {{
+ *  decimals: number
+ *  tokenBalance: BigNumber
+ * }} param0 
+ */
 function OptionExchange({ symbol, tokenBalance, token, exchange, decimals }) {
-  const [buyAmt, setBuyAmt] = useState(0);
-  const [sellAmt, setSellAmt] = useState(0);
-  const [premiumToPay, setPremiumToPay] = useState(0);
-  const [premiumReceived, setPremiumReceived] = useState(0);
+  const [buyAmt, setBuyAmt] = useState(new BigNumber(0));
+  const [sellAmt, setSellAmt] = useState(new BigNumber(0));
+  const [premiumToPay, setPremiumToPay] = useState(new BigNumber(0));
+  const [premiumReceived, setPremiumReceived] = useState(new BigNumber(0));
 
   const updatePremiumToPay = async (buyAmt) => {
-    if (!buyAmt || buyAmt === 0) {
-      setPremiumToPay(0);
+    const butAmountBN = new BigNumber(buyAmt)
+    if (butAmountBN.lte(new BigNumber(0))) {
+      setPremiumToPay(new BigNumber(0));
       return;
     }
-    const amount = toBaseUnitString(buyAmt, decimals);
+    const amount = toBaseUnitBN(butAmountBN, decimals).toString();
     const premium = await getPremiumToPay(exchange, token, amount);
-    setPremiumToPay(premium);
+    setPremiumToPay(new BigNumber(premium));
   };
 
   const updatePremiumReceived = async (sellAmt) => {
-    if (!sellAmt || sellAmt === 0) {
-      setPremiumReceived(0);
+    const sellAmountBN = new BigNumber(sellAmt)
+    if (sellAmountBN.lte(new BigNumber(0))) {
+      setPremiumReceived(new BigNumber(0));
       return;
     }
-    const amount = toBaseUnitString(sellAmt, decimals);
+    const amount = toBaseUnitBN(sellAmountBN, decimals).toString();
     const premium = await getPremiumReceived(exchange, token, amount);
-    setPremiumReceived(premium);
+    setPremiumReceived(new BigNumber(premium));
   };
 
   return (
@@ -51,8 +61,13 @@ function OptionExchange({ symbol, tokenBalance, token, exchange, decimals }) {
                   wide={true}
                   value={buyAmt}
                   onChange={(event) => {
-                    setBuyAmt(event.target.value);
-                    updatePremiumToPay(event.target.value);
+                    if(event.target.value){
+                      setBuyAmt(event.target.value);
+                      updatePremiumToPay(event.target.value);
+                    } else {
+                      setBuyAmt(new BigNumber(0));
+                      updatePremiumToPay(new BigNumber(0));
+                    }
                   }}
                 />
               </>
@@ -66,14 +81,14 @@ function OptionExchange({ symbol, tokenBalance, token, exchange, decimals }) {
                   buyOTokensFromExchange(
                     token,
                     exchange,
-                    toBaseUnitString(buyAmt, decimals),
-                    premiumToPay
+                    toBaseUnitBN(buyAmt, decimals).toString(),
+                    toBaseUnitBN(premiumToPay, 18).toString()
                   );
                 }}
               />
             </div>
           </div>
-          <PriceSection label='Cost:' amt={premiumToPay} symbol='' />
+          <PriceSection label='Cost:' amt={premiumToPay.toString()} symbol='' />
         </div>
         <div style={{ width: '6%' }}></div>
         {/* Remove collateral */}
@@ -86,8 +101,13 @@ function OptionExchange({ symbol, tokenBalance, token, exchange, decimals }) {
                   wide={true}
                   value={sellAmt}
                   onChange={(event) => {
-                    setSellAmt(event.target.value);
-                    updatePremiumReceived(event.target.value);
+                    if(event.target.value) {
+                      setSellAmt(event.target.value);
+                      updatePremiumReceived(event.target.value);
+                    } else {
+                      setSellAmt(new BigNumber(0))
+                      updatePremiumReceived(new BigNumber(0));
+                    }
                   }}
                 />
                 <MaxButton
@@ -107,7 +127,7 @@ function OptionExchange({ symbol, tokenBalance, token, exchange, decimals }) {
                   sellOTokensFromExchange(
                     token, 
                     exchange, 
-                    toBaseUnitString(sellAmt, decimals)
+                    toBaseUnitBN(sellAmt, decimals).toString()
                   );
                 }}
               />

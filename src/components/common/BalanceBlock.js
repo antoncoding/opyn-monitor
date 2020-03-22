@@ -1,5 +1,9 @@
 import React from 'react'
 
+/**
+ * 
+ * @param {{balance: number | string | BigNumber}} param0 
+ */
 function BalanceBlock({asset, balance}){
   let integer = '0',
     digits = '0';

@@ -9,11 +9,17 @@ const web3 = new Web3('https://mainnet.infura.io/v3/44fd23cda65746a699a5d3c0e2fa
 
 // ERC20 Info
 
+/**
+ * 
+ * @param {string} erc20Token address
+ * @param {string} user address
+ * @return {Promise<string>}
+ */
 export const getTokenBalance = async (erc20Token, user) => {
   if (user === '') return '0'
   const oTokenContract = new web3.eth.Contract(optionContractABI, erc20Token);
   const balance = await oTokenContract.methods.balanceOf(user).call();
-  return parseInt(balance);
+  return balance;
 };
 
 export const getDecimals = async (erc20Token) => {

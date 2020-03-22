@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 
 import { liquidate, addERC20Collateral, addETHCollateral } from '../../utils/web3';
 import { getMaxLiquidatable } from '../../utils/infura';
-import { toTokenUnitsBN, toBaseUnitString, formatDigits } from '../../utils/number';
+import { toTokenUnitsBN, toBaseUnitBN, formatDigits } from '../../utils/number';
 import { RatioTag } from '../common';
 
 import {
@@ -59,7 +59,7 @@ function VaultModal({ useCollateral, oToken, owner, collateral, isSafe, oTokensI
           entriesPerPage={1}
           renderEntry={({ collateral, isSafe, oTokensIssued, ratio }) => {
             return [
-              formatDigits(toTokenUnitsBN(collateral, collateralDecimals).toNumber(), 5), 
+              formatDigits(toTokenUnitsBN(collateral, collateralDecimals), 5), 
               formatDigits(toTokenUnitsBN(oTokensIssued, decimals), 5),
               ratio, 
               RatioTag({ isSafe, ratio, useCollateral })
@@ -89,7 +89,7 @@ function VaultModal({ useCollateral, oToken, owner, collateral, isSafe, oTokensI
                 onClick={() => {
                   collateralIsETH 
                   ? addETHCollateral(oToken, owner, addValue)
-                  : addERC20Collateral(collateralAsset, oToken, owner, toBaseUnitString(addValue, collateralDecimals))}}
+                  : addERC20Collateral(collateralAsset, oToken, owner, toBaseUnitBN(addValue, collateralDecimals).toString())}}
               />
             }
           />

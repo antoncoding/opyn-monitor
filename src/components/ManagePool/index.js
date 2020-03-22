@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
+import { Header } from '@aragon/ui';
 
 import { getTokenBalance, getBalance, getERC20Info } from '../../utils/infura';
+import { toTokenUnitsBN } from '../../utils/number'
 
-import { Header } from '@aragon/ui';
 
 import { options } from '../../constants/options';
 
@@ -12,6 +13,7 @@ import OptionExchange from './OptionExchange'
 
 import AddLiquidity from './AddLiquidity';
 import RemoveLiquidity from './RemoveLiquidity'
+import BigNumber from 'bignumber.js';
 
 function ManagePool({ user }) {
 
@@ -20,30 +22,30 @@ function ManagePool({ user }) {
   const option = options.find((option) => option.addr === token);
   const { uniswapExchange, decimals, symbol, exchange } = option;
 
-  const [poolTokenBalance, setPoolTokenBalance] = useState(0);
-  const [userTokenBalance, setUserTokenBalance] = useState(0);
-  const [poolETHBalance, setPoolETHBalance] = useState(0);
-  const [userETHBalance, setUserETHBalance] = useState(0);
+  const [poolTokenBalance, setPoolTokenBalance] = useState(new BigNumber(0));
+  const [userTokenBalance, setUserTokenBalance] = useState(new BigNumber(0));
+  const [poolETHBalance, setPoolETHBalance] = useState(new BigNumber(0));
+  const [userETHBalance, setUserETHBalance] = useState(new BigNumber(0));
 
-  const [userliquidityTokenBalance, setUserLiquidityTokenBalance] = useState(0);
+  const [userliquidityTokenBalance, setUserLiquidityTokenBalance] = useState(new BigNumber(0));
+  const [liquidityTokenSupply, setLiquidityTokenSupply] = useState(new BigNumber(0));
   const [liquidityTokenDecimals, setLiquidityTokenDecimals] = useState(0);
-  const [liquidityTokenSupply, setLiquidityTokenSupply] = useState(0);
 
   useEffect(() => {
     let isCancelled = false;
 
     async function updatePoolInfo() {
-      let [exchangeTokenBalance, exchagneETHBalance, liquidityTokenInfo] = await Promise.all([
+      let [exTokenBalance, exchagneETHBalance, liquidityTokenInfo] = await Promise.all([
         getTokenBalance(token, uniswapExchange),
         getBalance(uniswapExchange),
         getERC20Info(uniswapExchange),
       ]);
       const { decimals: liqTokenDecimal, totalSupply: liqTokenTotalSupply } = liquidityTokenInfo;
-      exchangeTokenBalance = exchangeTokenBalance / 10 ** decimals;
+      const exchangeTokenBalance = toTokenUnitsBN(exTokenBalance, decimals);
       if (!isCancelled) {
         setLiquidityTokenDecimals(liqTokenDecimal);
-        setLiquidityTokenSupply(liqTokenTotalSupply);
-        setPoolETHBalance(exchagneETHBalance);
+        setLiquidityTokenSupply(new BigNumber(liqTokenTotalSupply));
+        setPoolETHBalance(new BigNumber(exchagneETHBalance));
         setPoolTokenBalance(exchangeTokenBalance);
       }
     }
@@ -67,8 +69,8 @@ function ManagePool({ user }) {
         getTokenBalance(uniswapExchange, user),
       ]);
 
-      const userTokenBalance = tokenBalance / 10 ** decimals;
-      const userLiqTokenBalance = liqTokenBalance / 10 ** liquidityTokenDecimals;
+      const userTokenBalance = toTokenUnitsBN(tokenBalance, decimals);
+      const userLiqTokenBalance = toTokenUnitsBN(liqTokenBalance, liquidityTokenDecimals);
       if (!isCancelled) {
         setUserLiquidityTokenBalance(userLiqTokenBalance);
         setUserETHBalance(userETHBalance);
@@ -122,11 +124,8 @@ function ManagePool({ user }) {
       />
 
       <RemoveLiquidity
-        user={user}
-        otoken={token}
         otokenDecimals={decimals}
         otokenSymbol={symbol}
-        userTokenBalance={userTokenBalance}
         userliquidityTokenBalance={userliquidityTokenBalance}
         userETHBalance={userETHBalance}
         uniswapExchange={uniswapExchange}
