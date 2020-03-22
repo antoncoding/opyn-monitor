@@ -6,8 +6,12 @@ import { BalanceBlock, MaxButton } from '../common';
 import { liquidate } from '../../utils/web3';
 import { getMaxLiquidatable } from '../../utils/infura';
 import { getLiquidationHistory } from '../../utils/graph';
-import { formatDigits, fromWei, toTokenUnits, timeSince, toBaseUnitString } from '../../utils/number';
+import { formatDigits, fromWei, toTokenUnitsBN, timeSince, toBaseUnitString } from '../../utils/number';
 
+/**
+ * 
+ * @param {{userTokenBalance: BigNumber}} param0 
+ */
 function LiquidationHistory({ owner, token, isOwner, tokenDecimals, userTokenBalance }) {
   const [maxLiquidatable, setMaxLiquidatable] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
@@ -18,7 +22,7 @@ function LiquidationHistory({ owner, token, isOwner, tokenDecimals, userTokenBal
   useEffect(() => {
     async function updateLiquidatable() {
       const maxToLiquidate = await getMaxLiquidatable(token, owner);
-      setMaxLiquidatable(toTokenUnits(maxToLiquidate, tokenDecimals));
+      setMaxLiquidatable(toTokenUnitsBN(maxToLiquidate, tokenDecimals).toNumber());
     }
 
     updateLiquidatable();
@@ -60,7 +64,7 @@ function LiquidationHistory({ owner, token, isOwner, tokenDecimals, userTokenBal
                       />
                       <MaxButton
                         onClick={() => {
-                          const maximum = Math.min(userTokenBalance, maxLiquidatable);
+                          const maximum = Math.min(userTokenBalance.toNumber(), maxLiquidatable);
                           setAmtToLiquidate(maximum);
                         }}
                       />

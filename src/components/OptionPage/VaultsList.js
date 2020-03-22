@@ -6,7 +6,7 @@ import { SectionTitle, RatioTag } from '../common';
 
 import { getAllVaultsForOption } from '../../utils/graph';
 import { getDecimals } from '../../utils/infura';
-import { formatDigits, fromWei, compareVaultRatio, toTokenUnits } from '../../utils/number';
+import { formatDigits, compareVaultRatio, toTokenUnitsBN } from '../../utils/number';
 import { calculateRatio, calculateStrikeValueInCollateral } from '../../utils/calculation';
 
 import { options, ETH_ADDRESS } from '../../constants/options';
@@ -14,7 +14,7 @@ import { options, ETH_ADDRESS } from '../../constants/options';
 function VaultOwnerList({ oToken, user }) {
   const option = options.find((option) => option.addr === oToken);
 
-  const [collateralDecimals, setCollateralDecimals] = useState(0);
+  const [collateralDecimals, setCollateralDecimals] = useState(18);
 
   // like ETH:DAI option, not using other assets as collateral. vaultUseCollateral = false
   const vaultUsesCollateral = option.collateral !== option.strike;
@@ -35,7 +35,7 @@ function VaultOwnerList({ oToken, user }) {
     let isCancelled = false;
     const updateInfo = async () => {
       const vaults = await getAllVaultsForOption(oToken);
-      const { strike, decimals, minRatio, strikePrice, oracle, collateral } = option;
+      const { strike, minRatio, strikePrice, oracle, collateral } = option;
 
       const strikeValueInCollateral = await calculateStrikeValueInCollateral(
         collateral,
@@ -56,8 +56,6 @@ function VaultOwnerList({ oToken, user }) {
             strikePrice,
             strikeValueInCollateral
           );
-          const oTokensIssued = toTokenUnits(vault.oTokensIssued, decimals);
-          vault.oTokensIssued = oTokensIssued;
           vault.ratio = ratio;
           vault.useCollateral = vaultUsesCollateral;
           vault.isSafe = ratio > minRatio;
@@ -93,19 +91,20 @@ function VaultOwnerList({ oToken, user }) {
           return [
             <IdentityBadge entity={owner} shorten={true} />,
             formatDigits(
-              collateralIsETH ? fromWei(collateral) : toTokenUnits(collateral, collateralDecimals),
+              toTokenUnitsBN(collateral, collateralDecimals).toNumber(),
               6
             ),
-            formatDigits(oTokensIssued, 6),
+            formatDigits(
+              toTokenUnitsBN(oTokensIssued, option.decimals).toNumber(), 
+              6
+            ),
             formatDigits(ratio, 5),
             RatioTag({ isSafe, ratio, useCollateral }),
             <VaultModal
               decimals={option.decimals}
               oToken={oToken}
               owner={owner}
-              collateral={
-                collateralIsETH ? fromWei(collateral) : toTokenUnits(collateral, collateralDecimals)
-              }
+              collateral={collateral}
               collateralAsset={option.collateral}
               collateralDecimals={collateralDecimals}
               isSafe={isSafe}

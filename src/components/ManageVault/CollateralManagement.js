@@ -1,4 +1,5 @@
 import React, { useState, useMemo } from 'react';
+import BigNumber from 'bignumber.js';
 
 import { getDecimals, getERC20Symbol } from '../../utils/infura'
 import { addETHCollateral, addERC20Collateral, removeCollateral,  } from '../../utils/web3';
@@ -9,17 +10,16 @@ import { Box, TextInput, Button, IconCirclePlus, IconCircleMinus } from '@aragon
 import { formatDigits, toTokenUnitsBN, toBaseUnitBN } from '../../utils/number'
 import { calculateRatio } from '../../utils/calculation'
 import { ETH_ADDRESS } from '../../constants/options';
-import BigNumber from 'bignumber.js';
 
 /**
  * 
- * @param {{isOwner: boolean, strikePrice:number, strikeValue:BigNumber }} param0 
+ * @param {{isOwner: boolean, strikePrice:number, strikeValue:BigNumber, collateralAssetBalance: BigNumber }} param0 
  */
 function CollateralManagement({
   isOwner,
   vault,
   collateralAsset,
-  collateralAssetBalance,
+  collateralAssetBalance, // Bignumber, / token unit
   token,
   owner,
   strikeValue,
@@ -60,7 +60,7 @@ function CollateralManagement({
         <div style={{ width: '30%' }}>
           {BalanceBlock({ 
             asset: collateralIsETH ? 'Your ETH Balance' : `Your ${collateralSymbol} Balance`, 
-            balance: formatDigits(collateralAssetBalance,6) })}
+            balance: formatDigits(collateralAssetBalance.toString(),6) })}
         </div>
         {/* Add collateral */}
         <div style={{ width: '32%', paddingTop: '2%' }}>
@@ -85,7 +85,7 @@ function CollateralManagement({
                 />
                 <MaxButton
                   onClick={() => {
-                    setAddCollateralAmt(collateralAssetBalance);
+                    setAddCollateralAmt(collateralAssetBalance.toNumber());
                     const collateralBalanceRaw = toBaseUnitBN(collateralAssetBalance, collateralDecimals)
                     const newCollateral = new BigNumber(vault.collateral).plus(collateralBalanceRaw).toNumber()
                     updateNewRatio(newCollateral)

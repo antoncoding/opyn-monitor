@@ -9,7 +9,7 @@ import IssuedTokenManagement from './IssuedTokenManagement';
 import LiquidationHistory from './Liquidation';
 import ExerciseHistory from './Exercise';
 
-import { formatDigits, toTokenUnits } from '../../utils/number';
+import { formatDigits, toTokenUnitsBN } from '../../utils/number';
 import { calculateRatio, calculateStrikeValueInCollateral } from '../../utils/calculation';
 import { getTokenBalance, getBalance, getDecimals } from '../../utils/infura';
 import { getAllVaultsForUser } from '../../utils/graph';
@@ -31,9 +31,9 @@ function ManageVault({ user }) {
   const [strikeValueInCollateral, setStrikeValue] = useState(new BigNumber(0));
   const [ratio, setRatio] = useState(0);
 
-  const [ownerTokenBalance, setOwnerTokenBalance] = useState(0);
-  const [userTokenBalance, setUserTokenBalance] = useState(0);
-  const [userCollateralAssetBalance, setUserCollateralAssetBalance] = useState(0);
+  const [ownerTokenBalance, setOwnerTokenBalance] = useState(new BigNumber(0));
+  const [userTokenBalance, setUserTokenBalance] = useState(new BigNumber(0));
+  const [userCollateralAssetBalance, setUserCollateralAssetBalance] = useState(new BigNumber(0));
 
   // status
   const [noVault, setNoVault] = useState(true);
@@ -61,19 +61,19 @@ function ManageVault({ user }) {
       ]);
 
       // SetUserCollateralAmount
-      let collateralBalance,
-        _collateralDecimals = 18;
+      let collateralBalance = new BigNumber(0)
+      let _collateralDecimals = 18;
 
       if (collateralIsETH) {
-        collateralBalance = await getBalance(user);
+        collateralBalance = new BigNumber(await getBalance(user));
       } else {
         const _tokenBalance = await getTokenBalance(collateral, user);
         _collateralDecimals = await getDecimals(collateral);
-        collateralBalance = toTokenUnits(_tokenBalance, _collateralDecimals);
+        collateralBalance = toTokenUnitsBN(_tokenBalance, _collateralDecimals);
       }
 
-      _ownerTokenBalance = toTokenUnits(_ownerTokenBalance, decimals);
-      _userTokenBalance = toTokenUnits(_userTokenBalance, decimals);
+      const _ownerTokenBalanceBN = toTokenUnitsBN(_ownerTokenBalance, decimals);
+      const _userTokenBalanceBN = toTokenUnitsBN(_userTokenBalance, decimals);
 
       const strikeValueInCollateral = await calculateStrikeValueInCollateral(
         collateral,
@@ -91,8 +91,8 @@ function ManageVault({ user }) {
         setStrikeValue(strikeValueInCollateral);
         setVault(vault);
         setCollateralDecimals(_collateralDecimals);
-        setOwnerTokenBalance(_ownerTokenBalance);
-        setUserTokenBalance(_userTokenBalance);
+        setOwnerTokenBalance(_ownerTokenBalanceBN);
+        setUserTokenBalance(_userTokenBalanceBN);
         setRatio(formatDigits(ratio, 5));
         setUserCollateralAssetBalance(collateralBalance);
       }

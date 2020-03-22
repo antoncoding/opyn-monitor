@@ -4,7 +4,7 @@ import { Header, DataView, IdentityBadge } from '@aragon/ui';
 import { options, ETH_ADDRESS } from '../../constants/options';
 import { SectionTitle, ManageVaultButton, OpenVaultButton } from '../common';
 import { getAllVaultsForUser } from '../../utils/graph';
-import { formatDigits, compareVaultRatio, toTokenUnits } from '../../utils/number';
+import { formatDigits, compareVaultRatio, toTokenUnitsBN } from '../../utils/number';
 import { calculateRatio, calculateStrikeValueInCollateral } from '../../utils/calculation';
 import { getDecimals } from '../../utils/infura';
 
@@ -73,7 +73,7 @@ function MyVaults({ user }) {
                   return [
                     oTokenName,
                     <IdentityBadge entity={oToken} />,
-                    formatDigits(toTokenUnits(collateral, collateralDecimals), 5),
+                    formatDigits(toTokenUnitsBN(collateral, collateralDecimals).toNumber(), 5),
                     formatDigits(ratio, 4),
                     <ManageVaultButton oToken={oToken} owner={user} />,
                   ];

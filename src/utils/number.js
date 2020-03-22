@@ -52,10 +52,6 @@ export const toTokenUnitsBN = (tokenAmount, tokenDecimals) => {
   return _amt.div(_digits)
 }
 
-export const toTokenUnits = (tokenAmount, tokenDecimals) => {
-  return tokenAmount / 10 ** tokenDecimals
-}
-
 export function timeSince(timeStamp) {
   var now = new Date(),
     secondsPast = (now.getTime() - timeStamp) / 1000;

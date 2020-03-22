@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 
 import { liquidate, addERC20Collateral, addETHCollateral } from '../../utils/web3';
 import { getMaxLiquidatable } from '../../utils/infura';
-import { toTokenUnits, toBaseUnitString } from '../../utils/number';
+import { toTokenUnitsBN, toBaseUnitString, formatDigits } from '../../utils/number';
 import { RatioTag } from '../common';
 
 import {
@@ -18,6 +18,10 @@ import {
   DataView,
 } from '@aragon/ui';
 
+/**
+ * 
+ * @param {{collateral: string, oTokensIssued: string collateralDecimals:Number, decimals:Number}} param0 
+ */
 function VaultModal({ useCollateral, oToken, owner, collateral, isSafe, oTokensIssued, ratio, decimals, collateralAsset, collateralIsETH, collateralDecimals }) {
   const [opened, setOpened] = useState(false);
   const [addValue, setAddValue] = useState(0);
@@ -31,7 +35,7 @@ function VaultModal({ useCollateral, oToken, owner, collateral, isSafe, oTokensI
       if (!opened) return;
       const maxLiquidatable = await getMaxLiquidatable(oToken, owner);
       if (!isCancelled) {
-        setLiquidateAmt(toTokenUnits(maxLiquidatable, decimals));
+        setLiquidateAmt(toTokenUnitsBN(maxLiquidatable, decimals).toNumber());
       }
     }
     getData();
@@ -54,7 +58,12 @@ function VaultModal({ useCollateral, oToken, owner, collateral, isSafe, oTokensI
           entries={[{ collateral, isSafe, oTokensIssued, ratio }]}
           entriesPerPage={1}
           renderEntry={({ collateral, isSafe, oTokensIssued, ratio }) => {
-            return [collateral, oTokensIssued, ratio, RatioTag({ isSafe, ratio, useCollateral })];
+            return [
+              formatDigits(toTokenUnitsBN(collateral, collateralDecimals).toNumber(), 5), 
+              formatDigits(toTokenUnitsBN(oTokensIssued, decimals), 5),
+              ratio, 
+              RatioTag({ isSafe, ratio, useCollateral })
+            ];
           }}
         />
 

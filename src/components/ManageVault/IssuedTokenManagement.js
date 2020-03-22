@@ -7,7 +7,7 @@ import { Box, TextInput, Button, IconCirclePlus, IconCircleMinus } from '@aragon
 
 /**
  * 
- * @param {{strikeValue: BigNumber}} param0 
+ * @param {{strikeValue: BigNumber, tokenBalance: BigNumber}} param0 
  */
 function IssuedTokenManagement({
   isOwner,
@@ -67,7 +67,7 @@ function IssuedTokenManagement({
         <div style={{ width: '30%' }}>
           <BalanceBlock
             asset={`Owner ${symbol} Balance `}
-            balance={tokenBalance}
+            balance={tokenBalance.toString()}
           />
         </div>
         {/* Issue More Token */}
@@ -120,7 +120,7 @@ function IssuedTokenManagement({
                 <MaxButton
                   onClick={() => {
                     const issued = Number(vault.oTokensIssued) / 10 ** decimals;
-                    const maxToBurn = Math.min(tokenBalance, issued)
+                    const maxToBurn = Math.min(tokenBalance.toNumber(), issued)
                     setBurnAmt(maxToBurn);
                     updateNewRatio(handleDecimals(issued - maxToBurn, decimals))
                   }}
