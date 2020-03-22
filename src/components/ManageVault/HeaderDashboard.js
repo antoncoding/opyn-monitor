@@ -1,15 +1,13 @@
 import React from 'react';
 
 import { BalanceBlock, RatioTag, HelperText } from '../common';
-import { formatDigits, fromWei, toTokenUnits } from '../../utils/number';
+import { formatDigits, toTokenUnitsBN } from '../../utils/number';
 
-const HeaderDashboard = ({ ratio, minRatio, symbol, vault, decimals, newRatio, collateralIsETH, collateralDecimals, useCollateral }) => {
-  const tokenInUnit = vault.oTokensIssued ? vault.oTokensIssued / 10 ** decimals : 0;
-  const collateralBalance = vault.collateral ?
-    collateralIsETH
-      ? fromWei(vault.collateral)
-      : toTokenUnits(vault.collateral, collateralDecimals)
-    : '0'
+const HeaderDashboard = ({ ratio, minRatio, symbol, vault, decimals, newRatio, collateralDecimals, useCollateral }) => {
+  const tokenInUnit = vault.oTokensIssued ? toTokenUnitsBN(vault.oTokensIssued, decimals).toNumber() : '0';
+  const collateralBalance = vault.collateral 
+  ? toTokenUnitsBN(vault.collateral, collateralDecimals).toString()
+  : '0'
   
   return (
     <div style={{ padding: '2%', display: 'flex', alignItems: 'center' }}>
