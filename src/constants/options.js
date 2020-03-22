@@ -17,24 +17,24 @@ export const options = [
     uniswapExchange: '0xA6923533A6362008e9b536271C2Bdc0FF1467D3c',
     expiry: 1612915200
   },
-  {
-    addr: '0x87fe8eba753076a943bd2a5f6c3556188064797e',
-    title: 'Opyn ETH Put $100',
+  // {
+  //   addr: '0x87fe8eba753076a943bd2a5f6c3556188064797e',
+  //   title: 'Opyn ETH Put $100',
 
-    // constants in contract
-    symbol: 'oETH $100 Put',
-    name: 'Opyn ETH Put $100 03/30/20',
-    decimals: 8,
-    oracle: '0x7054e08461e3eCb7718B63540adDB3c3A1746415',
-    collateral: '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48',
-    underlying: "0x0000000000000000000000000000000000000000",
-    strike: "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
-    strikePrice: 1e-6,
-    minRatio: 1,
-    exchange: '0x39246c4f3f6592c974ebc44f80ba6dc69b817c71',
-    uniswapExchange: '0xA680B19749672A632e1E493Be7807638A57c952F',
-    expiry: 1585526400
-  },
+  //   // constants in contract
+  //   symbol: 'oETH $100 Put',
+  //   name: 'Opyn ETH Put $100 03/30/20',
+  //   decimals: 8,
+  //   oracle: '0x7054e08461e3eCb7718B63540adDB3c3A1746415',
+  //   collateral: '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48',
+  //   underlying: "0x0000000000000000000000000000000000000000",
+  //   strike: "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+  //   strikePrice: 1e-6,
+  //   minRatio: 1,
+  //   exchange: '0x39246c4f3f6592c974ebc44f80ba6dc69b817c71',
+  //   uniswapExchange: '0xA680B19749672A632e1E493Be7807638A57c952F',
+  //   expiry: 1585526400
+  // },
   {
     addr: '0x8ed9f862363ffdfd3a07546e618214b6d59f03d4',
     title: 'cUSDC Insurance',
