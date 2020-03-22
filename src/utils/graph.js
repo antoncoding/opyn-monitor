@@ -60,6 +60,29 @@ const liquidationActionsQuery = (owner) => `{
 
 `
 
+/**
+ * Get all exercise history for one user
+ * @param {string} owner vault owner
+ * @param {string} option contract address
+ * @return {Promise<{amtCollateralToPay: string, exerciser:string, oTokensToExercise:string, timestamp:string, transactionHash: string}>}
+ */
+export async function getExerciseHistory(owner, option) {
+  const query = `{
+    exerciseActions (where: {
+      vault_contains: "${owner}"
+      optionsContract_contains: "${option}"
+    }) {
+      exerciser
+      oTokensToExercise
+      amtCollateralToPay
+      transactionHash
+      timestamp
+    }
+  }`
+
+  const response = await postQuery(query)
+  return response.data.exerciseActions
+}
 
 const postQuery = async (query) => {
   const options = {
