@@ -7,15 +7,16 @@ import HeaderDashboard from './HeaderDashboard';
 import CollateralManagement from './CollateralManagement';
 import IssuedTokenManagement from './IssuedTokenManagement';
 import LiquidationHistory from './Liquidation';
+import ExerciseHistory from './Exercise';
 
 import { formatDigits, toTokenUnits } from '../../utils/number';
-import { calculateRatio, calculateStrikeValueInCollateral } from '../../utils/calculation'
+import { calculateRatio, calculateStrikeValueInCollateral } from '../../utils/calculation';
 import { getTokenBalance, getBalance, getDecimals } from '../../utils/infura';
 import { getAllVaultsForUser } from '../../utils/graph';
-import { redeem } from '../../utils/web3'
+import { redeem } from '../../utils/web3';
 
 import { options, ETH_ADDRESS } from '../../constants/options';
-
+import BigNumber from 'bignumber.js';
 
 function ManageVault({ user }) {
   let { token, owner } = useParams();
@@ -27,7 +28,7 @@ function ManageVault({ user }) {
   const [tabSelected, setTabSelected] = useState(0);
 
   const [vault, setVault] = useState({});
-  const [strikeValueInCollateral, setStrikeValue] = useState(0);
+  const [strikeValueInCollateral, setStrikeValue] = useState(new BigNumber(0));
   const [ratio, setRatio] = useState(0);
 
   const [ownerTokenBalance, setOwnerTokenBalance] = useState(0);
@@ -38,7 +39,7 @@ function ManageVault({ user }) {
   const [noVault, setNoVault] = useState(true);
   const [newRatio, setNewRatio] = useState(ratio);
 
-  const [collateralDecimals, setCollateralDecimals] = useState(0);
+  const [collateralDecimals, setCollateralDecimals] = useState(18);
   const collateralIsETH = collateral === ETH_ADDRESS;
 
   const vaultUsesCollateral = collateral !== strike;
@@ -60,7 +61,8 @@ function ManageVault({ user }) {
       ]);
 
       // SetUserCollateralAmount
-      let collateralBalance, _collateralDecimals = 0;
+      let collateralBalance,
+        _collateralDecimals = 18;
 
       if (collateralIsETH) {
         collateralBalance = await getBalance(user);
@@ -73,7 +75,11 @@ function ManageVault({ user }) {
       _ownerTokenBalance = toTokenUnits(_ownerTokenBalance, decimals);
       _userTokenBalance = toTokenUnits(_userTokenBalance, decimals);
 
-      const strikeValueInCollateral = await calculateStrikeValueInCollateral(collateral, strike, oracle)
+      const strikeValueInCollateral = await calculateStrikeValueInCollateral(
+        collateral,
+        strike,
+        oracle
+      );
       const ratio = calculateRatio(
         vault.collateral,
         vault.oTokensIssued,
@@ -98,7 +104,19 @@ function ManageVault({ user }) {
       isCancelled = true;
       clearInterval(id);
     };
-  }, [collateral, collateralDecimals, collateralIsETH, decimals, oracle, owner, strike, strikePrice, token, user, vaultUsesCollateral]);
+  }, [
+    collateral,
+    collateralDecimals,
+    collateralIsETH,
+    decimals,
+    oracle,
+    owner,
+    strike,
+    strikePrice,
+    token,
+    user,
+    vaultUsesCollateral,
+  ]);
 
   const isOwner = user === owner;
 
@@ -106,13 +124,15 @@ function ManageVault({ user }) {
     <div style={{ padding: 100, textAlign: 'center' }}> No Vault Found for this user </div>
   ) : (
     <>
-      <Header 
+      <Header
         primary={isOwner ? 'Manage Your Vault' : 'Vault Detail'}
         secondary={
-          expiry*1000 > Date.now() 
-          ? <Timer end={new Date(expiry*1000)}/>
-          : <Button onClick={()=>redeem(token)} label={'Redeem'} />
-        }  
+          expiry * 1000 > Date.now() ? (
+            <Timer end={new Date(expiry * 1000)} />
+          ) : (
+            <Button onClick={() => redeem(token)} label={'Redeem'} />
+          )
+        }
       />
 
       <HeaderDashboard
@@ -130,7 +150,7 @@ function ManageVault({ user }) {
       />
 
       <Tabs
-        items={['Collateral Management', 'Token Issuance', 'Liquidation']}
+        items={['Collateral Management', 'Token Issuance', 'Liquidation', 'Exercise']}
         selected={tabSelected}
         onChange={setTabSelected}
       />
@@ -181,6 +201,17 @@ function ManageVault({ user }) {
         ) : (
           <Box> This vault cannot be liquidated </Box>
         )
+      ) : (
+        <></>
+      )}
+
+      {tabSelected === 3 ? (
+        <ExerciseHistory
+          owner={owner}
+          token={token}
+          tokenDecimals={decimals}
+          collateralDecimals={collateralDecimals}
+        />
       ) : (
         <></>
       )}

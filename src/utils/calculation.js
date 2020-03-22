@@ -1,6 +1,6 @@
 import BigNumber from 'bignumber.js'
 import { getPrice, getDecimals } from './infura'
-import { toBaseUnitString } from './number'
+import { toBaseUnitBN } from './number'
 
 
 /**
@@ -9,25 +9,26 @@ import { toBaseUnitString } from './number'
  * @param {string} strike address
  * @param {string} oracle address
  * @param {number?} collateralDecimals if provided, wont get again if needed
+ * @return {Promise<BigNumber>}
  */
 export const calculateStrikeValueInCollateral = async(collateral, strike, oracle, collateralDecimals=undefined ) => {
   const ETH_Address = '0x0000000000000000000000000000000000000000'
   let strikeValueInCollateral;
   if (collateral === ETH_Address) {
     const strikeValueInWei = await getPrice(oracle, strike);
-    strikeValueInCollateral = strikeValueInWei;
+    strikeValueInCollateral = new BigNumber(strikeValueInWei);
   } else if (collateral === strike) {
     // No collateral, like ETH option
     if (collateralDecimals===undefined) 
       collateralDecimals = await getDecimals(collateral)
-    strikeValueInCollateral = new BigNumber(10).pow(new BigNumber(collateralDecimals)).toNumber();
+    strikeValueInCollateral = new BigNumber(10).pow(new BigNumber(collateralDecimals));
   } else {
     // Use other ERC20 as collateral : Untested
     if (collateralDecimals===undefined) 
       collateralDecimals = await getDecimals(collateral)
     const strikeValueInWei = await getPrice(oracle, strike);
     const collateralValueInWei = await getPrice(oracle, collateral);
-    strikeValueInCollateral = toBaseUnitString(
+    strikeValueInCollateral = toBaseUnitBN(
       parseInt(strikeValueInWei) / parseInt(collateralValueInWei),
       collateralDecimals
     );
@@ -40,7 +41,7 @@ export const calculateStrikeValueInCollateral = async(collateral, strike, oracle
  * @param {string} collateral number of collateral in base unit
  * @param {string} tokenIssued number of token in base unit
  * @param {number} strikePrice 
- * @param {number} strikeValueInCollateral 
+ * @param {BigNumber} strikeValueInCollateral 
  * @return {number}
  */
 export const calculateRatio = (collateral, tokenIssued, strikePrice, strikeValueInCollateral) => {
@@ -48,7 +49,7 @@ export const calculateRatio = (collateral, tokenIssued, strikePrice, strikeValue
   const colalteralBN = new BigNumber(collateral)
   const tokenIssuedBN = new BigNumber(tokenIssued)
   const strikePriceBN = new BigNumber(strikePrice)
-  const strikeValueInCollateralBN = new BigNumber(strikeValueInCollateral.toString())
-  const result = (colalteralBN.div(tokenIssuedBN)).div(strikePriceBN).div(strikeValueInCollateralBN)
+  // const strikeValueInCollateralBN = new BigNumber(strikeValueInCollateral.toString())
+  const result = (colalteralBN.div(tokenIssuedBN)).div(strikePriceBN).div(strikeValueInCollateral)
   return result.toNumber()
 }

@@ -9,6 +9,13 @@ export function toBaseUnitString(rawAmt, decimals) {
   return raw.times(base.pow(decimalsBN)).toString()
 }
 
+export function toBaseUnitBN(rawAmt, decimals) {
+  const raw = new BigNumber(rawAmt)
+  const base = new BigNumber(10)
+  const decimalsBN = new BigNumber(decimals)
+  return raw.times(base.pow(decimalsBN))
+}
+
 export function formatDigits(num, percision) {
   return parseFloat(num).toFixed(percision)
 }
@@ -32,6 +39,17 @@ export const formatETHAmtToStr = (amtInEth) => {
   if(digits.length > 18) digits = digits.slice(0, 18)
   const result = `${int}.${digits}`
   return result
+}
+
+/**
+ * 
+ * @param {string} tokenAmount in base unit
+ * @param {number} tokenDecimals 
+ */
+export const toTokenUnitsBN = (tokenAmount, tokenDecimals) => {
+  const _amt = new BigNumber(tokenAmount)
+  const _digits = new BigNumber(10).pow(new BigNumber(tokenDecimals))
+  return _amt.div(_digits)
 }
 
 export const toTokenUnits = (tokenAmount, tokenDecimals) => {

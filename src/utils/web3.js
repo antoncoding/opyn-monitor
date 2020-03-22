@@ -126,7 +126,7 @@ export const addETHCollateral = async (oTokenAddr, owner, ethAmt) => {
  * @param {string} collaral 
  * @param {string} oTokenAddr 
  * @param {string} owner 
- * @param {number} collateralAmt in min unit
+ * @param {number|string} collateralAmt in min unit
  */
 export const addERC20Collateral = async (collateral, oTokenAddr, owner, collateralAmt) => {
   const collateralAmtBN = new BigNumber(collateralAmt)
@@ -154,24 +154,23 @@ export const addERC20Collateral = async (collateral, oTokenAddr, owner, collater
 
 /**
  * 
- * @param {*} collateral 
- * @param {*} oTokenAddr 
- * @param {number} collateralAmt eth: in eth. other: in base unit
+ * @param {string} collateral 
+ * @param {string} oTokenAddr 
+ * @param {string} collateralAmt in base unit
  */
 export const removeCollateral = async (collateral, oTokenAddr, collateralAmt) => {
   const account = await checkConnectedAndGetAddress()
   const oToken = new web3.eth.Contract(oTokenABI, oTokenAddr);
   if(collateral === ETH_ADDRESS) {
-    const amtInETH = collateralAmt.toString()
     await oToken.methods
-      .removeCollateral(web3.utils.toWei(amtInETH))
+      .removeCollateral(collateralAmt)
       .send({ from: account })
       .on('transactionHash', (hash) => {
         notify.hash(hash);
       });
   } else {
     await oToken.methods
-      .removeCollateral(collateralAmt.toString())
+      .removeCollateral(collateralAmt)
       .send({ from: account })
       .on('transactionHash', (hash) => {
         notify.hash(hash);

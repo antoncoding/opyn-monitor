@@ -6,11 +6,15 @@ import { addETHCollateral, addERC20Collateral, removeCollateral,  } from '../../
 import { BalanceBlock, MaxButton } from '../common';
 import { Box, TextInput, Button, IconCirclePlus, IconCircleMinus } from '@aragon/ui';
 
-import { formatDigits, toWei, fromWei, toTokenUnits, toBaseUnitString } from '../../utils/number'
+import { formatDigits, toTokenUnitsBN, toBaseUnitBN } from '../../utils/number'
 import { calculateRatio } from '../../utils/calculation'
 import { ETH_ADDRESS } from '../../constants/options';
 import BigNumber from 'bignumber.js';
 
+/**
+ * 
+ * @param {{isOwner: boolean, strikePrice:number, strikeValue:BigNumber }} param0 
+ */
 function CollateralManagement({
   isOwner,
   vault,
@@ -26,7 +30,7 @@ function CollateralManagement({
   const [addCollateralAmt, setAddCollateralAmt] = useState(0); // in token unit
   const [removeCollateralAmt, setRemoveCollateralAmt] = useState(0); // in token unit
 
-  const [collateralDecimals, setCollateralDecimals] = useState(0)
+  const [collateralDecimals, setCollateralDecimals] = useState(18)
   const [collateralSymbol, setCollateralSymbol] = useState(0)
 
   const collateralIsETH = collateralAsset === ETH_ADDRESS
@@ -74,16 +78,16 @@ function CollateralManagement({
                       return
                     } 
                     setAddCollateralAmt(amt);
-                    const amtRaw = collateralIsETH ? toWei(amt) : toBaseUnitString(amt, collateralDecimals)
-                    const newCollateralInWei = new BigNumber(vault.collateral).plus( new BigNumber(amtRaw)).toNumber()
+                    const amtRaw = toBaseUnitBN(amt, collateralDecimals)
+                    const newCollateralInWei = new BigNumber(vault.collateral).plus(amtRaw).toNumber()
                     updateNewRatio(newCollateralInWei)
                   }}
                 />
                 <MaxButton
                   onClick={() => {
                     setAddCollateralAmt(collateralAssetBalance);
-                    const collateralBalanceRaw = collateralIsETH ? toWei(collateralAssetBalance) : toBaseUnitString(collateralAssetBalance, collateralDecimals)
-                    const newCollateral = new BigNumber(vault.collateral).plus(new BigNumber(collateralBalanceRaw)).toNumber()
+                    const collateralBalanceRaw = toBaseUnitBN(collateralAssetBalance, collateralDecimals)
+                    const newCollateral = new BigNumber(vault.collateral).plus(collateralBalanceRaw).toNumber()
                     updateNewRatio(newCollateral)
                   }}
                 />
@@ -97,7 +101,7 @@ function CollateralManagement({
                 onClick={() => {
                   collateralIsETH 
                     ? addETHCollateral(token, owner, addCollateralAmt)
-                    : addERC20Collateral(collateralAsset, token, owner, toBaseUnitString(addCollateralAmt, collateralDecimals))
+                    : addERC20Collateral(collateralAsset, token, owner, toBaseUnitBN(addCollateralAmt, collateralDecimals))
                 }}
               />
             </div>
@@ -120,18 +124,22 @@ function CollateralManagement({
                       return
                     }
                     setRemoveCollateralAmt(amt);
-                    const amtRaw = collateralIsETH ? toWei(amt) : toBaseUnitString(amt, collateralDecimals)
-                    const newCollateralWei = new BigNumber(vault.collateral).minus(new BigNumber(amtRaw)).toNumber()
+                    const amtRaw = toBaseUnitBN(amt, collateralDecimals)
+                    const newCollateralWei = new BigNumber(vault.collateral).minus(amtRaw).toNumber()
                     updateNewRatio(newCollateralWei)
                   }}
                 />
                 <MaxButton
                   onClick={() => {
-                    if (strikeValue <= 0) return;
-                    const minValueInStrike = strikePrice * vault.oTokensIssued * minRatio;
-                    const minCollateral = minValueInStrike * strikeValue;
-                    const maxToRemove = parseInt(vault.collateral - minCollateral).toString();
-                    const maxToRemoveInTokenUnit = collateralIsETH ? fromWei(maxToRemove) : toTokenUnits(maxToRemove, collateralDecimals)
+                    if (strikeValue.toNumber() <= 0) return;
+                    const strikePriceBN = new BigNumber(strikePrice)
+                    const tokenIssuedBN = new BigNumber(vault.oTokensIssued)
+                    const minRatioBN = new BigNumber(minRatio)
+                    const minCollateral = strikePriceBN.times(tokenIssuedBN).times(minRatioBN).times(strikeValue)
+                    // const minValueInStrike = strikePrice * vault.oTokensIssued * minRatio;
+                    // const minCollateral = minValueInStrike * strikeValue;
+                    const maxToRemove = new BigNumber(vault.collateral).minus(minCollateral).toString();
+                    const maxToRemoveInTokenUnit = toTokenUnitsBN(maxToRemove, collateralDecimals).toNumber()
                     setRemoveCollateralAmt(maxToRemoveInTokenUnit);
                     setNewRatio(minRatio)
                   }}
@@ -145,9 +153,7 @@ function CollateralManagement({
                 icon={<IconCircleMinus />}
                 label='Remove'
                 onClick={() => {
-                  collateralIsETH 
-                    ? removeCollateral(collateralAsset, token, removeCollateralAmt)
-                    : removeCollateral(collateralAsset, token, toBaseUnitString(removeCollateralAmt, collateralDecimals));
+                  removeCollateral(collateralAsset, token, toBaseUnitBN(removeCollateralAmt, collateralDecimals).toString());
                 }}
               />
             </div>

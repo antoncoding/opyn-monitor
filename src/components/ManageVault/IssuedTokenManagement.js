@@ -5,6 +5,10 @@ import { toBaseUnitString, handleDecimals } from '../../utils/number';
 import { calculateRatio } from '../../utils/calculation'
 import { Box, TextInput, Button, IconCirclePlus, IconCircleMinus } from '@aragon/ui';
 
+/**
+ * 
+ * @param {{strikeValue: BigNumber}} param0 
+ */
 function IssuedTokenManagement({
   isOwner,
   vault,
@@ -81,7 +85,7 @@ function IssuedTokenManagement({
                   onClick={() => {
                     if (strikePrice <= 0) return;
                     const maxTotal =
-                      (vault.collateral) / (minRatio * strikePrice * strikeValue);
+                      (vault.collateral) / (minRatio * strikePrice * strikeValue.toNumber());
                     const maxToIssueRaw = parseInt(maxTotal) - vault.oTokensIssued;
                     const maxToIssue = maxToIssueRaw / 10 ** decimals;
                     setIssueAmt(maxToIssue);
