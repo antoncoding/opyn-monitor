@@ -32,7 +32,7 @@ function RemoveLiquidity({
   liquidityTokenDecimals,
   liquidityTokenSupply
 }) {
-  const SLIPPAGE_RATE = 3;
+  const SLIPPAGE_RATE = 2;
 
   const [amtLiquidityTokenToSell, setAmtLiquidityTokenToSell] = useState(new BigNumber(0));
 
@@ -42,7 +42,6 @@ function RemoveLiquidity({
 
   const minETHReceived = estETHRecieved.times( new BigNumber(100 - SLIPPAGE_RATE)).div(new BigNumber(100))
   const minTokenReceived = estOTokenReceived.times( new BigNumber(100 - SLIPPAGE_RATE)).div(new BigNumber(100))
-  
   const onChangeTokenAmtToSend = (tokenAmt) => {
     if(!tokenAmt) {
       setAmtLiquidityTokenToSell(new BigNumber(0))

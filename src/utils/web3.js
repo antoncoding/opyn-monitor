@@ -269,7 +269,7 @@ export const addLiquidity = async (oToken, uniswapAddr, maxToken, minLiquidity, 
       maxToken, // max_tokens
       deadline // deadline
     )
-    .send({ from: account, value: ethInWei - 1 })
+    .send({ from: account, value: ethInWei })
     .on('transactionHash', (hash) => {
       notify.hash(hash);
     });

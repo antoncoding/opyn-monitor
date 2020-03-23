@@ -29,7 +29,7 @@ function AddLiquidity({
   liquidityTokenDecimals,
   liquidityTokenSupply
 }) {
-  const SLIPPAGE_RATE = 3;
+  const SLIPPAGE_RATE = 2;
 
 
   const [amtETHToAdd, setAmtETHToAdd] = useState(new BigNumber(0));
