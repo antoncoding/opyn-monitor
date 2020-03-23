@@ -67,3 +67,17 @@ export function compareVaultRatio(vaultA, vaultB) {
   }
   return comparison;
 }
+
+export function compareVaultIssued(vaultA, vaultB) {
+  const amountA = vaultA.oTokensIssued;
+  const amountB = vaultB.oTokensIssued;
+
+  let comparison = 0;
+  if (parseInt(amountA) > parseInt(amountB)) {
+    comparison = -1;
+  } else if (parseInt(amountA) < parseInt(amountB)) {
+    comparison = 1;
+  }
+  return comparison;
+}
+

@@ -92,6 +92,20 @@ export const getMaxLiquidatable = async (oToken, vaultOwner) => {
   return parseInt(maxVaultLiquidatable)
 }
 
+
+/**
+ * 
+ * @param {string} oToken 
+ * @param {string} tokenToExercise 
+ * @return {Promise<string>}
+ */
+export const getUnderlyingRequiredToExercise = async (oToken, tokenToExercise) => {
+  const oTokenContract = new web3.eth.Contract(optionContractABI, oToken);
+  const underlyringRequired = await oTokenContract.methods.underlyingRequiredToExercise(tokenToExercise).call();
+  // console.log(`what `, underlyringRequired)
+  return underlyringRequired
+}
+
 export const getAssetsAndOracle = async (address) => {
   const token = new web3.eth.Contract(optionContractABI, address);
   const [oracle, underlying, strike, minRatioObj, strikePriceObj] = await Promise.all([
@@ -106,6 +120,13 @@ export const getAssetsAndOracle = async (address) => {
   return { underlying, strike, minRatio, strikePrice, oracle };
 };
 
+/**
+ * 
+ * @param {string} contract 
+ * @param {string} user 
+ * @param {string} spender 
+ * @return {Promise<string>}
+ */
 export const getAllowance = async (contract, user, spender) => {
   const token = new web3.eth.Contract(optionContractABI, contract);
   const allowance = await token.methods.allowance(user, spender).call();

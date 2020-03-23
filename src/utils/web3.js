@@ -189,6 +189,33 @@ export const redeem = async(token) => {
     });
 }
 
+/**
+ * Exercise your oTokens
+ * @param {string} oTokenAddr 
+ * @param {string} underlying asset type
+ * @param {string} amountToExercise 
+ * @param {string[]} vaults vault owners
+ */
+export const exercise = async(oTokenAddr, underlying, amountToExercise, vaults) => {
+  const account = await checkConnectedAndGetAddress()
+  const oToken = new web3.eth.Contract(oTokenABI, oTokenAddr);
+  const underlyingRequired = await oToken.methods.underlyingRequiredToExercise(amountToExercise).call()
+  
+  const underlyingIsETH = underlying === ETH_ADDRESS
+
+  if (!underlyingIsETH) {
+    const allowance = await getAllowance(underlying, account, oTokenAddr)
+    if(new BigNumber(allowance).lt(underlyingRequired))
+    await approve(underlying, oTokenAddr, UINT256_MAX)
+  }
+
+  await oToken.methods
+    .exercise(amountToExercise, vaults)
+    .send({from: account, value: underlyingIsETH ? underlyingRequired : '0'})
+    .on('transactionHash', (hash) => {
+      notify.hash(hash);
+    });
+}
 
 export const approve = async (oTokenAddr, spender, amt) => {
   const account = await checkConnectedAndGetAddress()
