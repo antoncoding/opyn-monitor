@@ -4,6 +4,7 @@ import RatioTag from './RatioTag'
 import SectionTitle from './SectionTitle'
 import MaxButton from './MaxButton'
 import HelperText from './HelpText'
+import PriceSection from './PriceSection'
 import { ManageVaultButton, OpenVaultButton } from './VaultButton'
 
 export {
@@ -14,5 +15,6 @@ export {
   MaxButton,
   HelperText,
   ManageVaultButton,
-  OpenVaultButton
+  OpenVaultButton,
+  PriceSection
 }

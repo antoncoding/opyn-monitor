@@ -4,7 +4,7 @@ import { buyOTokensFromExchange, sellOTokensFromExchange } from '../../utils/web
 
 import { getPremiumToPay, getPremiumReceived } from '../../utils/infura';
 
-import { BalanceBlock, MaxButton } from '../common';
+import { BalanceBlock, MaxButton, PriceSection } from '../common';
 import { toBaseUnitBN } from '../../utils/number';
 import { Box, TextInput, Button, IconCirclePlus, IconCircleMinus } from '@aragon/ui';
 import BigNumber from 'bignumber.js';
@@ -138,18 +138,6 @@ function OptionExchange({ symbol, tokenBalance, token, exchange, decimals }) {
       </div>
     </Box>
   );
-}
-
-function PriceSection({ label, amt, symbol = '' }) {
-  if (parseFloat(amt) > 0) {
-    return (
-      <div style={{ padding: 3, opacity: 0.5 }}>
-        <span style={{ fontSize: 13 }}> {label} </span>{' '}
-        <span style={{ fontSize: 13 }}> {parseFloat(amt).toFixed(5)} </span>{' '}
-        <span style={{ fontSize: 13 }}> {symbol} </span>
-      </div>
-    );
-  } else return <div style={{ padding: 3, opacity: 0.5 }}></div>;
 }
 
 export default OptionExchange;
