@@ -1,42 +1,20 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect } from 'react';
 
 import { DataView, IdentityBadge } from '@aragon/ui';
 import VaultModal from './VaultModal';
 import { SectionTitle, RatioTag } from '../common';
 
-import { getAllVaultsForOption } from '../../utils/graph';
-import { getDecimals } from '../../utils/infura';
 import { formatDigits, compareVaultRatio, toTokenUnitsBN } from '../../utils/number';
 import { calculateRatio, calculateStrikeValueInCollateral } from '../../utils/calculation';
 
-import { options, ETH_ADDRESS } from '../../constants/options';
 
-function VaultOwnerList({ oToken, user }) {
-  const option = options.find((option) => option.addr === oToken);
-
-  const [collateralDecimals, setCollateralDecimals] = useState(18);
-
-  // like ETH:DAI option, not using other assets as collateral. vaultUseCollateral = false
+function VaultOwnerList({ oToken, user, vaults, option, collateralIsETH, collateralDecimals }) {
   const vaultUsesCollateral = option.collateral !== option.strike;
-  const collateralIsETH = option.collateral === ETH_ADDRESS;
-
+  
   const [isLoading, setIsLoading] = useState(true);
-  const [vaults, setVaults] = useState([]);
   const [vaultsWithDetail, setVaultDetail] = useState([])
 
   const [page, setPage] = useState(0)
-
-  // Get Collateral decimals if collateral is not eth
-  useMemo(async () => {
-    if (!collateralIsETH) {
-      const _decimals = await getDecimals(option.collateral);
-      setCollateralDecimals(_decimals);
-    }
-    // Get All vaults once
-    const vaults = await getAllVaultsForOption(oToken);
-    setVaults(vaults)
-
-  }, [collateralIsETH, oToken, option.collateral]);
 
   useEffect(() => {
     let isCancelled = false;

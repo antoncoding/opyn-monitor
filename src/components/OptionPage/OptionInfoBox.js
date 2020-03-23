@@ -1,11 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { Box, Split, Header, IdentityBadge } from '@aragon/ui';
+import { Box, Split, IdentityBadge } from '@aragon/ui';
+
 import { getERC20Info, getBalance } from '../../utils/infura';
 
-import { options } from '../../constants/options';
-
 function OptionOverview({ oToken, tokenName }) {
-  const option = options.find((option) => option.addr === oToken);
   const [balance, setBalance] = useState('0');
   const [totalSupply, setTotalSupply] = useState('0');
 
@@ -28,7 +26,6 @@ function OptionOverview({ oToken, tokenName }) {
 
   return (
     <>
-      <Header primary={option.name} />
       <Split
         primary={
           <Split
