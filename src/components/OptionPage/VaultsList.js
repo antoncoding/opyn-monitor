@@ -22,6 +22,9 @@ function VaultOwnerList({ oToken, user }) {
 
   const [isLoading, setIsLoading] = useState(true);
   const [vaults, setVaults] = useState([]);
+  const [vaultsWithDetail, setVaultDetail] = useState([])
+
+  const [page, setPage] = useState(0)
 
   // Get Collateral decimals if collateral is not eth
   useMemo(async () => {
@@ -29,12 +32,16 @@ function VaultOwnerList({ oToken, user }) {
       const _decimals = await getDecimals(option.collateral);
       setCollateralDecimals(_decimals);
     }
-  }, [collateralIsETH, option.collateral]);
+    // Get All vaults once
+    const vaults = await getAllVaultsForOption(oToken);
+    setVaults(vaults)
+
+  }, [collateralIsETH, oToken, option.collateral]);
 
   useEffect(() => {
     let isCancelled = false;
     const updateInfo = async () => {
-      const vaults = await getAllVaultsForOption(oToken);
+      if(vaults.length === 0) return
       const { strike, minRatio, strikePrice, oracle, collateral } = option;
 
       const strikeValueInCollateral = await calculateStrikeValueInCollateral(
@@ -65,7 +72,7 @@ function VaultOwnerList({ oToken, user }) {
         .sort(compareVaultRatio);
 
       if (!isCancelled) {
-        setVaults(vaultDetail);
+        setVaultDetail(vaultDetail);
         setIsLoading(false);
       }
     };
@@ -77,15 +84,17 @@ function VaultOwnerList({ oToken, user }) {
       isCancelled = true;
       clearInterval(id);
     };
-  }, [collateralDecimals, collateralIsETH, oToken, option, user, vaultUsesCollateral]);
+  }, [collateralDecimals, collateralIsETH, oToken, option, user, vaultUsesCollateral, vaults]);
 
   return (
     <>
       <SectionTitle title={'All Vaults'} />
       <DataView
+        page={page}
+        onPageChange={setPage}
         status={isLoading ? 'loading' : 'default'}
         fields={['Owner', 'collateral', 'Issued', 'RATIO', 'Status', '']}
-        entries={vaults}
+        entries={vaultsWithDetail}
         entriesPerPage={5}
         renderEntry={({ owner, collateral, oTokensIssued, ratio, isSafe, useCollateral }) => {
           return [
