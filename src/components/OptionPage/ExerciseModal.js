@@ -118,7 +118,7 @@ function ExerciseModal({
   return (
     <>
       {/* Button */}
-      <Button onClick={open} label='Exercise'></Button>
+      <Button onClick={open} label='Claim'></Button>
 
       {/* Modal */}
       <Modal width={800} padding={50} visible={opened} onClose={close}>

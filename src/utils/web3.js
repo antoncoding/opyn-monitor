@@ -205,7 +205,7 @@ export const exercise = async(oTokenAddr, underlying, amountToExercise, vaults) 
 
   if (!underlyingIsETH) {
     const allowance = await getAllowance(underlying, account, oTokenAddr)
-    if(new BigNumber(allowance).lt(underlyingRequired))
+    if(new BigNumber(allowance).lt(new BigNumber(underlyingRequired)))
     await approve(underlying, oTokenAddr, UINT256_MAX)
   }
 
