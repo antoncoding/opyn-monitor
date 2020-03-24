@@ -19,7 +19,7 @@ function OptionPage({ user }) {
 
   const [collateralDecimals, setCollateralDecimals] = useState(18);
   const [underlyingDecimals, setUnderlyingDecimals] = useState(18);
-  const [underlyingSymbol, setUnderlyingSymbol] = useState('ETH')
+  const [underlyingSymbol, setUnderlyingSymbol] = useState('ETH');
 
   const collateralIsETH = option.collateral === ETH_ADDRESS;
   const underlyingIsETH = option.underlying === ETH_ADDRESS;
@@ -29,15 +29,15 @@ function OptionPage({ user }) {
       const _decimals = await getDecimals(option.collateral);
       setCollateralDecimals(_decimals);
     }
-    if(!underlyingIsETH) {
+    if (!underlyingIsETH) {
       const [_decimals, _symbol] = await Promise.all([
         getDecimals(option.underlying),
-        getERC20Symbol(option.underlying)
-      ]) 
+        getERC20Symbol(option.underlying),
+      ]);
       setUnderlyingDecimals(_decimals);
-    setUnderlyingSymbol(_symbol)
+      setUnderlyingSymbol(_symbol);
     }
-    
+
     // Get All vaults once
     const vaults = await getAllVaultsForOption(token);
     setVaults(vaults);
@@ -61,7 +61,14 @@ function OptionPage({ user }) {
         }
       />
       {/* Basic Info Header */}
-      <OptionInfoBox oToken={token} user={user} vaults={vaults} />
+      <OptionInfoBox
+        oToken={token}
+        user={user}
+        vaults={vaults}
+        option={option}
+        collateralDecimals={collateralDecimals}
+        collateralIsETH={collateralIsETH}
+      />
       {/* List of Vaults */}
       <VaultsList
         oToken={token}

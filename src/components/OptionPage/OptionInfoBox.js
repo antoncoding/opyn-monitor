@@ -1,19 +1,28 @@
 import React, { useState, useEffect } from 'react';
 import { Box, Split, IdentityBadge } from '@aragon/ui';
 
-import { getERC20Info, getBalance } from '../../utils/infura';
+import BigNumber from 'bignumber.js'
 
-function OptionOverview({ oToken, tokenName }) {
-  const [balance, setBalance] = useState('0');
+import { getERC20Info, getBalance, getTokenBalance } from '../../utils/infura';
+import { toTokenUnitsBN } from '../../utils/number'
+
+function OptionOverview({ oToken, tokenName, option, collateralIsETH, collateralDecimals }) {
+  const [totalCollateral, setTotalCollateral] = useState(new BigNumber(0));
   const [totalSupply, setTotalSupply] = useState('0');
 
   useEffect(() => {
     let isCancelled = false;
     async function init() {
-      const [balance, tokenInfo] = await Promise.all([getBalance(oToken), getERC20Info(oToken)]);
-      const { totalSupply } = tokenInfo;
+      let _totalCollateral;
+      if (collateralIsETH) {
+        _totalCollateral = new BigNumber(await getBalance(oToken))
+      } else {
+        const rawCollateralBalance = await getTokenBalance(option.collateral, oToken)
+        _totalCollateral = toTokenUnitsBN(rawCollateralBalance, collateralDecimals)
+      }
+      const { totalSupply } = await getERC20Info(oToken);
       if (!isCancelled) {
-        setBalance(balance);
+        setTotalCollateral(_totalCollateral);
         setTotalSupply(totalSupply);
       }
     }
@@ -22,7 +31,7 @@ function OptionOverview({ oToken, tokenName }) {
     return () => {
       isCancelled = true;
     };
-  }, [oToken]);
+  }, [collateralDecimals, collateralIsETH, oToken, option.collateral]);
 
   return (
     <>
@@ -35,8 +44,8 @@ function OptionOverview({ oToken, tokenName }) {
               </Box>
             }
             secondary={
-              <Box heading={'balance'} padding={15}>
-                {balance}
+              <Box heading={'Total Collateral'} padding={15}>
+                {totalCollateral.toNumber()}
               </Box>
             }
           />
