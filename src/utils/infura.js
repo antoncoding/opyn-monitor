@@ -7,6 +7,8 @@ const oracleABI = require('../constants/abi/Oracle.json');
 const Promise = require('bluebird');
 const web3 = new Web3('https://mainnet.infura.io/v3/44fd23cda65746a699a5d3c0e2fa45d5');
 
+const ETH_ADDR = '0x0000000000000000000000000000000000000000'
+
 // ERC20 Info
 
 /**
@@ -156,16 +158,15 @@ export const getPrice = async (oracleAddr, token) => {
 };
 
 // Option Exchange
-export const getPremiumToPay = async (exchangeAddr, tokenToBuy, buyAmt) => {
+export const getPremiumToPay = async (exchangeAddr, tokenToBuy, buyAmt, paymentToken=ETH_ADDR) => {
   const exchange = new web3.eth.Contract(optionExchangeABI, exchangeAddr);
-  const paymentToken = '0x0000000000000000000000000000000000000000';
   const premiumToPay = await exchange.methods.premiumToPay(tokenToBuy, paymentToken, buyAmt).call();
-  return web3.utils.fromWei(premiumToPay);
+  return premiumToPay
 };
 
 export const getPremiumReceived = async (exchangeAddr, tokenToSell, sellAmt) => {
   const exchange = new web3.eth.Contract(optionExchangeABI, exchangeAddr);
-  const payoutToken = '0x0000000000000000000000000000000000000000';
+  const payoutToken = ETH_ADDR;
   const premiumReceived = await exchange.methods
     .premiumReceived(tokenToSell, payoutToken, sellAmt)
     .call();

@@ -91,6 +91,7 @@ function VaultOwnerList({ oToken, user, vaults, option, collateralIsETH, collate
               decimals={option.decimals}
               oToken={oToken}
               owner={owner}
+              exchange={option.exchange}
               collateral={collateral}
               collateralAsset={option.collateral}
               collateralDecimals={collateralDecimals}
