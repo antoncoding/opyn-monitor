@@ -1,10 +1,10 @@
 // const prefix = 'https://cors-anywhere-anton.herokuapp.com/';
-const opynGraphEndpoint = 'https://api.thegraph.com/subgraphs/name/aparnakr/opyn'
+const opynGraphEndpoint = 'https://api.thegraph.com/subgraphs/name/aparnakr/opyn';
 
 /**
  * @return {Promise<Array<{colalteral: string, oTokensIssued: string, owner: string}>>}
  */
-export async function getAllVaultsForOption(optionAddress){
+export async function getAllVaultsForOption(optionAddress) {
   const query = `
   {
     vaults(where: {
@@ -14,13 +14,13 @@ export async function getAllVaultsForOption(optionAddress){
       oTokensIssued,
       collateral,
     }
-  }`
-  const response = await postQuery(query)
-  const vaults = response.data.vaults
-  return vaults
+  }`;
+  const response = await postQuery(query);
+  const vaults = response.data.vaults;
+  return vaults;
 }
 
-export async function getAllVaultsForUser(owner){
+export async function getAllVaultsForUser(owner) {
   const query = `{
     vaults (where: {owner: "${owner}"}) {
       optionsContract {
@@ -29,16 +29,16 @@ export async function getAllVaultsForUser(owner){
       oTokensIssued,
       collateral,
     }
-  }`
-  const response = await postQuery(query)
-  const actions = response.data.vaults
-  return actions
+  }`;
+  const response = await postQuery(query);
+  const actions = response.data.vaults;
+  return actions;
 }
 
 export async function getLiquidationHistory(owner) {
   const query = liquidationActionsQuery(owner);
-  const response = await postQuery(query)
-  return response.data.liquidateActions
+  const response = await postQuery(query);
+  return response.data.liquidateActions;
 }
 
 const liquidationActionsQuery = (owner) => `{
@@ -58,7 +58,7 @@ const liquidationActionsQuery = (owner) => `{
   }
 }
 
-`
+`;
 
 /**
  * Get all exercise history for one user
@@ -78,10 +78,10 @@ export async function getExerciseHistory(owner, option) {
       transactionHash
       timestamp
     }
-  }`
+  }`;
 
-  const response = await postQuery(query)
-  return response.data.exerciseActions
+  const response = await postQuery(query);
+  return response.data.exerciseActions;
 }
 
 const postQuery = async (query) => {
@@ -89,7 +89,7 @@ const postQuery = async (query) => {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ query }),
-  }
-  const res = await fetch(opynGraphEndpoint,  options)
-  return await res.json()
-}
+  };
+  const res = await fetch(opynGraphEndpoint, options);
+  return await res.json();
+};
