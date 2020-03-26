@@ -9,7 +9,7 @@ import OptionInfoBox from './OptionInfoBox';
 import { getDecimals, getERC20Symbol } from '../../utils/infura';
 import { getAllVaultsForOption } from '../../utils/graph';
 
-import { options, ETH_ADDRESS } from '../../constants/options';
+import { options, ETH_ADDRESS } from '../../constants/contracts';
 
 function OptionPage({ user }) {
   let { token } = useParams();

@@ -6,7 +6,7 @@ import { getTokenBalance, getBalance, getERC20Info } from '../../utils/infura';
 import { toTokenUnitsBN } from '../../utils/number'
 
 
-import { options } from '../../constants/options';
+import { options } from '../../constants/contracts';
 
 import DashBoard from './Header';
 import OptionExchange from './OptionExchange'

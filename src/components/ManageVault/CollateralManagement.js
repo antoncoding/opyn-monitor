@@ -9,7 +9,7 @@ import { Box, TextInput, Button, IconCirclePlus, IconCircleMinus } from '@aragon
 
 import { formatDigits, toTokenUnitsBN, toBaseUnitBN } from '../../utils/number'
 import { calculateRatio } from '../../utils/calculation'
-import { ETH_ADDRESS } from '../../constants/options';
+import { ETH_ADDRESS } from '../../constants/contracts';
 
 /**
  * 

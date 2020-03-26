@@ -5,7 +5,7 @@ import { buyOTokensFromExchange, sellOTokensFromExchange } from '../../utils/web
 import { getPremiumToPay, getPremiumReceived } from '../../utils/infura';
 
 import { BalanceBlock, MaxButton, PriceSection } from '../common';
-import { toBaseUnitBN } from '../../utils/number';
+import { toBaseUnitBN, fromWei } from '../../utils/number';
 import { Box, TextInput, Button, IconCirclePlus, IconCircleMinus } from '@aragon/ui';
 import BigNumber from 'bignumber.js';
 
@@ -30,7 +30,7 @@ function OptionExchange({ symbol, tokenBalance, token, exchange, decimals }) {
     }
     const amount = toBaseUnitBN(butAmountBN, decimals).toString();
     const premium = await getPremiumToPay(exchange, token, amount);
-    setPremiumToPay(new BigNumber(premium));
+    setPremiumToPay(new BigNumber(fromWei(premium)));
   };
 
   const updatePremiumReceived = async (sellAmt) => {

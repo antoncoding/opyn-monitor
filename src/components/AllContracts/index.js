@@ -1,6 +1,6 @@
 import React from 'react';
 import { useHistory } from 'react-router-dom';
-import { options } from '../../constants/options';
+import { options } from '../../constants/contracts';
 
 import { Header, DataView, IdentityBadge, Button } from '@aragon/ui';
 

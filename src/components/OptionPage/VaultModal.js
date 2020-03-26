@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 
-import { liquidate, addERC20Collateral, addETHCollateral } from '../../utils/web3';
+import { liquidate, addERC20Collateral, addETHCollateral, flashloanLiquidate } from '../../utils/web3';
 import { getMaxLiquidatable } from '../../utils/infura';
 import { toTokenUnitsBN, toBaseUnitBN, formatDigits } from '../../utils/number';
 import { RatioTag } from '../common';
@@ -114,15 +114,27 @@ function VaultModal({ useCollateral, oToken, owner, collateral, isSafe, oTokensI
               </>
             }
             secondary={
+              // <Button
+              //   wide={true}
+              //   disabled={isSafe}
+              //   label='Liquidate'
+              //   onClick={() => {
+              //     liquidate(
+              //       oToken, 
+              //       owner, 
+              //       toBaseUnitBN(liquidateAmt,decimals)
+              //     );
+              //   }}
+              // />
               <Button
                 wide={true}
-                disabled={isSafe}
-                label='Liquidate'
+                // disabled={isSafe}
+                label='Liquidate With Aave'
                 onClick={() => {
-                  liquidate(
+                  flashloanLiquidate(
                     oToken, 
                     owner, 
-                    toBaseUnitBN(liquidateAmt,decimals)
+                    // toBaseUnitBN(liquidateAmt,decimals)
                   );
                 }}
               />

@@ -1,7 +1,7 @@
 import React, { useState, useMemo } from 'react';
 
 import { Header, DataView, IdentityBadge } from '@aragon/ui';
-import { options, ETH_ADDRESS } from '../../constants/options';
+import { options, ETH_ADDRESS } from '../../constants/contracts';
 import { SectionTitle, ManageVaultButton, OpenVaultButton } from '../common';
 import { getAllVaultsForUser } from '../../utils/graph';
 import { formatDigits, compareVaultRatio, toTokenUnitsBN } from '../../utils/number';

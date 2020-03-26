@@ -15,7 +15,7 @@ import { getTokenBalance, getBalance, getDecimals } from '../../utils/infura';
 import { getAllVaultsForUser } from '../../utils/graph';
 import { redeem } from '../../utils/web3';
 
-import { options, ETH_ADDRESS } from '../../constants/options';
+import { options, ETH_ADDRESS } from '../../constants/contracts';
 import BigNumber from 'bignumber.js';
 
 function ManageVault({ user }) {
