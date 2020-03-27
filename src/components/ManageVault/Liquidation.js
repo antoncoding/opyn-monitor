@@ -9,8 +9,8 @@ import { getLiquidationHistory } from '../../utils/graph';
 import { formatDigits, fromWei, toTokenUnitsBN, timeSince, toBaseUnitBN } from '../../utils/number';
 
 /**
- * 
- * @param {{userTokenBalance: BigNumber}} param0 
+ *
+ * @param {{userTokenBalance: BigNumber}} param0
  */
 function LiquidationHistory({ owner, token, isOwner, tokenDecimals, userTokenBalance }) {
   const [maxLiquidatable, setMaxLiquidatable] = useState(0);
@@ -33,7 +33,10 @@ function LiquidationHistory({ owner, token, isOwner, tokenDecimals, userTokenBal
       const actions = await getLiquidationHistory(owner);
       const actionsForThisVault = actions.filter(
         (entry) => entry.vault.optionsContract.address === token
-      );
+      ).sort((actionA, actionB) => {
+        if(actionA.timestamp > actionB.timestamp) return -1;
+        return 1
+      });
       setEntries(actionsForThisVault);
       setIsLoading(false);
     }
@@ -42,7 +45,9 @@ function LiquidationHistory({ owner, token, isOwner, tokenDecimals, userTokenBal
 
   return (
     <>
-      {isOwner ? <></> : (
+      {isOwner ? (
+        <></>
+      ) : (
         <Box heading={'Liquidate'}>
           <>
             <div style={{ display: 'flex' }}>
@@ -75,7 +80,10 @@ function LiquidationHistory({ owner, token, isOwner, tokenDecimals, userTokenBal
                       disabled={maxLiquidatable <= 0}
                       label='Liquidate'
                       onClick={() => {
-                        const amtToLiquidate = toBaseUnitBN(amountToLiquidate, tokenDecimals).toString();
+                        const amtToLiquidate = toBaseUnitBN(
+                          amountToLiquidate,
+                          tokenDecimals
+                        ).toString();
                         liquidate(token, owner, amtToLiquidate);
                       }}
                     />
