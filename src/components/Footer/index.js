@@ -21,6 +21,7 @@ function Footer({theme}) {
       <Link  external={true} href="https://opyn.co/#/">Opyn</Link>{', '} 
       <Link  external={true} href="https://ui.aragon.org/">Aragon UI</Link>{', '}  
       <Link  external={true} href="https://www.blocknative.com/">Blocknative</Link>{'. '}  
+      <Link  external={true} href="https://www.kollateral.co/">Kollateral</Link>{'. '}  
       Hosted on <Link  external={true} href="https://github.com/antoncoding/opyn-liquidator">GitHub</Link>.
     </div>
   )

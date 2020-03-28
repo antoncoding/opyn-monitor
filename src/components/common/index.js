@@ -5,6 +5,7 @@ import SectionTitle from './SectionTitle'
 import MaxButton from './MaxButton'
 import HelperText from './HelpText'
 import PriceSection from './PriceSection'
+import Comment from './Comment'
 import { ManageVaultButton, OpenVaultButton } from './VaultButton'
 
 export {
@@ -16,5 +17,6 @@ export {
   HelperText,
   ManageVaultButton,
   OpenVaultButton,
-  PriceSection
+  PriceSection,
+  Comment,
 }

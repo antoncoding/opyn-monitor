@@ -3,6 +3,7 @@ import { useHistory } from 'react-router-dom';
 import { options } from '../../constants/contracts';
 
 import { Header, DataView, IdentityBadge, Button } from '@aragon/ui';
+import { Comment } from '../common'
 
 function AllContracts() {
   const history = useHistory();
@@ -12,7 +13,7 @@ function AllContracts() {
   return (
     <>
       <Header primary='All Contracts' />
-      <div style={{padding: 5, opacity:0.5}}> Choose an option contract to proceed </div>
+      <Comment text='Choose an option contract to proceed.' />
       <DataView
         fields={['Name', 'Contract', '']}
         entries={options}

@@ -2,7 +2,7 @@ import React, { useState, useMemo } from 'react';
 
 import { Header, DataView, IdentityBadge } from '@aragon/ui';
 import { options, ETH_ADDRESS } from '../../constants/contracts';
-import { SectionTitle, ManageVaultButton, OpenVaultButton } from '../common';
+import { SectionTitle, ManageVaultButton, OpenVaultButton, Comment } from '../common';
 import { getAllVaultsForUser } from '../../utils/graph';
 import { formatDigits, compareVaultRatio, toTokenUnitsBN } from '../../utils/number';
 import { calculateRatio, calculateStrikeValueInCollateral } from '../../utils/calculation';
@@ -105,7 +105,7 @@ function MyVaults({ user }) {
         </>
       ) : (
         // Not connected to wallet
-        <div style={{ padding: 5, opacity: 0.5 }}> Please connect wallet to proceed </div>
+        <Comment text='Please connect wallet to proceed.' />
       )}
     </>
   );
