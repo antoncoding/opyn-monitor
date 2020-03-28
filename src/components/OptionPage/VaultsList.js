@@ -88,12 +88,10 @@ function VaultOwnerList({ oToken, user, vaults, option, collateralIsETH, collate
             formatDigits(ratio, 5),
             RatioTag({ isSafe, ratio, useCollateral }),
             <VaultModal
-              decimals={option.decimals}
+              option={option}
               oToken={oToken}
               owner={owner}
-              exchange={option.exchange}
               collateral={collateral}
-              collateralAsset={option.collateral}
               collateralDecimals={collateralDecimals}
               isSafe={isSafe}
               useCollateral={useCollateral}

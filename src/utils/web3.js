@@ -4,21 +4,26 @@ import Onboard from 'bnc-onboard';
 
 import { notify } from './blockNative';
 import { getAllowance, getPremiumToPay } from './infura';
-import { ETH_ADDRESS, DAI, ERC20_Liquidator, AAVE_LENDING } from '../constants/contracts';
+import { ETH_ADDRESS, DAI, ERC20_Liquidator, AAVE_LENDING, Kollateral_Liquidator, Kollateral_Invoker, KETH } from '../constants/contracts';
 
 const oTokenABI = require('../constants/abi/OptionContract.json');
 const exchangeABI = require('../constants/abi/OptionExchange.json');
 const uniswapExchangeABI = require('../constants/abi/UniswapExchange.json');
 const aaveABI = require('../constants/abi/LendingPool.json');
+const invokerABI = require('../constants/abi/KollateralInvoker.json');
 
 const DEADLINE_FROM_NOW = 60 * 15;
 const UINT256_MAX = '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff';
+
+const INFURA_KEY = process.env.REACT_APP_INFURA_KEY
+const BLOCKNATIVE_KEY = process.env.REACT_APP_BLOCKNATIVE_KEY
+const FORTMATIC_KEY = process.env.REACT_APP_FORTMATIC_KEY
 
 const storedTheme = window.localStorage.getItem('theme');
 
 const onboard = Onboard({
   darkMode: storedTheme === 'dark',
-  dappId: '7e7c9d55-dd5e-4ee1-bc38-edf27b59ce06', // [String] The API key created by step one above
+  dappId: BLOCKNATIVE_KEY, // [String] The API key created by step one above
   networkId: 1, // [Integer] The Ethereum network ID your Dapp uses.
   subscriptions: {
     wallet: (wallet) => {
@@ -31,11 +36,11 @@ const onboard = Onboard({
       { walletName: 'metamask' },
       {
         walletName: 'walletConnect',
-        infuraKey: '44fd23cda65746a699a5d3c0e2fa45d5',
+        infuraKey: INFURA_KEY,
       },
       {
         walletName: 'fortmatic',
-        apiKey: 'pk_live_3009900A5E842CD5',
+        apiKey: FORTMATIC_KEY,
       },
       { walletName: 'trust' },
       { walletName: 'coinbase' },
@@ -87,7 +92,7 @@ export const liquidate = async (oTokenAddr, owner, liquidateAmt) => {
     });
 };
 
-export const flashloanLiquidate = async (oTokenAddr, optionExchange, owner) => {
+export const aaveLiquidate = async (oTokenAddr, optionExchange, owner) => {
   const account = await checkConnectedAndGetAddress();
   const oTokenAddressBytes = web3.utils.hexToBytes(web3.utils.toHex(oTokenAddr));
   const vaultAddressBytes = web3.utils.hexToBytes(web3.utils.toHex(owner));
@@ -118,6 +123,46 @@ export const flashloanLiquidate = async (oTokenAddr, optionExchange, owner) => {
       notify.hash(hash);
     });
 };
+
+/**
+ * 
+ * @param {string} oTokenAddr 
+ * @param {string} optionExchange 
+ * @param {string} owner 
+ * @param {string} paymentToken payment token address
+ */
+export const kollateralLiquidate = async (oTokenAddr ,optionExchange, owner, paymentToken) => {
+  const account = await checkConnectedAndGetAddress();
+
+  const oToken = new web3.eth.Contract(oTokenABI, oTokenAddr);
+  const amountOTokens = await oToken.methods.maxOTokensLiquidatable(owner).call();
+
+  if(new BigNumber(amountOTokens).lte(new BigNumber(0))) {
+    throw new Error(`Nothing to liquidate`)
+  }
+
+  const premiumToPay = await getPremiumToPay(
+    optionExchange, // exchange
+    oTokenAddr,
+    amountOTokens,
+    paymentToken === KETH ? ETH_ADDRESS : paymentToken
+  );
+
+  const kollateralInvoker = new web3.eth.Contract(invokerABI, Kollateral_Invoker);
+
+  const data = web3.eth.abi.encodeParameters(["address", "address"], [owner, oTokenAddr]) 
+  await kollateralInvoker.methods
+    .invoke(
+      Kollateral_Liquidator, // invokeTo
+      data, // invokeData
+      paymentToken, // tokenAddress: Dai, ETH, 
+      premiumToPay
+    )
+    .send({from: account})
+    .on('transactionHash', (hash) => {
+      notify.hash(hash);
+    });
+}
 
 export const burnOToken = async (oTokenAddr, burnAmt) => {
   const account = await checkConnectedAndGetAddress();

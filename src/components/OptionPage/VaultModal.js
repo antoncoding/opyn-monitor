@@ -1,16 +1,6 @@
 import React, { useState, useEffect } from 'react';
 
 import {
-  liquidate,
-  addERC20Collateral,
-  addETHCollateral,
-  flashloanLiquidate,
-} from '../../utils/web3';
-import { getMaxLiquidatable } from '../../utils/infura';
-import { toTokenUnitsBN, toBaseUnitBN, formatDigits } from '../../utils/number';
-import { RatioTag } from '../common';
-
-import {
   Header,
   Button,
   Modal,
@@ -21,26 +11,38 @@ import {
   IconEthereum,
   IconConnect,
   DataView,
+  useToast,
 } from '@aragon/ui';
+
+import { RatioTag, Comment } from '../common';
+
+import {
+  liquidate,
+  addERC20Collateral,
+  addETHCollateral,
+  kollateralLiquidate,
+} from '../../utils/web3';
+import { getMaxLiquidatable } from '../../utils/infura';
+import { toTokenUnitsBN, toBaseUnitBN, formatDigits } from '../../utils/number';
+import { KETH, DAI, USDC } from '../../constants/contracts';
 
 /**
  *
- * @param {{collateral: string, oTokensIssued: string collateralDecimals:Number, decimals:Number, exchange:string}} param0
+ * @param {{ option:{decimals:string, exchange:string, collateral:string, symbol:string} oTokensIssued: string collateralDecimals:Number, exchange:string}} param0
  */
 function VaultModal({
+  option,
   useCollateral,
   oToken,
   owner,
-  collateral,
+  collateral, // amount of collateral of this vault
   isSafe,
   oTokensIssued,
   ratio,
-  decimals,
-  collateralAsset,
   collateralIsETH,
   collateralDecimals,
-  exchange,
 }) {
+  const toast = useToast()
   const [opened, setOpened] = useState(false);
   const [addValue, setAddValue] = useState(0);
   const [liquidateAmt, setLiquidateAmt] = useState(0);
@@ -53,7 +55,7 @@ function VaultModal({
       if (!opened) return;
       const maxLiquidatable = await getMaxLiquidatable(oToken, owner);
       if (!isCancelled) {
-        setLiquidateAmt(toTokenUnitsBN(maxLiquidatable, decimals).toNumber());
+        setLiquidateAmt(toTokenUnitsBN(maxLiquidatable, option.decimals).toNumber());
       }
     }
     getData();
@@ -61,25 +63,24 @@ function VaultModal({
     return () => {
       isCancelled = true;
     };
-  }, [decimals, oToken, opened, owner]);
+  }, [option.decimals, oToken, opened, owner]);
 
   return (
     <>
       <Button onClick={open} label='More'></Button>
-      <Modal width={800} padding={50} visible={opened} onClose={close}>
+      <Modal width={900} padding={50} visible={opened} onClose={close}>
         <Header primary={'Access Position'} />
-        <Box heading={'Owner'}>
-          <IdentityBadge entity={owner} shorten={false} />
-        </Box>
+
         <DataView
-          fields={['Collateral', 'Issued', 'ratio', 'Status']}
-          entries={[{ collateral, isSafe, oTokensIssued, ratio }]}
+          fields={['Owner', 'Collateral', 'Issued', 'ratio', 'Status']}
+          entries={[{ collateral, isSafe, oTokensIssued, ratio, owner }]}
           entriesPerPage={1}
-          renderEntry={({ collateral, isSafe, oTokensIssued, ratio }) => {
+          renderEntry={({ owner, collateral, isSafe, oTokensIssued, ratio }) => {
             return [
+              <IdentityBadge entity={owner} shorten={true} />,
               formatDigits(toTokenUnitsBN(collateral, collateralDecimals), 5),
-              formatDigits(toTokenUnitsBN(oTokensIssued, decimals), 5),
-              ratio,
+              formatDigits(toTokenUnitsBN(oTokensIssued, option.decimals), 5),
+              formatDigits(ratio, 4),
               RatioTag({ isSafe, ratio, useCollateral }),
             ];
           }}
@@ -108,7 +109,7 @@ function VaultModal({
                   collateralIsETH
                     ? addETHCollateral(oToken, owner, addValue)
                     : addERC20Collateral(
-                        collateralAsset,
+                        option.collateral,
                         oToken,
                         owner,
                         toBaseUnitBN(addValue, collateralDecimals).toString()
@@ -119,13 +120,12 @@ function VaultModal({
           />
         </Box>
 
-        <br></br>
         {useCollateral ? (
           <Box heading={'Liquidate'}>
+            <Comment text={`Liquidate with your ${option.symbol}`} />
             <Split
               primary={
-                <div style={{display: 'flex'}}>
-                  {/* <BalanceBlock /> */}
+                <>
                   <TextInput
                     wide={true}
                     type='number'
@@ -134,36 +134,64 @@ function VaultModal({
                       setLiquidateAmt(event.target.value);
                     }}
                   />
-                  <Button
-                  disabled={isSafe}
-                  label='Liquidate'
-                  onClick={() => {
-                    liquidate(
-                      oToken,
-                      owner,
-                      toBaseUnitBN(liquidateAmt,decimals)
-                    );
-                  }}
-                />
-                </div>
+                </>
               }
               secondary={
-                
-                <Button
-                  wide={true}
-                  icon={<IconConnect/>}
-                  disabled={isSafe}
-                  label='Flashloan!'
-                  onClick={() => {
-                    flashloanLiquidate(
-                      oToken,
-                      exchange,
-                      owner
-                    );
-                  }}
-                />
+                <>
+                  <Button
+                    wide={true}
+                    disabled={isSafe}
+                    label='Liquidate'
+                    onClick={() => {
+                      liquidate(oToken, owner, toBaseUnitBN(liquidateAmt, option.decimals))
+                      .catch(error => {
+                        toast(error.toString())
+                      });;
+                    }}
+                  />
+                </>
               }
             />
+            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+              <Comment text={` Or `} />
+            </div>
+            <Comment text={`Liquidate with flashloan Liquidator`} />
+            <div style={{ display: 'flex' }}>
+              <Button
+                icon={<IconConnect />}
+                label={'DAI'}
+                onClick={() => {
+                  kollateralLiquidate(oToken, option.exchange, owner, DAI)
+                  .catch(error => {
+                    toast(error.toString())
+                  });
+                }}
+                wide={true}
+                selected
+              />
+              <Button
+                icon={<IconConnect />}
+                label={'USDC'}
+                onClick={() => {
+                  kollateralLiquidate(oToken, option.exchange, owner, USDC)
+                  .catch(error => {
+                    toast(error.toString())
+                  });
+                }}
+                wide={true}
+              />
+              <Button
+                icon={<IconConnect />}
+                label={'ETH'}
+                onClick={() => {
+                    kollateralLiquidate(oToken, option.exchange, owner, KETH)
+                    .catch(error => {
+                      toast(error.toString())
+                    });
+                }}
+                wide={true}
+              />
+            </div>
           </Box>
         ) : (
           <></>
