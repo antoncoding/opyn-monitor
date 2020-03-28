@@ -9,7 +9,7 @@ import {
   TextInput,
   IdentityBadge,
   IconEthereum,
-  IconConnect,
+  // IconConnect,
   DataView,
   useToast,
 } from '@aragon/ui';
@@ -20,11 +20,11 @@ import {
   liquidate,
   addERC20Collateral,
   addETHCollateral,
-  kollateralLiquidate,
+  // kollateralLiquidate,
 } from '../../utils/web3';
 import { getMaxLiquidatable } from '../../utils/infura';
 import { toTokenUnitsBN, toBaseUnitBN, formatDigits } from '../../utils/number';
-import { KETH, DAI, USDC } from '../../constants/contracts';
+// import { KETH, DAI, USDC } from '../../constants/contracts';
 
 /**
  *
@@ -152,7 +152,7 @@ function VaultModal({
                 </>
               }
             />
-            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+            {/* <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
               <Comment text={` Or `} />
             </div>
             <Comment text={`Liquidate with flashloan Liquidator`} />
@@ -191,7 +191,7 @@ function VaultModal({
                 }}
                 wide={true}
               />
-            </div>
+            </div> */}
           </Box>
         ) : (
           <></>
