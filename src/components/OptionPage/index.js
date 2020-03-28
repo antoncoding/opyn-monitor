@@ -39,7 +39,8 @@ function OptionPage({ user }) {
     }
 
     // Get All vaults once
-    const vaults = (await getAllVaultsForOption(token)).filter(vault => vault.owner !== '0x47dbb61b56c37dd47f4f208ad693062b78e4c958');
+    const vaults = (await getAllVaultsForOption(token))
+      .filter(vault => vault.owner !== '0x47dbb61b56c37dd47f4f208ad693062b78e4c958' && vault.owner !== '0xeb919adce5908185a6f6c860ab42812e83ed355a');
     setVaults(vaults);
   }, [collateralIsETH, option.collateral, option.underlying, token, underlyingIsETH]);
 
