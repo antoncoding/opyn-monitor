@@ -1,5 +1,6 @@
 import Web3 from 'web3';
 import BigNumber from 'bignumber.js';
+
 const web3 = new Web3();
 
 /**
@@ -22,9 +23,9 @@ export function toBaseUnitBN(rawAmt, decimals) {
  * @return {BigNumber}
  */
 export const toTokenUnitsBN = (tokenAmount, tokenDecimals) => {
-  const _amt = new BigNumber(tokenAmount);
-  const _digits = new BigNumber(10).pow(new BigNumber(tokenDecimals));
-  return _amt.div(_digits);
+  const amt = new BigNumber(tokenAmount);
+  const digits = new BigNumber(10).pow(new BigNumber(tokenDecimals));
+  return amt.div(digits);
 };
 
 export function formatDigits(num, percision) {
@@ -35,16 +36,16 @@ export const fromWei = web3.utils.fromWei;
 export const toWei = web3.utils.toWei;
 
 export function timeSince(timeStamp) {
-  var now = new Date(),
-    secondsPast = (now.getTime() - timeStamp) / 1000;
+  const now = new Date();
+  const secondsPast = (now.getTime() - timeStamp) / 1000;
   if (secondsPast < 60) {
-    return parseInt(secondsPast) + 's ago';
+    return `${parseInt(secondsPast, 10)}s ago`;
   }
   if (secondsPast < 3600) {
-    return parseInt(secondsPast / 60) + 'm ago';
+    return `${parseInt(secondsPast / 60, 10)}m ago`;
   }
   if (secondsPast <= 86400) {
-    return parseInt(secondsPast / 3600) + 'h ago';
+    return `${parseInt(secondsPast / 3600, 10)}h ago`;
   }
   if (secondsPast > 86400) {
     const ts = new Date(timeStamp);
@@ -53,9 +54,11 @@ export function timeSince(timeStamp) {
       .toDateString()
       .match(/ [a-zA-Z]*/)[0]
       .replace(' ', '');
-    const year = ts.getFullYear() === now.getFullYear() ? '' : ' ' + ts.getFullYear();
-    return day + ' ' + month + year;
+    const year = ts.getFullYear() === now.getFullYear() ? '' : ` ${ts.getFullYear()}`;
+    return `${day} ${month}${year}`;
   }
+
+  return timeStamp;
 }
 
 export function compareVaultRatio(vaultA, vaultB) {
@@ -76,9 +79,9 @@ export function compareVaultIssued(vaultA, vaultB) {
   const amountB = vaultB.oTokensIssued;
 
   let comparison = 0;
-  if (parseInt(amountA) > parseInt(amountB)) {
+  if (parseInt(amountA, 10) > parseInt(amountB, 10)) {
     comparison = -1;
-  } else if (parseInt(amountA) < parseInt(amountB)) {
+  } else if (parseInt(amountA, 10) < parseInt(amountB, 10)) {
     comparison = 1;
   }
   return comparison;

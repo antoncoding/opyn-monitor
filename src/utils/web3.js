@@ -1,10 +1,13 @@
+/* eslint-disable camelcase */
 import Web3 from 'web3';
 import BigNumber from 'bignumber.js';
 import Onboard from 'bnc-onboard';
 
 import { notify } from './blockNative';
 import { getAllowance, getPremiumToPay } from './infura';
-import { ETH_ADDRESS, DAI, ERC20_Liquidator, AAVE_LENDING, Kollateral_Liquidator, Kollateral_Invoker, KETH } from '../constants/contracts';
+import {
+  ETH_ADDRESS, DAI, ERC20_Liquidator, AAVE_LENDING, Kollateral_Liquidator, Kollateral_Invoker, KETH,
+} from '../constants/contracts';
 
 const oTokenABI = require('../constants/abi/OptionContract.json');
 const exchangeABI = require('../constants/abi/OptionExchange.json');
@@ -15,11 +18,13 @@ const invokerABI = require('../constants/abi/KollateralInvoker.json');
 const DEADLINE_FROM_NOW = 60 * 15;
 const UINT256_MAX = '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff';
 
-const INFURA_KEY = process.env.REACT_APP_INFURA_KEY
-const BLOCKNATIVE_KEY = process.env.REACT_APP_BLOCKNATIVE_KEY
-const FORTMATIC_KEY = process.env.REACT_APP_FORTMATIC_KEY
+const INFURA_KEY = process.env.REACT_APP_INFURA_KEY;
+const BLOCKNATIVE_KEY = process.env.REACT_APP_BLOCKNATIVE_KEY;
+const FORTMATIC_KEY = process.env.REACT_APP_FORTMATIC_KEY;
 
 const storedTheme = window.localStorage.getItem('theme');
+
+let web3;
 
 const onboard = Onboard({
   darkMode: storedTheme === 'dark',
@@ -49,7 +54,6 @@ const onboard = Onboard({
   },
 });
 
-let web3;
 
 export const updateModalMode = async (theme) => {
   const darkMode = theme === 'dark';
@@ -68,6 +72,7 @@ export const disconnect = async () => {
   onboard.walletReset();
 };
 
+// eslint-disable-next-line consistent-return
 export const checkConnectedAndGetAddress = async () => {
   let checked = false;
   try {
@@ -76,6 +81,7 @@ export const checkConnectedAndGetAddress = async () => {
     await onboard.walletSelect();
     checked = await onboard.walletCheck();
   } finally {
+    // eslint-disable-next-line no-unsafe-finally
     if (checked) return onboard.getState().address;
   }
 };
@@ -85,7 +91,7 @@ export const liquidate = async (oTokenAddr, owner, liquidateAmt) => {
   const oToken = new web3.eth.Contract(oTokenABI, oTokenAddr);
 
   await oToken.methods
-    .liquidate(owner, parseInt(liquidateAmt))
+    .liquidate(owner, liquidateAmt)
     .send({ from: account })
     .on('transactionHash', (hash) => {
       notify.hash(hash);
@@ -105,7 +111,7 @@ export const aaveLiquidate = async (oTokenAddr, optionExchange, owner) => {
     optionExchange, // exchange
     oTokenAddr,
     amountOTokens,
-    DAI
+    DAI,
   );
 
   const lendingPool = new web3.eth.Contract(aaveABI, AAVE_LENDING);
@@ -116,7 +122,7 @@ export const aaveLiquidate = async (oTokenAddr, optionExchange, owner) => {
       ERC20_Liquidator,
       DAI, // _reserve
       premiumToPay, // amount
-      data
+      data,
     )
     .send({ from: account })
     .on('transactionHash', (hash) => {
@@ -125,44 +131,44 @@ export const aaveLiquidate = async (oTokenAddr, optionExchange, owner) => {
 };
 
 /**
- * 
- * @param {string} oTokenAddr 
- * @param {string} optionExchange 
- * @param {string} owner 
+ *
+ * @param {string} oTokenAddr
+ * @param {string} optionExchange
+ * @param {string} owner
  * @param {string} paymentToken payment token address
  */
-export const kollateralLiquidate = async (oTokenAddr ,optionExchange, owner, paymentToken) => {
+export const kollateralLiquidate = async (oTokenAddr, optionExchange, owner, paymentToken) => {
   const account = await checkConnectedAndGetAddress();
 
   const oToken = new web3.eth.Contract(oTokenABI, oTokenAddr);
   const amountOTokens = await oToken.methods.maxOTokensLiquidatable(owner).call();
 
-  if(new BigNumber(amountOTokens).lte(new BigNumber(0))) {
-    throw new Error(`Nothing to liquidate`)
+  if (new BigNumber(amountOTokens).lte(new BigNumber(0))) {
+    throw new Error('Nothing to liquidate');
   }
 
   const premiumToPay = await getPremiumToPay(
     optionExchange, // exchange
     oTokenAddr,
     amountOTokens,
-    paymentToken === KETH ? ETH_ADDRESS : paymentToken
+    paymentToken === KETH ? ETH_ADDRESS : paymentToken,
   );
 
   const kollateralInvoker = new web3.eth.Contract(invokerABI, Kollateral_Invoker);
 
-  const data = web3.eth.abi.encodeParameters(["address", "address"], [owner, oTokenAddr]) 
+  const data = web3.eth.abi.encodeParameters(['address', 'address'], [owner, oTokenAddr]);
   await kollateralInvoker.methods
     .invoke(
       Kollateral_Liquidator, // invokeTo
       data, // invokeData
-      paymentToken, // tokenAddress: Dai, ETH, 
-      premiumToPay
+      paymentToken, // tokenAddress: Dai, ETH,
+      premiumToPay,
     )
-    .send({from: account})
+    .send({ from: account })
     .on('transactionHash', (hash) => {
       notify.hash(hash);
     });
-}
+};
 
 export const burnOToken = async (oTokenAddr, burnAmt) => {
   const account = await checkConnectedAndGetAddress();
@@ -265,6 +271,17 @@ export const redeem = async (token) => {
     });
 };
 
+export const approve = async (oTokenAddr, spender, amt) => {
+  const account = await checkConnectedAndGetAddress();
+  const oToken = new web3.eth.Contract(oTokenABI, oTokenAddr);
+  await oToken.methods
+    .approve(spender, amt)
+    .send({ from: account })
+    .on('transactionHash', (hash) => {
+      notify.hash(hash);
+    });
+};
+
 /**
  * Exercise your oTokens
  * @param {string} oTokenAddr
@@ -283,24 +300,14 @@ export const exercise = async (oTokenAddr, underlying, amountToExercise, vaults)
 
   if (!underlyingIsETH) {
     const allowance = await getAllowance(underlying, account, oTokenAddr);
-    if (new BigNumber(allowance).lt(new BigNumber(underlyingRequired)))
+    if (new BigNumber(allowance).lt(new BigNumber(underlyingRequired))) {
       await approve(underlying, oTokenAddr, UINT256_MAX);
+    }
   }
 
   await oToken.methods
     .exercise(amountToExercise, vaults)
     .send({ from: account, value: underlyingIsETH ? underlyingRequired : '0' })
-    .on('transactionHash', (hash) => {
-      notify.hash(hash);
-    });
-};
-
-export const approve = async (oTokenAddr, spender, amt) => {
-  const account = await checkConnectedAndGetAddress();
-  const oToken = new web3.eth.Contract(oTokenABI, oTokenAddr);
-  await oToken.methods
-    .approve(spender, amt)
-    .send({ from: account })
     .on('transactionHash', (hash) => {
       notify.hash(hash);
     });
@@ -327,7 +334,7 @@ export const buyOTokensFromExchange = async (oTokenAddr, exchangeAddr, buyAmt, e
       account,
       oTokenAddr,
       '0x0000000000000000000000000000000000000000', // payment
-      buyAmt
+      buyAmt,
     )
     .send({ from: account, value: ethAmt })
     .on('transactionHash', (hash) => {
@@ -347,7 +354,7 @@ export const sellOTokensFromExchange = async (oTokenAddr, exchangeAddr, sellAmt)
       account,
       oTokenAddr,
       '0x0000000000000000000000000000000000000000', // payment
-      sellAmt
+      sellAmt,
     )
     .send({ from: account })
     .on('transactionHash', (hash) => {
@@ -372,7 +379,7 @@ export const addLiquidity = async (oToken, uniswapAddr, maxToken, minLiquidity, 
     .addLiquidity(
       minLiquidity, // min_liquidity
       maxToken, // max_tokens
-      deadline // deadline
+      deadline, // deadline
     )
     .send({ from: account, value: ethInWei })
     .on('transactionHash', (hash) => {

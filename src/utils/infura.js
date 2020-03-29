@@ -1,12 +1,12 @@
 import Web3 from 'web3';
 
+const Promise = require('bluebird');
 const optionContractABI = require('../constants/abi/OptionContract.json');
 const optionExchangeABI = require('../constants/abi/OptionExchange.json');
 const oracleABI = require('../constants/abi/Oracle.json');
 
-const Promise = require('bluebird');
 
-const INFURA_KEY = process.env.REACT_APP_INFURA_KEY
+const INFURA_KEY = process.env.REACT_APP_INFURA_KEY;
 
 const web3 = new Web3(`https://mainnet.infura.io/v3/${INFURA_KEY}`);
 
@@ -30,19 +30,19 @@ export const getTokenBalance = async (erc20Token, user) => {
 export const getDecimals = async (erc20Token) => {
   const oTokenContract = new web3.eth.Contract(optionContractABI, erc20Token);
   const decimals = await oTokenContract.methods.decimals().call();
-  return parseInt(decimals);
+  return parseInt(decimals, 10);
 };
 
 export const getERC20Symbol = async (erc20Token) => {
   const oTokenContract = new web3.eth.Contract(optionContractABI, erc20Token);
-  return await oTokenContract.methods.symbol().call();
+  return oTokenContract.methods.symbol().call();
 };
 
 export const getERC20Info = async (address) => {
   const token = new web3.eth.Contract(optionContractABI, address);
   const totalSupplyDecimals = await token.methods.totalSupply().call();
   const decimals = await token.methods.decimals().call();
-  const totalSupply = parseInt(totalSupplyDecimals) / 10 ** parseInt(decimals);
+  const totalSupply = parseInt(totalSupplyDecimals, 10) / 10 ** parseInt(decimals, 10);
   return { decimals, totalSupply };
 };
 
@@ -61,28 +61,11 @@ export const getVaults = async (owners, oToken) => {
     const collateral = web3.utils.fromWei(res[0]);
     const oTokensIssued = res[1];
     const underlying = res[2];
-    return { collateral, oTokensIssued, underlying, owner, oToken };
+    return {
+      collateral, oTokensIssued, underlying, owner, oToken,
+    };
   });
   return vaults;
-};
-
-/**
- * Compare user balance with max liquidatable and decide max liquidatable
- * @param {string} oToken
- * @param {string} owner
- * @param {string} liquidator
- */
-export const getMaxToLiquidate = async (oToken, owner, liquidator) => {
-  const maxVaultLiquidatable = await getMaxLiquidatable(oToken, owner);
-  const oTokenContract = new web3.eth.Contract(optionContractABI, oToken);
-  const userbalance = liquidator ? await oTokenContract.methods.balanceOf(liquidator).call() : 0;
-
-  const maxLiquidatable = Math.min(
-    parseInt(userbalance, 10),
-    parseInt(maxVaultLiquidatable, 10)
-  ).toString();
-
-  return parseInt(maxLiquidatable);
 };
 
 /**
@@ -96,8 +79,27 @@ export const getMaxLiquidatable = async (oToken, vaultOwner) => {
   const maxVaultLiquidatable = await oTokenContract.methods
     .maxOTokensLiquidatable(vaultOwner)
     .call();
-  return parseInt(maxVaultLiquidatable);
+  return maxVaultLiquidatable;
 };
+
+// /**
+//  * Compare user balance with max liquidatable and decide max liquidatable
+//  * @param {string} oToken
+//  * @param {string} owner
+//  * @param {string} liquidator
+//  */
+// export const getMaxToLiquidate = async (oToken, owner, liquidator) => {
+//   const maxVaultLiquidatable = await getMaxLiquidatable(oToken, owner);
+//   const oTokenContract = new web3.eth.Contract(optionContractABI, oToken);
+//   const userbalance = liquidator ? await oTokenContract.methods.balanceOf(liquidator).call() : 0;
+
+//   const maxLiquidatable = Math.min(
+//     parseInt(userbalance, 10),
+//     parseInt(maxVaultLiquidatable, 10),
+//   ).toString();
+
+//   return parseInt(maxLiquidatable, 10);
+// };
 
 /**
  *
@@ -125,7 +127,9 @@ export const getAssetsAndOracle = async (address) => {
   ]);
   const strikePrice = strikePriceObj[0] * 10 ** strikePriceObj[1];
   const minRatio = minRatioObj[0] * 10 ** minRatioObj[1];
-  return { underlying, strike, minRatio, strikePrice, oracle };
+  return {
+    underlying, strike, minRatio, strikePrice, oracle,
+  };
 };
 
 /**
@@ -168,7 +172,7 @@ export const getPremiumToPay = async (
   exchangeAddr,
   tokenToBuy,
   buyAmt,
-  paymentToken = ETH_ADDR
+  paymentToken = ETH_ADDR,
 ) => {
   const exchange = new web3.eth.Contract(optionExchangeABI, exchangeAddr);
   const premiumToPay = await exchange.methods.premiumToPay(tokenToBuy, paymentToken, buyAmt).call();

@@ -14,25 +14,26 @@ export const calculateStrikeValueInCollateral = async (
   collateral,
   strike,
   oracle,
-  collateralDecimals = undefined
+  collateralDecimals = undefined,
 ) => {
   const ETH_Address = '0x0000000000000000000000000000000000000000';
   let strikeValueInCollateral;
+  let decimals = collateralDecimals;
   if (collateral === ETH_Address) {
     const strikeValueInWei = await getPrice(oracle, strike);
     strikeValueInCollateral = new BigNumber(strikeValueInWei);
   } else if (collateral === strike) {
     // No collateral, like ETH option
-    if (collateralDecimals === undefined) collateralDecimals = await getDecimals(collateral);
-    strikeValueInCollateral = new BigNumber(10).pow(new BigNumber(collateralDecimals));
+    if (decimals === undefined) decimals = await getDecimals(collateral);
+    strikeValueInCollateral = new BigNumber(10).pow(new BigNumber(decimals));
   } else {
     // Use other ERC20 as collateral : Untested
-    if (collateralDecimals === undefined) collateralDecimals = await getDecimals(collateral);
+    if (decimals === undefined) decimals = await getDecimals(collateral);
     const strikeValueInWei = await getPrice(oracle, strike);
     const collateralValueInWei = await getPrice(oracle, collateral);
     strikeValueInCollateral = toBaseUnitBN(
-      parseInt(strikeValueInWei) / parseInt(collateralValueInWei),
-      collateralDecimals
+      parseInt(strikeValueInWei, 10) / parseInt(collateralValueInWei, 10),
+      decimals,
     );
   }
   return strikeValueInCollateral;

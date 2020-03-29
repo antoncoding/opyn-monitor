@@ -64,7 +64,12 @@ const liquidationActionsQuery = (owner) => `{
  * Get all exercise history for one user
  * @param {string} owner vault owner
  * @param {string} option contract address
- * @return {Promise<{amtCollateralToPay: string, exerciser:string, oTokensToExercise:string, timestamp:string, transactionHash: string}>}
+ * @return {Promise<{
+ * amtCollateralToPay: string,
+ * exerciser:string,
+ * oTokensToExercise:string,
+ * timestamp:string,
+ * transactionHash: string}>}
  */
 export async function getExerciseHistory(owner, option) {
   const query = `{
@@ -91,5 +96,5 @@ const postQuery = async (query) => {
     body: JSON.stringify({ query }),
   };
   const res = await fetch(opynGraphEndpoint, options);
-  return await res.json();
+  return res.json();
 };
