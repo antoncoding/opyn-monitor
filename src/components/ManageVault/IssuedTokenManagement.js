@@ -1,20 +1,22 @@
 import React, { useState } from 'react';
-import BigNumber from 'bignumber.js'
-
+import BigNumber from 'bignumber.js';
+import PropTypes from 'prop-types';
+import {
+  Box, TextInput, Button, IconCirclePlus, IconCircleMinus,
+} from '@aragon/ui';
 import { burnOToken, issueOToken } from '../../utils/web3';
 import { BalanceBlock, MaxButton } from '../common';
 import { toBaseUnitBN, toTokenUnitsBN } from '../../utils/number';
-import { calculateRatio } from '../../utils/calculation'
-import { Box, TextInput, Button, IconCirclePlus, IconCircleMinus } from '@aragon/ui';
+import { calculateRatio } from '../../utils/calculation';
 
 /**
- * 
+ *
  * @param {{
- * strikeValue: BigNumber, 
- * tokenBalance: BigNumber, 
- * strikePrice: Number, 
+ * strikeValue: BigNumber,
+ * tokenBalance: BigNumber,
+ * strikePrice: Number,
  * decimals: Number
- * }} param0 
+ * }} param0
  */
 function IssuedTokenManagement({
   isOwner,
@@ -32,51 +34,51 @@ function IssuedTokenManagement({
   const [burnAmt, setBurnAmt] = useState(new BigNumber(0));
 
   /**
-   * 
+   *
    * @param {BigNumber} newAmt in raw amt
    */
   const updateNewRatio = (newAmt) => {
-    if(newAmt.lte(new BigNumber(0))) return
-    const newRatio = calculateRatio(vault.collateral, newAmt, strikePrice, strikeValue)
+    if (newAmt.lte(new BigNumber(0))) return;
+    const newRatio = calculateRatio(vault.collateral, newAmt, strikePrice, strikeValue);
     setNewRatio(newRatio);
   };
 
   const onChangeIssueAmt = (intputAmt) => {
-    if (!intputAmt){
-      setIssueAmt(new BigNumber(0))
+    if (!intputAmt) {
+      setIssueAmt(new BigNumber(0));
       return;
     }
-    const amountBN = new BigNumber(intputAmt)
+    const amountBN = new BigNumber(intputAmt);
     setIssueAmt(amountBN);
     updateNewRatio(new BigNumber(vault.oTokensIssued).plus(toBaseUnitBN(amountBN, decimals)));
-  }
+  };
 
   const onClickIssueToken = () => {
     issueOToken(
-      token, 
-      toBaseUnitBN(issueAmt, decimals).toString()
+      token,
+      toBaseUnitBN(issueAmt, decimals).toString(),
     );
-  }
+  };
 
   const onChangeBurnAmt = (intputAmt) => {
-    if(!intputAmt) {
-      setBurnAmt(new BigNumber(0))
+    if (!intputAmt) {
+      setBurnAmt(new BigNumber(0));
       return;
     }
-    const amountBN = new BigNumber(intputAmt)
+    const amountBN = new BigNumber(intputAmt);
     updateNewRatio(new BigNumber(vault.oTokensIssued).minus(toBaseUnitBN(amountBN, decimals)));
     setBurnAmt(amountBN);
-  }
+  };
 
   const onClickBurnToken = () => {
     burnOToken(
-      token, 
-      toBaseUnitBN(burnAmt, decimals).toString()
+      token,
+      toBaseUnitBN(burnAmt, decimals).toString(),
     );
-  }
+  };
 
   return (
-    <Box heading={'Total Issued'}>
+    <Box heading="Total Issued">
       <div style={{ display: 'flex' }}>
         {/* total Issued */}
         <div style={{ width: '30%' }}>
@@ -91,8 +93,8 @@ function IssuedTokenManagement({
             <div style={{ width: '60%' }}>
               <>
                 <TextInput
-                  type='number'
-                  wide={true}
+                  type="number"
+                  wide
                   value={issueAmt}
                   onChange={(event) => onChangeIssueAmt(event.target.value)}
                 />
@@ -101,9 +103,9 @@ function IssuedTokenManagement({
                     if (strikePrice <= 0) return;
                     // (vault.collateral) / (minRatio * strikePrice * strikeValue.toNumber());
                     const maxTotal = new BigNumber(vault.collateral).div(
-                      new BigNumber(minRatio).times(new BigNumber(strikePrice)).times(strikeValue)
-                    )
-                      
+                      new BigNumber(minRatio).times(new BigNumber(strikePrice)).times(strikeValue),
+                    );
+
                     const maxToIssueRaw = maxTotal.minus(new BigNumber(vault.oTokensIssued));
                     const maxToIssue = toTokenUnitsBN(maxToIssueRaw, decimals);
                     setIssueAmt(maxToIssue);
@@ -115,32 +117,32 @@ function IssuedTokenManagement({
             <div style={{ width: '40%' }}>
               <Button
                 disabled={!isOwner}
-                wide={true}
+                wide
                 icon={<IconCirclePlus />}
-                label='Issue'
+                label="Issue"
                 onClick={onClickIssueToken}
               />
             </div>
           </div>
         </div>
-        <div style={{ width: '6%' }}></div>
+        <div style={{ width: '6%' }} />
         {/* Remove collateral */}
         <div style={{ width: '32%', paddingTop: '2%' }}>
           <div style={{ display: 'flex' }}>
             <div style={{ width: '60%' }}>
               <>
                 <TextInput
-                  type='number'
-                  wide={true}
+                  type="number"
+                  wide
                   value={burnAmt}
                   onChange={(event) => onChangeBurnAmt(event.target.value)}
                 />
                 <MaxButton
                   onClick={() => {
-                    const issued = toTokenUnitsBN(vault.oTokensIssued, decimals)
+                    const issued = toTokenUnitsBN(vault.oTokensIssued, decimals);
                     const maxToBurn = tokenBalance.lt(issued) ? tokenBalance : issued; // min (issued, tokenBalance)
                     setBurnAmt(maxToBurn);
-                    updateNewRatio(issued.minus(maxToBurn))
+                    updateNewRatio(issued.minus(maxToBurn));
                   }}
                 />
               </>
@@ -148,9 +150,9 @@ function IssuedTokenManagement({
             <div style={{ width: '40%' }}>
               <Button
                 disabled={!isOwner}
-                wide={true}
+                wide
                 icon={<IconCircleMinus />}
-                label='Burn'
+                label="Burn"
                 onClick={onClickBurnToken}
               />
             </div>
@@ -160,5 +162,21 @@ function IssuedTokenManagement({
     </Box>
   );
 }
+
+IssuedTokenManagement.propTypes = {
+  isOwner: PropTypes.bool.isRequired,
+  vault: PropTypes.shape({
+    oTokensIssued: PropTypes.string,
+    collateral: PropTypes.string,
+  }).isRequired,
+  tokenBalance: PropTypes.instanceOf(BigNumber).isRequired,
+  token: PropTypes.string.isRequired,
+  strikeValue: PropTypes.instanceOf(BigNumber).isRequired,
+  strikePrice: PropTypes.number.isRequired,
+  minRatio: PropTypes.number.isRequired,
+  decimals: PropTypes.number.isRequired,
+  symbol: PropTypes.string.isRequired,
+  setNewRatio: PropTypes.func.isRequired,
+};
 
 export default IssuedTokenManagement;

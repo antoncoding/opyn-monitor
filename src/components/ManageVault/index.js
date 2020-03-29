@@ -1,28 +1,32 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
+import PropTypes from 'prop-types';
+import {
+  Header, Tabs, Box, Timer, Button,
+} from '@aragon/ui';
 
-import { Header, Tabs, Box, Timer, Button } from '@aragon/ui';
-
+import BigNumber from 'bignumber.js';
 import HeaderDashboard from './HeaderDashboard';
 import CollateralManagement from './CollateralManagement';
 import IssuedTokenManagement from './IssuedTokenManagement';
 import LiquidationHistory from './Liquidation';
 import ExerciseHistory from './Exercise';
 
-import { formatDigits, toTokenUnitsBN } from '../../utils/number';
+import { toTokenUnitsBN } from '../../utils/number';
 import { calculateRatio, calculateStrikeValueInCollateral } from '../../utils/calculation';
 import { getTokenBalance, getBalance, getDecimals } from '../../utils/infura';
 import { getAllVaultsForUser } from '../../utils/graph';
 import { redeem } from '../../utils/web3';
 
 import { options, ETH_ADDRESS } from '../../constants/contracts';
-import BigNumber from 'bignumber.js';
 
 function ManageVault({ user }) {
-  let { token, owner } = useParams();
+  const { token, owner } = useParams();
 
-  const option = options.find((option) => option.addr === token);
-  const { decimals, symbol, oracle, strike, strikePrice, minRatio, collateral, expiry } = option;
+  const option = options.find((o) => o.addr === token);
+  const {
+    decimals, symbol, oracle, strike, strikePrice, minRatio, collateral, expiry,
+  } = option;
 
   // Tab Navigation
   const [tabSelected, setTabSelected] = useState(0);
@@ -48,52 +52,52 @@ function ManageVault({ user }) {
     let isCancelled = false;
 
     async function updateInfo() {
-      const vault = (await getAllVaultsForUser(owner)).find(
-        (vault) => vault.optionsContract.address === token
+      const vaultToManage = (await getAllVaultsForUser(owner)).find(
+        (v) => v.optionsContract.address === token,
       );
       if (vault === undefined) {
         return;
       }
       setNoVault(false);
-      let [_ownerTokenBalance, _userTokenBalance] = await Promise.all([
+      const [_ownerTokenBalance, _userTokenBalance] = await Promise.all([
         getTokenBalance(token, owner),
         getTokenBalance(token, user),
       ]);
 
       // SetUserCollateralAmount
-      let collateralBalance = new BigNumber(0)
-      let _collateralDecimals = 18;
+      let collateralBalance = new BigNumber(0);
+      let colltDecimals = 18;
 
       if (collateralIsETH) {
         collateralBalance = new BigNumber(await getBalance(user));
       } else {
-        const _tokenBalance = await getTokenBalance(collateral, user);
-        _collateralDecimals = await getDecimals(collateral);
-        collateralBalance = toTokenUnitsBN(_tokenBalance, _collateralDecimals);
+        const userColltBalance = await getTokenBalance(collateral, user);
+        colltDecimals = await getDecimals(collateral);
+        collateralBalance = toTokenUnitsBN(userColltBalance, colltDecimals);
       }
 
-      const _ownerTokenBalanceBN = toTokenUnitsBN(_ownerTokenBalance, decimals);
-      const _userTokenBalanceBN = toTokenUnitsBN(_userTokenBalance, decimals);
+      const ownerTokenBalanceBN = toTokenUnitsBN(_ownerTokenBalance, decimals);
+      const userTokenBalanceBN = toTokenUnitsBN(_userTokenBalance, decimals);
 
-      const strikeValueInCollateral = await calculateStrikeValueInCollateral(
+      const strikeValInCollt = await calculateStrikeValueInCollateral(
         collateral,
         strike,
-        oracle
+        oracle,
       );
-      const ratio = calculateRatio(
-        vault.collateral,
-        vault.oTokensIssued,
+      const currentRatio = calculateRatio(
+        vaultToManage.collateral,
+        vaultToManage.oTokensIssued,
         strikePrice,
-        strikeValueInCollateral
+        strikeValInCollt,
       );
 
       if (!isCancelled) {
         setStrikeValue(strikeValueInCollateral);
-        setVault(vault);
-        setCollateralDecimals(_collateralDecimals);
-        setOwnerTokenBalance(_ownerTokenBalanceBN);
-        setUserTokenBalance(_userTokenBalanceBN);
-        setRatio(formatDigits(ratio, 5));
+        setVault(vaultToManage);
+        setCollateralDecimals(colltDecimals);
+        setOwnerTokenBalance(ownerTokenBalanceBN);
+        setUserTokenBalance(userTokenBalanceBN);
+        setRatio(currentRatio);
         setUserCollateralAssetBalance(collateralBalance);
       }
     }
@@ -130,7 +134,7 @@ function ManageVault({ user }) {
           expiry * 1000 > Date.now() ? (
             <Timer end={new Date(expiry * 1000)} />
           ) : (
-            <Button onClick={() => redeem(token)} label={'Redeem'} />
+            <Button onClick={() => redeem(token)} label="Redeem" />
           )
         }
       />
@@ -218,5 +222,9 @@ function ManageVault({ user }) {
     </>
   );
 }
+
+ManageVault.propTypes = {
+  user: PropTypes.string.isRequired,
+};
 
 export default ManageVault;
