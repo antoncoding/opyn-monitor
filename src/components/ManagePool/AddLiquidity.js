@@ -1,33 +1,36 @@
 import React, { useState } from 'react';
-import BigNumber from 'bignumber.js'
+import PropTypes from 'prop-types';
+import BigNumber from 'bignumber.js';
+import {
+  Box, TextInput, Button, IconCirclePlus, IconEthereum,
+} from '@aragon/ui';
 import { addLiquidity } from '../../utils/web3';
 
 import { BalanceBlock, MaxButton, PriceSection } from '../common';
 import { toBaseUnitBN } from '../../utils/number';
-import { Box, TextInput, Button, IconCirclePlus, IconEthereum } from '@aragon/ui';
 
 /**
- * 
- * @param {{ 
- * poolTokenBalance: BigNumber, 
- * poolETHBalance:BigNumber, 
- * liquidityTokenSupply: BigNumber, 
- * userTokenBalance: BigNumber, 
- * userETHBalance:BigNumber 
+ *
+ * @param {{
+ * poolTokenBalance: BigNumber,
+ * poolETHBalance:BigNumber,
+ * liquidityTokenSupply: BigNumber,
+ * userTokenBalance: BigNumber,
+ * userETHBalance:BigNumber
  * uniswapExchange: string
- * }} param0 
+ * }} param0
  */
-function AddLiquidity({ 
-  otoken, 
-  otokenSymbol, 
-  otokenDecimals, 
-  userTokenBalance, 
+function AddLiquidity({
+  otoken,
+  otokenSymbol,
+  otokenDecimals,
+  userTokenBalance,
   userETHBalance,
   uniswapExchange,
-  poolTokenBalance, 
+  poolTokenBalance,
   poolETHBalance,
   liquidityTokenDecimals,
-  liquidityTokenSupply
+  liquidityTokenSupply,
 }) {
   const SLIPPAGE_RATE = 2;
 
@@ -35,8 +38,8 @@ function AddLiquidity({
   const [amtETHToAdd, setAmtETHToAdd] = useState(new BigNumber(0));
   const [amtTokenToAdd, setAmtTokenToAdd] = useState(new BigNumber(0));
 
-  const liquidityMinted = (liquidityTokenSupply.times( amtETHToAdd)).div(poolETHBalance);
-  const liquidityMintedMin = (liquidityMinted.times(new BigNumber(100 - SLIPPAGE_RATE))).div(new BigNumber(100))
+  const liquidityMinted = (liquidityTokenSupply.times(amtETHToAdd)).div(poolETHBalance);
+  const liquidityMintedMin = (liquidityMinted.times(new BigNumber(100 - SLIPPAGE_RATE))).div(new BigNumber(100));
   const ethToTokenRatio = poolETHBalance.div(poolTokenBalance);
   const tokenToEthRatio = poolTokenBalance.div(poolETHBalance);
 
@@ -44,7 +47,7 @@ function AddLiquidity({
     if (!ethAmt) {
       setAmtTokenToAdd(new BigNumber(0));
       setAmtETHToAdd(new BigNumber(0));
-      return
+      return;
     }
 
     const newTokenAmt = (new BigNumber(ethAmt).times(tokenToEthRatio));
@@ -56,7 +59,7 @@ function AddLiquidity({
     if (!tokenAmt) {
       setAmtTokenToAdd(new BigNumber(0));
       setAmtETHToAdd(new BigNumber(0));
-      return
+      return;
     }
 
     const newEthAmt = new BigNumber(tokenAmt).times(ethToTokenRatio);
@@ -65,11 +68,11 @@ function AddLiquidity({
   };
 
   return (
-    <Box heading={'Add Liquidity'}>
+    <Box heading="Add Liquidity">
       <div style={{ display: 'flex' }}>
         {/* Pool Status */}
         <div style={{ width: '30%' }}>
-          <BalanceBlock asset={`ETH Balance`} balance={userETHBalance} />
+          <BalanceBlock asset="ETH Balance" balance={userETHBalance} />
         </div>
         {/* Add Liquidity too pool */}
         <div style={{ width: '70%', paddingTop: '2%' }}>
@@ -77,10 +80,10 @@ function AddLiquidity({
             <div style={{ width: '35%', marginRight: '5%' }}>
               <>
                 <TextInput
-                  adornmentPosition='end'
+                  adornmentPosition="end"
                   adornment={otokenSymbol}
-                  type='number'
-                  wide={true}
+                  type="number"
+                  wide
                   value={amtTokenToAdd.toNumber()}
                   onChange={(event) => {
                     onChangeTokenAmtToSend(event.target.value);
@@ -95,32 +98,32 @@ function AddLiquidity({
             </div>
             <div style={{ width: '35%', marginRight: '5%' }}>
               <TextInput
-                adornmentPosition='end'
+                adornmentPosition="end"
                 adornment={<IconEthereum />}
-                type='number'
-                wide={true}
+                type="number"
+                wide
                 value={amtETHToAdd.toNumber()}
                 onChange={(event) => {
                   onChangeETHAmtToSend(event.target.value);
                 }}
               />
-              <PriceSection label='Mint' amt={liquidityMinted} symbol='Pool Tokens' />
+              <PriceSection label="Mint" amt={liquidityMinted} symbol="Pool Tokens" />
             </div>
             <div style={{ width: '30%' }}>
               <Button
-                wide={true}
+                wide
                 icon={<IconCirclePlus />}
-                label='Add Liquidity'
+                label="Add Liquidity"
                 onClick={() => {
                   const maxToken = toBaseUnitBN(amtTokenToAdd, otokenDecimals).toString();
                   const minLiquidity = toBaseUnitBN(liquidityMintedMin, liquidityTokenDecimals).toString();
-                  const ethWei = toBaseUnitBN(amtETHToAdd, 18).toString()
+                  const ethWei = toBaseUnitBN(amtETHToAdd, 18).toString();
                   addLiquidity(
                     otoken,
                     uniswapExchange,
                     maxToken,
                     minLiquidity,
-                    ethWei
+                    ethWei,
                   );
                 }}
               />
@@ -132,6 +135,17 @@ function AddLiquidity({
   );
 }
 
-
+AddLiquidity.propTypes = {
+  otoken: PropTypes.string.isRequired,
+  otokenSymbol: PropTypes.string.isRequired,
+  otokenDecimals: PropTypes.number.isRequired,
+  userTokenBalance: PropTypes.instanceOf(BigNumber).isRequired,
+  userETHBalance: PropTypes.instanceOf(BigNumber).isRequired,
+  uniswapExchange: PropTypes.string.isRequired,
+  poolTokenBalance: PropTypes.instanceOf(BigNumber).isRequired,
+  poolETHBalance: PropTypes.instanceOf(BigNumber).isRequired,
+  liquidityTokenDecimals: PropTypes.number.isRequired,
+  liquidityTokenSupply: PropTypes.instanceOf(BigNumber).isRequired,
+};
 
 export default AddLiquidity;

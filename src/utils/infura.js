@@ -38,12 +38,17 @@ export const getERC20Symbol = async (erc20Token) => {
   return oTokenContract.methods.symbol().call();
 };
 
+/**
+ *
+ * @param {*} address
+ * @return {Promise<{decimals: number, totalSupply: number}>}
+ */
 export const getERC20Info = async (address) => {
   const token = new web3.eth.Contract(optionContractABI, address);
   const totalSupplyDecimals = await token.methods.totalSupply().call();
   const decimals = await token.methods.decimals().call();
   const totalSupply = parseInt(totalSupplyDecimals, 10) / 10 ** parseInt(decimals, 10);
-  return { decimals, totalSupply };
+  return { decimals: parseInt(decimals, 10), totalSupply };
 };
 
 // Option Contract

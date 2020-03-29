@@ -36,6 +36,7 @@ function BalanceBlock({ asset, balance }) {
 BalanceBlock.propTypes = {
   asset: PropTypes.string.isRequired,
   balance: PropTypes.oneOfType([
+    PropTypes.instanceOf(BigNumber),
     PropTypes.string,
     PropTypes.number,
   ]).isRequired,

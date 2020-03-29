@@ -1,26 +1,28 @@
 import React, { useState, useEffect } from 'react';
+import PropTypes from 'prop-types';
 import { useParams } from 'react-router-dom';
 import { Header } from '@aragon/ui';
 
+import BigNumber from 'bignumber.js';
 import { getTokenBalance, getBalance, getERC20Info } from '../../utils/infura';
-import { toTokenUnitsBN } from '../../utils/number'
+import { toTokenUnitsBN } from '../../utils/number';
 
 
 import { options } from '../../constants/contracts';
 
 import DashBoard from './Header';
-import OptionExchange from './OptionExchange'
+import OptionExchange from './OptionExchange';
 
 import AddLiquidity from './AddLiquidity';
-import RemoveLiquidity from './RemoveLiquidity'
-import BigNumber from 'bignumber.js';
+import RemoveLiquidity from './RemoveLiquidity';
 
 function ManagePool({ user }) {
+  const { token } = useParams();
 
-  let { token } = useParams();
-
-  const option = options.find((option) => option.addr === token);
-  const { uniswapExchange, decimals, symbol, exchange } = option;
+  const option = options.find((o) => o.addr === token);
+  const {
+    uniswapExchange, decimals, symbol, exchange,
+  } = option;
 
   const [poolTokenBalance, setPoolTokenBalance] = useState(new BigNumber(0));
   const [userTokenBalance, setUserTokenBalance] = useState(new BigNumber(0));
@@ -35,7 +37,7 @@ function ManagePool({ user }) {
     let isCancelled = false;
 
     async function updatePoolInfo() {
-      let [exTokenBalance, exchagneETHBalance, liquidityTokenInfo] = await Promise.all([
+      const [exTokenBalance, exchagneETHBalance, liquidityTokenInfo] = await Promise.all([
         getTokenBalance(token, uniswapExchange),
         getBalance(uniswapExchange),
         getERC20Info(uniswapExchange),
@@ -63,23 +65,24 @@ function ManagePool({ user }) {
     let isCancelled = false;
 
     async function updateUserInfo() {
-      let [tokenBalance, userETHBalance, liqTokenBalance] = await Promise.all([
+      const [tokenBalance, userEthBalance, liqTokenBalance] = await Promise.all([
         getTokenBalance(token, user),
         getBalance(user),
         getTokenBalance(uniswapExchange, user),
       ]);
 
-      const userTokenBalance = toTokenUnitsBN(tokenBalance, decimals);
-      const userLiqTokenBalance = toTokenUnitsBN(liqTokenBalance, liquidityTokenDecimals);
+      const userOTknBalanceBN = toTokenUnitsBN(tokenBalance, decimals);
+      const userLiqTknBalanceBN = toTokenUnitsBN(liqTokenBalance, liquidityTokenDecimals);
       if (!isCancelled) {
-        setUserLiquidityTokenBalance(userLiqTokenBalance);
-        setUserETHBalance(userETHBalance);
-        setUserTokenBalance(userTokenBalance);
+        setUserLiquidityTokenBalance(userLiqTknBalanceBN);
+        setUserETHBalance(userEthBalance);
+        setUserTokenBalance(userOTknBalanceBN);
       }
     }
     updateUserInfo();
     const id = setInterval(updateUserInfo, 10000);
 
+    // eslint-disable-next-line consistent-return
     return () => {
       isCancelled = true;
       clearInterval(id);
@@ -88,7 +91,7 @@ function ManagePool({ user }) {
 
   return (
     <>
-      <Header primary='Exchange' />
+      <Header primary="Exchange" />
 
       <DashBoard
         user={user}
@@ -106,7 +109,7 @@ function ManagePool({ user }) {
         decimals={decimals}
       />
 
-      <Header primary='Provide Liquidity' />
+      <Header primary="Provide Liquidity" />
 
       <AddLiquidity
         user={user}
@@ -137,5 +140,9 @@ function ManagePool({ user }) {
     </>
   );
 }
+
+ManagePool.propTypes = {
+  user: PropTypes.string.isRequired,
+};
 
 export default ManagePool;
