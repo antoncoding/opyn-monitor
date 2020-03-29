@@ -65,6 +65,7 @@ function ExerciseModal({
   // Update user balance
   useMemo(async () => {
     if (!user) return;
+    if (!opened) return;
     let userUnderlying;
     if (underlyingIsETH) {
       userUnderlying = new BigNumber(await getBalance(user));
@@ -78,7 +79,7 @@ function ExerciseModal({
 
     setUserUnderlyingBalance(userUnderlying);
     setUserOTokenBalance(userOTkns);
-  }, [oToken, option.decimals, option.underlying, underlyingDecimals, underlyingIsETH, user]);
+  }, [oToken, option.decimals, option.underlying, underlyingDecimals, underlyingIsETH, user, opened]);
 
   const onSelectEntries = (entries, indexes) => {
     setSelectedIndexes(indexes);

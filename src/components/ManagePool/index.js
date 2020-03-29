@@ -52,7 +52,7 @@ function ManagePool({ user }) {
       }
     }
     updatePoolInfo();
-    const id = setInterval(updatePoolInfo, 10000);
+    const id = setInterval(updatePoolInfo, 15000);
 
     return () => {
       isCancelled = true;
@@ -75,12 +75,12 @@ function ManagePool({ user }) {
       const userLiqTknBalanceBN = toTokenUnitsBN(liqTokenBalance, liquidityTokenDecimals);
       if (!isCancelled) {
         setUserLiquidityTokenBalance(userLiqTknBalanceBN);
-        setUserETHBalance(userEthBalance);
+        setUserETHBalance(new BigNumber(userEthBalance));
         setUserTokenBalance(userOTknBalanceBN);
       }
     }
     updateUserInfo();
-    const id = setInterval(updateUserInfo, 10000);
+    const id = setInterval(updateUserInfo, 15000);
 
     // eslint-disable-next-line consistent-return
     return () => {

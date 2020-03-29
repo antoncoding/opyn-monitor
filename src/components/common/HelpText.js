@@ -6,17 +6,11 @@ function HelperText({ label, amt }) {
     return (
       <div style={{ padding: 3, opacity: 0.5 }}>
         <span style={{ fontSize: 13 }}>
-          {' '}
           {label}
-          {' '}
         </span>
-        {' '}
         <span style={{ fontSize: 13 }}>
-          {' '}
           {parseFloat(amt).toFixed(5)}
-          {' '}
         </span>
-        {' '}
       </div>
     );
   } return <div style={{ padding: 3, opacity: 0.5 }} />;

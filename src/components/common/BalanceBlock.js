@@ -15,14 +15,10 @@ function BalanceBlock({ asset, balance }) {
 
   return (
     <>
-      <div style={{ fontSize: 14, padding: 3 }}>
-        {' '}
-        {asset}
-        {' '}
-      </div>
+      <div style={{ fontSize: 14, padding: 3 }}>{asset}</div>
       <div style={{ padding: 3 }}>
         <span style={{ fontSize: 24 }}>{integer}</span>
-.
+        .
         <span style={{ fontSize: 18 }}>
           {' '}
           {digits}
@@ -41,6 +37,5 @@ BalanceBlock.propTypes = {
     PropTypes.number,
   ]).isRequired,
 };
-
 
 export default BalanceBlock;
