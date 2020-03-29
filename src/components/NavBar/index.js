@@ -22,13 +22,30 @@ function NavBar({ theme, updateTheme, user, setUser }) {
         ) : (
           <>
             <div style={{ height: '100%' }}>
-              <BackButton onClick={()=>{
-                history.goBack();
-              }} />
+              <BackButton
+                onClick={() => {
+                  history.goBack();
+                }}
+              />
             </div>
-            <LinkButton title='My Vaults' onClick={()=>{history.push('/myvaults/')}} />
-            <LinkButton title='All Contracts' onClick={()=>{history.push('/options/')}} />
-            <LinkButton title='Trade' onClick={()=>{history.push('/trade/')}} />
+            <LinkButton
+              title='My Vaults'
+              onClick={() => {
+                history.push('/myvaults/');
+              }}
+            />
+            <LinkButton
+              title='All Contracts'
+              onClick={() => {
+                history.push('/options/');
+              }}
+            />
+            <LinkButton
+              title='Trade'
+              onClick={() => {
+                history.push('/trade/');
+              }}
+            />
           </>
         )
       }
@@ -42,16 +59,14 @@ function NavBar({ theme, updateTheme, user, setUser }) {
   );
 }
 
-function LinkButton ({title, onClick}){
-  return(
+function LinkButton({ title, onClick }) {
+  return (
     <div style={{ paddingLeft: 40 }}>
-      <LinkBase onClick={onClick}> 
-        <div style={{padding: '1%', opacity:0.5, fontSize: 17}}>
-            {title}
-        </div>
-        </LinkBase>
+      <LinkBase onClick={onClick}>
+        <div style={{ padding: '1%', opacity: 0.5, fontSize: 17 }}>{title}</div>
+      </LinkBase>
     </div>
-  )
+  );
 }
 
 export default NavBar;
