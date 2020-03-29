@@ -8,7 +8,7 @@ import { burnOToken, issueOToken } from '../../utils/web3';
 import { BalanceBlock, MaxButton } from '../common';
 import { toBaseUnitBN, toTokenUnitsBN } from '../../utils/number';
 import { calculateRatio } from '../../utils/calculation';
-
+import * as MyPTypes from '../types';
 /**
  *
  * @param {{
@@ -165,10 +165,7 @@ function IssuedTokenManagement({
 
 IssuedTokenManagement.propTypes = {
   isOwner: PropTypes.bool.isRequired,
-  vault: PropTypes.shape({
-    oTokensIssued: PropTypes.string,
-    collateral: PropTypes.string,
-  }).isRequired,
+  vault: MyPTypes.vault.isRequired,
   tokenBalance: PropTypes.instanceOf(BigNumber).isRequired,
   token: PropTypes.string.isRequired,
   strikeValue: PropTypes.instanceOf(BigNumber).isRequired,

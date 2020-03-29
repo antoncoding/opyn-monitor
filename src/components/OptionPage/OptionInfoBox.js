@@ -1,29 +1,33 @@
 import React, { useState, useEffect } from 'react';
+import PropTypes from 'prop-types';
 import { Box, Split, IdentityBadge } from '@aragon/ui';
 
-import BigNumber from 'bignumber.js'
+import BigNumber from 'bignumber.js';
+import * as MyPTypes from '../types';
 
 import { getERC20Info, getBalance, getTokenBalance } from '../../utils/infura';
-import { toTokenUnitsBN } from '../../utils/number'
+import { toTokenUnitsBN } from '../../utils/number';
 
-function OptionOverview({ oToken, tokenName, option, collateralIsETH, collateralDecimals }) {
+function OptionOverview({
+  oToken, tokenSymbol, option, collateralIsETH, collateralDecimals,
+}) {
   const [totalCollateral, setTotalCollateral] = useState(new BigNumber(0));
   const [totalSupply, setTotalSupply] = useState('0');
 
   useEffect(() => {
     let isCancelled = false;
     async function init() {
-      let _totalCollateral;
+      let totalCollt;
       if (collateralIsETH) {
-        _totalCollateral = new BigNumber(await getBalance(oToken))
+        totalCollt = new BigNumber(await getBalance(oToken));
       } else {
-        const rawCollateralBalance = await getTokenBalance(option.collateral, oToken)
-        _totalCollateral = toTokenUnitsBN(rawCollateralBalance, collateralDecimals)
+        const rawCollateralBalance = await getTokenBalance(option.collateral, oToken);
+        totalCollt = toTokenUnitsBN(rawCollateralBalance, collateralDecimals);
       }
-      const { totalSupply } = await getERC20Info(oToken);
+      const { totalSupply: supply } = await getERC20Info(oToken);
       if (!isCancelled) {
-        setTotalCollateral(_totalCollateral);
-        setTotalSupply(totalSupply);
+        setTotalCollateral(totalCollt);
+        setTotalSupply(supply);
       }
     }
     init();
@@ -36,28 +40,38 @@ function OptionOverview({ oToken, tokenName, option, collateralIsETH, collateral
   return (
     <>
       <Split
-        primary={
+        primary={(
           <Split
-            primary={
-              <Box heading={'contract'} padding={15}>
+            primary={(
+              <Box heading="contract" padding={15}>
                 <IdentityBadge entity={oToken} shorten={false} />
               </Box>
-            }
-            secondary={
-              <Box heading={'Total Collateral'} padding={15}>
+            )}
+            secondary={(
+              <Box heading="Total Collateral" padding={15}>
                 {totalCollateral.toNumber()}
               </Box>
-            }
+            )}
           />
-        }
-        secondary={
-          <Box heading={'total supply'} padding={15}>
-            {totalSupply} {tokenName}
+        )}
+        secondary={(
+          <Box heading="total supply" padding={15}>
+            {totalSupply}
+            {' '}
+            {tokenSymbol}
           </Box>
-        }
+        )}
       />
     </>
   );
 }
+
+OptionOverview.propTypes = {
+  oToken: PropTypes.string.isRequired,
+  tokenSymbol: PropTypes.string.isRequired,
+  option: MyPTypes.option.isRequired,
+  collateralIsETH: PropTypes.bool.isRequired,
+  collateralDecimals: PropTypes.number.isRequired,
+};
 
 export default OptionOverview;

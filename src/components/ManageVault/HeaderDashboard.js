@@ -3,7 +3,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { BalanceBlock, RatioTag, HelperText } from '../common';
 import { formatDigits, toTokenUnitsBN } from '../../utils/number';
-
+import * as MyPTypes from '../types';
 
 const HeaderDashboard = ({
   ratio, minRatio, symbol, vault, decimals, newRatio, collateralDecimals, useCollateral,
@@ -60,10 +60,7 @@ HeaderDashboard.propTypes = {
   ratio: PropTypes.number.isRequired,
   minRatio: PropTypes.number.isRequired,
   symbol: PropTypes.string.isRequired,
-  vault: PropTypes.shape({
-    oTokensIssued: PropTypes.string,
-    collateral: PropTypes.string,
-  }).isRequired,
+  vault: MyPTypes.vault.isRequired,
   decimals: PropTypes.number.isRequired,
   newRatio: PropTypes.number.isRequired,
   collateralDecimals: PropTypes.number.isRequired,

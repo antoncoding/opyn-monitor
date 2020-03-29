@@ -12,6 +12,7 @@ import { BalanceBlock, MaxButton } from '../common';
 import { formatDigits, toTokenUnitsBN, toBaseUnitBN } from '../../utils/number';
 import { calculateRatio } from '../../utils/calculation';
 import { ETH_ADDRESS } from '../../constants/contracts';
+import * as MyPTypes from '../types';
 
 /**
  *
@@ -181,10 +182,7 @@ function CollateralManagement({
 
 CollateralManagement.propTypes = {
   isOwner: PropTypes.bool.isRequired,
-  vault: PropTypes.shape({
-    collateral: PropTypes.string,
-    oTokensIssued: PropTypes.string,
-  }).isRequired,
+  vault: MyPTypes.vault.isRequired,
   collateralAsset: PropTypes.string.isRequired,
   collateralAssetBalance: PropTypes.instanceOf(BigNumber).isRequired,
   token: PropTypes.string.isRequired,

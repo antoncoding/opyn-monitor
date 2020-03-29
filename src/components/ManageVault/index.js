@@ -55,9 +55,6 @@ function ManageVault({ user }) {
       const vaultToManage = (await getAllVaultsForUser(owner)).find(
         (v) => v.optionsContract.address === token,
       );
-      if (vault === undefined) {
-        return;
-      }
       setNoVault(false);
       const [_ownerTokenBalance, _userTokenBalance] = await Promise.all([
         getTokenBalance(token, owner),
@@ -119,7 +116,7 @@ function ManageVault({ user }) {
     strikePrice,
     token,
     user,
-    vaultUsesCollateral,
+    strikeValueInCollateral,
   ]);
 
   const isOwner = user === owner;

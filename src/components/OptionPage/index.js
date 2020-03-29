@@ -1,4 +1,5 @@
 import React, { useMemo, useState } from 'react';
+import PropTypes from 'prop-types';
 import { useParams } from 'react-router-dom';
 import { Header } from '@aragon/ui';
 
@@ -12,8 +13,8 @@ import { getAllVaultsForOption } from '../../utils/graph';
 import { options, ETH_ADDRESS } from '../../constants/contracts';
 
 function OptionPage({ user }) {
-  let { token } = useParams();
-  const option = options.find((option) => option.addr === token);
+  const { token } = useParams();
+  const option = options.find((o) => o.addr === token);
 
   const [vaults, setVaults] = useState([]);
 
@@ -26,8 +27,8 @@ function OptionPage({ user }) {
 
   useMemo(async () => {
     if (!collateralIsETH) {
-      const _decimals = await getDecimals(option.collateral);
-      setCollateralDecimals(_decimals);
+      const colltDecimals = await getDecimals(option.collateral);
+      setCollateralDecimals(colltDecimals);
     }
     if (!underlyingIsETH) {
       const [_decimals, _symbol] = await Promise.all([
@@ -39,16 +40,15 @@ function OptionPage({ user }) {
     }
 
     // Get All vaults once
-    const vaults = (await getAllVaultsForOption(token))
-      .filter(vault => vault.owner !== '0x47dbb61b56c37dd47f4f208ad693062b78e4c958' && vault.owner !== '0xeb919adce5908185a6f6c860ab42812e83ed355a');
-    setVaults(vaults);
+    const allVaults = await getAllVaultsForOption(token);
+    setVaults(allVaults);
   }, [collateralIsETH, option.collateral, option.underlying, token, underlyingIsETH]);
 
   return (
     <>
       <Header
         primary={option.name}
-        secondary={
+        secondary={(
           <ExerciseModal
             user={user}
             oToken={token}
@@ -59,10 +59,11 @@ function OptionPage({ user }) {
             underlyingIsETH={underlyingIsETH}
             vaults={vaults}
           />
-        }
+        )}
       />
       {/* Basic Info Header */}
       <OptionInfoBox
+        tokenSymbol={option.symbol}
         oToken={token}
         user={user}
         vaults={vaults}
@@ -82,5 +83,9 @@ function OptionPage({ user }) {
     </>
   );
 }
+
+OptionPage.propTypes = {
+  user: PropTypes.string.isRequired,
+};
 
 export default OptionPage;
