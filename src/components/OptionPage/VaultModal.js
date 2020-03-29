@@ -12,6 +12,7 @@ import {
   IconConnect,
   DataView,
   useToast,
+  Tag,
 } from '@aragon/ui';
 
 import * as MyPTypes from '../types';
@@ -162,11 +163,19 @@ function VaultModal({
             <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
               <Comment text=" Or " />
             </div>
-            <Comment text="Liquidate with flashloan Liquidator" />
+            <Comment text={(
+              <>
+                <Tag> beta </Tag>
+                Liquidate with Kollateral Flashloan
+              </>
+              )}
+            />
+
             <div style={{ display: 'flex' }}>
               <Button
                 icon={<IconConnect />}
                 label="DAI"
+                disabled={isSafe}
                 onClick={() => {
                   kollateralLiquidate(oToken, option.exchange, owner, DAI).catch((error) => {
                     toast(error.toString());
@@ -178,6 +187,7 @@ function VaultModal({
               <Button
                 icon={<IconConnect />}
                 label="USDC"
+                disabled={isSafe}
                 onClick={() => {
                   kollateralLiquidate(oToken, option.exchange, owner, USDC).catch((error) => {
                     toast(error.toString());
@@ -188,6 +198,7 @@ function VaultModal({
               <Button
                 icon={<IconConnect />}
                 label="ETH"
+                disabled={isSafe}
                 onClick={() => {
                   kollateralLiquidate(oToken, option.exchange, owner, KETH).catch((error) => {
                     toast(error.toString());
