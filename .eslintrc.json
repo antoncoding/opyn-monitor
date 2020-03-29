@@ -1,0 +1,33 @@
+{
+    "env": {
+        "browser": true,
+        "es6": true
+    },
+    "extends": [
+        "plugin:react/recommended",
+        "airbnb"
+    ],
+    "globals": {
+        "Atomics": "readonly",
+        "SharedArrayBuffer": "readonly"
+    },
+    "parserOptions": {
+        "ecmaFeatures": {
+            "jsx": true
+        },
+        "ecmaVersion": 2018,
+        "sourceType": "module"
+    },
+    "plugins": [
+        "react"
+    ],
+    "rules": {
+        "react/jsx-filename-extension": "off",
+        "prefer-destructuring": "off",
+        "no-nested-ternary": "off",
+        "max-len": ["error", { "code": 120, "ignoreTrailingComments": true }],
+        "jsx-curly-spacing": "off",
+        "no-use-before-define": "off",
+        "camelcase": "off"
+    }
+}
