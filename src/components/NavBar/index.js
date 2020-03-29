@@ -1,11 +1,14 @@
 import React, { useEffect, useState } from 'react';
+import PropTypes from 'prop-types';
 import { useHistory } from 'react-router-dom';
 
+import { Bar, BackButton, LinkBase } from '@aragon/ui';
 import ConnectButton from './ConnectButton';
 import ChangeModeButton from './SettingsButton';
-import { Bar, BackButton, LinkBase } from '@aragon/ui';
 
-function NavBar({ theme, updateTheme, user, setUser }) {
+function NavBar({
+  theme, updateTheme, user, setUser,
+}) {
   const history = useHistory();
   const [isHome, updateIsHome] = useState(true);
 
@@ -29,19 +32,19 @@ function NavBar({ theme, updateTheme, user, setUser }) {
               />
             </div>
             <LinkButton
-              title='My Vaults'
+              title="My Vaults"
               onClick={() => {
                 history.push('/myvaults/');
               }}
             />
             <LinkButton
-              title='All Contracts'
+              title="All Contracts"
               onClick={() => {
                 history.push('/options/');
               }}
             />
             <LinkButton
-              title='Trade'
+              title="Trade"
               onClick={() => {
                 history.push('/trade/');
               }}
@@ -49,15 +52,23 @@ function NavBar({ theme, updateTheme, user, setUser }) {
           </>
         )
       }
-      secondary={
+      secondary={(
         <>
           <ConnectButton user={user} setUser={setUser} />
           <ChangeModeButton theme={theme} updateTheme={updateTheme} />
         </>
-      }
-    ></Bar>
+      )}
+    />
   );
 }
+
+
+NavBar.propTypes = {
+  theme: PropTypes.string.isRequired,
+  updateTheme: PropTypes.func.isRequired,
+  user: PropTypes.string.isRequired,
+  setUser: PropTypes.func.isRequired,
+};
 
 function LinkButton({ title, onClick }) {
   return (
@@ -68,5 +79,10 @@ function LinkButton({ title, onClick }) {
     </div>
   );
 }
+
+LinkButton.propTypes = {
+  title: PropTypes.string.isRequired,
+  onClick: PropTypes.func.isRequired,
+};
 
 export default NavBar;

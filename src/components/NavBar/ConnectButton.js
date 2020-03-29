@@ -1,5 +1,8 @@
 import React, { useState } from 'react';
-import { Button, IdentityBadge, IconConnect, Box, IconPower, LinkBase } from '@aragon/ui';
+import PropTypes from 'prop-types';
+import {
+  Button, IdentityBadge, IconConnect, Box, IconPower, LinkBase,
+} from '@aragon/ui';
 
 import { connect, disconnect } from '../../utils/web3';
 
@@ -11,7 +14,6 @@ function ConnectButton({ user, setUser }) {
     if (address === false) return;
     setIsConnected(true);
     setUser(address);
-    return true;
   };
 
   const disconnectWeb3 = async () => {
@@ -22,17 +24,26 @@ function ConnectButton({ user, setUser }) {
 
   return isConnected ? (
     <>
-      <div style={{paddingTop: 5, paddingRight: 5}}>
-      <LinkBase onClick={disconnectWeb3} size='small' > <IconPower /> </LinkBase>
+      <div style={{ paddingTop: 5, paddingRight: 5 }}>
+        <LinkBase onClick={disconnectWeb3} size="small">
+          {' '}
+          <IconPower />
+          {' '}
+        </LinkBase>
       </div>
       <Box padding={6}>
         <IdentityBadge entity={user} />
       </Box>
-      
+
     </>
   ) : (
-    <Button icon={<IconConnect />} label={'Connect'} onClick={connectWeb3} />
+    <Button icon={<IconConnect />} label="Connect" onClick={connectWeb3} />
   );
 }
+
+ConnectButton.propTypes = {
+  user: PropTypes.string.isRequired,
+  setUser: PropTypes.func.isRequired,
+};
 
 export default ConnectButton;

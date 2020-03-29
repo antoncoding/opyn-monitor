@@ -1,8 +1,10 @@
 import React, { useState, useMemo } from 'react';
-
+import PropTypes from 'prop-types';
 import { Header, DataView, IdentityBadge } from '@aragon/ui';
 import { options, ETH_ADDRESS } from '../../constants/contracts';
-import { SectionTitle, ManageVaultButton, OpenVaultButton, Comment } from '../common';
+import {
+  SectionTitle, ManageVaultButton, OpenVaultButton, Comment,
+} from '../common';
 import { getAllVaultsForUser } from '../../utils/graph';
 import { formatDigits, compareVaultRatio, toTokenUnitsBN } from '../../utils/number';
 import { calculateRatio, calculateStrikeValueInCollateral } from '../../utils/calculation';
@@ -31,19 +33,19 @@ function MyVaults({ user }) {
           option.collateral,
           option.strike,
           option.oracle,
-          collateralDecimals
+          collateralDecimals,
         );
         const ratio = calculateRatio(
           entry.collateral,
           entry.oTokensIssued,
           option.strikePrice,
-          strikeValueInCollateral
+          strikeValueInCollateral,
         );
         openedVaults.push({
           oToken: option.addr,
           oTokenName: option.title,
           collateral: entry.collateral,
-          collateralDecimals: collateralDecimals,
+          collateralDecimals,
           ratio,
         });
       } else {
@@ -59,25 +61,25 @@ function MyVaults({ user }) {
 
   return (
     <>
-      <Header primary={'My Vaults'} />
+      <Header primary="My Vaults" />
       {isConnected ? (
         <>
           {opendVaults.length > 0 ? (
             <div style={{ paddingBottom: '3%' }}>
-              <SectionTitle title={'Existing Vaults'} />
+              <SectionTitle title="Existing Vaults" />
               <DataView
                 fields={['Token', 'contract', 'collateral', 'Ratio', '']}
                 entries={opendVaults}
                 entriesPerPage={6}
-                renderEntry={({ oToken, oTokenName, collateral, collateralDecimals, ratio }) => {
-                  return [
-                    oTokenName,
-                    <IdentityBadge entity={oToken} />,
-                    formatDigits(toTokenUnitsBN(collateral, collateralDecimals).toNumber(), 5),
-                    formatDigits(ratio, 4),
-                    <ManageVaultButton oToken={oToken} owner={user} />,
-                  ];
-                }}
+                renderEntry={({
+                  oToken, oTokenName, collateral, collateralDecimals, ratio,
+                }) => [
+                  oTokenName,
+                  <IdentityBadge entity={oToken} />,
+                  formatDigits(toTokenUnitsBN(collateral, collateralDecimals).toNumber(), 5),
+                  formatDigits(ratio, 4),
+                  <ManageVaultButton oToken={oToken} owner={user} />,
+                ]}
               />
             </div>
           ) : (
@@ -86,17 +88,15 @@ function MyVaults({ user }) {
           {tokensToOpen.length > 0 ? (
             // Show vaults to open
             <div>
-              <SectionTitle title={'Open new vaults'} />
+              <SectionTitle title="Open new vaults" />
               <DataView
                 fields={['Token', 'contract', 'manage']}
                 entries={tokensToOpen}
-                renderEntry={({ oToken, oTokenName }) => {
-                  return [
-                    oTokenName,
-                    <IdentityBadge entity={oToken} shorten={false} />,
-                    <OpenVaultButton oToken={oToken} user={user} />,
-                  ];
-                }}
+                renderEntry={({ oToken, oTokenName }) => [
+                  oTokenName,
+                  <IdentityBadge entity={oToken} shorten={false} />,
+                  <OpenVaultButton oToken={oToken} user={user} />,
+                ]}
               />
             </div>
           ) : (
@@ -105,10 +105,14 @@ function MyVaults({ user }) {
         </>
       ) : (
         // Not connected to wallet
-        <Comment text='Please connect wallet to proceed.' />
+        <Comment text="Please connect wallet to proceed." />
       )}
     </>
   );
 }
+
+MyVaults.propTypes = {
+  user: PropTypes.string.isRequired,
+};
 
 export default MyVaults;
