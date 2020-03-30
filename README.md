@@ -1,5 +1,4 @@
 # Opyn Vault Monitor
-https://opynmonitor.xyz
 
 This is a frontend for users to easily manage/liquidate vaults under opyn protocol, and also buy/sell options. For more information about opyn protocol, take a look at https://opyn.co/
 
