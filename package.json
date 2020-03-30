@@ -19,7 +19,6 @@
     "styled-components": "^5.0.1",
     "web3": "^1.2.6"
   },
-  "homepage": "https://antoncoding.github.io/opyn-liquidator/",
   "scripts": {
     "sync-assets": "copy-aragon-ui-assets ./public",
     "start": "npm run sync-assets && react-scripts start",
