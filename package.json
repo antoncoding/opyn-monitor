@@ -32,6 +32,16 @@
   "eslintConfig": {
     "extends": "react-app"
   },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  },
+  "lint-staged": {
+    "./src/**": [
+      "eslint --fix"
+    ]
+  },
   "browserslist": {
     "production": [
       ">0.2%",
@@ -51,6 +61,8 @@
     "eslint-plugin-jsx-a11y": "^6.2.3",
     "eslint-plugin-react": "^7.19.0",
     "eslint-plugin-react-hooks": "^2.5.1",
-    "gh-pages": "^2.2.0"
+    "gh-pages": "^2.2.0",
+    "husky": "^3.1.0",
+    "lint-staged": "^10.0.10"
   }
 }

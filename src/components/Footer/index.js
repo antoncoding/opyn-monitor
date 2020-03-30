@@ -26,7 +26,7 @@ function Footer({ theme }) {
       <Link external href="https://ui.aragon.org/">
         Aragon UI
       </Link>
-,
+      ,
       {', '}
       <Link external href="https://www.blocknative.com/">
         Blocknative
