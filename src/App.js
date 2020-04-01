@@ -7,6 +7,7 @@ import NavBar from './components/NavBar';
 import HomePage from './components/HomePage';
 import AllOptoins from './components/AllContracts';
 import Trade from './components/Trade';
+import OptionTrading from './components/OptionTrading';
 import MyVaults from './components/MyVaults';
 import OptionPage from './components/OptionPage';
 import ManageVault from './components/ManageVault';
@@ -46,6 +47,7 @@ function App() {
             <ManageVault user={user} />
           </Route>
           {/* Trade */}
+          <Route path="/trades/eth/"><OptionTrading user={user} /></Route>
           <Route path="/trade/:token/"><ManagePool user={user} /></Route>
           <Route path="/trade/">
             <Trade />
