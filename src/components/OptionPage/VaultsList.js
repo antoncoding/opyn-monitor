@@ -4,7 +4,9 @@ import { DataView, IdentityBadge } from '@aragon/ui';
 import VaultModal from './VaultModal';
 import { SectionTitle, RatioTag } from '../common';
 import * as MyPTypes from '../types';
-import { formatDigits, compareVaultRatio, toTokenUnitsBN } from '../../utils/number';
+import {
+  formatDigits, compareVaultRatio, compareVaultIssued, toTokenUnitsBN,
+} from '../../utils/number';
 import { calculateRatio, calculateStrikeValueInCollateral } from '../../utils/calculation';
 
 
@@ -59,7 +61,7 @@ function VaultOwnerList({
             oToken,
           };
         })
-        .sort(compareVaultRatio);
+        .sort(vaultUsesCollateral ? compareVaultRatio : compareVaultIssued);
 
       if (!isCancelled) {
         setVaultDetail(vaultDetail);
