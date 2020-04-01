@@ -19,7 +19,7 @@ function AllContracts() {
       <Header primary="All Contracts" />
       <Comment text="Choose an option contract to proceed." />
       <Tabs
-        items={['Insurances', 'ETH Options']}
+        items={['DeFi Insurance', 'ETH Options']}
         selected={tabSelected}
         onChange={setTabSelected}
       />

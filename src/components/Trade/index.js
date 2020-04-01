@@ -15,7 +15,7 @@ function AllContracts() {
   return (
     <>
       <Header primary="Trade" />
-      <Comment text="Buy or Sell DeFi Insurances" />
+      <Comment text="Buy or Sell DeFi Insurance" />
       <DataView
         fields={['Name', 'Contract', '']}
         entries={insurances}
