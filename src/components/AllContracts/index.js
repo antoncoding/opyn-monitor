@@ -7,8 +7,10 @@ import { eth_options, insurances } from '../../constants/contracts';
 // import { timeSince } from '../../utils/number';
 import { Comment } from '../common';
 
+const storedOptionTab = window.localStorage.getItem('optionTab');
+
 function AllContracts() {
-  const [tabSelected, setTabSelected] = useState(0);
+  const [tabSelected, setTabSelected] = useState(storedOptionTab ? parseInt(storedOptionTab, 10) : 0);
 
   const history = useHistory();
   const goToToken = (addr) => {
@@ -21,7 +23,10 @@ function AllContracts() {
       <Tabs
         items={['DeFi Insurance', 'ETH Options']}
         selected={tabSelected}
-        onChange={setTabSelected}
+        onChange={(choice) => {
+          setTabSelected(choice);
+          window.localStorage.setItem('optionTab', choice);
+        }}
       />
 
       {tabSelected === 0 ? (
