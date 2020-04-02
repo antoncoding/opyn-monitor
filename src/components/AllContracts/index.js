@@ -5,10 +5,11 @@ import {
 } from '@aragon/ui';
 import { eth_options, insurances } from '../../constants/contracts';
 import { Comment } from '../common';
+import { getPreference, storePreference } from '../../utils/storage';
 
 function AllContracts() {
-  const storedOptionTab = window.localStorage.getItem('optionTab');
-  const [tabSelected, setTabSelected] = useState(storedOptionTab ? parseInt(storedOptionTab, 10) : 0);
+  const storedOptionTab = getPreference('optionTab', '0');
+  const [tabSelected, setTabSelected] = useState(parseInt(storedOptionTab, 10));
 
   const history = useHistory();
   const goToToken = (addr) => {
@@ -23,7 +24,7 @@ function AllContracts() {
         selected={tabSelected}
         onChange={(choice) => {
           setTabSelected(choice);
-          window.localStorage.setItem('optionTab', choice);
+          storePreference('optionTab', choice.toString());
         }}
       />
 

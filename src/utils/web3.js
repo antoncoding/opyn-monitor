@@ -5,6 +5,7 @@ import Onboard from 'bnc-onboard';
 
 import { notify } from './blockNative';
 import { getAllowance, getPremiumToPay } from './infura';
+import { getPreference } from './storage';
 import {
   ETH_ADDRESS, Kollateral_Liquidator, Kollateral_Invoker, KETH,
 } from '../constants/contracts';
@@ -21,12 +22,10 @@ const INFURA_KEY = process.env.REACT_APP_INFURA_KEY;
 const BLOCKNATIVE_KEY = process.env.REACT_APP_BLOCKNATIVE_KEY;
 const FORTMATIC_KEY = process.env.REACT_APP_FORTMATIC_KEY;
 
-const storedTheme = window.localStorage.getItem('theme');
-
 let web3;
 
 const onboard = Onboard({
-  darkMode: storedTheme === 'dark',
+  darkMode: getPreference('theme', 'light') === 'dark',
   dappId: BLOCKNATIVE_KEY, // [String] The API key created by step one above
   networkId: 1, // [Integer] The Ethereum network ID your Dapp uses.
   subscriptions: {
