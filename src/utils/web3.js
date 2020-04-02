@@ -6,13 +6,12 @@ import Onboard from 'bnc-onboard';
 import { notify } from './blockNative';
 import { getAllowance, getPremiumToPay } from './infura';
 import {
-  ETH_ADDRESS, DAI, ERC20_Liquidator, AAVE_LENDING, Kollateral_Liquidator, Kollateral_Invoker, KETH,
+  ETH_ADDRESS, Kollateral_Liquidator, Kollateral_Invoker, KETH,
 } from '../constants/contracts';
 
 const oTokenABI = require('../constants/abi/OptionContract.json');
 const exchangeABI = require('../constants/abi/OptionExchange.json');
 const uniswapExchangeABI = require('../constants/abi/UniswapExchange.json');
-const aaveABI = require('../constants/abi/LendingPool.json');
 const invokerABI = require('../constants/abi/KollateralInvoker.json');
 
 const DEADLINE_FROM_NOW = 60 * 15;
@@ -92,38 +91,6 @@ export const liquidate = async (oTokenAddr, owner, liquidateAmt) => {
 
   await oToken.methods
     .liquidate(owner, liquidateAmt)
-    .send({ from: account })
-    .on('transactionHash', (hash) => {
-      notify.hash(hash);
-    });
-};
-
-export const aaveLiquidate = async (oTokenAddr, optionExchange, owner) => {
-  const account = await checkConnectedAndGetAddress();
-  const oTokenAddressBytes = web3.utils.hexToBytes(web3.utils.toHex(oTokenAddr));
-  const vaultAddressBytes = web3.utils.hexToBytes(web3.utils.toHex(owner));
-  const data = oTokenAddressBytes.concat(vaultAddressBytes);
-
-  const oToken = new web3.eth.Contract(oTokenABI, oTokenAddr);
-  const amountOTokens = await oToken.methods.maxOTokensLiquidatable(owner).call();
-
-  const premiumToPay = await getPremiumToPay(
-    optionExchange, // exchange
-    oTokenAddr,
-    amountOTokens,
-    DAI,
-  );
-
-  const lendingPool = new web3.eth.Contract(aaveABI, AAVE_LENDING);
-
-  // Use liquidator to liquidate our own position
-  await lendingPool.methods
-    .flashLoan(
-      ERC20_Liquidator,
-      DAI, // _reserve
-      premiumToPay, // amount
-      data,
-    )
     .send({ from: account })
     .on('transactionHash', (hash) => {
       notify.hash(hash);
