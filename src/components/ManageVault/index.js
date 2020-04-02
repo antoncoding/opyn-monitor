@@ -18,12 +18,12 @@ import { getTokenBalance, getBalance, getDecimals } from '../../utils/infura';
 import { getAllVaultsForUser } from '../../utils/graph';
 import { redeem } from '../../utils/web3';
 
-import { options, ETH_ADDRESS } from '../../constants/contracts';
+import { allOptions, ETH_ADDRESS } from '../../constants/contracts';
 
 function ManageVault({ user }) {
   const { token, owner } = useParams();
 
-  const option = options.find((o) => o.addr === token);
+  const option = allOptions.find((o) => o.addr === token);
   const {
     decimals, symbol, oracle, strike, strikePrice, minRatio, collateral, expiry,
   } = option;
@@ -126,7 +126,7 @@ function ManageVault({ user }) {
   ) : (
     <>
       <Header
-        primary={isOwner ? 'Manage Your Vault' : 'Vault Detail'}
+        primary={isOwner ? 'Manage My Vault' : 'Vault Detail'}
         secondary={
           expiry * 1000 > Date.now() ? (
             <Timer end={new Date(expiry * 1000)} />

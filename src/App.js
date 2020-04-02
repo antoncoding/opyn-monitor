@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import { HashRouter as Router, Switch, Route } from 'react-router-dom';
 import { Main } from '@aragon/ui';
 import { updateModalMode } from './utils/web3';
+import { storePreference, getPreference } from './utils/storage';
 import NavBar from './components/NavBar';
 import HomePage from './components/HomePage';
 import AllOptoins from './components/AllContracts';
@@ -15,7 +16,7 @@ import ManagePool from './components/ManagePool';
 import Footer from './components/Footer';
 
 function App() {
-  const storedTheme = window.localStorage.getItem('theme') || 'light';
+  const storedTheme = getPreference('theme', 'light');
 
   const [user, setUser] = useState(''); // the current connected user
   const [theme, setTheme] = useState(storedTheme);
@@ -23,7 +24,7 @@ function App() {
   const updateTheme = (newTheme) => {
     setTheme(newTheme);
     updateModalMode(newTheme);
-    window.localStorage.setItem('theme', newTheme);
+    storePreference('theme', newTheme);
   };
 
   return (

@@ -1,12 +1,14 @@
 import React, { useState, useMemo } from 'react';
 import PropTypes from 'prop-types';
 import { Header, DataView, IdentityBadge } from '@aragon/ui';
-import { options, ETH_ADDRESS } from '../../constants/contracts';
+import { allOptions, ETH_ADDRESS } from '../../constants/contracts';
 import {
   SectionTitle, ManageVaultButton, OpenVaultButton, Comment,
 } from '../common';
 import { getAllVaultsForUser } from '../../utils/graph';
-import { formatDigits, compareVaultRatio, toTokenUnitsBN } from '../../utils/number';
+import {
+  formatDigits, compareVaultRatio, toTokenUnitsBN,
+} from '../../utils/number';
 import { calculateRatio, calculateStrikeValueInCollateral } from '../../utils/calculation';
 import { getDecimals } from '../../utils/infura';
 
@@ -23,7 +25,7 @@ function MyVaults({ user }) {
     const userVaults = await getAllVaultsForUser(user);
     const openedVaults = [];
     const notOpenedTokens = [];
-    await Promise.map(options, async (option) => {
+    await Promise.map(allOptions, async (option) => {
       const entry = userVaults.find((vault) => vault.optionsContract.address === option.addr);
       const isOpened = entry !== undefined;
       const collatearlIsETH = option.collateral === ETH_ADDRESS;
@@ -48,7 +50,7 @@ function MyVaults({ user }) {
           collateralDecimals,
           ratio,
         });
-      } else {
+      } else if (option.expiry > (Date.now() / 1000)) {
         notOpenedTokens.push({
           oToken: option.addr,
           oTokenName: option.title,

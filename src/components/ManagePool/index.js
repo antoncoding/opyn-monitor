@@ -8,7 +8,7 @@ import { getTokenBalance, getBalance, getERC20Info } from '../../utils/infura';
 import { toTokenUnitsBN } from '../../utils/number';
 
 
-import { options } from '../../constants/contracts';
+import { allOptions } from '../../constants/contracts';
 
 import DashBoard from './Header';
 import OptionExchange from './OptionExchange';
@@ -19,7 +19,7 @@ import RemoveLiquidity from './RemoveLiquidity';
 function ManagePool({ user }) {
   const { token } = useParams();
 
-  const option = options.find((o) => o.addr === token);
+  const option = allOptions.find((o) => o.addr === token);
   const {
     uniswapExchange, decimals, symbol, exchange,
   } = option;

@@ -10,11 +10,11 @@ import OptionInfoBox from './OptionInfoBox';
 import { getDecimals, getERC20Symbol } from '../../utils/infura';
 import { getAllVaultsForOption } from '../../utils/graph';
 
-import { options, ETH_ADDRESS } from '../../constants/contracts';
+import { allOptions, ETH_ADDRESS } from '../../constants/contracts';
 
 function OptionPage({ user }) {
   const { token } = useParams();
-  const option = options.find((o) => o.addr === token);
+  const option = allOptions.find((o) => o.addr === token);
 
   const [vaults, setVaults] = useState([]);
 
