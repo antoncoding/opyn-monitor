@@ -6,9 +6,18 @@ import { formatDigits, toTokenUnitsBN } from '../../utils/number';
 import * as MyPTypes from '../types';
 
 const HeaderDashboard = ({
-  ratio, minRatio, symbol, vault, decimals, newRatio, collateralDecimals, useCollateral,
+  ratio,
+  minRatio,
+  symbol,
+  vault,
+  decimals,
+  newRatio,
+  collateralDecimals,
+  useCollateral,
 }) => {
-  const tokenInUnit = vault.oTokensIssued ? toTokenUnitsBN(vault.oTokensIssued, decimals).toNumber() : '0';
+  const tokenInUnit = vault.oTokensIssued
+    ? toTokenUnitsBN(vault.oTokensIssued, decimals).toNumber()
+    : '0';
   const collateralBalance = vault.collateral
     ? toTokenUnitsBN(vault.collateral, collateralDecimals).toString()
     : '0';
@@ -26,11 +35,15 @@ const HeaderDashboard = ({
           <div style={{ fontSize: 14, padding: 3 }}>
             Current Ratio
             {' '}
-            {ratio > 0 ? <RatioTag isSafe={ratio >= minRatio} ratio={ratio} useCollateral={useCollateral} /> : <></>}
+            {ratio > 0 ? (
+              <RatioTag isSafe={ratio >= minRatio} ratio={ratio} useCollateral={useCollateral} />
+            ) : (
+              <></>
+            )}
           </div>
           <div style={{ fontSize: 24, padding: 3 }}>
             <span style={{ fontSize: 24 }}>{formatDigits(ratio, 5).split('.')[0]}</span>
-.
+            .
             <span style={{ fontSize: 18 }}>
               {formatDigits(ratio, 5).split('.')[1]}
               {' '}
@@ -38,7 +51,7 @@ const HeaderDashboard = ({
             {minRatio > 0 ? (
               <span style={{ fontSize: 16 }}>
                 {' '}
-/
+                /
                 {' '}
                 {minRatio}
                 {' '}
@@ -47,7 +60,11 @@ const HeaderDashboard = ({
           </div>
           <>
             {' '}
-            {newRatio === ratio ? '' : <HelperText label="New Ratio" amt={newRatio.toString()} />}
+            {newRatio === ratio ? (
+              ''
+            ) : (
+              <HelperText label="New Ratio" amt={newRatio.toString()} />
+            )}
             {' '}
           </>
         </>
