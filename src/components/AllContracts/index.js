@@ -4,12 +4,10 @@ import {
   Header, DataView, IdentityBadge, Button, Tabs,
 } from '@aragon/ui';
 import { eth_options, insurances } from '../../constants/contracts';
-// import { timeSince } from '../../utils/number';
 import { Comment } from '../common';
 
-const storedOptionTab = window.localStorage.getItem('optionTab');
-
 function AllContracts() {
+  const storedOptionTab = window.localStorage.getItem('optionTab');
   const [tabSelected, setTabSelected] = useState(storedOptionTab ? parseInt(storedOptionTab, 10) : 0);
 
   const history = useHistory();
