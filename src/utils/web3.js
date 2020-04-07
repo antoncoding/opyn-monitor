@@ -1,19 +1,21 @@
 /* eslint-disable camelcase */
 import Web3 from 'web3';
 import BigNumber from 'bignumber.js';
+import { signatureUtils } from '@0x/order-utils';
 import Onboard from 'bnc-onboard';
 
 import { notify } from './blockNative';
 import { getAllowance, getPremiumToPay } from './infura';
 import { getPreference } from './storage';
 import {
-  ETH_ADDRESS, Kollateral_Liquidator, Kollateral_Invoker, KETH,
+  ETH_ADDRESS, Kollateral_Liquidator, Kollateral_Invoker, KETH, ZeroX_Exchange,
 } from '../constants/contracts';
 
 const oTokenABI = require('../constants/abi/OptionContract.json');
 const exchangeABI = require('../constants/abi/OptionExchange.json');
 const uniswapExchangeABI = require('../constants/abi/UniswapExchange.json');
 const invokerABI = require('../constants/abi/KollateralInvoker.json');
+const ZX_ExchagneABI = require('../constants/abi/ZeroX_Exchange.json');
 
 const DEADLINE_FROM_NOW = 60 * 15;
 const UINT256_MAX = '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff';
@@ -237,7 +239,7 @@ export const redeem = async (token) => {
     });
 };
 
-export const approve = async (oTokenAddr, spender, amt) => {
+export const approve = async (oTokenAddr, spender, amt = UINT256_MAX) => {
   const account = await checkConnectedAndGetAddress();
   const oToken = new web3.eth.Contract(oTokenABI, oTokenAddr);
   await oToken.methods
@@ -365,6 +367,31 @@ export const removeLiquidity = async (uniswapAddr, pool_token_amount, min_eth_we
     .send({
       from: account,
     })
+    .on('transactionHash', (hash) => {
+      notify.hash(hash);
+    });
+};
+
+/*
+ * 0x Protocols
+ */
+
+/**
+* Sign Order
+* @param {*} order
+*/
+export const signOrder = async (order) => {
+  const account = await checkConnectedAndGetAddress();
+  return signatureUtils.ecSignOrderAsync(web3, order, account);
+};
+
+
+export const fillOrder = async (order, amt, signature) => {
+  const account = await checkConnectedAndGetAddress();
+  const exchange = new web3.eth.Contract(ZX_ExchagneABI, ZeroX_Exchange);
+  await exchange.methods.fillOrder(order, amt, signature).send({
+    from: account,
+  })
     .on('transactionHash', (hash) => {
       notify.hash(hash);
     });
