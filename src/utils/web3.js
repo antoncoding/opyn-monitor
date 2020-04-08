@@ -4,6 +4,10 @@ import BigNumber from 'bignumber.js';
 import { signatureUtils } from '@0x/order-utils';
 import Onboard from 'bnc-onboard';
 
+// import { ContractWrappers } from '@0x/contract-wrappers';
+// import { getContractAddressesForChainOrThrow } from '@0x/contract-addresses';
+
+// import {} from '@'
 import { notify } from './blockNative';
 import { getAllowance, getPremiumToPay } from './infura';
 import { getPreference } from './storage';
@@ -389,9 +393,12 @@ export const signOrder = async (order) => {
 export const fillOrder = async (order, amt, signature) => {
   const account = await checkConnectedAndGetAddress();
   const exchange = new web3.eth.Contract(ZX_ExchagneABI, ZeroX_Exchange);
-  await exchange.methods.fillOrder(order, amt, signature).send({
-    from: account,
-  })
+  await exchange.methods
+    .fillOrder(order, amt, signature)
+    .send({
+      from: account,
+      value: '750000000000000', // Protocol fee: gas to be gas price * 150
+    })
     .on('transactionHash', (hash) => {
       notify.hash(hash);
     });
