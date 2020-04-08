@@ -1,4 +1,10 @@
-export const ERC20_ASSET_PROXY_ID = '0xf47261b0';
+import { assetDataUtils } from '@0x/order-utils';
+
+import { WETH } from '../constants/contracts';
+
+import { toTokenUnitsBN } from './number';
+
+const Promise = require('bluebird');
 
 const endpoint = 'https://api.0x.org/';
 
@@ -59,10 +65,28 @@ const endpoint = 'https://api.0x.org/';
   }[]}
 }>}
  */
-export function getOrderBook(base, quote) {
-  const baseAsset = toERC20AssetId(base);
-  const quoteAsset = toERC20AssetId(quote);
+export async function getOrderBook(base, quote) {
+  const baseAsset = assetDataUtils.encodeERC20AssetData(base);
+  const quoteAsset = assetDataUtils.encodeERC20AssetData(quote);
   return request(`sra/v3/orderbook?baseAssetData=${baseAsset}&quoteAssetData=${quoteAsset}&perPage=${100}`);
+}
+
+/**
+ * get oToken:WETH stats (v1) for all options
+ * @param {Array<{addr:string, decimals:number}>} options
+ * @return {Promise<Arrya< option: address, bestAsk: BigNumber, bestAsk:BigNumber >>}
+ */
+export async function getBasePairAskAndBids(options) {
+  const bestAskAndBids = await Promise.map(options, async ({ addr: option, decimals }) => {
+    const { asks, bids } = await getOrderBook(option, WETH);
+    const { makerAssetAmount: askTokenAmt, takerAssetAmount: askWETHAmt } = asks.records[0].order;
+
+    const { makerAssetAmount: bidWETHAmt, takerAssetAmount: bidTokenAmt } = bids.records[0].order;
+    const bestAsk = toTokenUnitsBN(askWETHAmt, 18).div(toTokenUnitsBN(askTokenAmt, decimals));
+    const bestBid = toTokenUnitsBN(bidWETHAmt, 18).div(toTokenUnitsBN(bidTokenAmt, decimals));
+    return { option, bestAsk, bestBid };
+  });
+  return bestAskAndBids;
 }
 
 /**
@@ -102,6 +126,6 @@ export function connectWebSocket(_orders, setBuyOrders) {
  * @param {srting} erc20_address hex addres contain 0x
  * @return {string}
  */
-function toERC20AssetId(erc20_address) {
-  return ERC20_ASSET_PROXY_ID.padEnd(34, '0').concat(erc20_address.slice(2));
-}
+// function toERC20AssetId(erc20_address) {
+//   return ERC20_ASSET_PROXY_ID.padEnd(34, '0').concat(erc20_address.slice(2));
+// }
