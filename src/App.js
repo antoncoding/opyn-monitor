@@ -15,6 +15,9 @@ import ManageVault from './components/ManageVault';
 import ManagePool from './components/ManagePool';
 import Footer from './components/Footer';
 
+// testing
+import ZEROXTest from './components/OptionTrading/test';
+
 function App() {
   const storedTheme = getPreference('theme', 'light');
 
@@ -49,6 +52,7 @@ function App() {
           </Route>
           {/* Trade */}
           <Route path="/trades/eth/"><OptionTrading user={user} /></Route>
+          <Route path="/trades/test/"><ZEROXTest /></Route>
           <Route path="/trade/:token/"><ManagePool user={user} /></Route>
           <Route path="/trade/">
             <Trade />
