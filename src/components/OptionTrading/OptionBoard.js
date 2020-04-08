@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import PropTypes from 'prop-types';
 import { DataView } from '@aragon/ui';
 import { getBasePairAskAndBids } from '../../utils/0x';
@@ -9,9 +9,8 @@ function OptionBoard({ calls, puts }) {
   const [callStats, setCallStats] = useState([]);
 
   // get option status
-  useEffect(() => {
+  useMemo(() => {
     let isCancelled = false;
-
     const updateBoardStats = async () => {
       const [callData, putData] = await Promise.all([
         getBasePairAskAndBids(calls),
@@ -30,7 +29,7 @@ function OptionBoard({ calls, puts }) {
       isCancelled = true;
       clearInterval(id);
     };
-  }, [calls, puts]);
+  }, []);
 
   return (
     <>

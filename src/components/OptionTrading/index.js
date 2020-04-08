@@ -1,4 +1,3 @@
-/* eslint-disable no-underscore-dangle */
 import React, { useEffect } from 'react';
 // import BigNumber from 'bignumber.js';
 import { Header } from '@aragon/ui';
@@ -13,13 +12,13 @@ function OptionTrading() {
 
   useEffect(() => {
     // let isCancelled = false;
-    // const updateBoardStats = async () => {
+    // const udpateInfo = async () => {
     //   if (!isCancelled) {
     //     setOptionStats(allStats);
     //   }
     // };
-    // updateBoardStats();
-    // const id = setInterval(updateBoardStats, 1000);
+    // udpateInfo();
+    // const id = setInterval(udpateInfo, 1000);
 
     // return () => {
     //   isCancelled = true;
