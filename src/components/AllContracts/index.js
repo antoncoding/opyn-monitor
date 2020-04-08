@@ -3,7 +3,8 @@ import { useHistory } from 'react-router-dom';
 import {
   Header, DataView, IdentityBadge, Button, Tabs,
 } from '@aragon/ui';
-import { eth_options, insurances } from '../../constants/contracts';
+
+import { insurances, eth_options } from '../../constants/options';
 import { Comment } from '../common';
 import { getPreference, storePreference } from '../../utils/storage';
 

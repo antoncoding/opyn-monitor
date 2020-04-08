@@ -10,7 +10,8 @@ import OptionInfoBox from './OptionInfoBox';
 import { getDecimals, getERC20Symbol } from '../../utils/infura';
 import { getAllVaultsForOption } from '../../utils/graph';
 
-import { allOptions, ETH_ADDRESS } from '../../constants/contracts';
+import { ETH_ADDRESS } from '../../constants/contracts';
+import { allOptions } from '../../constants/options';
 
 function OptionPage({ user }) {
   const { token } = useParams();
