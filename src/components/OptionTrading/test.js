@@ -7,7 +7,7 @@ import {
 
 
 import { toTokenUnitsBN, formatDigits } from '../../utils/number';
-import { getOrderBook } from '../../utils/0x';
+import { getOrderBook, isValid } from '../../utils/0x';
 import {
   approve,
   // signOrder,
@@ -71,7 +71,7 @@ function OptionTrading() {
             <DataView
               title="ask"
               fields={['Amount (ETH)', 'Price']}
-              entries={asks.filter((entry) => isValid(entry))}
+              entries={asks.filter((entry) => isValid(entry, 18))}
               entriesPerPage={5}
               renderEntry={({ order, metaData }) => {
                 const rate = new BigNumber(order.takerAssetAmount)
@@ -99,7 +99,7 @@ function OptionTrading() {
             {/* 買DAI, makerAsset: ETH, takerAsset: DAI */}
             <DataView
               fields={['Amount (DAI)', 'Price']}
-              entries={bids.filter((entry) => isValid(entry))}
+              entries={bids.filter((entry) => isValid(entry, 18))}
               entriesPerPage={5}
               renderEntry={({ order, metaData }) => [
                 toTokenUnitsBN(metaData.remainingFillableTakerAssetAmount, 18).toNumber(),
@@ -119,6 +119,4 @@ function OptionTrading() {
   );
 }
 
-const isValid = (entry) => parseInt(entry.order.expirationTimeSeconds, 10) > Date.now() / 1000
-  && new BigNumber(entry.metaData.remainingFillableTakerAssetAmount) > 100000;
 export default OptionTrading;

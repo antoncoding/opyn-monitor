@@ -1,5 +1,5 @@
 import { assetDataUtils } from '@0x/order-utils';
-
+import BigNumber from 'bignumber.js';
 import { WETH } from '../constants/contracts';
 
 import { toTokenUnitsBN } from './number';
@@ -79,9 +79,10 @@ export async function getOrderBook(base, quote) {
 export async function getBasePairAskAndBids(options) {
   const bestAskAndBids = await Promise.map(options, async ({ addr: option, decimals }) => {
     const { asks, bids } = await getOrderBook(option, WETH);
-    const { makerAssetAmount: askTokenAmt, takerAssetAmount: askWETHAmt } = asks.records[0].order;
-
-    const { makerAssetAmount: bidWETHAmt, takerAssetAmount: bidTokenAmt } = bids.records[0].order;
+    const validAsks = asks.records.filter((record) => isValid(record, decimals));
+    const validBids = bids.records.filter((record) => isValid(record, decimals));
+    const { makerAssetAmount: askTokenAmt, takerAssetAmount: askWETHAmt } = validAsks[0].order;
+    const { makerAssetAmount: bidWETHAmt, takerAssetAmount: bidTokenAmt } = validBids[0].order;
     const bestAsk = toTokenUnitsBN(askWETHAmt, 18).div(toTokenUnitsBN(askTokenAmt, decimals));
     const bestBid = toTokenUnitsBN(bidWETHAmt, 18).div(toTokenUnitsBN(bidTokenAmt, decimals));
     return { option, bestAsk, bestBid };
@@ -129,3 +130,8 @@ export function connectWebSocket(_orders, setBuyOrders) {
 // function toERC20AssetId(erc20_address) {
 //   return ERC20_ASSET_PROXY_ID.padEnd(34, '0').concat(erc20_address.slice(2));
 // }
+
+
+export const isValid = (entry, decimals) => parseInt(entry.order.expirationTimeSeconds, 10) > Date.now() / 1000
+  && new BigNumber(entry.metaData.remainingFillableTakerAssetAmount)
+    .gt(new BigNumber(0.0001).times(new BigNumber(10).pow(decimals)));
