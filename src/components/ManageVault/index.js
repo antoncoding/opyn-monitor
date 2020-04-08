@@ -18,7 +18,8 @@ import { getTokenBalance, getBalance, getDecimals } from '../../utils/infura';
 import { getAllVaultsForUser } from '../../utils/graph';
 import { redeem } from '../../utils/web3';
 
-import { allOptions, ETH_ADDRESS } from '../../constants/contracts';
+import { ETH_ADDRESS } from '../../constants/contracts';
+import { allOptions } from '../../constants/options';
 
 function ManageVault({ user }) {
   const { token, owner } = useParams();

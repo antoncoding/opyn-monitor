@@ -55,3 +55,5 @@ export const mock_eth_calls = [
     expiry: 1587715200,
   },
 ];
+
+export const eth_calls = [];

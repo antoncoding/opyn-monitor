@@ -101,11 +101,9 @@ function IssuedTokenManagement({
                 <MaxButton
                   onClick={() => {
                     if (strikePrice <= 0) return;
-                    // (vault.collateral) / (minRatio * strikePrice * strikeValue.toNumber());
                     const maxTotal = new BigNumber(vault.collateral).div(
                       new BigNumber(minRatio).times(new BigNumber(strikePrice)).times(strikeValue),
                     );
-
                     const maxToIssueRaw = maxTotal.minus(new BigNumber(vault.oTokensIssued));
                     const maxToIssue = toTokenUnitsBN(maxToIssueRaw, decimals);
                     setIssueAmt(maxToIssue);

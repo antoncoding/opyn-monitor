@@ -1,7 +1,8 @@
 import React, { useState, useMemo } from 'react';
 import PropTypes from 'prop-types';
 import { Header, DataView, IdentityBadge } from '@aragon/ui';
-import { allOptions, ETH_ADDRESS } from '../../constants/contracts';
+import { ETH_ADDRESS } from '../../constants/contracts';
+import { allOptions } from '../../constants/options';
 import {
   SectionTitle, ManageVaultButton, OpenVaultButton, Comment,
 } from '../common';
