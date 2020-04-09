@@ -37,7 +37,7 @@ function AllContracts() {
           renderEntry={({ addr, title }) => [
             <>{title}</>,
             <IdentityBadge entity={addr} shorten={false} />,
-            <Button onClick={() => goToToken(addr)}> View Vault </Button>,
+            <Button onClick={() => goToToken(addr)}> View Vaults </Button>,
           ]}
         />
       ) : (
@@ -50,7 +50,7 @@ function AllContracts() {
             <>{title}</>,
             <IdentityBadge entity={addr} shorten={false} />,
             new Date(parseInt(expiry * 1000, 10)).toDateString(),
-            <Button onClick={() => goToToken(addr)}> View Vault </Button>,
+            <Button onClick={() => goToToken(addr)}> View Vaults </Button>,
           ]}
         />
       )}

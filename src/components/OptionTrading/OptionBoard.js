@@ -15,7 +15,7 @@ function OptionBoard({ calls, puts }) {
   const [selectedExpiryIdx, setExpiryIdx] = useState(0);
 
   const optionsByDate = groupByDate(puts, calls, putStats, callStats);
-  console.log(optionsByDate[0]);
+  // console.log(optionsByDate[0]);
   // console.log(JSON.stringify(optionsByDate, null, 2));
 
   // get option status
@@ -37,9 +37,8 @@ function OptionBoard({ calls, puts }) {
 
     return () => {
       isCancelled = true;
-      // clearInterval(id);
     };
-  }, []);
+  }, [calls, puts]);
 
   return (
     <>
