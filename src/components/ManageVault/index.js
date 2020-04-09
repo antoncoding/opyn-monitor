@@ -109,7 +109,6 @@ function ManageVault({ user }) {
     };
   }, [
     collateral,
-    collateralDecimals,
     collateralIsETH,
     decimals,
     oracle,
