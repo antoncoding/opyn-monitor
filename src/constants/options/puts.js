@@ -43,7 +43,7 @@ export const eth_puts = [
     // constants in contract
     symbol: 'oETH $150 Put',
     name: 'Opyn ETH Put $150 04/24/20',
-    decimals: 8,
+    decimals: 7,
     oracle: '0x7054e08461e3eCb7718B63540adDB3c3A1746415',
     collateral: '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48',
     underlying: '0x0000000000000000000000000000000000000000',
