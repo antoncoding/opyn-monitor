@@ -7,7 +7,7 @@ import NoWalletView from './NoWallet';
 import { ETH_ADDRESS } from '../../constants/contracts';
 import { allOptions } from '../../constants/options';
 import {
-  SectionTitle, ManageVaultButton, OpenVaultButton,
+  SectionTitle, ManageVaultButton, OpenVaultButton, Comment,
 } from '../common';
 import { getAllVaultsForUser } from '../../utils/graph';
 import {
@@ -22,6 +22,7 @@ function MyVaults({ user }) {
   const [opendVaults, setOpenedVaults] = useState([]);
   const [tokensToOpen, setTokensToOpen] = useState([]);
 
+  const [isLoading, setIsLoading] = useState(true);
   // enable not logged in user to use this feature
   const [watchAddress, setWatchAddress] = useState('');
   const isWatchMode = user === '' && watchAddress !== '';
@@ -65,6 +66,7 @@ function MyVaults({ user }) {
         });
       }
     });
+    setIsLoading(false);
     setOpenedVaults(openedVaults.sort(compareVaultRatio));
     setTokensToOpen(notOpenedTokens);
   }, [user, watchAddress, hasAddressConnected, isWatchMode]);
@@ -92,11 +94,12 @@ function MyVaults({ user }) {
                 ]}
               />
             </div>
+          ) : isLoading ? (
+            <Comment text="Loading" />
           ) : (
-            <></>
+            <Comment text="No Opened Vaults" />
           )}
           {tokensToOpen.length > 0 && !isWatchMode ? (
-            // Show vaults to open
             <div>
               <SectionTitle title="Open new vaults" />
               <DataView

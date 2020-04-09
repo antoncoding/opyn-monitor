@@ -1,18 +1,24 @@
 import Web3 from 'web3';
 
+import ENS from 'ethereum-ens';
+
 const Promise = require('bluebird');
 const optionContractABI = require('../constants/abi/OptionContract.json');
 const optionExchangeABI = require('../constants/abi/OptionExchange.json');
 const oracleABI = require('../constants/abi/Oracle.json');
 
-
 const INFURA_KEY = process.env.REACT_APP_INFURA_KEY;
 
 const web3 = new Web3(`https://mainnet.infura.io/v3/${INFURA_KEY}`);
+const ens = new ENS(web3);
 
 const ETH_ADDR = '0x0000000000000000000000000000000000000000';
 
-// ERC20 Info
+// ENS
+export const resolveENS = async (ensName) => {
+  const address = await ens.resolver(ensName).addr();
+  return address;
+};
 
 /**
  *
