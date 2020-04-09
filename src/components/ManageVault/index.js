@@ -29,6 +29,8 @@ function ManageVault({ user }) {
     decimals, symbol, oracle, strike, strikePrice, minRatio, collateral, expiry,
   } = option;
 
+  const [isLoading, setIsLoading] = useState(true);
+
   // Tab Navigation
   const [tabSelected, setTabSelected] = useState(0);
 
@@ -98,6 +100,7 @@ function ManageVault({ user }) {
         setUserTokenBalance(userTokenBalanceBN);
         setRatio(currentRatio);
         setUserCollateralAssetBalance(collateralBalance);
+        setIsLoading(false);
       }
     }
     updateInfo();
@@ -122,103 +125,109 @@ function ManageVault({ user }) {
 
   const isOwner = user === owner;
 
-  return noVault ? (
-    <div style={{ padding: 100, textAlign: 'center' }}> No Vault Found for this user </div>
-  ) : (
-    <>
-      <Header
-        primary={isOwner ? 'Manage My Vault' : 'Vault Detail'}
-        secondary={
+  return noVault
+    ? isLoading ? (
+      <div style={{ padding: 100, textAlign: 'center', fontSize: 17 }}>
+        Loading
+      </div>
+    )
+      : (
+        <div style={{ padding: 100, textAlign: 'center' }}> No Vault Found for this user </div>
+      ) : (
+        <>
+          <Header
+            primary={isOwner ? 'Manage My Vault' : 'Vault Detail'}
+            secondary={
           expiry * 1000 > Date.now() ? (
             <Timer end={new Date(expiry * 1000)} />
           ) : (
             <Button onClick={() => redeem(token)} label="Redeem" />
           )
         }
-      />
-
-      <HeaderDashboard
-        owner={owner}
-        user={user}
-        ratio={ratio}
-        minRatio={minRatio}
-        vault={vault}
-        decimals={decimals}
-        symbol={symbol}
-        newRatio={newRatio}
-        useCollateral={vaultUsesCollateral}
-        collateralIsETH={collateralIsETH}
-        collateralDecimals={collateralDecimals}
-      />
-
-      <Tabs
-        items={['Collateral Management', 'Token Issuance', 'Liquidation', 'Exercise']}
-        selected={tabSelected}
-        onChange={setTabSelected}
-      />
-
-      {tabSelected === 0 ? (
-        <CollateralManagement
-          isOwner={isOwner}
-          vault={vault}
-          collateralAssetBalance={userCollateralAssetBalance}
-          collateralAsset={option.collateral}
-          token={token}
-          owner={owner}
-          strikeValue={strikeValueInCollateral}
-          strikePrice={strikePrice}
-          minRatio={minRatio}
-          setNewRatio={setNewRatio}
-        />
-      ) : (
-        <></>
-      )}
-
-      {tabSelected === 1 ? (
-        <IssuedTokenManagement
-          isOwner={isOwner}
-          vault={vault}
-          tokenBalance={ownerTokenBalance}
-          token={token}
-          strikeValue={strikeValueInCollateral}
-          strikePrice={strikePrice}
-          minRatio={minRatio}
-          decimals={decimals}
-          symbol={symbol}
-          setNewRatio={setNewRatio}
-        />
-      ) : (
-        <></>
-      )}
-
-      {tabSelected === 2 ? (
-        vaultUsesCollateral ? (
-          <LiquidationHistory
-            userTokenBalance={userTokenBalance}
-            isOwner={isOwner}
-            owner={owner}
-            token={token}
-            tokenDecimals={decimals}
           />
-        ) : (
-          <Box> This vault cannot be liquidated </Box>
-        )
-      ) : (
-        <></>
-      )}
 
-      {tabSelected === 3 ? (
-        <ExerciseHistory
-          owner={owner}
-          token={token}
-          tokenDecimals={decimals}
-          collateralDecimals={collateralDecimals}
-        />
-      ) : (
-        <></>
-      )}
-    </>
-  );
+          <HeaderDashboard
+            owner={owner}
+            user={user}
+            ratio={ratio}
+            minRatio={minRatio}
+            vault={vault}
+            decimals={decimals}
+            symbol={symbol}
+            newRatio={newRatio}
+            useCollateral={vaultUsesCollateral}
+            collateralIsETH={collateralIsETH}
+            collateralDecimals={collateralDecimals}
+          />
+
+          <Tabs
+            items={['Collateral Management', 'Token Issuance', 'Liquidation', 'Exercise']}
+            selected={tabSelected}
+            onChange={setTabSelected}
+          />
+
+          {tabSelected === 0 ? (
+            <CollateralManagement
+              isOwner={isOwner}
+              vault={vault}
+              collateralAssetBalance={userCollateralAssetBalance}
+              collateralAsset={option.collateral}
+              token={token}
+              owner={owner}
+              strikeValue={strikeValueInCollateral}
+              strikePrice={strikePrice}
+              minRatio={minRatio}
+              setNewRatio={setNewRatio}
+            />
+          ) : (
+            <></>
+          )}
+
+          {tabSelected === 1 ? (
+            <IssuedTokenManagement
+              isOwner={isOwner}
+              vault={vault}
+              tokenBalance={ownerTokenBalance}
+              token={token}
+              strikeValue={strikeValueInCollateral}
+              strikePrice={strikePrice}
+              minRatio={minRatio}
+              decimals={decimals}
+              symbol={symbol}
+              setNewRatio={setNewRatio}
+            />
+          ) : (
+            <></>
+          )}
+
+          {tabSelected === 2 ? (
+            vaultUsesCollateral ? (
+              <LiquidationHistory
+                userTokenBalance={userTokenBalance}
+                isOwner={isOwner}
+                owner={owner}
+                token={token}
+                tokenDecimals={decimals}
+              />
+            ) : (
+              <Box> This vault cannot be liquidated </Box>
+            )
+          ) : (
+            <></>
+          )}
+
+          {tabSelected === 3 ? (
+            <ExerciseHistory
+              owner={owner}
+              token={token}
+              tokenDecimals={decimals}
+              collateralDecimals={collateralDecimals}
+            />
+          ) : (
+            <></>
+          )}
+        </>
+    );
 }
 
 ManageVault.propTypes = {
