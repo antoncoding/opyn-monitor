@@ -32,7 +32,7 @@ function PleaseLogin({ setWatchAddress }) {
           {usedAddresses.length > 0 ? (
             <div style={{ paddingTop: '3%' }}>
               <DataView
-                entries={usedAddresses}
+                entries={usedAddresses.reverse()}
                 fields={['used']}
                 entriesPerPage={5}
                 renderEntry={(address) => [
@@ -49,7 +49,6 @@ function PleaseLogin({ setWatchAddress }) {
                       address={address}
                       scale={1.3}
                       radius={5}
-                      soften={0.8}
                     />
                     <span style={{ paddingLeft: 8, fontSize: 15, fontFamily: 'aragon-ui-monospace' }}>{address}</span>
                   </LinkBase>,
