@@ -3,9 +3,11 @@ import PropTypes from 'prop-types';
 import {
   TextInput, DataView, Button, LinkBase, EthIdenticon, useToast,
 } from '@aragon/ui';
-import { getPreference, storePreference } from '../../utils/storage';
+import { getPreference, checkAddressAndAddToStorage } from '../../utils/storage';
+
 import { Comment } from '../common';
 import { isAddress } from '../../utils/number';
+import { resolveENS } from '../../utils/infura';
 
 function PleaseLogin({ setWatchAddress }) {
   const toast = useToast();
@@ -24,6 +26,7 @@ function PleaseLogin({ setWatchAddress }) {
       <div style={{ display: 'flex' }}>
         <div style={{ width: '50%' }}>
           <TextInput
+            placeholder="Ethereum address or ENS"
             value={InAddress}
             onChange={(e) => { setAddress(e.target.value); }}
             wide
@@ -38,10 +41,7 @@ function PleaseLogin({ setWatchAddress }) {
                 renderEntry={(address) => [
                   <LinkBase onClick={() => {
                     setWatchAddress(address);
-                    if (!usedAddresses.includes(address)) {
-                      usedAddresses.push(address);
-                      storePreference('watch_addresses', JSON.stringify(usedAddresses));
-                    }
+                    checkAddressAndAddToStorage(address);
                   }}
                   >
                     {/* <IdentityBadge entity={address} /> */}
@@ -60,15 +60,18 @@ function PleaseLogin({ setWatchAddress }) {
         <div style={{ width: '8%', paddingLeft: '1%', paddingRight: '1%' }}>
           <Button
             label="Watch Address"
-            onClick={() => {
+            onClick={async () => {
               if (isAddress(InAddress)) {
                 setWatchAddress(InAddress);
-                if (!usedAddresses.includes(InAddress)) {
-                  usedAddresses.push(InAddress);
-                  storePreference('watch_addresses', JSON.stringify(usedAddresses));
-                }
+                checkAddressAndAddToStorage(InAddress);
               } else {
-                toast('Invalid Address');
+                try {
+                  const address = await resolveENS(InAddress);
+                  setWatchAddress(address);
+                  checkAddressAndAddToStorage(address);
+                } catch (error) {
+                  toast('Invalid Address');
+                }
               }
             }}
           />

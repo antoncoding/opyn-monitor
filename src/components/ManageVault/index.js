@@ -11,6 +11,7 @@ import CollateralManagement from './CollateralManagement';
 import IssuedTokenManagement from './IssuedTokenManagement';
 import LiquidationHistory from './Liquidation';
 import ExerciseHistory from './Exercise';
+import { Comment } from '../common';
 
 import { toTokenUnitsBN } from '../../utils/number';
 import { calculateRatio, calculateStrikeValueInCollateral } from '../../utils/calculation';
@@ -127,12 +128,10 @@ function ManageVault({ user }) {
 
   return noVault
     ? isLoading ? (
-      <div style={{ padding: 100, textAlign: 'center', fontSize: 17 }}>
-        Loading
-      </div>
+      <Comment text="Loading..." />
     )
       : (
-        <div style={{ padding: 100, textAlign: 'center' }}> No Vault Found for this user </div>
+        <Comment text="No Vault Found for this user under this contract" />
       ) : (
         <>
           <Header
