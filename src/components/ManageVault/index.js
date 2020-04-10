@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useParams } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import {
@@ -18,7 +18,8 @@ import { getTokenBalance, getBalance, getDecimals } from '../../utils/infura';
 import { getAllVaultsForUser } from '../../utils/graph';
 import { redeem } from '../../utils/web3';
 
-import { allOptions, ETH_ADDRESS } from '../../constants/contracts';
+import { ETH_ADDRESS } from '../../constants/contracts';
+import { allOptions } from '../../constants/options';
 
 function ManageVault({ user }) {
   const { token, owner } = useParams();
@@ -48,13 +49,14 @@ function ManageVault({ user }) {
 
   const vaultUsesCollateral = collateral !== strike;
 
-  useEffect(() => {
+  useMemo(() => {
     let isCancelled = false;
-
     async function updateInfo() {
       const vaultToManage = (await getAllVaultsForUser(owner)).find(
         (v) => v.optionsContract.address === token,
       );
+      if (vaultToManage === undefined) return;
+
       setNoVault(false);
       const [_ownerTokenBalance, _userTokenBalance] = await Promise.all([
         getTokenBalance(token, owner),
@@ -107,7 +109,6 @@ function ManageVault({ user }) {
     };
   }, [
     collateral,
-    collateralDecimals,
     collateralIsETH,
     decimals,
     oracle,

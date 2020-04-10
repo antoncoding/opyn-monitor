@@ -86,3 +86,5 @@ export function compareVaultIssued(vaultA, vaultB) {
   }
   return comparison;
 }
+
+export const isAddress = web3.utils.isAddress;

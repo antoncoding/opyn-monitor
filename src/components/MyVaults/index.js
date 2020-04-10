@@ -1,9 +1,13 @@
 import React, { useState, useMemo } from 'react';
 import PropTypes from 'prop-types';
+
 import { Header, DataView, IdentityBadge } from '@aragon/ui';
-import { allOptions, ETH_ADDRESS } from '../../constants/contracts';
+import NoWalletView from './NoWallet';
+
+import { ETH_ADDRESS } from '../../constants/contracts';
+import { allOptions } from '../../constants/options';
 import {
-  SectionTitle, ManageVaultButton, OpenVaultButton, Comment,
+  SectionTitle, ManageVaultButton, OpenVaultButton,
 } from '../common';
 import { getAllVaultsForUser } from '../../utils/graph';
 import {
@@ -17,12 +21,16 @@ const Promise = require('bluebird');
 function MyVaults({ user }) {
   const [opendVaults, setOpenedVaults] = useState([]);
   const [tokensToOpen, setTokensToOpen] = useState([]);
-  const isConnected = user !== '';
+
+  // enable not logged in user to use this feature
+  const [watchAddress, setWatchAddress] = useState('');
+  const isWatchMode = user === '' && watchAddress !== '';
+  const hasAddressConnected = user !== '' || watchAddress !== '';
 
   // Only request all vaults once
   useMemo(async () => {
-    if (!isConnected) return;
-    const userVaults = await getAllVaultsForUser(user);
+    if (!hasAddressConnected) return;
+    const userVaults = await getAllVaultsForUser(isWatchMode ? watchAddress : user);
     const openedVaults = [];
     const notOpenedTokens = [];
     await Promise.map(allOptions, async (option) => {
@@ -59,12 +67,12 @@ function MyVaults({ user }) {
     });
     setOpenedVaults(openedVaults.sort(compareVaultRatio));
     setTokensToOpen(notOpenedTokens);
-  }, [isConnected, user]);
+  }, [user, watchAddress, hasAddressConnected, isWatchMode]);
 
   return (
     <>
       <Header primary="My Vaults" />
-      {isConnected ? (
+      {hasAddressConnected ? (
         <>
           {opendVaults.length > 0 ? (
             <div style={{ paddingBottom: '3%' }}>
@@ -80,14 +88,14 @@ function MyVaults({ user }) {
                   <IdentityBadge entity={oToken} />,
                   formatDigits(toTokenUnitsBN(collateral, collateralDecimals).toNumber(), 5),
                   formatDigits(ratio, 4),
-                  <ManageVaultButton oToken={oToken} owner={user} />,
+                  <ManageVaultButton oToken={oToken} owner={isWatchMode ? watchAddress : user} />,
                 ]}
               />
             </div>
           ) : (
             <></>
           )}
-          {tokensToOpen.length > 0 ? (
+          {tokensToOpen.length > 0 && !isWatchMode ? (
             // Show vaults to open
             <div>
               <SectionTitle title="Open new vaults" />
@@ -107,7 +115,10 @@ function MyVaults({ user }) {
         </>
       ) : (
         // Not connected to wallet
-        <Comment text="Please connect wallet to proceed." />
+        <NoWalletView
+          watchAddress={watchAddress}
+          setWatchAddress={setWatchAddress}
+        />
       )}
     </>
   );

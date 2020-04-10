@@ -7,12 +7,10 @@ import BigNumber from 'bignumber.js';
 import { getTokenBalance, getBalance, getERC20Info } from '../../utils/infura';
 import { toTokenUnitsBN } from '../../utils/number';
 
-
-import { allOptions } from '../../constants/contracts';
+import { allOptions } from '../../constants/options';
 
 import DashBoard from './Header';
 import OptionExchange from './OptionExchange';
-
 import AddLiquidity from './AddLiquidity';
 import RemoveLiquidity from './RemoveLiquidity';
 

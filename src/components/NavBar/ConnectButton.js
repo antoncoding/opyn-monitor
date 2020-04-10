@@ -5,15 +5,23 @@ import {
 } from '@aragon/ui';
 
 import { connect, disconnect } from '../../utils/web3';
+import { storePreference, getPreference } from '../../utils/storage';
 
 function ConnectButton({ user, setUser }) {
   const [isConnected, setIsConnected] = useState(false);
+
+  const watch_addrs = getPreference('watch_addresses', '[]');
+  const usedAddresses = JSON.parse(watch_addrs);
 
   const connectWeb3 = async () => {
     const address = await connect();
     if (address === false) return;
     setIsConnected(true);
     setUser(address);
+    if (!usedAddresses.includes(address)) {
+      usedAddresses.push(address);
+      storePreference('watch_addresses', JSON.stringify(usedAddresses));
+    }
   };
 
   const disconnectWeb3 = async () => {
