@@ -164,8 +164,10 @@ function groupByDate(puts, calls, putStats, callStats) {
 
 const BidText = styled.div`{
   color: #7aae1a;
+  font-size: 17px;
 }`;
 
 const AskText = styled.div`{
   color: #da5750;
+  font-size: 17px;
 }`;
