@@ -1,7 +1,8 @@
 /* eslint-disable no-restricted-syntax */
 import React, { useMemo, useState } from 'react';
 import PropTypes from 'prop-types';
-import { DataView, DropDown } from '@aragon/ui';
+import styled from 'styled-components';
+import { DataView, DropDown, LinkBase } from '@aragon/ui';
 
 import { SectionTitle } from '../common';
 
@@ -58,25 +59,51 @@ function OptionBoard({ calls, puts, setBaseAsset }) {
           <SectionTitle title="Puts" />
         </div>
       </div>
+      {/* <div style={{ display: 'flex' }}> */}
+      {/* Calls */}
+      {/* <div style={{ width: '45%' }}> */}
       <DataView
+            // mode="table"
         fields={['last', 'bid', 'ask', 'strike', 'last', 'bid', 'ask']}
         entries={optionsByDate[selectedExpiryIdx] ? optionsByDate[selectedExpiryIdx].entry : []}
         renderEntry={({
-          // call,
-          // put,
-          callDetail,
+          call,
+          put,
           putDetail,
+          callDetail,
           strikePrice,
-        }) => [
-          // call, put, callDetail, putDetail, strikePrice,
-          <>-</>,
-          <>{callDetail !== undefined ? callDetail.bestBid.toFixed(5) : '-'}</>,
-          <>{callDetail !== undefined ? callDetail.bestAsk.toFixed(5) : '-'}</>,
-          <span style={{ fontSize: 19 }}>{strikePrice}</span>,
-          <>-</>,
-          <>{putDetail !== undefined ? putDetail.bestBid.toFixed(5) : '-'}</>,
-          <>{putDetail !== undefined ? putDetail.bestAsk.toFixed(5) : '-'}</>,
-        ]}
+        }) => {
+          const lastCallPrice = '-';
+          let callAsk = '-';
+          let callBid = '-';
+          let callOnclick = () => {};
+
+          const lastPutPrice = '-';
+          let putAsk = '-';
+          let putBid = '-';
+          let putOnclick = () => {};
+
+          if (callDetail !== undefined) {
+            callAsk = callDetail.bestAsk.toFixed(6);
+            callBid = callDetail.bestBid.toFixed(6);
+            callOnclick = () => { setBaseAsset(call); };
+          }
+          if (putDetail !== undefined) {
+            putAsk = putDetail.bestAsk.toFixed(6);
+            putBid = putDetail.bestBid.toFixed(6);
+            putOnclick = () => { setBaseAsset(put); };
+          }
+
+          return [
+            <LinkBase onClick={callOnclick}>{lastCallPrice}</LinkBase>,
+            <LinkBase onClick={callOnclick}><BidText>{callBid}</BidText></LinkBase>,
+            <LinkBase onClick={callOnclick}><AskText>{callAsk}</AskText></LinkBase>,
+            <div style={{ fontSize: 20 }}>{strikePrice}</div>,
+            <LinkBase onClick={putOnclick}>{lastPutPrice}</LinkBase>,
+            <LinkBase onClick={putOnclick}><BidText>{putBid}</BidText></LinkBase>,
+            <LinkBase onClick={putOnclick}><AskText>{putAsk}</AskText></LinkBase>,
+          ];
+        }}
       />
     </div>
   );
@@ -134,3 +161,11 @@ function groupByDate(puts, calls, putStats, callStats) {
   }
   return result;
 }
+
+const BidText = styled.div`{
+  color: #7aae1a;
+}`;
+
+const AskText = styled.div`{
+  color: #da5750;
+}`;

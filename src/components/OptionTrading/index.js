@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import { Header } from '@aragon/ui';
 
@@ -18,11 +18,6 @@ const quoteAsset = {
 }; // WETH
 
 function OptionTrading({ user, theme }) {
-  // const style = {
-
-  // };
-
-  // const baseAsset =;
   const [baseAsset, setBaseAsset] = useState(eth_calls[0]); // DAI
   // const [quoteAsset, ] = useState(); //  WETH
 
@@ -30,10 +25,9 @@ function OptionTrading({ user, theme }) {
   const [bids, setBids] = useState([]);
 
   // Update orderbook data
-  useMemo(() => {
+  useEffect(() => {
     let isCancelled = false;
     const updateOrderBook = async () => {
-      // console.log('update orderbook');
       const res = await getOrderBook(baseAsset.addr, quoteAsset.addr);
       if (!isCancelled) {
         setAsks(res.asks.records);
@@ -111,7 +105,7 @@ const WholeScreen = styled.div`
 
 const FlexWrapper = styled.div`
   display: flex;
-  height:90%
+  height:87%
 `;
 
 export default OptionTrading;

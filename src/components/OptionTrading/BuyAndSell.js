@@ -142,7 +142,7 @@ const Tab = styled.div`
   cursor: pointer;
 `;
 const Label = styled.div`
-  height: 16px;
+  height: 14px;
   font-size: 14px;
   color: #ffffff;
   margin: 20px 0 15px 0;

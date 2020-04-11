@@ -64,8 +64,8 @@ export const mock_eth_puts = [
   {
     addr: '0x6b175474e89094c44da98b954eedeac495271d0f', // its' actually dai
     title: 'ETH Put $100 04/03/20',
-    symbol: 'oETH $150 Put',
-    name: 'Opyn ETH Put $150 04/03/20',
+    symbol: 'oETH $100 Put',
+    name: 'Opyn ETH Put $100 04/03/20',
     strikePriceInUSD: 100,
     decimals: 18,
     oracle: '0x7054e08461e3eCb7718B63540adDB3c3A1746415',
