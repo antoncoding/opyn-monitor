@@ -27,3 +27,29 @@ export const option = PropTypes.shape({
   uniswapExchange: PropTypes.string.isRequired,
   expiry: PropTypes.number.isRequired,
 });
+
+export const order = PropTypes.shape({
+  order: PropTypes.shape({
+    signature: PropTypes.string.isRequired,
+    senderAddress: PropTypes.string.isRequired,
+    makerAddress: PropTypes.string.isRequired,
+    takerAddress: PropTypes.string.isRequired,
+    makerFee: PropTypes.string.isRequired,
+    takerFee: PropTypes.string.isRequired,
+    makerAssetAmount: PropTypes.string.isRequired,
+    takerAssetAmount: PropTypes.string.isRequired,
+    makerAssetData: PropTypes.string.isRequired,
+    takerAssetData: PropTypes.string.isRequired,
+    salt: PropTypes.string.isRequired,
+    exchangeAddress: PropTypes.string.isRequired,
+    feeRecipientAddress: PropTypes.string.isRequired,
+    expirationTimeSeconds: PropTypes.string.isRequired,
+    makerFeeAssetData: PropTypes.string.isRequired,
+    chainId: PropTypes.number.isRequired,
+    takerFeeAssetData: PropTypes.string.isRequired,
+  }),
+  metaData: PropTypes.shape({
+    orderHash: PropTypes.string.isRequired,
+    remainingFillableTakerAssetAmount: PropTypes.string.isRequired,
+  }),
+});

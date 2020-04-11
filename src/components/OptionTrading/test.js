@@ -1,5 +1,5 @@
 /* eslint-disable no-underscore-dangle */
-import React, { useEffect, useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import BigNumber from 'bignumber.js';
 import {
   Header, Button, Box, DataView,
@@ -18,13 +18,12 @@ import { ZeroX_ERC20Proxy } from '../../constants/contracts';
 function OptionTrading() {
   const baseAsset = '0x6b175474e89094c44da98b954eedeac495271d0f';
   const quoteAsset = '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2';
-  // const [baseAsset, setBaseAsset] = useState('0x6b175474e89094c44da98b954eedeac495271d0f'); // DAI
-  // const [quoteAsset, setQuoteAsset] = useState('0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2'); //  WETH
+
   const [asks, setAsks] = useState([]);
   const [bids, setBids] = useState([]);
 
   // Update orderbook data
-  useEffect(() => {
+  useMemo(() => {
     let isCancelled = false;
     const updateOrderBook = async () => {
       const res = await getOrderBook(baseAsset, quoteAsset);

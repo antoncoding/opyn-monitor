@@ -1,22 +1,20 @@
 /* eslint-disable no-restricted-syntax */
 import React, { useMemo, useState } from 'react';
 import PropTypes from 'prop-types';
-import { DataView, DropDown } from '@aragon/ui';
+import { DataView, DropDown, Split } from '@aragon/ui';
 
-// import BigNumber from 'bignumber.js';
+import { SectionTitle } from '../common';
 
 import { getBasePairAskAndBids } from '../../utils/0x';
 import { option as OptionType } from '../types';
 
-function OptionBoard({ calls, puts }) {
+function OptionBoard({ calls, puts, setBaseAsset }) {
   const [putStats, setPutStats] = useState([]);
   const [callStats, setCallStats] = useState([]);
 
   const [selectedExpiryIdx, setExpiryIdx] = useState(0);
 
   const optionsByDate = groupByDate(puts, calls, putStats, callStats);
-  // console.log(optionsByDate[0]);
-  // console.log(JSON.stringify(optionsByDate, null, 2));
 
   // get option status
   useMemo(() => {
@@ -47,6 +45,21 @@ function OptionBoard({ calls, puts }) {
         selected={selectedExpiryIdx}
         onChange={setExpiryIdx}
       />
+      <div
+        style={{
+          display: 'flex',
+        }}
+      >
+        <SectionTitle title="Calls" />
+        <div
+          style={{
+            marginLeft: 'auto',
+            marginRight: 0,
+          }}
+        >
+          <SectionTitle title="Puts" />
+        </div>
+      </div>
       <DataView
         fields={['last', 'bid', 'ask', 'strike', 'last', 'bid', 'ask']}
         entries={optionsByDate[selectedExpiryIdx] ? optionsByDate[selectedExpiryIdx].entry : []}
@@ -56,14 +69,15 @@ function OptionBoard({ calls, puts }) {
           callDetail,
           putDetail,
           strikePrice,
-        }) => [// call, put, callDetail, putDetail, strikePrice,
+        }) => [
+          // call, put, callDetail, putDetail, strikePrice,
           <>-</>,
-          <>{ callDetail !== undefined ? callDetail.bestBid.toFixed(5) : '-' }</>,
-          <>{ callDetail !== undefined ? callDetail.bestAsk.toFixed(5) : '-' }</>,
+          <>{callDetail !== undefined ? callDetail.bestBid.toFixed(5) : '-'}</>,
+          <>{callDetail !== undefined ? callDetail.bestAsk.toFixed(5) : '-'}</>,
           <span style={{ fontSize: 19 }}>{strikePrice}</span>,
           <>-</>,
-          <>{ putDetail !== undefined ? putDetail.bestBid.toFixed(5) : '-' }</>,
-          <>{ putDetail !== undefined ? putDetail.bestAsk.toFixed(5) : '-' }</>,
+          <>{putDetail !== undefined ? putDetail.bestBid.toFixed(5) : '-'}</>,
+          <>{putDetail !== undefined ? putDetail.bestAsk.toFixed(5) : '-'}</>,
         ]}
       />
     </>
@@ -73,6 +87,7 @@ function OptionBoard({ calls, puts }) {
 OptionBoard.propTypes = {
   calls: PropTypes.arrayOf(OptionType).isRequired,
   puts: PropTypes.arrayOf(OptionType).isRequired,
+  setBaseAsset: PropTypes.func.isRequired,
 };
 
 export default OptionBoard;
@@ -92,7 +107,9 @@ function groupByDate(puts, calls, putStats, callStats) {
 
   for (const expiry of distinctExpirys) {
     const optionsExpiresThisDay = allOptions.filter((o) => o.expiry === expiry);
-    const strikePrices = [...new Set(optionsExpiresThisDay.map((option) => option.strikePriceInUSD))];
+    const strikePrices = [
+      ...new Set(optionsExpiresThisDay.map((option) => option.strikePriceInUSD)),
+    ];
 
     // const allStrikesForThisDay = {};
     const entry = [];
@@ -112,7 +129,8 @@ function groupByDate(puts, calls, putStats, callStats) {
     entry.sort((a, b) => (a.strikePrice > b.strikePrice ? 1 : -1));
     const expiryText = new Date(expiry * 1000).toDateString();
     result.push({
-      expiryText, entry,
+      expiryText,
+      entry,
     });
     // result[expiryKey] = entryRow;
   }
