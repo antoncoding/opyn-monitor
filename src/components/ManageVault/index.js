@@ -11,12 +11,14 @@ import CollateralManagement from './CollateralManagement';
 import IssuedTokenManagement from './IssuedTokenManagement';
 import LiquidationHistory from './Liquidation';
 import ExerciseHistory from './Exercise';
+import UnderlyingManagement from './UnderlyingManagement';
+
 import { Comment } from '../common';
 
 import { toTokenUnitsBN } from '../../utils/number';
 import { calculateRatio, calculateStrikeValueInCollateral } from '../../utils/calculation';
 import { getTokenBalance, getBalance, getDecimals } from '../../utils/infura';
-import { getAllVaultsForUser } from '../../utils/graph';
+import { getVault } from '../../utils/graph';
 import { redeem } from '../../utils/web3';
 
 import { ETH_ADDRESS } from '../../constants/contracts';
@@ -27,7 +29,7 @@ function ManageVault({ user }) {
 
   const option = allOptions.find((o) => o.addr === token);
   const {
-    decimals, symbol, oracle, strike, strikePrice, minRatio, collateral, expiry,
+    decimals, symbol, oracle, strike, strikePrice, minRatio, collateral, expiry, underlying,
   } = option;
 
   const [isLoading, setIsLoading] = useState(true);
@@ -55,10 +57,8 @@ function ManageVault({ user }) {
   useMemo(() => {
     let isCancelled = false;
     async function updateInfo() {
-      const vaultToManage = (await getAllVaultsForUser(owner)).find(
-        (v) => v.optionsContract.address === token,
-      );
-      if (vaultToManage === undefined) return;
+      const vaultToManage = await getVault(owner, token);
+      if (vaultToManage === null) return;
 
       setNoVault(false);
       const [_ownerTokenBalance, _userTokenBalance] = await Promise.all([
@@ -160,7 +160,7 @@ function ManageVault({ user }) {
           />
 
           <Tabs
-            items={['Collateral Management', 'Token Issuance', 'Liquidation', 'Exercise']}
+            items={['Collateral Management', 'Token Issuance', 'Liquidation', 'Exercise', 'Underlying Redemption']}
             selected={tabSelected}
             onChange={setTabSelected}
           />
@@ -225,6 +225,15 @@ function ManageVault({ user }) {
           ) : (
             <></>
           )}
+
+          {tabSelected === 4 ? (
+            <UnderlyingManagement
+              owner={owner}
+              token={token}
+              underlying={underlying}
+              underlyingAmount={vault.underlying}
+            />
+          ) : <> </>}
         </>
     );
 }

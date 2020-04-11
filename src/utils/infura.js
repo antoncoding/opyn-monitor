@@ -34,6 +34,7 @@ export const getTokenBalance = async (erc20Token, user) => {
 };
 
 export const getDecimals = async (erc20Token) => {
+  if (erc20Token === ETH_ADDR) return 18;
   const oTokenContract = new web3.eth.Contract(optionContractABI, erc20Token);
   const decimals = await oTokenContract.methods.decimals().call();
   return parseInt(decimals, 10);
