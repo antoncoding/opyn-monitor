@@ -1,7 +1,7 @@
 /* eslint-disable no-restricted-syntax */
 import React, { useMemo, useState } from 'react';
 import PropTypes from 'prop-types';
-import { DataView, DropDown, Split } from '@aragon/ui';
+import { DataView, DropDown } from '@aragon/ui';
 
 import { SectionTitle } from '../common';
 
@@ -39,17 +39,15 @@ function OptionBoard({ calls, puts, setBaseAsset }) {
   }, [calls, puts]);
 
   return (
-    <>
-      <DropDown
-        items={optionsByDate.map((item) => item.expiryText)}
-        selected={selectedExpiryIdx}
-        onChange={setExpiryIdx}
-      />
-      <div
-        style={{
-          display: 'flex',
-        }}
-      >
+    <div>
+      <div style={{ display: 'flex' }}>
+        <DropDown
+          items={optionsByDate.map((item) => item.expiryText)}
+          selected={selectedExpiryIdx}
+          onChange={setExpiryIdx}
+        />
+      </div>
+      <div style={{ display: 'flex' }}>
         <SectionTitle title="Calls" />
         <div
           style={{
@@ -80,7 +78,7 @@ function OptionBoard({ calls, puts, setBaseAsset }) {
           <>{putDetail !== undefined ? putDetail.bestAsk.toFixed(5) : '-'}</>,
         ]}
       />
-    </>
+    </div>
   );
 }
 

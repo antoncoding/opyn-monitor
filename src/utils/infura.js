@@ -17,7 +17,7 @@ const ETH_ADDR = '0x0000000000000000000000000000000000000000';
 // ENS
 export const resolveENS = async (ensName) => {
   const address = await ens.resolver(ensName).addr();
-  return address;
+  return address.toLowerCase();
 };
 
 /**
@@ -34,6 +34,7 @@ export const getTokenBalance = async (erc20Token, user) => {
 };
 
 export const getDecimals = async (erc20Token) => {
+  if (erc20Token === ETH_ADDR) return 18;
   const oTokenContract = new web3.eth.Contract(optionContractABI, erc20Token);
   const decimals = await oTokenContract.methods.decimals().call();
   return parseInt(decimals, 10);

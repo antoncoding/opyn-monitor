@@ -12,11 +12,11 @@ import OptionTrading from './components/OptionTrading';
 import MyVaults from './components/MyVaults';
 import OptionPage from './components/OptionPage';
 import ManageVault from './components/ManageVault';
-import ManagePool from './components/ManagePool';
+import Uniswap from './components/UniswapTrade';
 import Footer from './components/Footer';
 
 // testing
-import ZEROXTest from './components/OptionTrading/test';
+// import ZEROXTest from './components/OptionTrading/test';
 
 function App() {
   const storedTheme = getPreference('theme', 'light');
@@ -50,10 +50,12 @@ function App() {
           <Route path="/manage/:token/:owner">
             <ManageVault user={user} />
           </Route>
-          {/* Trade */}
-          <Route path="/trades/eth/"><OptionTrading user={user} /></Route>
-          <Route path="/trades/test/"><ZEROXTest /></Route>
-          <Route path="/trade/:token/"><ManagePool user={user} /></Route>
+          {/* Trading */}
+          <Route path="/trades/eth/">
+            <OptionTrading user={user} theme={theme} />
+          </Route>
+          {/* <Route path="/trades/test/"><ZEROXTest /></Route> */}
+          <Route path="/trade/:token/"><Uniswap user={user} /></Route>
           <Route path="/trade/">
             <Trade />
           </Route>

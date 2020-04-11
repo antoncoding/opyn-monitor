@@ -19,8 +19,7 @@ function OrderHistory({
 
   const orders = []; // asks.concat(bids);
 
-  const bidsFromUser = bids;
-  // .filter((o) => o.order.makerAddress === '0x6924a03bb710eaf199ab6ac9f2bb148215ae9b5d');
+  const bidsFromUser = bids.filter((o) => o.order.makerAddress === '0x6924a03bb710eaf199ab6ac9f2bb148215ae9b5d');
   // const asksFromUser = asks.filter((o) => o.order.makerAddress === '0x6924a03bb710eaf199ab6ac9f2bb148215ae9b5d');
   // .filter((o) => o.order.makerAddress === user);
   for (const bid of bidsFromUser) {
@@ -33,24 +32,14 @@ function OrderHistory({
       status: 'open',
       expiry: bid.order.expirationTimeSeconds,
     });
-    // assetDataUtils.decodeAssetDataOrThrow(bid.order.takerAssetData).tokenAddress === option);
   }
-
-  // for (const ask of asksFromUser) {
-  // console.log(assetDataUtils.decodeAssetDataOrThrow(ask.order.makerAssetData).tokenAddress === option);
-  // }
 
 
   return (
     <>
-      {/* <Tabs
-        items={['Orders']}
-        selected={selectedTab}
-        onChange={setSelectedTab}
-      /> */}
       <SectionTitle title="My Orders" />
       <DataView
-        entriesPerPage={5}
+        entriesPerPage={4}
         page={page}
         onPageChange={setPage}
         fields={['digest', 'status', 'price', 'amount', 'expiration']}
@@ -63,8 +52,6 @@ function OrderHistory({
           order.expiry,
         ]}
       />
-
-
     </>
   );
 }

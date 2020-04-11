@@ -243,6 +243,21 @@ export const redeem = async (token) => {
     });
 };
 
+/**
+ *
+ * @param {string} token
+ */
+export const removeUnderlying = async (token) => {
+  const account = await checkConnectedAndGetAddress();
+  const oToken = new web3.eth.Contract(oTokenABI, token);
+  await oToken.methods
+    .removeUnderlying()
+    .send({ from: account })
+    .on('transactionHash', (hash) => {
+      notify.hash(hash);
+    });
+};
+
 export const approve = async (oTokenAddr, spender, amt = UINT256_MAX) => {
   const account = await checkConnectedAndGetAddress();
   const oToken = new web3.eth.Contract(oTokenABI, oTokenAddr);
