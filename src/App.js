@@ -11,7 +11,7 @@ import Trade from './components/Trade';
 import MyVaults from './components/MyVaults';
 import OptionPage from './components/OptionPage';
 import ManageVault from './components/ManageVault';
-import ManagePool from './components/ManagePool';
+import Uniswap from './components/UniswapTrade';
 import Footer from './components/Footer';
 
 function App() {
@@ -47,7 +47,7 @@ function App() {
             <ManageVault user={user} />
           </Route>
           {/* Trade */}
-          <Route path="/trade/:token/"><ManagePool user={user} /></Route>
+          <Route path="/trade/:token/"><Uniswap user={user} /></Route>
           <Route path="/trade/">
             <Trade />
           </Route>

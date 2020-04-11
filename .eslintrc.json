@@ -22,6 +22,8 @@
         "react"
     ],
     "rules": {
+        // "no-tabs": "off",
+        // "indent": ["error", "tab"],
         "react/jsx-filename-extension": "off",
         "prefer-destructuring": "off",
         "no-nested-ternary": "off",

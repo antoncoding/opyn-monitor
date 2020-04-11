@@ -14,7 +14,7 @@ import OptionExchange from './OptionExchange';
 import AddLiquidity from './AddLiquidity';
 import RemoveLiquidity from './RemoveLiquidity';
 
-function ManagePool({ user }) {
+function UniswapPool({ user }) {
   const { token } = useParams();
 
   const option = allOptions.find((o) => o.addr === token);
@@ -139,8 +139,8 @@ function ManagePool({ user }) {
   );
 }
 
-ManagePool.propTypes = {
+UniswapPool.propTypes = {
   user: PropTypes.string.isRequired,
 };
 
-export default ManagePool;
+export default UniswapPool;
