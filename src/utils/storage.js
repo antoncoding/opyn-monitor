@@ -19,7 +19,7 @@ export function storePreference(key, value) {
 export function checkAddressAndAddToStorage(address) {
   const watch_addrs = getPreference('watch_addresses', '[]');
   const usedAddresses = JSON.parse(watch_addrs);
-  if (!usedAddresses.includes(address)) {
+  if (!usedAddresses.includes(address.toLowerCase()) && !usedAddresses.includes(address)) {
     usedAddresses.push(address);
     storePreference('watch_addresses', JSON.stringify(usedAddresses));
   }

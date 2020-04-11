@@ -17,7 +17,7 @@ const ETH_ADDR = '0x0000000000000000000000000000000000000000';
 // ENS
 export const resolveENS = async (ensName) => {
   const address = await ens.resolver(ensName).addr();
-  return address;
+  return address.toLowerCase();
 };
 
 /**

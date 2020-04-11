@@ -28,7 +28,7 @@ function PleaseLogin({ setWatchAddress }) {
           <TextInput
             placeholder="Ethereum address or ENS"
             value={InAddress}
-            onChange={(e) => { setAddress(e.target.value); }}
+            onChange={(e) => { setAddress(e.target.value.toLowerCase()); }}
             wide
           />
 

@@ -45,7 +45,7 @@ export async function getAllVaultsForUser(owner) {
 export async function getVault(owner, option) {
   const query = `{
     vault(
-     id: "${option}-${owner}"
+     id: "${option.toLowerCase()}-${owner.toLowerCase()}"
     ) {
       underlying
       collateral

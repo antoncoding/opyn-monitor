@@ -58,7 +58,10 @@ function ManageVault({ user }) {
     let isCancelled = false;
     async function updateInfo() {
       const vaultToManage = await getVault(owner, token);
-      if (vaultToManage === null) return;
+      if (vaultToManage === null) {
+        setIsLoading(false);
+        return;
+      }
 
       setNoVault(false);
       const [_ownerTokenBalance, _userTokenBalance] = await Promise.all([
