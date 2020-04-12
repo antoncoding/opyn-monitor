@@ -74,7 +74,7 @@ export async function getOrderBook(base, quote) {
 /**
  * get oToken:WETH stats (v1) for all options
  * @param {Array<{addr:string, decimals:number}>} options
- * @return {Promise<Arrya< option: address, bestAsk: BigNumber, bestAsk:BigNumber >>}
+ * @return {Promise<Arrya< option: address, bestAskPrice: BigNumber, bestAskPrice:BigNumber, bestAsk:{}, bestBid:{} >>}
  */
 export async function getBasePairAskAndBids(options) {
   const bestAskAndBids = await Promise.map(options, async ({ addr: option, decimals }) => {
@@ -83,9 +83,11 @@ export async function getBasePairAskAndBids(options) {
     const validBids = bids.records.filter((record) => isValid(record, decimals));
     const { makerAssetAmount: askTokenAmt, takerAssetAmount: askWETHAmt } = validAsks[0].order;
     const { makerAssetAmount: bidWETHAmt, takerAssetAmount: bidTokenAmt } = validBids[0].order;
-    const bestAsk = toTokenUnitsBN(askWETHAmt, 18).div(toTokenUnitsBN(askTokenAmt, decimals));
-    const bestBid = toTokenUnitsBN(bidWETHAmt, 18).div(toTokenUnitsBN(bidTokenAmt, decimals));
-    return { option, bestAsk, bestBid };
+    const bestAskPrice = toTokenUnitsBN(askWETHAmt, 18).div(toTokenUnitsBN(askTokenAmt, decimals));
+    const bestBidPrice = toTokenUnitsBN(bidWETHAmt, 18).div(toTokenUnitsBN(bidTokenAmt, decimals));
+    return {
+      option, bestAskPrice, bestBidPrice, bestAsk: validAsks[0], bestBid: validBids[0],
+    };
   });
   return bestAskAndBids;
 }

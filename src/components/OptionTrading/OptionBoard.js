@@ -9,7 +9,9 @@ import { SectionTitle } from '../common';
 import { getBasePairAskAndBids } from '../../utils/0x';
 import { option as OptionType } from '../types';
 
-function OptionBoard({ calls, puts, setBaseAsset }) {
+function OptionBoard({
+  calls, puts, setBaseAsset, setTradeType, setSelectedOrders,
+}) {
   const [putStats, setPutStats] = useState([]);
   const [callStats, setCallStats] = useState([]);
 
@@ -77,31 +79,56 @@ function OptionBoard({ calls, puts, setBaseAsset }) {
           let callAsk = '-';
           let callBid = '-';
           let callOnclick = () => {};
+          let callBidOnclick = () => {};
+          let callAskOnclick = () => {};
 
           const lastPutPrice = '-';
           let putAsk = '-';
           let putBid = '-';
           let putOnclick = () => {};
+          let putBidOnclick = () => {};
+          let putAskOnclick = () => {};
 
           if (callDetail !== undefined) {
-            callAsk = callDetail.bestAsk.toFixed(6);
-            callBid = callDetail.bestBid.toFixed(6);
+            callAsk = callDetail.bestAskPrice.toFixed(6);
+            callBid = callDetail.bestBidPrice.toFixed(6);
             callOnclick = () => { setBaseAsset(call); };
+
+            callBidOnclick = () => {
+              setSelectedOrders([callDetail.bestBid]);
+              setTradeType('bid');
+              setBaseAsset(call);
+            };
+            callAskOnclick = () => {
+              setSelectedOrders([callDetail.bestAsk]);
+              setTradeType('ask');
+              setBaseAsset(call);
+            };
           }
           if (putDetail !== undefined) {
-            putAsk = putDetail.bestAsk.toFixed(6);
-            putBid = putDetail.bestBid.toFixed(6);
+            putAsk = putDetail.bestAskPrice.toFixed(6);
+            putBid = putDetail.bestBidPrice.toFixed(6);
             putOnclick = () => { setBaseAsset(put); };
+            putBidOnclick = () => {
+              setBaseAsset(put);
+              setSelectedOrders([putDetail.bestBid]);
+              setTradeType('bid');
+            };
+            putAskOnclick = () => {
+              setBaseAsset(put);
+              setSelectedOrders([putDetail.bestAsk]);
+              setTradeType('ask');
+            };
           }
 
           return [
             <LinkBase onClick={callOnclick}>{lastCallPrice}</LinkBase>,
-            <LinkBase onClick={callOnclick}><BidText>{callBid}</BidText></LinkBase>,
-            <LinkBase onClick={callOnclick}><AskText>{callAsk}</AskText></LinkBase>,
+            <LinkBase onClick={callBidOnclick}><BidText>{callBid}</BidText></LinkBase>,
+            <LinkBase onClick={callAskOnclick}><AskText>{callAsk}</AskText></LinkBase>,
             <div style={{ fontSize: 20 }}>{strikePrice}</div>,
             <LinkBase onClick={putOnclick}>{lastPutPrice}</LinkBase>,
-            <LinkBase onClick={putOnclick}><BidText>{putBid}</BidText></LinkBase>,
-            <LinkBase onClick={putOnclick}><AskText>{putAsk}</AskText></LinkBase>,
+            <LinkBase onClick={putBidOnclick}><BidText>{putBid}</BidText></LinkBase>,
+            <LinkBase onClick={putAskOnclick}><AskText>{putAsk}</AskText></LinkBase>,
           ];
         }}
       />
@@ -113,6 +140,8 @@ OptionBoard.propTypes = {
   calls: PropTypes.arrayOf(OptionType).isRequired,
   puts: PropTypes.arrayOf(OptionType).isRequired,
   setBaseAsset: PropTypes.func.isRequired,
+  setTradeType: PropTypes.func.isRequired,
+  setSelectedOrders: PropTypes.func.isRequired,
 };
 
 export default OptionBoard;
@@ -121,8 +150,8 @@ export default OptionBoard;
  *
  * @param {Array<{strikePriceInUSD:number, addr:string, expiry:number}>} puts
  * @param {Array<{strikePriceInUSD:number, addr:string, expiry:number}>} calls
- * @param {Array<{option: string, bestBid: BigNumber, bestAsk: BigNumber}>} putStats
- * @param {Array<{option: string, bestBid: BigNumber, bestAsk: BigNumber}>} callStats
+ * @param {Array<{option: string, bestBidPrice: BigNumber, bestAskPrice: BigNumber}>} putStats
+ * @param {Array<{option: string, bestBidPrice: BigNumber, bestAskPrice: BigNumber}>} callStats
  * @returns {} key: expiry in string, value: array of { call, put, callDetail, putDetail, strikePrice}
  */
 function groupByDate(puts, calls, putStats, callStats) {

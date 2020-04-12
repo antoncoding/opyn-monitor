@@ -27,6 +27,9 @@ function OptionTrading({ user, theme }) {
   const [asks, setAsks] = useState([]);
   const [bids, setBids] = useState([]);
 
+  const [tradeType, setTradeType] = useState('bid');
+  const [selectedOrders, setSelectedOrders] = useState([]);
+
   // user balance
   const [baseAssetBalance, setBaseAssetBalance] = useState(BigNumber(0));
   const [quoteAssetBalance, setQuoteAssetBalance] = useState(BigNumber(0));
@@ -114,12 +117,24 @@ function OptionTrading({ user, theme }) {
               collateralDecimals={collateralDecimals}
               vault={vault}
               theme={theme}
+
+              tradeType={tradeType}
+              setTradeType={setTradeType}
+
+              selectedOrders={selectedOrders}
+              setSelectedOrders={setSelectedOrders}
             />
           </FixBottom>
         </LeftPart>
         <RightPart>
           <Header primary="Trade ETH Options" />
-          <OptionBoard puts={eth_puts} calls={eth_calls} setBaseAsset={setBaseAsset} />
+          <OptionBoard
+            puts={eth_puts}
+            calls={eth_calls}
+            setBaseAsset={setBaseAsset}
+            setTradeType={setTradeType}
+            setSelectedOrders={setSelectedOrders}
+          />
           <FixBottom>
             <OrderHistory asks={asks} bids={bids} user={user} option={baseAsset} />
           </FixBottom>

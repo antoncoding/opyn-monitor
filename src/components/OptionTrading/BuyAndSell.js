@@ -7,11 +7,15 @@ import styled from 'styled-components';
 import BigNumber from 'bignumber.js';
 
 import { toTokenUnitsBN } from '../../utils/number';
-import { vault as VaultType } from '../types';
+import { vault as VaultType, order as OrderType } from '../types';
 
 function BuyAndSell({
 
-  // theme, // string
+  tradeType, // ask || bid
+  selectedOrders, //
+  setTradeType,
+  setSelectedOrders,
+
   vault,
   baseAssetSymbol, // "oETH"
   quoteAssetSymbol, // "WETH"
@@ -27,8 +31,31 @@ function BuyAndSell({
   // collateralBalance, // :BigNumber,
   // orders,
 }) {
-  const [selectedTab, setSelectedTab] = useState(0);
+  // const [selectedTab, setSelectedTab] = useState('bid'); // 0: sell, 1: buy
   const theme = useTheme();
+  // console.log(tradeType);
+
+  const [baseAssetAmount, setBaseAssetAmount] = useState(new BigNumber(0));
+  const [price, setPrice] = useState(new BigNumber(0));
+
+  const onChangeAmount = (amount) => {
+    if (!amount) {
+      setBaseAssetAmount(new BigNumber(0));
+      return;
+    }
+    const amountBN = new BigNumber(amount);
+    setBaseAssetAmount(amountBN);
+    // updateNewRatio(new BigNumber(vault.oTokensIssued).plus(toBaseUnitBN(amountBN, decimals)));
+  };
+
+  const onChangeRate = (rate) => {
+    if (!rate) {
+      setPrice(new BigNumber(0));
+      return;
+    }
+    const amountBN = new BigNumber(rate);
+    setPrice(amountBN);
+  };
 
   // const [mode, setMode] = useState('create');
 
@@ -63,15 +90,44 @@ function BuyAndSell({
       </Wrapper>
       <Wrapper>
         <TabWrapper theme={theme}>
-          <Tab active={selectedTab === 0} onClick={() => setSelectedTab(0)} theme={theme}> Buy </Tab>
-          <Tab active={selectedTab === 1} onClick={() => setSelectedTab(1)} theme={theme}> Sell </Tab>
+          <Tab
+            active={tradeType === 'bid'}
+            onClick={() => {
+              setSelectedOrders([]);
+              setTradeType('bid');
+            }}
+            theme={theme}
+          >
+            Buy
+          </Tab>
+          <Tab
+            active={tradeType === 'ask'}
+            onClick={() => {
+              setSelectedOrders([]);
+              setTradeType('ask');
+            }}
+            theme={theme}
+          >
+            Sell
+
+          </Tab>
         </TabWrapper>
         <LowerPart>
           <Label>Amount</Label>
-          <TextInput wide type="number" />
+          <TextInput
+            wide
+            type="number"
+            onChange={(e) => onChangeAmount(e.target.value)}
+            value={baseAssetAmount}
+          />
 
           <Label>Price per token</Label>
-          <TextInput wide type="number" />
+          <TextInput
+            wide
+            type="number"
+            onChange={(e) => onChangeRate(e.target.value)}
+            value={price}
+          />
 
           <BottomTextWrapper>
             <BottomText>Order Cost</BottomText>
@@ -99,7 +155,7 @@ function BuyAndSell({
         </LowerPart>
       </Wrapper>
       <Flex>
-        <Button label={selectedTab === 0 ? 'Buy' : 'Sell'} wide />
+        <Button label={tradeType === 0 ? 'Buy' : 'Sell'} wide />
         {/* <Half><Button label="Sell" wide /></Half> */}
       </Flex>
     </BuyAndSellBlock>
@@ -120,6 +176,12 @@ BuyAndSell.propTypes = {
   collateralDecimals: PropTypes.number.isRequired,
 
   vault: VaultType,
+
+  tradeType: PropTypes.string.isRequired,
+  setTradeType: PropTypes.func.isRequired,
+
+  selectedOrders: PropTypes.arrayOf(OrderType).isRequired,
+  setSelectedOrders: PropTypes.func.isRequired,
 };
 
 BuyAndSell.defaultProps = {
