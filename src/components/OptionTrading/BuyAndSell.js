@@ -38,13 +38,14 @@ function BuyAndSell({
 }) {
   const theme = useTheme();
 
-  const [quoteAssetAmount, setQuoteAssetAmount] = useState(new BigNumber(0));
+  // const [quoteAssetAmount, setQuoteAssetAmount] = useState(new BigNumber(0));
   const [baseAssetAmount, setBaseAssetAmount] = useState(new BigNumber(0));
   const [price, setPrice] = useState(new BigNumber(0));
 
+  const quoteAssetAmount = price.times(baseAssetAmount);
+
   const onChangeBaseAmount = (amount) => {
     if (!amount) {
-      console.log('invalid');
       setBaseAssetAmount(new BigNumber(0));
       return;
     }
@@ -53,8 +54,8 @@ function BuyAndSell({
 
     // calculate quote asset
     // price 0.0001 WETH, amount 10 => need 0.001 weth
-    const quoteAmount = price.times(amountBN);
-    setQuoteAssetAmount(quoteAmount);
+    // const quoteAmount = price.times(amountBN);
+    // setQuoteAssetAmount(quoteAmount);
   };
 
   const onChangeRate = (rate) => {
@@ -65,8 +66,8 @@ function BuyAndSell({
     const rateBN = new BigNumber(rate);
     setPrice(rateBN);
 
-    const quoteAmount = rateBN.times(baseAssetAmount);
-    setQuoteAssetAmount(quoteAmount);
+    // const quoteAmount = rateBN.times(baseAssetAmount);
+    // setQuoteAssetAmount(quoteAmount);
   };
 
   const createBidOrder = async () => {
@@ -82,14 +83,7 @@ function BuyAndSell({
   };
 
   if (selectedOrders.length > 0) console.log(selectedOrders[0].order);
-  // let actionType = ''
-  // if(selectedOrders.length === 0) {
-  //   actionType = 'create'
-  // } else {
-  //   const orderAmountSum =
-  // }
 
-  // const [mode, setMode] = useState('create');
 
   return (
     <BuyAndSellBlock theme={theme}>
@@ -162,8 +156,8 @@ function BuyAndSell({
           />
 
           <BottomTextWrapper>
-            <BottomText>Order Cost</BottomText>
-            <BottomText>0</BottomText>
+            <BottomText>{tradeType === 'bid' ? 'Cost' : 'Earn'}</BottomText>
+            <BottomText>{`${quoteAssetAmount.toFixed(4)} WETH`}</BottomText>
           </BottomTextWrapper>
           <BottomTextWrapper>
             <BottomText>
@@ -175,11 +169,11 @@ function BuyAndSell({
                 </Help>
               </Flex>
             </BottomText>
-            <BottomText>$0.123</BottomText>
+            <BottomText>0 WETH</BottomText>
             {/* </div> */}
           </BottomTextWrapper>
           <BottomTextWrapper>
-            <BottomText>Total cost</BottomText>
+            <BottomText>Total Cost</BottomText>
             <BottomText>$429</BottomText>
           </BottomTextWrapper>
         </LowerPart>

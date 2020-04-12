@@ -5,11 +5,11 @@ import { Header } from '@aragon/ui';
 import styled from 'styled-components';
 import BigNumber from 'bignumber.js';
 import OptionBoard from './OptionBoard';
-import OrderHistory from './OrderHistory';
+import OrderList from './Orders';
 import BuyAndSell from './BuyAndSell';
 
 import { getTokenBalance, getDecimals } from '../../utils/infura';
-import { getOrderBook } from '../../utils/0x';
+import { getOrderBook, isValid } from '../../utils/0x';
 import { getVault } from '../../utils/graph';
 // import { toTokenUnitsBN } from '../../utils/number';
 
@@ -45,8 +45,8 @@ function OptionTrading({ user, theme }) {
     const updateOrderBook = async () => {
       const res = await getOrderBook(baseAsset.addr, quoteAsset.addr);
       if (!isCancelled) {
-        setAsks(res.asks.records);
-        setBids(res.bids.records);
+        setAsks(res.asks.records.filter((record) => isValid(record, quoteAsset.decimals)));
+        setBids(res.bids.records.filter((record) => isValid(record, baseAsset.decimals)));
       }
     };
     // update baseAsset Balance
@@ -105,29 +105,31 @@ function OptionTrading({ user, theme }) {
         <LeftPart>
           {/* OrderBook */}
           {/* Buy And Sell */}
-          <FixBottom>
-            <BuyAndSell
-              user={user}
-              baseAsset={baseAsset.addr}
-              quoteAsset={quoteAsset.addr}
-              baseAssetSymbol={baseAsset.symbol}
-              collateralSymbol={baseAsset.collateralSymbol}
-              quoteAssetSymbol={quoteAsset.symbol}
-              baseAssetBalance={baseAssetBalance}
-              quoteAssetBalance={quoteAssetBalance}
-              baseAssetDecimals={baseAsset.decimals}
-              quoteAssetDecimals={quoteAsset.decimals}
-              collateralDecimals={collateralDecimals}
-              vault={vault}
-              theme={theme}
+          {/* <FixBottom> */}
+          <Header />
+          <Header />
+          <BuyAndSell
+            user={user}
+            baseAsset={baseAsset.addr}
+            quoteAsset={quoteAsset.addr}
+            baseAssetSymbol={baseAsset.symbol}
+            collateralSymbol={baseAsset.collateralSymbol}
+            quoteAssetSymbol={quoteAsset.symbol}
+            baseAssetBalance={baseAssetBalance}
+            quoteAssetBalance={quoteAssetBalance}
+            baseAssetDecimals={baseAsset.decimals}
+            quoteAssetDecimals={quoteAsset.decimals}
+            collateralDecimals={collateralDecimals}
+            vault={vault}
+            theme={theme}
 
-              tradeType={tradeType}
-              setTradeType={setTradeType}
+            tradeType={tradeType}
+            setTradeType={setTradeType}
 
-              selectedOrders={selectedOrders}
-              setSelectedOrders={setSelectedOrders}
-            />
-          </FixBottom>
+            selectedOrders={selectedOrders}
+            setSelectedOrders={setSelectedOrders}
+          />
+          {/* </FixBottom> */}
         </LeftPart>
         <RightPart>
           <Header primary="Trade ETH Options" />
@@ -138,9 +140,10 @@ function OptionTrading({ user, theme }) {
             setTradeType={setTradeType}
             setSelectedOrders={setSelectedOrders}
           />
-          <FixBottom>
-            <OrderHistory asks={asks} bids={bids} user={user} option={baseAsset} />
-          </FixBottom>
+          <br />
+          {/* <FixBottom> */}
+          <OrderList asks={asks} bids={bids} user={user} option={baseAsset} />
+          {/* </FixBottom> */}
         </RightPart>
       </FlexWrapper>
     </WholeScreen>
@@ -152,9 +155,9 @@ OptionTrading.propTypes = {
   theme: PropTypes.string.isRequired,
 };
 
-const FixBottom = styled.div`
-  margin-top: auto;
-`;
+// const FixBottom = styled.div`
+//   margin-top: auto;
+// `;
 
 const LeftPart = styled.div`
   width: 20%;

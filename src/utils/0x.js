@@ -1,4 +1,4 @@
-import { assetDataUtils, signatureUtils } from '@0x/order-utils';
+import { assetDataUtils } from '@0x/order-utils';
 import BigNumber from 'bignumber.js';
 import { WETH } from '../constants/contracts';
 
@@ -125,17 +125,17 @@ export function connectWebSocket(_orders, setBuyOrders) {
 }
 
 /**
- * Convert ERC20 token address to 0x ERC20 asset ID
- * @param {srting} erc20_address hex addres contain 0x
- * @return {string}
+ *
+ * @param {*} entry
+ * @param {*} decimals
  */
-// function toERC20AssetId(erc20_address) {
-//   return ERC20_ASSET_PROXY_ID.padEnd(34, '0').concat(erc20_address.slice(2));
-// }
-
-export const isValid = (entry, decimals) => parseInt(entry.order.expirationTimeSeconds, 10) > Date.now() / 1000
-  && new BigNumber(entry.metaData.remainingFillableTakerAssetAmount)
-    .gt(new BigNumber(0.0001).times(new BigNumber(10).pow(decimals)));
+export const isValid = (entry, takerAssetDecimals) => {
+  const notExpired = parseInt(entry.order.expirationTimeSeconds, 10) > Date.now() / 1000;
+  // notDust: not very good
+  const notDust = new BigNumber(entry.metaData.remainingFillableTakerAssetAmount)
+    .gt(new BigNumber(0.0001).times(new BigNumber(10).pow(takerAssetDecimals)));
+  return notExpired && notDust;
+};
 
 export const createOrder = (maker, makerAsset, takerAsset, makerAssetAmount, takerAssetAmount) => {
   const salt = BigNumber.random(20).times(new BigNumber(10).pow(new BigNumber(20))).integerValue().toString(10);
@@ -170,3 +170,18 @@ export const broadcastOrder = async (order) => {
   });
   return res;
 };
+
+export const getBidPrice = (bid) => new BigNumber(bid.order.makerAssetAmount)
+  .div(new BigNumber(bid.order.takerAssetAmount));
+
+/**
+ *
+ * @param {{}} ask
+ */
+export const getAskPrice = (ask) => new BigNumber(ask.order.takerAssetAmount)
+  .div(new BigNumber(ask.order.makerAssetAmount));
+
+export const getOrderFillRatio = (order) => new BigNumber(100)
+  .minus(new BigNumber(order.metaData.remainingFillableTakerAssetAmount)
+    .div(new BigNumber(order.order.takerAssetAmount))
+    .times(100)).toFixed(2);
