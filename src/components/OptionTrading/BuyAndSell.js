@@ -1,23 +1,37 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Button, useTheme, TextInput } from '@aragon/ui';
+import {
+  Button, useTheme, TextInput, Help,
+} from '@aragon/ui';
 import styled from 'styled-components';
+import BigNumber from 'bignumber.js';
+
+import { toTokenUnitsBN } from '../../utils/number';
+import { vault as VaultType } from '../types';
 
 function BuyAndSell({
 
   // theme, // string
+  vault,
   baseAssetSymbol, // "oETH"
   quoteAssetSymbol, // "WETH"
   collateralSymbol, // // USDC
-  // baseAssetBalance, // :BigNumber,
+
+  baseAssetBalance,
+  quoteAssetBalance,
+
+  baseAssetDecimals,
+  quoteAssetDecimals,
+  collateralDecimals,
   // quoteAssetBalance, // :BigNumber,
   // collateralBalance, // :BigNumber,
   // orders,
 }) {
   // const [selectedTab, setSelectedTab] = useState('Buy');
   const theme = useTheme();
-  // BACKGROUND_COLOR = theme.background;
-  // console.log(BACKGROUND_COLOR.hexColor);
+
+  // const [mode, setMode] = useState('create');
+
   return (
     <BuyAndSellBlock theme={theme}>
       <Header theme={theme}>
@@ -27,49 +41,54 @@ function BuyAndSell({
         <TopPart theme={theme}>
           <FlexWrapper>
             <div>{baseAssetSymbol}</div>
-            <TopPartText>0</TopPartText>
+            <TopPartText>{toTokenUnitsBN(baseAssetBalance, baseAssetDecimals).toFormat(4)}</TopPartText>
           </FlexWrapper>
           <FlexWrapper>
             <div>{quoteAssetSymbol}</div>
-            <TopPartText>0</TopPartText>
+            <TopPartText>{toTokenUnitsBN(quoteAssetBalance, quoteAssetDecimals).toFormat(4)}</TopPartText>
           </FlexWrapper>
         </TopPart>
         <FlexWrapper>
           <div>
             Collateral
-            {' '}
             {collateralSymbol}
           </div>
-          <TopPartText>0</TopPartText>
+          <TopPartText>
+            { vault ? toTokenUnitsBN(vault.collateral, collateralDecimals).toFormat(4) : 0}
+          </TopPartText>
         </FlexWrapper>
       </Wrapper>
       <Wrapper>
         <LowerPart>
           <Label>Amount</Label>
-          <TextInput wide />
+          <TextInput wide type="number" />
 
           <Label>Price per token</Label>
-          <TextInput wide />
-          {/* <Input theme={theme} /> */}
-          {[
-            {
-              label: 'Order Details',
-              content: 'USD',
-            },
-            {
-              label: 'Fee',
-              content: '$1.05',
-            },
-            {
-              label: 'Total Cost',
-              content: '$590.63',
-            },
-          ].map((x) => (
-            <BottomTextWrapper key={x.label}>
-              <BottomText>{x.label}</BottomText>
-              <BottomText>{x.content}</BottomText>
-            </BottomTextWrapper>
-          ))}
+          <TextInput wide type="number" />
+
+          <BottomTextWrapper>
+            <BottomText>Order Cost</BottomText>
+            <BottomText>0</BottomText>
+          </BottomTextWrapper>
+          <BottomTextWrapper>
+            <BottomText>
+              <Flex>
+                <p style={{ paddingRight: '5px' }}>Fee</p>
+                <Help hint="Why am I paying?">
+                  The fee is charged by 0x.
+                  The higher your gasPirce is, the higher you will be charged for.
+                </Help>
+              </Flex>
+            </BottomText>
+            {/* <div style={{ paddingLeft: '5px' }} />
+            <div style={{ marginLeft: 'auto', right: 0 }}> */}
+            <BottomText>$0.123</BottomText>
+            {/* </div> */}
+          </BottomTextWrapper>
+          <BottomTextWrapper>
+            <BottomText>Total cost</BottomText>
+            <BottomText>$429</BottomText>
+          </BottomTextWrapper>
         </LowerPart>
       </Wrapper>
       <Flex>
@@ -85,6 +104,24 @@ BuyAndSell.propTypes = {
   baseAssetSymbol: PropTypes.string.isRequired,
   quoteAssetSymbol: PropTypes.string.isRequired,
   collateralSymbol: PropTypes.string.isRequired,
+
+  baseAssetBalance: PropTypes.instanceOf(BigNumber).isRequired,
+  quoteAssetBalance: PropTypes.instanceOf(BigNumber).isRequired,
+
+  baseAssetDecimals: PropTypes.number.isRequired,
+  quoteAssetDecimals: PropTypes.number.isRequired,
+  collateralDecimals: PropTypes.number.isRequired,
+
+  vault: VaultType,
+};
+
+BuyAndSell.defaultProps = {
+  vault: {
+    owner: '',
+    oTokensIssued: '0',
+    collateral: '0',
+    underlying: '0',
+  },
 };
 
 export default BuyAndSell;

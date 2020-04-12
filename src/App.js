@@ -52,7 +52,11 @@ function App() {
           </Route>
           {/* Trading */}
           <Route path="/trades/eth/">
-            <OptionTrading user={user} theme={theme} />
+            <OptionTrading
+              user="0x28595f15c04cf1f4ce978fc77a210dbc30e025bb"
+              // user="0x6924a03bb710eaf199ab6ac9f2bb148215ae9b5d" // 0x
+              theme={theme}
+            />
           </Route>
           {/* <Route path="/trades/test/"><ZEROXTest /></Route> */}
           <Route path="/trade/:token/"><Uniswap user={user} /></Route>

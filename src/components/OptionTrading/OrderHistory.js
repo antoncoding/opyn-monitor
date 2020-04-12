@@ -1,7 +1,7 @@
 /* eslint-disable no-restricted-syntax */
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
-import { DataView } from '@aragon/ui';
+import { DataView, Timer, Button } from '@aragon/ui';
 
 // import { assetDataUtils } from '@0x/order-utils';
 
@@ -19,18 +19,46 @@ function OrderHistory({
 
   const orders = []; // asks.concat(bids);
 
-  const bidsFromUser = bids.filter((o) => o.order.makerAddress === '0x6924a03bb710eaf199ab6ac9f2bb148215ae9b5d');
+  // const bidsFromUser = bids.filter((o) => o.order.makerAddress === '0x6924a03bb710eaf199ab6ac9f2bb148215ae9b5d');
   // const asksFromUser = asks.filter((o) => o.order.makerAddress === '0x6924a03bb710eaf199ab6ac9f2bb148215ae9b5d');
+
+  const bidsFromUser = bids.slice(0, 3);
+  const asksFromUser = asks.slice(0, 3);
+
   // .filter((o) => o.order.makerAddress === user);
   for (const bid of bidsFromUser) {
+    // taker asset: option
     const price = new BigNumber(bid.order.makerAssetAmount).div(new BigNumber(bid.order.takerAssetAmount));
-    const amount = toTokenUnitsBN(bid.metaData.remainingFillableTakerAssetAmount, option.decimals);
+    const filledRatio = 100 - new BigNumber(bid.metaData.remainingFillableTakerAssetAmount)
+      .div(new BigNumber(bid.order.takerAssetAmount)).times(100).toNumber();
     orders.push({
-      id: bid.metaData.orderHash.slice(2, 6),
+      id: bid.metaData.orderHash.slice(2, 8),
+      type: 'bid',
       price: price.toFixed(6),
-      amount: amount.toFixed(6),
+      filledRatio,
+      total: toTokenUnitsBN(bid.order.takerAssetAmount, option.decimals).toFixed(6),
       status: 'open',
       expiry: bid.order.expirationTimeSeconds,
+    });
+  }
+
+  // Selling the option
+  for (const ask of asksFromUser) {
+    // makerAssetAmount: option
+    // takerAssetAmount: weth
+    const price = new BigNumber(ask.order.takerAssetAmount).div(new BigNumber(ask.order.makerAssetAmount));
+    // unit weth left -> unit option left
+    const filledRatio = 100 - new BigNumber(ask.metaData.remainingFillableTakerAssetAmount)
+      .div(new BigNumber(ask.order.takerAssetAmount)).times(100).toNumber();
+
+    const total = toTokenUnitsBN(ask.order.makerAssetAmount, option.decimals).toFixed(6);
+    orders.push({
+      id: ask.metaData.orderHash.slice(2, 8),
+      type: 'ask',
+      price: price.toFixed(6),
+      filledRatio,
+      total,
+      expiry: ask.order.expirationTimeSeconds,
     });
   }
 
@@ -42,14 +70,15 @@ function OrderHistory({
         entriesPerPage={4}
         page={page}
         onPageChange={setPage}
-        fields={['digest', 'status', 'price', 'amount', 'expiration']}
+        fields={['digest', 'price', 'amount', 'filled', 'expiration', '']}
         entries={orders}
-        renderEntry={(order) => [// call, put, callDetail, putDetail, strikePrice,
+        renderEntry={(order) => [// call, put, callDetail, putDetail, strikePrice
           order.id,
-          order.status,
           order.price,
-          order.amount,
-          order.expiry,
+          order.total,
+          `${order.filledRatio}%`,
+          <Timer end={new Date(order.expiry * 1000)} />,
+          <Button onClick={() => {}}>Cancel Order</Button>,
         ]}
       />
     </>

@@ -4,6 +4,7 @@ export const vault = PropTypes.shape({
   owner: PropTypes.string,
   oTokensIssued: PropTypes.string,
   collateral: PropTypes.string,
+  underlying: PropTypes.string,
 });
 
 // export const detailVault = PropTypes.shape({
