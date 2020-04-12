@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import {
   Button, useTheme, TextInput, Help,
@@ -27,7 +27,7 @@ function BuyAndSell({
   // collateralBalance, // :BigNumber,
   // orders,
 }) {
-  // const [selectedTab, setSelectedTab] = useState('Buy');
+  const [selectedTab, setSelectedTab] = useState(0);
   const theme = useTheme();
 
   // const [mode, setMode] = useState('create');
@@ -50,15 +50,22 @@ function BuyAndSell({
         </TopPart>
         <FlexWrapper>
           <div>
-            Collateral
+            Collateral (
             {collateralSymbol}
+            )
           </div>
           <TopPartText>
-            { vault ? toTokenUnitsBN(vault.collateral, collateralDecimals).toFormat(4) : 0}
+            { vault
+              ? toTokenUnitsBN(vault.collateral, collateralDecimals).toFormat(4)
+              : Number(0).toFixed(4)}
           </TopPartText>
         </FlexWrapper>
       </Wrapper>
       <Wrapper>
+        <TabWrapper theme={theme}>
+          <Tab active={selectedTab === 0} onClick={() => setSelectedTab(0)} theme={theme}> Buy </Tab>
+          <Tab active={selectedTab === 1} onClick={() => setSelectedTab(1)} theme={theme}> Sell </Tab>
+        </TabWrapper>
         <LowerPart>
           <Label>Amount</Label>
           <TextInput wide type="number" />
@@ -92,8 +99,8 @@ function BuyAndSell({
         </LowerPart>
       </Wrapper>
       <Flex>
-        <Half><Button label="Buy" wide /></Half>
-        <Half><Button label="Sell" wide /></Half>
+        <Button label={selectedTab === 0 ? 'Buy' : 'Sell'} wide />
+        {/* <Half><Button label="Sell" wide /></Half> */}
       </Flex>
     </BuyAndSellBlock>
   );
@@ -165,18 +172,16 @@ const TopPartText = styled.div``;
 const LowerPart = styled.div`
   background-color: ${(props) => props.theme.background};
 `;
-// const Tab = styled.div`
-//   width: 50%;
-//   height: 53px;
-//   border: solid 1px #1f273b;
-//   background-color: ${(props) => (props.active ? BACKGROUND_COLOR : '#22293b')};
-//   color: ${(props) => (props.active ? 'white' : '#4f5e84')};
-//   justify-content: center;
-//   display: flex;
-//   align-items: center;
-//   border-bottom: ${(props) => (props.active ? `1px solid ${BACKGROUND_COLOR}` : '')};
-//   cursor: pointer;
-// `;
+const Tab = styled.div`
+  width: 50%;
+  height: 50px;
+  color: ${(props) => (props.active ? props.theme.content : props.theme.surfaceContentSecondary)};
+  justify-content: center;
+  display: flex;
+  align-items: center;
+  border-bottom: ${(props) => (props.active ? `2px solid ${props.theme.selected}` : `1px solid ${props.theme.border}`)};
+  cursor: pointer;
+`;
 const Label = styled.div`
   height: 14px;
   font-size: 14px;
@@ -210,15 +215,16 @@ const Flex = styled.div`
   display:flex;
   width: 90%;
 `;
-const Half = styled.div`
-  width: 50%;
-`;
-// const TabWrapper = styled.div`
-//   width: 100%;
-//   display: flex;
-//   background-color: #1f273b;
-//   padding-top: 10px;
+// const Half = styled.div`
+//   width: 50%;
 // `;
+const TabWrapper = styled.div`
+  width: 100%;
+  display: flex;
+  background-color: ${(props) => props.theme.surface};
+  padding-top: 10px;
+  border: ${(props) => props.theme.border}
+`;
 const BottomTextWrapper = styled(FlexWrapper)`
   height: 27px;
   border-bottom: solid 1px #979797;
