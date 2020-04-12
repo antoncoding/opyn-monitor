@@ -1,6 +1,7 @@
 /* eslint-disable camelcase */
 import Web3 from 'web3';
 import BigNumber from 'bignumber.js';
+import { MetamaskSubprovider } from '@0x/subproviders';
 import { signatureUtils } from '@0x/order-utils';
 import Onboard from 'bnc-onboard';
 
@@ -401,7 +402,8 @@ export const removeLiquidity = async (uniswapAddr, pool_token_amount, min_eth_we
 */
 export const signOrder = async (order) => {
   const account = await checkConnectedAndGetAddress();
-  return signatureUtils.ecSignOrderAsync(web3, order, account);
+  const provider = new MetamaskSubprovider(web3.currentProvider);
+  return signatureUtils.ecSignOrderAsync(provider, order, account);
 };
 
 
@@ -412,7 +414,7 @@ export const fillOrder = async (order, amt, signature) => {
     .fillOrder(order, amt, signature)
     .send({
       from: account,
-      value: '750000000000000', // Protocol fee: gas to be gas price * 150
+      // value: '750000000000000', // Protocol fee: gas to be gas price * 150
     })
     .on('transactionHash', (hash) => {
       notify.hash(hash);

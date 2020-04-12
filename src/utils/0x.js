@@ -1,4 +1,4 @@
-import { assetDataUtils } from '@0x/order-utils';
+import { assetDataUtils, signatureUtils } from '@0x/order-utils';
 import BigNumber from 'bignumber.js';
 import { WETH } from '../constants/contracts';
 
@@ -103,7 +103,7 @@ async function request(path) {
 
 export function connectWebSocket(_orders, setBuyOrders) {
   const socket = new WebSocket('wss://api.0x.org/sra/v3');
-  socket.onopen = function () {
+  socket.onopen = () => {
     // console.log(`socket open ${e}`);
     socket.send(JSON.stringify({
       type: 'subscribe',
@@ -115,7 +115,7 @@ export function connectWebSocket(_orders, setBuyOrders) {
       takerAssetData: '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2',
     }));
   };
-  socket.onmessage = function (event) {
+  socket.onmessage = (event) => {
     const data = JSON.parse(event.data);
     const entry = data.payload[0];
 
@@ -133,7 +133,40 @@ export function connectWebSocket(_orders, setBuyOrders) {
 //   return ERC20_ASSET_PROXY_ID.padEnd(34, '0').concat(erc20_address.slice(2));
 // }
 
-
 export const isValid = (entry, decimals) => parseInt(entry.order.expirationTimeSeconds, 10) > Date.now() / 1000
   && new BigNumber(entry.metaData.remainingFillableTakerAssetAmount)
     .gt(new BigNumber(0.0001).times(new BigNumber(10).pow(decimals)));
+
+export const createOrder = (maker, makerAsset, takerAsset, makerAssetAmount, takerAssetAmount) => {
+  const salt = BigNumber.random(20).times(new BigNumber(10).pow(new BigNumber(20))).integerValue().toString(10);
+  const order = {
+    senderAddress: '0x0000000000000000000000000000000000000000',
+    makerAddress: maker,
+    takerAddress: '0x0000000000000000000000000000000000000000',
+    makerFee: '0',
+    takerFee: '0',
+    makerAssetAmount,
+    takerAssetAmount,
+    makerAssetData: assetDataUtils.encodeERC20AssetData(makerAsset),
+    takerAssetData: assetDataUtils.encodeERC20AssetData(takerAsset),
+    salt,
+    exchangeAddress: '0x61935cbdd02287b511119ddb11aeb42f1593b7ef',
+    feeRecipientAddress: '0x1000000000000000000000000000000000000011',
+    expirationTimeSeconds: '1587389907', // 4/20
+    makerFeeAssetData: '0x',
+    chainId: 1,
+    takerFeeAssetData: '0x',
+  };
+  return order;
+};
+
+export const broadcastOrder = async (order) => {
+  const url = `${endpoint}sra/v3/orders`;
+  const res = await fetch(url, {
+    method: 'POST',
+    body: JSON.stringify(order),
+  }).catch((error) => {
+    console.error(error);
+  });
+  return res;
+};

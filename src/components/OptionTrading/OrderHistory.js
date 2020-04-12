@@ -18,13 +18,9 @@ function OrderHistory({
 
   const orders = []; // asks.concat(bids);
 
-  // const bidsFromUser = bids.filter((o) => o.order.makerAddress === '0x6924a03bb710eaf199ab6ac9f2bb148215ae9b5d');
-  // const asksFromUser = asks.filter((o) => o.order.makerAddress === '0x6924a03bb710eaf199ab6ac9f2bb148215ae9b5d');
+  const bidsFromUser = bids.filter((o) => o.order.makerAddress === user);
+  const asksFromUser = asks.filter((o) => o.order.makerAddress === '0x6924a03bb710eaf199ab6ac9f2bb148215ae9b5d');
 
-  const bidsFromUser = bids.slice(0, 3);
-  const asksFromUser = asks.slice(0, 3);
-
-  // .filter((o) => o.order.makerAddress === user);
   for (const bid of bidsFromUser) {
     // taker asset: option
     const price = new BigNumber(bid.order.makerAssetAmount).div(new BigNumber(bid.order.takerAssetAmount));

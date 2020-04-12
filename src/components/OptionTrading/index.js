@@ -107,6 +107,9 @@ function OptionTrading({ user, theme }) {
           {/* Buy And Sell */}
           <FixBottom>
             <BuyAndSell
+              user={user}
+              baseAsset={baseAsset.addr}
+              quoteAsset={quoteAsset.addr}
               baseAssetSymbol={baseAsset.symbol}
               collateralSymbol={baseAsset.collateralSymbol}
               quoteAssetSymbol={quoteAsset.symbol}

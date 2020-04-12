@@ -5,18 +5,23 @@ import {
 } from '@aragon/ui';
 import styled from 'styled-components';
 import BigNumber from 'bignumber.js';
-
-import { toTokenUnitsBN } from '../../utils/number';
+import { createOrder, broadcastOrder } from '../../utils/0x';
+import { signOrder } from '../../utils/web3';
+import { toTokenUnitsBN, toBaseUnitBN } from '../../utils/number';
 import { vault as VaultType, order as OrderType } from '../types';
+// import { eth_calls } from '../../constants/options';
 
 function BuyAndSell({
-
+  user,
   tradeType, // ask || bid
   selectedOrders, //
   setTradeType,
   setSelectedOrders,
 
   vault,
+  baseAsset,
+  quoteAsset,
+
   baseAssetSymbol, // "oETH"
   quoteAssetSymbol, // "WETH"
   collateralSymbol, // // USDC
@@ -31,21 +36,25 @@ function BuyAndSell({
   // collateralBalance, // :BigNumber,
   // orders,
 }) {
-  // const [selectedTab, setSelectedTab] = useState('bid'); // 0: sell, 1: buy
   const theme = useTheme();
-  // console.log(tradeType);
 
+  const [quoteAssetAmount, setQuoteAssetAmount] = useState(new BigNumber(0));
   const [baseAssetAmount, setBaseAssetAmount] = useState(new BigNumber(0));
   const [price, setPrice] = useState(new BigNumber(0));
 
-  const onChangeAmount = (amount) => {
+  const onChangeBaseAmount = (amount) => {
     if (!amount) {
+      console.log('invalid');
       setBaseAssetAmount(new BigNumber(0));
       return;
     }
     const amountBN = new BigNumber(amount);
     setBaseAssetAmount(amountBN);
-    // updateNewRatio(new BigNumber(vault.oTokensIssued).plus(toBaseUnitBN(amountBN, decimals)));
+
+    // calculate quote asset
+    // price 0.0001 WETH, amount 10 => need 0.001 weth
+    const quoteAmount = price.times(amountBN);
+    setQuoteAssetAmount(quoteAmount);
   };
 
   const onChangeRate = (rate) => {
@@ -53,9 +62,32 @@ function BuyAndSell({
       setPrice(new BigNumber(0));
       return;
     }
-    const amountBN = new BigNumber(rate);
-    setPrice(amountBN);
+    const rateBN = new BigNumber(rate);
+    setPrice(rateBN);
+
+    const quoteAmount = rateBN.times(baseAssetAmount);
+    setQuoteAssetAmount(quoteAmount);
   };
+
+  const createBidOrder = async () => {
+    const order = createOrder(
+      user,
+      quoteAsset,
+      baseAsset,
+      toBaseUnitBN(quoteAssetAmount, quoteAssetDecimals),
+      toBaseUnitBN(baseAssetAmount, baseAssetDecimals),
+    );
+    const signedOrder = await signOrder(order);
+    await broadcastOrder(signedOrder);
+  };
+
+  if (selectedOrders.length > 0) console.log(selectedOrders[0].order);
+  // let actionType = ''
+  // if(selectedOrders.length === 0) {
+  //   actionType = 'create'
+  // } else {
+  //   const orderAmountSum =
+  // }
 
   // const [mode, setMode] = useState('create');
 
@@ -117,8 +149,8 @@ function BuyAndSell({
           <TextInput
             wide
             type="number"
-            onChange={(e) => onChangeAmount(e.target.value)}
-            value={baseAssetAmount}
+            onChange={(e) => onChangeBaseAmount(e.target.value)}
+            value={baseAssetAmount.toNumber()}
           />
 
           <Label>Price per token</Label>
@@ -126,7 +158,7 @@ function BuyAndSell({
             wide
             type="number"
             onChange={(e) => onChangeRate(e.target.value)}
-            value={price}
+            value={price.toNumber()}
           />
 
           <BottomTextWrapper>
@@ -143,8 +175,6 @@ function BuyAndSell({
                 </Help>
               </Flex>
             </BottomText>
-            {/* <div style={{ paddingLeft: '5px' }} />
-            <div style={{ marginLeft: 'auto', right: 0 }}> */}
             <BottomText>$0.123</BottomText>
             {/* </div> */}
           </BottomTextWrapper>
@@ -155,14 +185,20 @@ function BuyAndSell({
         </LowerPart>
       </Wrapper>
       <Flex>
-        <Button label={tradeType === 0 ? 'Buy' : 'Sell'} wide />
-        {/* <Half><Button label="Sell" wide /></Half> */}
+        <Button
+          onClick={createBidOrder}
+          label={tradeType === 'bid' ? 'Buy' : 'Sell'}
+          wide
+        />
       </Flex>
     </BuyAndSellBlock>
   );
 }
 
 BuyAndSell.propTypes = {
+  user: PropTypes.string.isRequired,
+  baseAsset: PropTypes.string.isRequired,
+  quoteAsset: PropTypes.string.isRequired,
   // theme: PropTypes.string.isRequired,
   baseAssetSymbol: PropTypes.string.isRequired,
   quoteAssetSymbol: PropTypes.string.isRequired,
@@ -250,20 +286,7 @@ const Label = styled.div`
   color: ${(props) => props.theme.content};
   margin: 20px 0 15px 0;
 `;
-// const Input = styled.input`
-//   width: 100%;
-//   height: 36px;
-//   border-radius: 5px;
-//   border: solid 0.5px ${(props) => props.theme.contolBorder};
-//   background-color: ${(props) => props.theme.background};
-//   padding: 10px;
-// `;
-// const Text = styled.div`
-//   width: 73px;
-//   height: 14px;
-//   font-size: 12px;
-//   color: ${(props) => (props.active ? 'white' : '#4f5e84')};
-// `;
+
 const BottomText = styled.div`
   height: 20px;
 `;
