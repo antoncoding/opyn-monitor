@@ -254,3 +254,15 @@ export const getOrdersTotalFillables = (orders) => {
 
   return { totalFillableTakerAmount, totalFillableMakerAmount };
 };
+
+/**
+ * @return {Promise<{
+ * fast:number, fastest:number, safeLow:number, average:number,
+ * block_time:number, blockNum:number speed:number,
+ * safeLowWait:number, avgWait:number, fastWait:number, fastestWait:number}>}
+ */
+export const getGasPrice = async () => {
+  const url = 'https://ethgasstation.info/json/ethgasAPI.json';
+  const res = await fetch(url);
+  return res.json();
+};

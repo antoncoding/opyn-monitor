@@ -6,7 +6,7 @@ import {
 import styled from 'styled-components';
 import BigNumber from 'bignumber.js';
 import {
-  createOrder, broadcastOrders, getAskPrice, getOrdersTotalFillables,
+  createOrder, broadcastOrders, getAskPrice, getOrdersTotalFillables, getGasPrice,
 } from '../../utils/0x';
 import { signOrder, fillOrder } from '../../utils/web3';
 import { toTokenUnitsBN, toBaseUnitBN } from '../../utils/number';
@@ -44,10 +44,30 @@ function BuyAndSell({
   const [baseAssetAmount, setBaseAssetAmount] = useState(new BigNumber(0));
   const [price, setPrice] = useState(new BigNumber(0));
 
+  // gasPrice is needed to calculate 0x fee
+  const [fastGasPrice, setFastGasPrice] = useState(new BigNumber(5)); //  in GWei
+
   const quoteAssetAmount = price.times(baseAssetAmount);
   const expiry = parseInt(Date.now() / 1000 + 86400, 10);
 
   const isFillingOrders = selectedOrders.length > 0;
+  const feeInETH = isFillingOrders ? fastGasPrice * selectedOrders.length * 0.00015 : 0;
+
+  // update gasPrice
+  useEffect(() => {
+    let isCanceled = false;
+    async function fetchGasPrice() {
+      const { fast } = await getGasPrice();
+      if (!isCanceled) setFastGasPrice(new BigNumber(fast).div(new BigNumber(10)));
+    }
+    fetchGasPrice();
+    const id = setInterval(fetchGasPrice, 30000);
+
+    return () => {
+      isCanceled = true;
+      clearInterval(id);
+    };
+  }, []);
 
   // when selected orders changed
   useEffect(() => {
@@ -134,7 +154,13 @@ function BuyAndSell({
       takeAmount = toBaseUnitBN(baseAssetAmount, baseAssetDecimals);
     }
 
-    await fillOrder(orderToFill.order, takeAmount.toString(), orderToFill.order.signature);
+    await fillOrder(
+      orderToFill.order,
+      takeAmount.toString(),
+      orderToFill.order.signature,
+      toBaseUnitBN(feeInETH, 18).toString(),
+      fastGasPrice.toString(),
+    );
   };
 
   return (
@@ -222,13 +248,13 @@ function BuyAndSell({
                 </Help>
               </Flex>
             </BottomText>
-            <BottomText>0 WETH</BottomText>
+            <BottomText>{`${feeInETH} ETH` }</BottomText>
             {/* </div> */}
           </BottomTextWrapper>
-          <BottomTextWrapper>
+          {/* <BottomTextWrapper>
             <BottomText>Total Cost</BottomText>
             <BottomText>$429</BottomText>
-          </BottomTextWrapper>
+          </BottomTextWrapper> */}
         </LowerPart>
       </Wrapper>
       <Flex>

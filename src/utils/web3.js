@@ -407,14 +407,16 @@ export const signOrder = async (order) => {
 };
 
 
-export const fillOrder = async (order, amt, signature) => {
+export const fillOrder = async (order, amt, signature, value, gasPrice) => {
+  console.log(gasPrice);
   const account = await checkConnectedAndGetAddress();
   const exchange = new web3.eth.Contract(ZX_ExchagneABI, ZeroX_Exchange);
   await exchange.methods
     .fillOrder(order, amt, signature)
     .send({
       from: account,
-      // value: '750000000000000', // Protocol fee: gas to be gas price * 150
+      value, // Protocol fee: gas to be gas price * 150
+      gasPrice: web3.utils.toWei(gasPrice, 'gwei'), // gwei to wei
     })
     .on('transactionHash', (hash) => {
       notify.hash(hash);
