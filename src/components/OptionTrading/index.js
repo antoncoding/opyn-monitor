@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useMemo } from 'react';
 import PropTypes from 'prop-types';
-import { Header } from '@aragon/ui';
+import { Header, Button } from '@aragon/ui';
 
 import styled from 'styled-components';
 import BigNumber from 'bignumber.js';
@@ -11,9 +11,9 @@ import BuyAndSell from './BuyAndSell';
 import { getTokenBalance, getDecimals } from '../../utils/infura';
 import { getOrderBook, isValid } from '../../utils/0x';
 import { getVault } from '../../utils/graph';
-// import { toTokenUnitsBN } from '../../utils/number';
-
-import { eth_puts, mock_eth_calls as eth_calls } from '../../constants/options';
+import { approve } from '../../utils/web3';
+import { eth_puts, eth_calls } from '../../constants/options';
+import { ZeroX_ERC20Proxy } from '../../constants/contracts';
 
 const quoteAsset = {
   symbol: 'WETH',
@@ -22,7 +22,7 @@ const quoteAsset = {
 }; // WETH
 
 function OptionTrading({ user, theme }) {
-  const [baseAsset, setBaseAsset] = useState(eth_calls[0]); // DAI
+  const [baseAsset, setBaseAsset] = useState(eth_puts[0]); // DAI
 
   const [asks, setAsks] = useState([]);
   const [bids, setBids] = useState([]);
@@ -41,6 +41,7 @@ function OptionTrading({ user, theme }) {
   // BaseAsset changeed: Update orderbook and base asset
   useEffect(() => {
     let isCancelled = false;
+
     // update orderbook
     const updateOrderBook = async () => {
       const res = await getOrderBook(baseAsset.addr, quoteAsset.addr);
@@ -49,6 +50,7 @@ function OptionTrading({ user, theme }) {
         setBids(res.bids.records.filter((record) => isValid(record)));
       }
     };
+
     // update baseAsset Balance
     const updateBaseBalance = async () => {
       const baseBalance = await getTokenBalance(baseAsset.addr, user);
@@ -103,11 +105,26 @@ function OptionTrading({ user, theme }) {
     <WholeScreen>
       <FlexWrapper>
         <LeftPart>
-          {/* OrderBook */}
           {/* Buy And Sell */}
-          {/* <FixBottom> */}
           <Header />
-          <Header />
+          <Header
+            primary={(
+              <Button
+                label="Enable oToken"
+                onClick={() => {
+                  approve(baseAsset.addr, ZeroX_ERC20Proxy);
+                }}
+              />
+          )}
+            secondary={(
+              <Button
+                label="Enable WETH"
+                onClick={() => {
+                  approve(quoteAsset.addr, ZeroX_ERC20Proxy);
+                }}
+              />
+)}
+          />
           <BuyAndSell
             user={user}
             baseAsset={baseAsset.addr}
@@ -129,7 +146,6 @@ function OptionTrading({ user, theme }) {
             selectedOrders={selectedOrders}
             setSelectedOrders={setSelectedOrders}
           />
-          {/* </FixBottom> */}
         </LeftPart>
         <RightPart>
           <Header primary="Trade ETH Options" />

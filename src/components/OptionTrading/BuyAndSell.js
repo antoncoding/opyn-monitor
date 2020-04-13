@@ -43,7 +43,7 @@ function BuyAndSell({
   const [price, setPrice] = useState(new BigNumber(0));
 
   const quoteAssetAmount = price.times(baseAssetAmount);
-
+  const [expiry, setExpiry] = useState((Date.now() / 1000 + 86400));
   const onChangeBaseAmount = (amount) => {
     if (!amount) {
       setBaseAssetAmount(new BigNumber(0));
@@ -70,14 +70,27 @@ function BuyAndSell({
     // setQuoteAssetAmount(quoteAmount);
   };
 
-  const createBidOrder = async () => {
-    const order = createOrder(
-      user,
-      quoteAsset,
-      baseAsset,
-      toBaseUnitBN(quoteAssetAmount, quoteAssetDecimals),
-      toBaseUnitBN(baseAssetAmount, baseAssetDecimals),
-    );
+  const createBidOrder = async (type) => {
+    let order;
+    if (type === 'bid') {
+      order = createOrder(
+        user,
+        quoteAsset,
+        baseAsset,
+        toBaseUnitBN(quoteAssetAmount, quoteAssetDecimals),
+        toBaseUnitBN(baseAssetAmount, baseAssetDecimals),
+        parseInt(expiry.toString(), 10),
+      );
+    } else {
+      order = createOrder(
+        user,
+        baseAsset,
+        quoteAsset,
+        toBaseUnitBN(baseAssetAmount, baseAssetDecimals),
+        toBaseUnitBN(quoteAssetAmount, quoteAssetDecimals),
+        parseInt(expiry.toString(), 10),
+      );
+    }
     const signedOrder = await signOrder(order);
     await broadcastOrders([signedOrder]);
   };
@@ -180,7 +193,7 @@ function BuyAndSell({
       </Wrapper>
       <Flex>
         <Button
-          onClick={createBidOrder}
+          onClick={() => createBidOrder(tradeType)}
           label={tradeType === 'bid' ? 'Buy' : 'Sell'}
           wide
         />

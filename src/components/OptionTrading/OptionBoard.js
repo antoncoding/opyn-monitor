@@ -65,9 +65,7 @@ function OptionBoard({
           <SectionTitle title="Puts" />
         </div>
       </div>
-      {/* <div style={{ display: 'flex' }}> */}
       {/* Calls */}
-      {/* <div style={{ width: '45%' }}> */}
       <DataView
             // mode="table"
         fields={['last', 'bid', 'ask', 'strike', 'last', 'bid', 'ask']}
@@ -161,7 +159,7 @@ export default OptionBoard;
  */
 function groupByDate(puts, calls, putStats, callStats) {
   const result = [];
-  const allOptions = puts.concat(calls);
+  const allOptions = puts.concat(calls).filter((option) => option.expiry > Date.now() / 1000);
   const distinctExpirys = [...new Set(allOptions.map((option) => option.expiry))];
 
   for (const expiry of distinctExpirys) {
@@ -171,13 +169,13 @@ function groupByDate(puts, calls, putStats, callStats) {
     ];
 
     // const allStrikesForThisDay = {};
-    const entry = [];
+    const entries = [];
     for (const strikePrice of strikePrices) {
       const put = puts.find((o) => o.strikePriceInUSD === strikePrice && o.expiry === expiry);
       const call = calls.find((o) => o.strikePriceInUSD === strikePrice && o.expiry === expiry);
       const putDetail = put ? putStats.find((p) => p.option === put.addr) : undefined;
       const callDetail = call ? callStats.find((c) => c.option === call.addr) : undefined;
-      entry.push({
+      entries.push({
         strikePrice,
         call,
         put,
@@ -185,11 +183,11 @@ function groupByDate(puts, calls, putStats, callStats) {
         putDetail,
       });
     }
-    entry.sort((a, b) => (a.strikePrice > b.strikePrice ? 1 : -1));
+    entries.sort((a, b) => (a.strikePrice > b.strikePrice ? 1 : -1));
     const expiryText = new Date(expiry * 1000).toDateString();
     result.push({
       expiryText,
-      entry,
+      entry: entries,
     });
     // result[expiryKey] = entryRow;
   }
