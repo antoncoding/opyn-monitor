@@ -5,7 +5,7 @@ import { Header, Button } from '@aragon/ui';
 import styled from 'styled-components';
 import BigNumber from 'bignumber.js';
 import OptionBoard from './OptionBoard';
-import OrderList from './Orders';
+import TabBoard from './TabBoard';
 import BuyAndSell from './BuyAndSell';
 
 import { getTokenBalance, getDecimals } from '../../utils/infura';
@@ -22,7 +22,7 @@ const quoteAsset = {
 }; // WETH
 
 function OptionTrading({ user, theme }) {
-  const [baseAsset, setBaseAsset] = useState(eth_puts[0]); // DAI
+  const [baseAsset, setBaseAsset] = useState(eth_puts[1]); // put 100
 
   const [asks, setAsks] = useState([]);
   const [bids, setBids] = useState([]);
@@ -37,6 +37,7 @@ function OptionTrading({ user, theme }) {
   // Collateral info for baseAsset
   const [collateralDecimals, setCollateralDecimals] = useState(18);
   const [vault, setVault] = useState({});
+
 
   // BaseAsset changeed: Update orderbook and base asset
   useEffect(() => {
@@ -158,12 +159,15 @@ function OptionTrading({ user, theme }) {
           />
           <br />
           {/* <FixBottom> */}
-          <OrderList
+          <TabBoard
             asks={asks}
             bids={bids}
             user={user}
             option={baseAsset}
             quoteAsset={quoteAsset}
+
+            setTradeType={setTradeType}
+            setSelectedOrders={setSelectedOrders}
           />
           {/* </FixBottom> */}
         </RightPart>

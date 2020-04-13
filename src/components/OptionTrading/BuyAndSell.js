@@ -1,12 +1,14 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import {
   Button, useTheme, TextInput, Help,
 } from '@aragon/ui';
 import styled from 'styled-components';
 import BigNumber from 'bignumber.js';
-import { createOrder, broadcastOrders } from '../../utils/0x';
-import { signOrder } from '../../utils/web3';
+import {
+  createOrder, broadcastOrders, getAskPrice, getOrdersTotalFillables,
+} from '../../utils/0x';
+import { signOrder, fillOrder } from '../../utils/web3';
 import { toTokenUnitsBN, toBaseUnitBN } from '../../utils/number';
 import { vault as VaultType, order as OrderType } from '../types';
 // import { eth_calls } from '../../constants/options';
@@ -43,7 +45,35 @@ function BuyAndSell({
   const [price, setPrice] = useState(new BigNumber(0));
 
   const quoteAssetAmount = price.times(baseAssetAmount);
-  const [expiry, setExpiry] = useState((Date.now() / 1000 + 86400));
+  const expiry = parseInt(Date.now() / 1000 + 86400, 10);
+
+  const isFillingOrders = selectedOrders.length > 0;
+
+  // selected orders
+  const selectedFillables = getOrdersTotalFillables(selectedOrders);
+
+
+  // when selected orders changed
+  useEffect(() => {
+    if (tradeType === 'bid') {
+      // ask: takerAsset: weth, makerAsset: oToken
+
+      // update amounot oToken to total order amount
+      const baseAmountTotal = toTokenUnitsBN(selectedFillables.totalFillableMakerAmount, baseAssetDecimals);
+      setBaseAssetAmount(baseAmountTotal);
+    } else {
+      // comming bids: takerAsset: oToken, makerAsset: weth
+
+      // set oToken Amount to tatal
+      const baseAmountTotal = toTokenUnitsBN(selectedFillables.totalFillableTakerAmount, baseAssetDecimals);
+      setBaseAssetAmount(baseAmountTotal);
+    }
+
+    // return () => {
+    //   console.log('clean up');
+    // };
+  }, [selectedOrders]);
+
   const onChangeBaseAmount = (amount) => {
     if (!amount) {
       setBaseAssetAmount(new BigNumber(0));
@@ -70,16 +100,16 @@ function BuyAndSell({
     // setQuoteAssetAmount(quoteAmount);
   };
 
-  const createBidOrder = async (type) => {
+  const createBidOrder = async () => {
     let order;
-    if (type === 'bid') {
+    if (tradeType === 'bid') {
       order = createOrder(
         user,
         quoteAsset,
         baseAsset,
         toBaseUnitBN(quoteAssetAmount, quoteAssetDecimals),
         toBaseUnitBN(baseAssetAmount, baseAssetDecimals),
-        parseInt(expiry.toString(), 10),
+        expiry,
       );
     } else {
       order = createOrder(
@@ -88,15 +118,27 @@ function BuyAndSell({
         quoteAsset,
         toBaseUnitBN(baseAssetAmount, baseAssetDecimals),
         toBaseUnitBN(quoteAssetAmount, quoteAssetDecimals),
-        parseInt(expiry.toString(), 10),
+        expiry,
       );
     }
     const signedOrder = await signOrder(order);
     await broadcastOrders([signedOrder]);
   };
 
-  // if (selectedOrders.length > 0) console.log(selectedOrders[0].order);
+  const fillOrders = async () => {
+    const orderToFill = selectedOrders[0];
+    let takeAmount;
+    if (tradeType === 'bid') {
+      // filling an ask order:
+      const orderPrice = getAskPrice(selectedOrders[0], baseAssetDecimals, quoteAssetDecimals);
+      const takeAmountInToken = orderPrice.times(baseAssetAmount);
+      takeAmount = toBaseUnitBN(takeAmountInToken, baseAssetDecimals);
+    } else {
+      takeAmount = toBaseUnitBN(baseAssetAmount, baseAssetDecimals);
+    }
 
+    await fillOrder(orderToFill.order, takeAmount.toString(), orderToFill.order.signature);
+  };
 
   return (
     <BuyAndSellBlock theme={theme}>
@@ -166,6 +208,7 @@ function BuyAndSell({
             type="number"
             onChange={(e) => onChangeRate(e.target.value)}
             value={price.toNumber()}
+            // disabled={isFillingOrders}
           />
 
           <BottomTextWrapper>
@@ -192,11 +235,22 @@ function BuyAndSell({
         </LowerPart>
       </Wrapper>
       <Flex>
-        <Button
-          onClick={() => createBidOrder(tradeType)}
-          label={tradeType === 'bid' ? 'Buy' : 'Sell'}
-          wide
-        />
+        { isFillingOrders
+          ? (
+            <Button
+              onClick={fillOrders}
+              label="Fill Orders"
+              wide
+            />
+          )
+          : (
+            <Button
+              onClick={createBidOrder}
+              label={tradeType === 'bid' ? 'Buy' : 'Sell'}
+              wide
+            />
+          )}
+
       </Flex>
     </BuyAndSellBlock>
   );

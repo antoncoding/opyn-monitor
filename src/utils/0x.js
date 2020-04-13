@@ -204,11 +204,11 @@ export const getBidPrice = (bid, makerAssetDecimals, takerAssetDecimals) => {
 };
 
 /**
- *
+ * Calculate price of an ask order
  * @param {{}} ask
  * @param {number} makerAssetDecimals oToken Decimal
  * @param {number} takerAssetDecimals WETH decimals
- * maker want to sell oToken
+ * @description maker want to sell oToken
  * takerAssetAmount 100 weth
  * makerAssetAmount 1 oToken
  */
@@ -224,3 +224,33 @@ export const getOrderFillRatio = (order) => new BigNumber(100)
   .minus(new BigNumber(order.metaData.remainingFillableTakerAssetAmount)
     .div(new BigNumber(order.order.takerAssetAmount))
     .times(100)).toFixed(2);
+
+/**
+ *
+ * @param {*} order
+ * @return { {remainingTakerAssetAmount: BigNumber, remainingMakerAssetAmount: BigNumber} }
+ */
+export const getRemainingMakerAndTakerAmount = (order) => {
+  const remainingTakerAssetAmount = new BigNumber(order.metaData.remainingFillableTakerAssetAmount);
+  const makerAssetAmountBN = new BigNumber(order.order.makerAssetAmount);
+  const takerAssetAmountBN = new BigNumber(order.order.takerAssetAmount);
+  const remainingMakerAssetAmount = remainingTakerAssetAmount.multipliedBy(makerAssetAmountBN).div(takerAssetAmountBN);
+  return { remainingTakerAssetAmount, remainingMakerAssetAmount };
+};
+
+/**
+ *
+ * @param {{}[]} orders
+ * @return {{totalFillableTakerAmount: BigNumber,totalFillableMakerAmount:BigNumber}}
+ */
+export const getOrdersTotalFillables = (orders) => {
+  const totalFillableTakerAmount = orders
+    .map((order) => new BigNumber(order.metaData.remainingFillableTakerAssetAmount))
+    .reduce((prev, next) => prev.plus(new BigNumber(next)), new BigNumber(0));
+
+  const totalFillableMakerAmount = orders
+    .map((order) => getRemainingMakerAndTakerAmount(order).remainingMakerAssetAmount)
+    .reduce((prev, next) => prev.plus(new BigNumber(next)), new BigNumber(0));
+
+  return { totalFillableTakerAmount, totalFillableMakerAmount };
+};
