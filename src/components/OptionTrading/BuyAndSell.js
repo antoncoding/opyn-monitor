@@ -5,7 +5,7 @@ import {
 } from '@aragon/ui';
 import styled from 'styled-components';
 import BigNumber from 'bignumber.js';
-import { createOrder, broadcastOrder } from '../../utils/0x';
+import { createOrder, broadcastOrders } from '../../utils/0x';
 import { signOrder } from '../../utils/web3';
 import { toTokenUnitsBN, toBaseUnitBN } from '../../utils/number';
 import { vault as VaultType, order as OrderType } from '../types';
@@ -79,10 +79,10 @@ function BuyAndSell({
       toBaseUnitBN(baseAssetAmount, baseAssetDecimals),
     );
     const signedOrder = await signOrder(order);
-    await broadcastOrder(signedOrder);
+    await broadcastOrders([signedOrder]);
   };
 
-  if (selectedOrders.length > 0) console.log(selectedOrders[0].order);
+  // if (selectedOrders.length > 0) console.log(selectedOrders[0].order);
 
 
   return (

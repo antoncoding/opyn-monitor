@@ -145,8 +145,8 @@ export const createOrder = (maker, makerAsset, takerAsset, makerAssetAmount, tak
     takerAddress: '0x0000000000000000000000000000000000000000',
     makerFee: '0',
     takerFee: '0',
-    makerAssetAmount,
-    takerAssetAmount,
+    makerAssetAmount: makerAssetAmount.toString(),
+    takerAssetAmount: takerAssetAmount.toString(),
     makerAssetData: assetDataUtils.encodeERC20AssetData(makerAsset),
     takerAssetData: assetDataUtils.encodeERC20AssetData(takerAsset),
     salt,
@@ -160,11 +160,15 @@ export const createOrder = (maker, makerAsset, takerAsset, makerAssetAmount, tak
   return order;
 };
 
-export const broadcastOrder = async (order) => {
+export const broadcastOrders = async (orders) => {
+  console.log(JSON.stringify(orders));
   const url = `${endpoint}sra/v3/orders`;
   const res = await fetch(url, {
     method: 'POST',
-    body: JSON.stringify(order),
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(orders),
   }).catch((error) => {
     console.error(error);
   });

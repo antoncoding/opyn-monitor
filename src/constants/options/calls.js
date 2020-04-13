@@ -40,26 +40,26 @@ export const mock_eth_calls = [
     uniswapExchange: '0x5734a78b1985B47dF3fbf1736c278F57c2C30983',
     expiry: 1587715200,
   },
-  {
-    addr: '0x6b175474e89094c44da98b954eedeac495271d0f', // it's actually bat
-    title: 'ETH Call $160 04/24/20',
+  // {
+  //   addr: '0x6b175474e89094c44da98b954eedeac495271d0f', // it's actually bat
+  //   title: 'ETH Call $160 04/24/20',
 
-    // constants in contract
-    strikePriceInUSD: 160,
-    symbol: 'oETH $160 Call',
-    name: 'Opyn ETH Call $160 04/24/20',
-    decimals: 18,
-    oracle: '0x7054e08461e3eCb7718B63540adDB3c3A1746415',
-    collateral: '0x0000000000000000000000000000000000000000',
-    collateralSymbol: 'ETH',
-    underlying: '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48',
-    strike: '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48',
-    strikePrice: 1e-6,
-    minRatio: 1,
-    exchange: '0x39246c4f3f6592c974ebc44f80ba6dc69b817c71',
-    uniswapExchange: '0x5734a78b1985B47dF3fbf1736c278F57c2C30983',
-    expiry: 1587715200,
-  },
+  //   // constants in contract
+  //   strikePriceInUSD: 160,
+  //   symbol: 'oETH $160 Call',
+  //   name: 'Opyn ETH Call $160 04/24/20',
+  //   decimals: 18,
+  //   oracle: '0x7054e08461e3eCb7718B63540adDB3c3A1746415',
+  //   collateral: '0x0000000000000000000000000000000000000000',
+  //   collateralSymbol: 'ETH',
+  //   underlying: '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48',
+  //   strike: '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48',
+  //   strikePrice: 1e-6,
+  //   minRatio: 1,
+  //   exchange: '0x39246c4f3f6592c974ebc44f80ba6dc69b817c71',
+  //   uniswapExchange: '0x5734a78b1985B47dF3fbf1736c278F57c2C30983',
+  //   expiry: 1587715200,
+  // },
 ];
 
 export const eth_calls = [];

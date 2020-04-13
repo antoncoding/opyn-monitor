@@ -23,17 +23,16 @@ function Orders({
   const [myOrdersPage, setMyOrdersPage] = useState(0);
   const [askPage, setAskPage] = useState(0);
   const [bidPage, setBidPage] = useState(0);
-
-  // format my order list
   const userAsks = asks
-    .filter((o) => o.order.makerAddress === user)
+    // .slice(4, 5)
+    .filter((o) => o.order.makerAddress === user.toLowerCase())
     .map((o) => {
       // eslint-disable-next-line no-param-reassign
       o.type = 'Ask';
       return o;
     });
   const userBids = bids
-    .filter((o) => o.order.makerAddress === user)
+    .filter((o) => o.order.makerAddress === user.toLowerCase())
     .map((o) => {
       // eslint-disable-next-line no-param-reassign
       o.type = 'Bid';
@@ -93,7 +92,7 @@ function Orders({
             renderEntry={(order) => [// call, put, callDetail, putDetail, strikePrice
               order.metaData.orderHash.slice(2, 8),
               order.type === 'Ask' ? <AskText>{order.type}</AskText> : <BidText>{order.type}</BidText>,
-              order.type === 'Ask' ? zeroXUtil.getAskPrice(order).toFixed(3) : zeroXUtil.getBidPrice(order).toFixed(3),
+              order.type === 'Ask' ? zeroXUtil.getAskPrice(order).toFixed(6) : zeroXUtil.getBidPrice(order).toFixed(6),
               order.type === 'Ask'
                 ? toTokenUnitsBN(order.order.makerAssetAmount, option.decimals).toFixed(3)
                 : toTokenUnitsBN(order.order.takerAssetAmount, option.decimals).toFixed(3),
