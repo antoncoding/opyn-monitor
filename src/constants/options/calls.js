@@ -6,7 +6,7 @@ export const mock_eth_calls = [
 
     // constants in contract
     symbol: 'oETH $150 Call',
-    name: 'Opyn ETH Put $150 04/03/20',
+    name: 'Opyn ETH Call $150 04/03/20',
     strikePriceInUSD: 150,
     decimals: 18,
     oracle: '0x7054e08461e3eCb7718B63540adDB3c3A1746415',

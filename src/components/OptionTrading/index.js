@@ -13,7 +13,7 @@ import { getOrderBook, isValid } from '../../utils/0x';
 import { getVault } from '../../utils/graph';
 // import { toTokenUnitsBN } from '../../utils/number';
 
-import { mock_eth_puts as eth_puts, mock_eth_calls as eth_calls } from '../../constants/options';
+import { eth_puts, mock_eth_calls as eth_calls } from '../../constants/options';
 
 const quoteAsset = {
   symbol: 'WETH',
@@ -45,8 +45,8 @@ function OptionTrading({ user, theme }) {
     const updateOrderBook = async () => {
       const res = await getOrderBook(baseAsset.addr, quoteAsset.addr);
       if (!isCancelled) {
-        setAsks(res.asks.records.filter((record) => isValid(record, quoteAsset.decimals)));
-        setBids(res.bids.records.filter((record) => isValid(record, baseAsset.decimals)));
+        setAsks(res.asks.records.filter((record) => isValid(record)));
+        setBids(res.bids.records.filter((record) => isValid(record)));
       }
     };
     // update baseAsset Balance
@@ -142,7 +142,13 @@ function OptionTrading({ user, theme }) {
           />
           <br />
           {/* <FixBottom> */}
-          <OrderList asks={asks} bids={bids} user={user} option={baseAsset} />
+          <OrderList
+            asks={asks}
+            bids={bids}
+            user={user}
+            option={baseAsset}
+            quoteAsset={quoteAsset}
+          />
           {/* </FixBottom> */}
         </RightPart>
       </FlexWrapper>

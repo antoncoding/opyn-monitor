@@ -79,14 +79,24 @@ export async function getOrderBook(base, quote) {
 export async function getBasePairAskAndBids(options) {
   const bestAskAndBids = await Promise.map(options, async ({ addr: option, decimals }) => {
     const { asks, bids } = await getOrderBook(option, WETH);
-    const validAsks = asks.records.filter((record) => isValid(record, decimals));
-    const validBids = bids.records.filter((record) => isValid(record, decimals));
-    const { makerAssetAmount: askTokenAmt, takerAssetAmount: askWETHAmt } = validAsks[0].order;
-    const { makerAssetAmount: bidWETHAmt, takerAssetAmount: bidTokenAmt } = validBids[0].order;
-    const bestAskPrice = toTokenUnitsBN(askWETHAmt, 18).div(toTokenUnitsBN(askTokenAmt, decimals));
-    const bestBidPrice = toTokenUnitsBN(bidWETHAmt, 18).div(toTokenUnitsBN(bidTokenAmt, decimals));
+    let bestAskPrice = 0;
+    let bestBidPrice = 0;
+    let bestAsk; let bestBid;
+    if (asks.records.length > 0) {
+      const validAsks = asks.records.filter((record) => isValid(record, decimals));
+      const { makerAssetAmount: askTokenAmt, takerAssetAmount: askWETHAmt } = validAsks[0].order;
+      bestAskPrice = toTokenUnitsBN(askWETHAmt, 18).div(toTokenUnitsBN(askTokenAmt, decimals));
+      bestAsk = validAsks[0];
+    }
+    if (bids.records.length > 0) {
+      const validBids = bids.records.filter((record) => isValid(record, decimals));
+      const { makerAssetAmount: bidWETHAmt, takerAssetAmount: bidTokenAmt } = validBids[0].order;
+      bestBidPrice = toTokenUnitsBN(bidWETHAmt, 18).div(toTokenUnitsBN(bidTokenAmt, decimals));
+      bestBid = validBids[0];
+    }
+
     return {
-      option, bestAskPrice, bestBidPrice, bestAsk: validAsks[0], bestBid: validBids[0],
+      option, bestAskPrice, bestBidPrice, bestAsk, bestBid,
     };
   });
   return bestAskAndBids;
@@ -129,11 +139,11 @@ export function connectWebSocket(_orders, setBuyOrders) {
  * @param {*} entry
  * @param {*} decimals
  */
-export const isValid = (entry, takerAssetDecimals) => {
+export const isValid = (entry) => {
   const notExpired = parseInt(entry.order.expirationTimeSeconds, 10) > Date.now() / 1000;
   // notDust: not very good
-  const notDust = new BigNumber(entry.metaData.remainingFillableTakerAssetAmount)
-    .gt(new BigNumber(0.0001).times(new BigNumber(10).pow(takerAssetDecimals)));
+  const notDust = true; // new BigNumber(entry.metaData.remainingFillableTakerAssetAmount)
+  //   .gt(new BigNumber(0.0001).times(new BigNumber(10).pow(takerAssetDecimals)));
   return notExpired && notDust;
 };
 
@@ -161,7 +171,6 @@ export const createOrder = (maker, makerAsset, takerAsset, makerAssetAmount, tak
 };
 
 export const broadcastOrders = async (orders) => {
-  console.log(JSON.stringify(orders));
   const url = `${endpoint}sra/v3/orders`;
   const res = await fetch(url, {
     method: 'POST',
@@ -169,21 +178,38 @@ export const broadcastOrders = async (orders) => {
       'Content-Type': 'application/json',
     },
     body: JSON.stringify(orders),
-  }).catch((error) => {
-    console.error(error);
   });
   return res;
 };
 
-export const getBidPrice = (bid) => new BigNumber(bid.order.makerAssetAmount)
-  .div(new BigNumber(bid.order.takerAssetAmount));
+/**
+ *
+ * @param {{}} bid
+ * @param {number} makerAssetDecimals WETH decimals
+ * @param {number} takerAssetDecimals oTokenDecimals
+ */
+export const getBidPrice = (bid, makerAssetDecimals, takerAssetDecimals) => {
+  const makerAssetAmount = toTokenUnitsBN(bid.order.makerAssetAmount, makerAssetDecimals);
+  const takerAssetAmount = toTokenUnitsBN(bid.order.takerAssetAmount, takerAssetDecimals);
+  return makerAssetAmount.div(takerAssetAmount);
+};
 
 /**
  *
  * @param {{}} ask
+ * @param {number} makerAssetDecimals oToken Decimal
+ * @param {number} takerAssetDecimals WETH decimals
+ * maker want to sell oToken
+ * takerAssetAmount 100 weth
+ * makerAssetAmount 1 oToken
  */
-export const getAskPrice = (ask) => new BigNumber(ask.order.takerAssetAmount)
-  .div(new BigNumber(ask.order.makerAssetAmount));
+export const getAskPrice = (ask, makerAssetDecimals, takerAssetDecimals) => {
+  const makerAssetAmount = toTokenUnitsBN(ask.order.makerAssetAmount, makerAssetDecimals);
+  const takerAssetAmount = toTokenUnitsBN(ask.order.takerAssetAmount, takerAssetDecimals);
+  return takerAssetAmount.div(makerAssetAmount);
+};
+new BigNumber()
+  .div(new BigNumber());
 
 export const getOrderFillRatio = (order) => new BigNumber(100)
   .minus(new BigNumber(order.metaData.remainingFillableTakerAssetAmount)

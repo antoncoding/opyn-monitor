@@ -1,5 +1,5 @@
 /* eslint-disable no-restricted-syntax */
-import React, { useMemo, useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { DataView, DropDown, LinkBase } from '@aragon/ui';
 import { AskText, BidText } from './styled';
@@ -20,13 +20,16 @@ function OptionBoard({
   const optionsByDate = groupByDate(puts, calls, putStats, callStats);
 
   // get option status
-  useMemo(() => {
+  useEffect(() => {
     let isCancelled = false;
     const updateBoardStats = async () => {
+      // console.log('update board');
       const [callData, putData] = await Promise.all([
         getBasePairAskAndBids(calls),
         getBasePairAskAndBids(puts),
       ]);
+
+      // console.log(putData);
 
       if (!isCancelled) {
         setCallStats(callData);
@@ -34,9 +37,10 @@ function OptionBoard({
       }
     };
     updateBoardStats();
-    // const id = setInterval(updateBoardStats, 5000);
+    const id = setInterval(updateBoardStats, 5000);
 
     return () => {
+      clearInterval(id);
       isCancelled = true;
     };
   }, [calls, puts]);
@@ -105,6 +109,7 @@ function OptionBoard({
               setBaseAsset(call);
             };
           }
+          // has this option pair
           if (putDetail !== undefined) {
             putAsk = putDetail.bestAskPrice.toFixed(6);
             putBid = putDetail.bestBidPrice.toFixed(6);

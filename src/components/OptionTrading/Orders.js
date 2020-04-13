@@ -16,7 +16,7 @@ import { AskText, BidText } from './styled';
 import * as zeroXUtil from '../../utils/0x';
 
 function Orders({
-  asks, bids, option, user,
+  asks, bids, option, user, quoteAsset,
 }) {
   const [selectedTab, setSelectedTab] = useState(0);
 
@@ -57,7 +57,7 @@ function Orders({
                 fields={['price', 'amount', 'filled', 'expiration']}
                 entries={asks}
                 renderEntry={(order) => [// call, put, callDetail, putDetail, strikePrice
-                  <AskText>{zeroXUtil.getAskPrice(order).toFixed(6)}</AskText>,
+                  <AskText>{zeroXUtil.getAskPrice(order, option.decimals, quoteAsset.decimals).toFixed(6)}</AskText>,
                   toTokenUnitsBN(order.order.makerAssetAmount, option.decimals).toFixed(3),
                   `${zeroXUtil.getOrderFillRatio(order)}%`,
                   <Timer format="hms" showIcon end={new Date(order.order.expirationTimeSeconds * 1000)} />,
@@ -72,7 +72,7 @@ function Orders({
                 fields={['price', 'amount', 'filled', 'expiration']}
                 entries={bids}
                 renderEntry={(order) => [// call, put, callDetail, putDetail, strikePrice
-                  <BidText>{zeroXUtil.getBidPrice(order).toFixed(6)}</BidText>,
+                  <BidText>{zeroXUtil.getBidPrice(order, quoteAsset.decimals, option.decimals).toFixed(6)}</BidText>,
                   toTokenUnitsBN(order.order.takerAssetAmount, option.decimals).toFixed(3),
                   `${zeroXUtil.getOrderFillRatio(order)}%`,
                   <Timer format="hms" showIcon end={new Date(order.order.expirationTimeSeconds * 1000)} />,
@@ -92,7 +92,9 @@ function Orders({
             renderEntry={(order) => [// call, put, callDetail, putDetail, strikePrice
               order.metaData.orderHash.slice(2, 8),
               order.type === 'Ask' ? <AskText>{order.type}</AskText> : <BidText>{order.type}</BidText>,
-              order.type === 'Ask' ? zeroXUtil.getAskPrice(order).toFixed(6) : zeroXUtil.getBidPrice(order).toFixed(6),
+              order.type === 'Ask'
+                ? zeroXUtil.getAskPrice(order, option.decimals, quoteAsset.decimals).toFixed(6)
+                : zeroXUtil.getBidPrice(order, quoteAsset.decimals, option.decimals).toFixed(6),
               order.type === 'Ask'
                 ? toTokenUnitsBN(order.order.makerAssetAmount, option.decimals).toFixed(3)
                 : toTokenUnitsBN(order.order.takerAssetAmount, option.decimals).toFixed(3),
@@ -112,6 +114,11 @@ Orders.propTypes = {
   bids: PropTypes.arrayOf(OrderType).isRequired,
   user: PropTypes.string.isRequired,
   option: OptionType.isRequired,
+  quoteAsset: PropTypes.shape({
+    decimals: PropTypes.number.isRequired,
+    addr: PropTypes.string.isRequired,
+    symbol: PropTypes.string.isRequired,
+  }).isRequired,
 };
 
 export default Orders;

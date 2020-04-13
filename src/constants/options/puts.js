@@ -11,6 +11,7 @@ export const eth_puts = [
     oracle: '0x7054e08461e3eCb7718B63540adDB3c3A1746415',
     collateral: '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48',
     collateralSymbol: 'USDC',
+    strikePriceInUSD: 100,
     underlying: '0x0000000000000000000000000000000000000000',
     strike: '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48',
     strikePrice: 1e-6,
@@ -30,6 +31,7 @@ export const eth_puts = [
     oracle: '0x7054e08461e3eCb7718B63540adDB3c3A1746415',
     collateral: '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48',
     collateralSymbol: 'USDC',
+    strikePriceInUSD: 100,
     underlying: '0x0000000000000000000000000000000000000000',
     strike: '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48',
     strikePrice: 1e-6,
@@ -41,7 +43,6 @@ export const eth_puts = [
   {
     addr: '0xaefc7b368f7b536c9e5e3f342bf534931ce58584',
     title: 'ETH Put $150 04/24/20',
-
     // constants in contract
     symbol: 'oETH $150 Put',
     name: 'Opyn ETH Put $150 04/24/20',
@@ -49,6 +50,7 @@ export const eth_puts = [
     oracle: '0x7054e08461e3eCb7718B63540adDB3c3A1746415',
     collateral: '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48',
     collateralSymbol: 'USDC',
+    strikePriceInUSD: 150,
     underlying: '0x0000000000000000000000000000000000000000',
     strike: '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48',
     strikePrice: 1.5e-5,
