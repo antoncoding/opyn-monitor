@@ -49,12 +49,9 @@ function BuyAndSell({
 
   const isFillingOrders = selectedOrders.length > 0;
 
-  // selected orders
-  const selectedFillables = getOrdersTotalFillables(selectedOrders);
-
-
   // when selected orders changed
   useEffect(() => {
+    const selectedFillables = getOrdersTotalFillables(selectedOrders);
     if (tradeType === 'bid') {
       // ask: takerAsset: weth, makerAsset: oToken
 
@@ -72,7 +69,7 @@ function BuyAndSell({
     // return () => {
     //   console.log('clean up');
     // };
-  }, [selectedOrders]);
+  }, [selectedOrders, baseAssetDecimals, tradeType]);
 
   const onChangeBaseAmount = (amount) => {
     if (!amount) {
