@@ -51,7 +51,9 @@ function BuyAndSell({
   const expiry = parseInt(Date.now() / 1000 + 86400, 10);
 
   const isFillingOrders = selectedOrders.length > 0;
-  const feeInETH = isFillingOrders ? fastGasPrice * selectedOrders.length * 0.00015 : 0;
+  const feeInETH = isFillingOrders
+    ? fastGasPrice.times(new BigNumber(selectedOrders.length)).times(new BigNumber(0.00015))
+    : new BigNumber(0);
 
   // update gasPrice
   useEffect(() => {
