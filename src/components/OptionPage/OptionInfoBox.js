@@ -9,7 +9,7 @@ import { getERC20Info, getBalance, getTokenBalance } from '../../utils/infura';
 import { toTokenUnitsBN } from '../../utils/number';
 
 function OptionOverview({
-  oToken, tokenSymbol, option, collateralIsETH, collateralDecimals,
+  oToken, tokenSymbol, option, collateralIsETH,
 }) {
   const [totalCollateral, setTotalCollateral] = useState(new BigNumber(0));
   const [totalSupply, setTotalSupply] = useState('0');
@@ -22,7 +22,7 @@ function OptionOverview({
         totalCollt = new BigNumber(await getBalance(oToken));
       } else {
         const rawCollateralBalance = await getTokenBalance(option.collateral, oToken);
-        totalCollt = toTokenUnitsBN(rawCollateralBalance, collateralDecimals);
+        totalCollt = toTokenUnitsBN(rawCollateralBalance, option.collateralDecimals);
       }
       const { totalSupply: supply } = await getERC20Info(oToken);
       if (!isCancelled) {
@@ -35,7 +35,7 @@ function OptionOverview({
     return () => {
       isCancelled = true;
     };
-  }, [collateralDecimals, collateralIsETH, oToken, option.collateral]);
+  }, [option.collateralDecimals, collateralIsETH, oToken, option.collateral]);
 
   return (
     <>
@@ -71,7 +71,6 @@ OptionOverview.propTypes = {
   tokenSymbol: PropTypes.string.isRequired,
   option: MyPTypes.option.isRequired,
   collateralIsETH: PropTypes.bool.isRequired,
-  collateralDecimals: PropTypes.number.isRequired,
 };
 
 export default OptionOverview;

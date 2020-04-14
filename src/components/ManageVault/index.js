@@ -17,7 +17,7 @@ import { Comment } from '../common';
 
 import { toTokenUnitsBN } from '../../utils/number';
 import { calculateRatio, calculateStrikeValueInCollateral } from '../../utils/calculation';
-import { getTokenBalance, getBalance, getDecimals } from '../../utils/infura';
+import { getTokenBalance, getBalance } from '../../utils/infura';
 import { getVault } from '../../utils/graph';
 import { redeem } from '../../utils/web3';
 
@@ -29,7 +29,8 @@ function ManageVault({ user }) {
 
   const option = allOptions.find((o) => o.addr === token);
   const {
-    decimals, symbol, oracle, strike, strikePrice, minRatio, collateral, expiry, underlying,
+    decimals, symbol, oracle, strike, strikePrice, minRatio,
+    collateral, expiry, underlying, collateralDecimals,
   } = option;
 
   const [isLoading, setIsLoading] = useState(true);
@@ -49,7 +50,6 @@ function ManageVault({ user }) {
   const [noVault, setNoVault] = useState(true);
   const [newRatio, setNewRatio] = useState(ratio);
 
-  const [collateralDecimals, setCollateralDecimals] = useState(18);
   const collateralIsETH = collateral === ETH_ADDRESS;
 
   const vaultUsesCollateral = collateral !== strike;
@@ -71,14 +71,13 @@ function ManageVault({ user }) {
 
       // SetUserCollateralAmount
       let collateralBalance = new BigNumber(0);
-      let colltDecimals = 18;
+      // let colltDecimals = 18;
 
       if (collateralIsETH) {
         collateralBalance = new BigNumber(await getBalance(user));
       } else {
         const userColltBalance = await getTokenBalance(collateral, user);
-        colltDecimals = await getDecimals(collateral);
-        collateralBalance = toTokenUnitsBN(userColltBalance, colltDecimals);
+        collateralBalance = toTokenUnitsBN(userColltBalance, collateralDecimals);
       }
 
       const ownerTokenBalanceBN = toTokenUnitsBN(_ownerTokenBalance, decimals);
@@ -88,6 +87,7 @@ function ManageVault({ user }) {
         collateral,
         strike,
         oracle,
+        collateralDecimals,
       );
       const currentRatio = calculateRatio(
         vaultToManage.collateral,
@@ -99,7 +99,6 @@ function ManageVault({ user }) {
       if (!isCancelled) {
         setStrikeValue(strikeValInCollt);
         setVault(vaultToManage);
-        setCollateralDecimals(colltDecimals);
         setOwnerTokenBalance(ownerTokenBalanceBN);
         setUserTokenBalance(userTokenBalanceBN);
         setRatio(currentRatio);
@@ -117,6 +116,7 @@ function ManageVault({ user }) {
   }, [
     collateral,
     collateralIsETH,
+    collateralDecimals,
     decimals,
     oracle,
     owner,
@@ -173,6 +173,7 @@ function ManageVault({ user }) {
               vault={vault}
               collateralAssetBalance={userCollateralAssetBalance}
               collateralAsset={option.collateral}
+              collateralDecimals={collateralDecimals}
               token={token}
               owner={owner}
               strikeValue={strikeValueInCollateral}

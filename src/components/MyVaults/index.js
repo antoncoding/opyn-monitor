@@ -4,7 +4,6 @@ import PropTypes from 'prop-types';
 import { Header, DataView, IdentityBadge } from '@aragon/ui';
 import NoWalletView from './NoWallet';
 
-import { ETH_ADDRESS } from '../../constants/contracts';
 import { allOptions } from '../../constants/options';
 import {
   SectionTitle, ManageVaultButton, OpenVaultButton, Comment,
@@ -14,7 +13,6 @@ import {
   formatDigits, compareVaultRatio, toTokenUnitsBN,
 } from '../../utils/number';
 import { calculateRatio, calculateStrikeValueInCollateral } from '../../utils/calculation';
-import { getDecimals } from '../../utils/infura';
 
 const Promise = require('bluebird');
 
@@ -37,14 +35,12 @@ function MyVaults({ user }) {
     await Promise.map(allOptions, async (option) => {
       const entry = userVaults.find((vault) => vault.optionsContract.address === option.addr);
       const isOpened = entry !== undefined;
-      const collatearlIsETH = option.collateral === ETH_ADDRESS;
       if (isOpened) {
-        const collateralDecimals = collatearlIsETH ? 18 : await getDecimals(option.collateral);
         const strikeValueInCollateral = await calculateStrikeValueInCollateral(
           option.collateral,
           option.strike,
           option.oracle,
-          collateralDecimals,
+          option.collateralDecimals,
         );
         const ratio = calculateRatio(
           entry.collateral,
@@ -56,7 +52,7 @@ function MyVaults({ user }) {
           oToken: option.addr,
           oTokenName: option.title,
           collateral: entry.collateral,
-          collateralDecimals,
+          collateralDecimals: option.collateralDecimals,
           ratio,
         });
       } else if (option.expiry > (Date.now() / 1000)) {
