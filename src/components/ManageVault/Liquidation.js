@@ -33,9 +33,8 @@ function LiquidationHistory({
       const maxToLiquidate = await getMaxLiquidatable(token, owner);
       setMaxLiquidatable(toTokenUnitsBN(maxToLiquidate, tokenDecimals).toNumber());
     }
-
     updateLiquidatable();
-  });
+  }, [owner, token, tokenDecimals]);
 
   useMemo(async () => {
     async function updateList() {
