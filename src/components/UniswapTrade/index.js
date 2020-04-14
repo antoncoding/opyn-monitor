@@ -4,7 +4,9 @@ import { useParams } from 'react-router-dom';
 import { Header } from '@aragon/ui';
 
 import BigNumber from 'bignumber.js';
-import { getTokenBalance, getBalance, getERC20Info } from '../../utils/infura';
+import {
+  getTokenBalance, getBalance, getTotalSupply,
+} from '../../utils/infura';
 import { toTokenUnitsBN } from '../../utils/number';
 
 import { allOptions } from '../../constants/options';
@@ -15,6 +17,8 @@ import AddLiquidity from './AddLiquidity';
 import RemoveLiquidity from './RemoveLiquidity';
 
 function UniswapPool({ user }) {
+  const liquidityTokenDecimals = 18;
+
   const { token } = useParams();
 
   const option = allOptions.find((o) => o.addr === token);
@@ -29,22 +33,21 @@ function UniswapPool({ user }) {
 
   const [userliquidityTokenBalance, setUserLiquidityTokenBalance] = useState(new BigNumber(0));
   const [liquidityTokenSupply, setLiquidityTokenSupply] = useState(new BigNumber(0));
-  const [liquidityTokenDecimals, setLiquidityTokenDecimals] = useState(0);
 
+  // Update Uniswap Pool Info
   useEffect(() => {
     let isCancelled = false;
 
     async function updatePoolInfo() {
-      const [exTokenBalance, exchagneETHBalance, liquidityTokenInfo] = await Promise.all([
+      const [exTokenBalance, exchagneETHBalance, liqTokenTotalSupply] = await Promise.all([
         getTokenBalance(token, uniswapExchange),
         getBalance(uniswapExchange),
-        getERC20Info(uniswapExchange),
+        getTotalSupply(uniswapExchange),
       ]);
-      const { decimals: liqTokenDecimal, totalSupply: liqTokenTotalSupply } = liquidityTokenInfo;
+      // const { decimals: liqTokenDecimal, totalSupply: liqTokenTotalSupply } = liquidityTokenInfo;
       const exchangeTokenBalance = toTokenUnitsBN(exTokenBalance, decimals);
       if (!isCancelled) {
-        setLiquidityTokenDecimals(liqTokenDecimal);
-        setLiquidityTokenSupply(new BigNumber(liqTokenTotalSupply));
+        setLiquidityTokenSupply(toTokenUnitsBN(liqTokenTotalSupply, liquidityTokenDecimals));
         setPoolETHBalance(new BigNumber(exchagneETHBalance));
         setPoolTokenBalance(exchangeTokenBalance);
       }
@@ -58,6 +61,7 @@ function UniswapPool({ user }) {
     };
   }, [decimals, token, uniswapExchange]);
 
+  // Update User balances
   useEffect(() => {
     if (user === '') return;
     let isCancelled = false;
@@ -121,7 +125,7 @@ function UniswapPool({ user }) {
         poolETHBalance={poolETHBalance}
         poolTokenBalance={poolTokenBalance}
         liquidityTokenDecimals={liquidityTokenDecimals}
-        liquidityTokenSupply={liquidityTokenSupply}
+        liquidityTokenSupply={liquidityTokenSupply} // in base unit
       />
 
       <RemoveLiquidity
@@ -133,7 +137,7 @@ function UniswapPool({ user }) {
         poolETHBalance={poolETHBalance}
         poolTokenBalance={poolTokenBalance}
         liquidityTokenDecimals={liquidityTokenDecimals}
-        liquidityTokenSupply={liquidityTokenSupply}
+        liquidityTokenSupply={liquidityTokenSupply} // in base unit
       />
     </>
   );

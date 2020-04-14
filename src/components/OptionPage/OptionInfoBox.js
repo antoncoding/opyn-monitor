@@ -5,14 +5,14 @@ import { Box, Split, IdentityBadge } from '@aragon/ui';
 import BigNumber from 'bignumber.js';
 import * as MyPTypes from '../types';
 
-import { getERC20Info, getBalance, getTokenBalance } from '../../utils/infura';
+import { getTotalSupply, getBalance, getTokenBalance } from '../../utils/infura';
 import { toTokenUnitsBN } from '../../utils/number';
 
 function OptionOverview({
   oToken, tokenSymbol, option, collateralIsETH,
 }) {
   const [totalCollateral, setTotalCollateral] = useState(new BigNumber(0));
-  const [totalSupply, setTotalSupply] = useState('0');
+  const [totalSupply, setTotalSupply] = useState(new BigNumber(0));
 
   useEffect(() => {
     let isCancelled = false;
@@ -24,10 +24,10 @@ function OptionOverview({
         const rawCollateralBalance = await getTokenBalance(option.collateral, oToken);
         totalCollt = toTokenUnitsBN(rawCollateralBalance, option.collateralDecimals);
       }
-      const { totalSupply: supply } = await getERC20Info(oToken);
+      const supply = await getTotalSupply(oToken);
       if (!isCancelled) {
         setTotalCollateral(totalCollt);
-        setTotalSupply(supply);
+        setTotalSupply(toTokenUnitsBN(supply, option.decimals));
       }
     }
     init();
@@ -35,7 +35,7 @@ function OptionOverview({
     return () => {
       isCancelled = true;
     };
-  }, [option.collateralDecimals, collateralIsETH, oToken, option.collateral]);
+  }, [option.collateralDecimals, collateralIsETH, oToken, option.collateral, option.decimals]);
 
   return (
     <>
@@ -49,14 +49,14 @@ function OptionOverview({
             )}
             secondary={(
               <Box heading="Total Collateral" padding={15}>
-                {totalCollateral.toNumber()}
+                {totalCollateral.toFormat(4)}
               </Box>
             )}
           />
         )}
         secondary={(
           <Box heading="total supply" padding={15}>
-            {totalSupply}
+            {totalSupply.toFormat(4)}
             {' '}
             {tokenSymbol}
           </Box>
