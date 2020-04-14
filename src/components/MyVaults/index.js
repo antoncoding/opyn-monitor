@@ -1,12 +1,14 @@
 import React, { useState, useMemo } from 'react';
 import PropTypes from 'prop-types';
-
-import { Header, DataView, IdentityBadge } from '@aragon/ui';
+import BigNumber from 'bignumber.js';
+import {
+  Header, DataView, IdentityBadge,
+} from '@aragon/ui';
 import NoWalletView from './NoWallet';
 
 import { allOptions } from '../../constants/options';
 import {
-  SectionTitle, ManageVaultButton, OpenVaultButton, Comment,
+  SectionTitle, ManageVaultButton, OpenVaultButton, Comment, CheckBox,
 } from '../common';
 import { getAllVaultsForUser } from '../../utils/graph';
 import {
@@ -25,6 +27,19 @@ function MyVaults({ user }) {
   const [watchAddress, setWatchAddress] = useState('');
   const isWatchMode = user === '' && watchAddress !== '';
   const hasAddressConnected = user !== '' || watchAddress !== '';
+
+  // checkbox
+  const [showExpired, setShowExpired] = useState(false);
+  const [showEmpty, setShowEmpty] = useState(true);
+
+  const displayVaults = opendVaults
+    .filter((vault) => {
+      if (showExpired) return true;
+      return vault.expiry * 1000 > Date.now();
+    }).filter((vault) => {
+      if (showEmpty) return true;
+      return new BigNumber(vault.collateral).gt(new BigNumber(0));
+    });
 
   // Only request all vaults once
   useMemo(async () => {
@@ -53,9 +68,11 @@ function MyVaults({ user }) {
           oTokenName: option.title,
           collateral: entry.collateral,
           collateralDecimals: option.collateralDecimals,
+          expiry: option.expiry,
           ratio,
         });
       } else if (option.expiry > (Date.now() / 1000)) {
+        // only put non-expired token to "can open" list
         notOpenedTokens.push({
           oToken: option.addr,
           oTokenName: option.title,
@@ -75,9 +92,22 @@ function MyVaults({ user }) {
           {opendVaults.length > 0 ? (
             <div style={{ paddingBottom: '3%' }}>
               <SectionTitle title="Existing Vaults" />
+              <div style={{ display: 'flex' }}>
+                <CheckBox
+                  text="Expired"
+                  checked={showExpired}
+                  onCheck={setShowExpired}
+                />
+                <CheckBox
+                  text="Empty"
+                  checked={showEmpty}
+                  onCheck={setShowEmpty}
+                />
+              </div>
+
               <DataView
                 fields={['Token', 'contract', 'collateral', 'Ratio', '']}
-                entries={opendVaults}
+                entries={displayVaults}
                 entriesPerPage={6}
                 renderEntry={({
                   oToken, oTokenName, collateral, collateralDecimals, ratio,

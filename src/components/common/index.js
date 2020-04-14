@@ -7,10 +7,12 @@ import HelperText from './HelpText';
 import PriceSection from './PriceSection';
 import Comment from './Comment';
 import { ManageVaultButton, OpenVaultButton } from './VaultButton';
+import CheckBox from './CheckBox';
 
 export {
   AddressBlock,
   BalanceBlock,
+  CheckBox,
   RatioTag,
   SectionTitle,
   MaxButton,
