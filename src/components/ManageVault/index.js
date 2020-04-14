@@ -97,7 +97,7 @@ function ManageVault({ user }) {
       );
 
       if (!isCancelled) {
-        setStrikeValue(strikeValueInCollateral);
+        setStrikeValue(strikeValInCollt);
         setVault(vaultToManage);
         setCollateralDecimals(colltDecimals);
         setOwnerTokenBalance(ownerTokenBalanceBN);
@@ -124,7 +124,6 @@ function ManageVault({ user }) {
     strikePrice,
     token,
     user,
-    strikeValueInCollateral,
   ]);
 
   const isOwner = user === owner;

@@ -104,6 +104,7 @@ function IssuedTokenManagement({
                     const maxTotal = new BigNumber(vault.collateral).div(
                       new BigNumber(minRatio).times(new BigNumber(strikePrice)).times(strikeValue),
                     );
+                    console.log('maxTotal', maxTotal.toNumber());
                     const maxToIssueRaw = maxTotal.minus(new BigNumber(vault.oTokensIssued));
                     const maxToIssue = toTokenUnitsBN(maxToIssueRaw, decimals);
                     setIssueAmt(maxToIssue);
