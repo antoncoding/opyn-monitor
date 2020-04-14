@@ -11,7 +11,10 @@ function MyCheckBox({ text, checked, onCheck }) {
         checked={checked}
         onChange={onCheck}
       />
-      {text}
+      <span style={{ paddingBottom: '5px' }}>
+        {text}
+      </span>
+      <br />
     </CheckBoxWrapper>
   );
 }

@@ -10,10 +10,11 @@ import { allOptions } from '../../constants/options';
 import {
   SectionTitle, ManageVaultButton, OpenVaultButton, Comment, CheckBox,
 } from '../common';
-import { getAllVaultsForUser } from '../../utils/graph';
 import {
   formatDigits, compareVaultRatio, toTokenUnitsBN,
 } from '../../utils/number';
+import { getAllVaultsForUser } from '../../utils/graph';
+import { getPreference, storePreference } from '../../utils/storage';
 import { calculateRatio, calculateStrikeValueInCollateral } from '../../utils/calculation';
 
 const Promise = require('bluebird');
@@ -29,17 +30,12 @@ function MyVaults({ user }) {
   const hasAddressConnected = user !== '' || watchAddress !== '';
 
   // checkbox
-  const [showExpired, setShowExpired] = useState(false);
-  const [showEmpty, setShowEmpty] = useState(true);
+  const [showExpired, setShowExpired] = useState(getPreference('showExpired', '0') === '1');
+  const [showEmpty, setShowEmpty] = useState(getPreference('showEmpty', '1') === '1');
 
   const displayVaults = opendVaults
-    .filter((vault) => {
-      if (showExpired) return true;
-      return vault.expiry * 1000 > Date.now();
-    }).filter((vault) => {
-      if (showEmpty) return true;
-      return new BigNumber(vault.collateral).gt(new BigNumber(0));
-    });
+    .filter((vault) => showExpired || vault.expiry * 1000 > Date.now())
+    .filter((vault) => showEmpty || new BigNumber(vault.collateral).gt(new BigNumber(0)));
 
   // Only request all vaults once
   useMemo(async () => {
@@ -91,18 +87,29 @@ function MyVaults({ user }) {
         <>
           {opendVaults.length > 0 ? (
             <div style={{ paddingBottom: '3%' }}>
-              <SectionTitle title="Existing Vaults" />
+
               <div style={{ display: 'flex' }}>
-                <CheckBox
-                  text="Expired"
-                  checked={showExpired}
-                  onCheck={setShowExpired}
-                />
-                <CheckBox
-                  text="Empty"
-                  checked={showEmpty}
-                  onCheck={setShowEmpty}
-                />
+                <SectionTitle title="Existing Vaults" />
+                <div style={{ marginLeft: 'auto' }}>
+                  <div style={{ display: 'flex' }}>
+                    <CheckBox
+                      text="Expired"
+                      checked={showExpired}
+                      onCheck={(checked) => {
+                        storePreference('showExpired', checked ? '1' : '0');
+                        setShowExpired(checked);
+                      }}
+                    />
+                    <CheckBox
+                      text="Empty"
+                      checked={showEmpty}
+                      onCheck={(checked) => {
+                        storePreference('showEmpty', checked ? '1' : '0');
+                        setShowEmpty(checked);
+                      }}
+                    />
+                  </div>
+                </div>
               </div>
 
               <DataView
