@@ -32,8 +32,9 @@ import { KETH, DAI, USDC } from '../../constants/contracts';
  *
  * @param {{ option:{
  * decimals:number,
- * exchange:string, collateral:string, symbol:string}
- * oTokensIssued: string collateralDecimals:Number, exchange:string}} param0
+ * exchange:string, collateral:string, symbol:string, collateralDecimals:Number}
+ * oTokensIssued: string
+ * , exchange:string}} param0
  */
 function VaultModal({
   option,
@@ -45,7 +46,6 @@ function VaultModal({
   oTokensIssued,
   ratio,
   collateralIsETH,
-  collateralDecimals,
 }) {
   const toast = useToast();
   const [opened, setOpened] = useState(false);
@@ -84,7 +84,7 @@ function VaultModal({
           entriesPerPage={1}
           renderEntry={(vault) => [
             <IdentityBadge entity={vault.owner} shorten />,
-            formatDigits(toTokenUnitsBN(vault.collateral, collateralDecimals), 5),
+            formatDigits(toTokenUnitsBN(vault.collateral, option.collateralDecimals), 5),
             formatDigits(toTokenUnitsBN(vault.oTokensIssued, option.decimals), 5),
             formatDigits(vault.ratio, 4),
             RatioTag({ isSafe: vault.isSafe, ratio, useCollateral }),
@@ -118,7 +118,7 @@ function VaultModal({
                       option.collateral,
                       oToken,
                       owner,
-                      toBaseUnitBN(addValue, collateralDecimals).toString(),
+                      toBaseUnitBN(addValue, option.collateralDecimals).toString(),
                     );
                   }
                 }}
@@ -226,7 +226,6 @@ VaultModal.propTypes = {
   oTokensIssued: PropTypes.string.isRequired,
   ratio: PropTypes.number.isRequired,
   collateralIsETH: PropTypes.bool.isRequired,
-  collateralDecimals: PropTypes.number.isRequired,
 };
 
 export default VaultModal;

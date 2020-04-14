@@ -19,7 +19,6 @@ function OptionPage({ user }) {
 
   const [vaults, setVaults] = useState([]);
 
-  const [collateralDecimals, setCollateralDecimals] = useState(18);
   const [underlyingDecimals, setUnderlyingDecimals] = useState(18);
   const [underlyingSymbol, setUnderlyingSymbol] = useState('ETH');
 
@@ -27,10 +26,6 @@ function OptionPage({ user }) {
   const underlyingIsETH = option.underlying === ETH_ADDRESS;
 
   useMemo(async () => {
-    if (!collateralIsETH) {
-      const colltDecimals = await getDecimals(option.collateral);
-      setCollateralDecimals(colltDecimals);
-    }
     if (!underlyingIsETH) {
       const [_decimals, _symbol] = await Promise.all([
         getDecimals(option.underlying),
@@ -43,7 +38,7 @@ function OptionPage({ user }) {
     // Get All vaults once
     const allVaults = await getAllVaultsForOption(token);
     setVaults(allVaults);
-  }, [collateralIsETH, option.collateral, option.underlying, token, underlyingIsETH]);
+  }, [option.underlying, token, underlyingIsETH]);
 
   return (
     <>
@@ -54,7 +49,6 @@ function OptionPage({ user }) {
             user={user}
             oToken={token}
             option={option}
-            collateralDecimals={collateralDecimals}
             underlyingDecimals={underlyingDecimals}
             underlyingSymbol={underlyingSymbol}
             underlyingIsETH={underlyingIsETH}
@@ -69,7 +63,6 @@ function OptionPage({ user }) {
         user={user}
         vaults={vaults}
         option={option}
-        collateralDecimals={collateralDecimals}
         collateralIsETH={collateralIsETH}
       />
       {/* List of Vaults */}
@@ -77,7 +70,6 @@ function OptionPage({ user }) {
         oToken={token}
         user={user}
         vaults={vaults}
-        collateralDecimals={collateralDecimals}
         collateralIsETH={collateralIsETH}
         option={option}
       />

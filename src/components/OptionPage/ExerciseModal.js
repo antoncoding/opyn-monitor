@@ -26,8 +26,7 @@ import {
  *
  * @param {{
  * oToken: string,
- * option: { decimals: number, underlying:string }
- * collateralDecimals: Number
+ * option: { decimals: number, underlying:string, collateralDecimals: Number }
  * underlyingDecimals: Number
  * underlyingSymbol: string
  * vaults: { collateral:string, oTokensIssued: string, owner:string, symbol:string }[]
@@ -39,7 +38,6 @@ function ExerciseModal({
   oToken,
   option,
   vaults,
-  collateralDecimals,
   underlyingDecimals,
   underlyingSymbol,
   underlyingIsETH,
@@ -178,7 +176,7 @@ function ExerciseModal({
           renderEntry={({ owner, collateral, oTokensIssued }) => [
             <IdentityBadge entity={owner} />,
             formatDigits(toTokenUnitsBN(oTokensIssued, option.decimals).toNumber(), 5),
-            formatDigits(toTokenUnitsBN(collateral, collateralDecimals).toNumber(), 5),
+            formatDigits(toTokenUnitsBN(collateral, option.collateralDecimals).toNumber(), 5),
           ]}
         />
         <br />
@@ -206,7 +204,6 @@ ExerciseModal.propTypes = {
   oToken: PropTypes.string.isRequired,
   option: myType.option.isRequired,
   vaults: PropTypes.arrayOf(myType.vault).isRequired,
-  collateralDecimals: PropTypes.number.isRequired,
   underlyingDecimals: PropTypes.number.isRequired,
   underlyingSymbol: PropTypes.string.isRequired,
   underlyingIsETH: PropTypes.bool.isRequired,

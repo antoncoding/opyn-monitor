@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 import {
   Box, TextInput, Button, IconCirclePlus, IconCircleMinus,
 } from '@aragon/ui';
-import { getDecimals, getERC20Symbol } from '../../utils/infura';
+import { getERC20Symbol } from '../../utils/infura';
 import { addETHCollateral, addERC20Collateral, removeCollateral } from '../../utils/web3';
 
 import { BalanceBlock, MaxButton } from '../common';
@@ -23,6 +23,7 @@ function CollateralManagement({
   vault,
   collateralAsset,
   collateralAssetBalance, // Bignumber, / token unit
+  collateralDecimals,
   token,
   owner,
   strikeValue,
@@ -33,16 +34,13 @@ function CollateralManagement({
   const [addCollateralAmt, setAddCollateralAmt] = useState(0); // in token unit
   const [removeCollateralAmt, setRemoveCollateralAmt] = useState(0); // in token unit
 
-  const [collateralDecimals, setCollateralDecimals] = useState(18);
-  const [collateralSymbol, setCollateralSymbol] = useState(0);
+  const [collateralSymbol, setCollateralSymbol] = useState('ETH');
 
   const collateralIsETH = collateralAsset === ETH_ADDRESS;
 
   useMemo(async () => {
     if (collateralIsETH) return;
-    const decimals = await getDecimals(collateralAsset);
     const symbol = await getERC20Symbol(collateralAsset);
-    setCollateralDecimals(decimals);
     setCollateralSymbol(symbol);
   }, [collateralAsset, collateralIsETH]);
 
@@ -63,7 +61,7 @@ function CollateralManagement({
         {/* balance */}
         <div style={{ width: '30%' }}>
           {BalanceBlock({
-            asset: collateralIsETH ? 'Your ETH Balance' : `Your ${collateralSymbol} Balance`,
+            asset: `Your ${collateralSymbol} Balance`,
             balance: formatDigits(collateralAssetBalance.toString(), 6),
           })}
         </div>
@@ -185,6 +183,7 @@ CollateralManagement.propTypes = {
   vault: MyPTypes.vault.isRequired,
   collateralAsset: PropTypes.string.isRequired,
   collateralAssetBalance: PropTypes.instanceOf(BigNumber).isRequired,
+  collateralDecimals: PropTypes.number.isRequired,
   token: PropTypes.string.isRequired,
   owner: PropTypes.string.isRequired,
   strikeValue: PropTypes.instanceOf(BigNumber).isRequired,

@@ -1,5 +1,5 @@
 import BigNumber from 'bignumber.js';
-import { getPrice, getDecimals } from './infura';
+import { getPrice } from './infura';
 import { toBaseUnitBN } from './number';
 
 /**
@@ -7,33 +7,29 @@ import { toBaseUnitBN } from './number';
  * @param {string} collateral address
  * @param {string} strike address
  * @param {string} oracle address
- * @param {number?} collateralDecimals if provided, wont get again if needed
+ * @param {number} collateralDecimals
  * @return {Promise<BigNumber>}
  */
 export const calculateStrikeValueInCollateral = async (
   collateral,
   strike,
   oracle,
-  collateralDecimals = undefined,
+  collateralDecimals,
 ) => {
   const ETH_Address = '0x0000000000000000000000000000000000000000';
   let strikeValueInCollateral;
-  let decimals = collateralDecimals;
   if (collateral === ETH_Address) {
     const strikeValueInWei = await getPrice(oracle, strike);
     strikeValueInCollateral = new BigNumber(strikeValueInWei);
   } else if (collateral === strike) {
     // No collateral, like ETH option
-    if (decimals === undefined) decimals = await getDecimals(collateral);
-    strikeValueInCollateral = new BigNumber(10).pow(new BigNumber(decimals));
+    strikeValueInCollateral = new BigNumber(10).pow(new BigNumber(collateralDecimals));
   } else {
-    // Use other ERC20 as collateral : Untested
-    if (decimals === undefined) decimals = await getDecimals(collateral);
     const strikeValueInWei = await getPrice(oracle, strike);
     const collateralValueInWei = await getPrice(oracle, collateral);
     strikeValueInCollateral = toBaseUnitBN(
       parseInt(strikeValueInWei, 10) / parseInt(collateralValueInWei, 10),
-      decimals,
+      collateralDecimals,
     );
   }
   return strikeValueInCollateral;

@@ -11,7 +11,7 @@ import { calculateRatio, calculateStrikeValueInCollateral } from '../../utils/ca
 
 
 function VaultOwnerList({
-  oToken, user, vaults, option, collateralIsETH, collateralDecimals,
+  oToken, user, vaults, option, collateralIsETH,
 }) {
   const vaultUsesCollateral = option.collateral !== option.strike;
 
@@ -25,13 +25,15 @@ function VaultOwnerList({
     const updateInfo = async () => {
       if (vaults.length === 0) return;
       const {
-        strike, minRatio, strikePrice, oracle, collateral,
+        strike, minRatio, strikePrice, oracle, collateral, collateralDecimals,
       } = option;
+
 
       const strikeValueInCollateral = await calculateStrikeValueInCollateral(
         collateral,
         strike,
         oracle,
+        collateralDecimals,
       );
       const vaultDetail = vaults
         .map((vault) => {
@@ -76,7 +78,7 @@ function VaultOwnerList({
       isCancelled = true;
       clearInterval(id);
     };
-  }, [collateralDecimals, collateralIsETH, oToken, option, user, vaultUsesCollateral, vaults]);
+  }, [collateralIsETH, oToken, option, user, vaultUsesCollateral, vaults]);
 
   return (
     <>
@@ -93,7 +95,7 @@ function VaultOwnerList({
         }) => [
           <IdentityBadge entity={owner} shorten />,
           formatDigits(
-            toTokenUnitsBN(collateral, collateralDecimals).toNumber(),
+            toTokenUnitsBN(collateral, option.collateralDecimals).toNumber(),
             6,
           ),
           formatDigits(
@@ -107,7 +109,6 @@ function VaultOwnerList({
             oToken={oToken}
             owner={owner}
             collateral={collateral}
-            collateralDecimals={collateralDecimals}
             isSafe={isSafe}
             useCollateral={useCollateral}
             collateralIsETH={collateralIsETH}
@@ -126,7 +127,6 @@ VaultOwnerList.propTypes = {
   vaults: PropTypes.arrayOf(MyPTypes.vault).isRequired,
   option: MyPTypes.option.isRequired,
   collateralIsETH: PropTypes.bool.isRequired,
-  collateralDecimals: PropTypes.number.isRequired,
 };
 
 export default VaultOwnerList;

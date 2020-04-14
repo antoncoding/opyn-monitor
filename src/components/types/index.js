@@ -20,6 +20,7 @@ export const option = PropTypes.shape({
   decimals: PropTypes.number.isRequired,
   oracle: PropTypes.string.isRequired,
   collateral: PropTypes.string.isRequired,
+  collateralDecimals: PropTypes.number.isRequired,
   underlying: PropTypes.string.isRequired,
   strike: PropTypes.string.isRequired,
   strikePrice: PropTypes.number.isRequired,
