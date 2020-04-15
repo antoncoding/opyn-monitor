@@ -266,3 +266,32 @@ export const getGasPrice = async () => {
   const res = await fetch(url);
   return res.json();
 };
+
+
+/**
+ * Return Minimal orders needed for target amount
+ * @param {{order: {
+      makerAssetAmount: string,
+      takerAssetAmount: string,
+    }}[]} selectedOrders
+ * @param {BigNumber} targetAmount
+ * @param {string} targetAsset maker or taker
+ */
+export const findMinOrdersForAmount = (selectedOrders, targetAmount, targetAsset) => {
+  console.log('find min orders ');
+  let sum = new BigNumber(0);
+  const requiredOrders = [];
+  // eslint-disable-next-line no-restricted-syntax
+  for (const order of selectedOrders) {
+    const amount = targetAsset === 'maker'
+      ? new BigNumber(order.order.makerAssetAmount)
+      : new BigNumber(order.order.takerAssetAmount);
+    sum = sum.plus(amount);
+    requiredOrders.push(order);
+
+    if (sum.gt(targetAmount)) {
+      break;
+    }
+  }
+  return requiredOrders;
+};

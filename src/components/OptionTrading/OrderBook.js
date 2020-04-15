@@ -18,20 +18,20 @@ function OrderBook({
   const [bidSelectedIndexs, setBidSelectedIndexes] = useState([]);
 
   const onSelectAskEntry = (entries, indexes) => {
-    setTradeType('bid'); // Filling ask orders is a bid
+    setTradeType('buy'); // Filling ask orders is a bid
     setSelectedOrders(entries);
     setAskSelectedIndexes(indexes);
   };
 
   const onSelectBidEntry = (entries, indexes) => {
-    setTradeType('ask'); // Filling bid orders is a ask
+    setTradeType('sell'); // Filling bid orders is a ask
     setSelectedOrders(entries);
     setBidSelectedIndexes(indexes);
   };
 
   // everytime tradeType or selectedOrders changed, the selection is updated
   useEffect(() => {
-    if (tradeType === 'bid') { // user select and ask order
+    if (tradeType === 'buy') { // user select and ask order
       setBidSelectedIndexes([]); // reset bid selections
       const selectedIdxs = [];
       for (let i = 0; i < asks.length; i += 1) {

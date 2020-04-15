@@ -98,14 +98,14 @@ function OptionBoard({
             callOnclick = () => { setBaseAsset(call); };
 
             callBidOnclick = () => {
-              setSelectedOrders(callDetail.bestBid ? [callDetail.bestBid] : []);
-              setTradeType('bid');
+              setTradeType('sell');
               setBaseAsset(call);
+              setSelectedOrders(callDetail.bestBid ? [callDetail.bestBid] : []);
             };
             callAskOnclick = () => {
-              setSelectedOrders(callDetail.bestAsk ? [callDetail.bestAsk] : []);
-              setTradeType('ask');
+              setTradeType('buy');
               setBaseAsset(call);
+              setSelectedOrders(callDetail.bestAsk ? [callDetail.bestAsk] : []);
             };
           }
           if (putDetail !== undefined) {
@@ -116,13 +116,14 @@ function OptionBoard({
 
             putBidOnclick = () => {
               setBaseAsset(put);
+              console.log('putDetail.bestBid', putDetail.bestBid);
+              setTradeType('sell');
               setSelectedOrders(putDetail.bestBid ? [putDetail.bestBid] : []);
-              setTradeType('bid');
             };
             putAskOnclick = () => {
               setBaseAsset(put);
+              setTradeType('buy');
               setSelectedOrders(putDetail.bestAsk ? [putDetail.bestAsk] : []);
-              setTradeType('ask');
             };
           }
 

@@ -27,7 +27,7 @@ function OptionTrading({ user, theme }) {
   const [asks, setAsks] = useState([]);
   const [bids, setBids] = useState([]);
 
-  const [tradeType, setTradeType] = useState('bid');
+  const [tradeType, setTradeType] = useState('buy');
   const [selectedOrders, setSelectedOrders] = useState([]);
 
   // user balance

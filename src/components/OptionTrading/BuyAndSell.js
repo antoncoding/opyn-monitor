@@ -47,6 +47,14 @@ function BuyAndSell({
   // const quoteAssetAmount = price.times(baseAssetAmount);
   const expiry = parseInt(Date.now() / 1000 + 86400, 10);
 
+  const [selectedOrderFillables, setSelectedOrdersFillable] = useState({
+    totalFillableMakerAmount: new BigNumber(0),
+    totalFillableTakerAmount: new BigNumber(0),
+  });
+
+  // Under some circumstances, we use this flag prevent useEffect updates
+  // const [flagFixAmount, setFlagFixAmount] = useState(false)
+
   const isFillingOrders = selectedOrders.length > 0;
   const feeInETH = isFillingOrders
     ? fastGasPrice.times(new BigNumber(selectedOrders.length)).times(new BigNumber(0.00015))
@@ -76,9 +84,8 @@ function BuyAndSell({
     let baseAmountTotal = new BigNumber(0);
     let quoteAmountTotal = new BigNumber(0);
     // Step 1. set oToken and WETH amount to order total and change price
-    if (tradeType === 'bid') {
+    if (tradeType === 'buy') {
       // ask: takerAsset: weth, makerAsset: oToken
-
       baseAmountTotal = toTokenUnitsBN(selectedFillables.totalFillableMakerAmount, baseAssetDecimals);
       quoteAmountTotal = toTokenUnitsBN(selectedFillables.totalFillableTakerAmount, quoteAssetDecimals);
     } else {
@@ -88,21 +95,41 @@ function BuyAndSell({
     }
     setBaseAssetAmount(baseAmountTotal);
     setQuoteAssetAmount(quoteAmountTotal);
+
+    setSelectedOrdersFillable(selectedFillables);
+
     const aggregateRate = quoteAmountTotal.div(baseAmountTotal);
     setRate(aggregateRate);
-
-    // return () => {
-    //   console.log('clean up');
-    // };
   }, [selectedOrders, baseAssetDecimals, tradeType, quoteAssetDecimals]);
 
+
   const onChangeBaseAmount = (amount) => {
+    // 1. Update amount field
     if (!amount) {
       setBaseAssetAmount(new BigNumber(0));
       return;
     }
     const amountBN = new BigNumber(amount);
     setBaseAssetAmount(amountBN);
+
+    // 2. If user has selected order, check if the amount is covered by selected orders
+    if (selectedOrders.length > 0) {
+      const totalOtokenInSelectedOrders = tradeType === 'buy'
+        ? selectedOrderFillables.totalFillableMakerAmount // oToken is the maker asset of ask orders
+        : selectedOrderFillables.totalFillableTakerAmount;
+
+      // user lower the amount
+      const target = toBaseUnitBN(amountBN, baseAssetDecimals);
+      if (totalOtokenInSelectedOrders.gt(target)) {
+        // Disable this now because updating selectedOrders will trigger another useEffect, update amount again
+        // const newSelectedOrders = findMinOrdersForAmount(selectedOrders, target,
+        //   tradeType === 'buy' ? 'maker' : 'taker');
+        // if (newSelectedOrders.length !== selectedOrders.length) {
+        //   // setSelectedOrders(newSelectedOrders);
+        // }
+
+      }
+    }
 
     // calculate quote asset
     // price 0.0001 WETH, amount 10 => need 0.001 weth
@@ -129,7 +156,7 @@ function BuyAndSell({
 
   const createBidOrder = async () => {
     let order;
-    if (tradeType === 'bid') {
+    if (tradeType === 'buy') {
       order = createOrder(
         user,
         quoteAsset,
@@ -155,7 +182,7 @@ function BuyAndSell({
   const fillOrders = async () => {
     const orderToFill = selectedOrders[0];
     let takeAmount;
-    if (tradeType === 'bid') {
+    if (tradeType === 'buy') {
       // filling an ask order:
       const orderPrice = getAskPrice(selectedOrders[0], baseAssetDecimals, quoteAssetDecimals);
       const takeAmountInToken = orderPrice.times(baseAssetAmount);
@@ -205,20 +232,20 @@ function BuyAndSell({
       <Wrapper>
         <TabWrapper theme={theme}>
           <Tab
-            active={tradeType === 'bid'}
+            active={tradeType === 'buy'}
             onClick={() => {
               setSelectedOrders([]);
-              setTradeType('bid');
+              setTradeType('buy');
             }}
             theme={theme}
           >
             Buy
           </Tab>
           <Tab
-            active={tradeType === 'ask'}
+            active={tradeType === 'sell'}
             onClick={() => {
               setSelectedOrders([]);
-              setTradeType('ask');
+              setTradeType('sell');
             }}
             theme={theme}
           >
@@ -245,7 +272,7 @@ function BuyAndSell({
           />
 
           <BottomTextWrapper>
-            <BottomText>{tradeType === 'bid' ? 'Cost' : 'Earn'}</BottomText>
+            <BottomText>{tradeType === 'buy' ? 'Cost' : 'Earn'}</BottomText>
             <BottomText>{`${quoteAssetAmount.toFixed(4)} WETH`}</BottomText>
           </BottomTextWrapper>
           <BottomTextWrapper>
@@ -279,7 +306,7 @@ function BuyAndSell({
           : (
             <Button
               onClick={createBidOrder}
-              label={tradeType === 'bid' ? 'Buy' : 'Sell'}
+              label={tradeType === 'buy' ? 'Buy' : 'Sell'}
               wide
             />
           )}
