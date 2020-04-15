@@ -5,7 +5,7 @@ import {
   DataView, Timer, Button,
 } from '@aragon/ui';
 
-// import { assetDataUtils } from '@0x/order-utils';
+import { cancelOrders } from '../../utils/web3';
 
 // import BigNumber from 'bignumber.js';
 
@@ -19,8 +19,8 @@ function MyOrders({
   asks, bids, option, user, quoteAsset,
 }) {
   const [myOrdersPage, setMyOrdersPage] = useState(0);
+  const [selectedOrders, setSelectedOrders] = useState([]);
   const userAsks = asks
-    // .slice(4, 5)
     .filter((o) => o.order.makerAddress === user.toLowerCase())
     .map((o) => {
       // eslint-disable-next-line no-param-reassign
@@ -41,6 +41,7 @@ function MyOrders({
         entriesPerPage={4}
         page={myOrdersPage}
         onPageChange={setMyOrdersPage}
+        onSelectEntries={setSelectedOrders}
         fields={['digest', 'type', 'price', 'amount', 'filled', 'expiration', '']}
         entries={userAsks.concat(userBids)}
         renderEntry={(order) => [// call, put, callDetail, putDetail, strikePrice
@@ -54,7 +55,24 @@ function MyOrders({
             : toTokenUnitsBN(order.order.takerAssetAmount, option.decimals).toFixed(3),
           `${zeroXUtil.getOrderFillRatio(order)}%`,
           <Timer end={new Date(order.order.expirationTimeSeconds * 1000)} />,
-          <Button onClick={() => {}}>Cancel Order</Button>,
+
+          selectedOrders.length > 0
+            ? (
+              <Button onClick={() => {
+                cancelOrders(selectedOrders.map((o) => o.order));
+              }}
+              >
+                Cancel Selected
+              </Button>
+            )
+            : (
+              <Button onClick={() => {
+                cancelOrders([order.order]);
+              }}
+              >
+                Cancel Order
+              </Button>
+            ),
         ]}
       />
     </>
