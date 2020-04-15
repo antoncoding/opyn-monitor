@@ -8,10 +8,12 @@ import PriceSection from './PriceSection';
 import Comment from './Comment';
 import { ManageVaultButton, OpenVaultButton } from './VaultButton';
 import Wrapper from './Wrapper';
+import CheckBox from './CheckBox';
 
 export {
   AddressBlock,
   BalanceBlock,
+  CheckBox,
   RatioTag,
   SectionTitle,
   MaxButton,

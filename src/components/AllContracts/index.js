@@ -5,12 +5,15 @@ import {
 } from '@aragon/ui';
 
 import { insurances, eth_options } from '../../constants/options';
-import { Comment } from '../common';
+import { Comment, CheckBox } from '../common';
 import { getPreference, storePreference } from '../../utils/storage';
 
 function AllContracts() {
   const storedOptionTab = getPreference('optionTab', '0');
+  const storedShowExpired = getPreference('showExpired', '0');
+
   const [tabSelected, setTabSelected] = useState(parseInt(storedOptionTab, 10));
+  const [showExpired, setShowExpired] = useState(storedShowExpired === '1'); // whether to show expired options
 
   const history = useHistory();
   const goToToken = (addr) => {
@@ -19,7 +22,19 @@ function AllContracts() {
   return (
     <>
       <Header primary="All Contracts" />
-      <Comment text="Choose an option contract to proceed." />
+      <div style={{ display: 'flex' }}>
+        <Comment text="Choose an option contract to proceed." />
+        <div style={{ marginLeft: 'auto' }}>
+          <CheckBox
+            text="Expired"
+            onCheck={(checked) => {
+              storePreference('showExpired', checked ? '1' : '0');
+              setShowExpired(checked);
+            }}
+            checked={showExpired}
+          />
+        </div>
+      </div>
       <Tabs
         items={['DeFi Insurance', 'ETH Options']}
         selected={tabSelected}
@@ -32,7 +47,7 @@ function AllContracts() {
       {tabSelected === 0 ? (
         <DataView
           fields={['Name', 'Contract', '']}
-          entries={insurances}
+          entries={insurances.filter((option) => showExpired || option.expiry * 1000 > Date.now())}
           entriesPerPage={6}
           renderEntry={({ addr, title }) => [
             <>{title}</>,
@@ -44,7 +59,7 @@ function AllContracts() {
         <DataView
           header="Options"
           fields={['Name', 'Contract', 'Expiry', '']}
-          entries={eth_options}
+          entries={eth_options.filter((option) => showExpired || option.expiry * 1000 > Date.now())}
           entriesPerPage={6}
           renderEntry={({ addr, title, expiry }) => [
             <>{title}</>,
