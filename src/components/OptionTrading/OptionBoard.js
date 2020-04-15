@@ -92,34 +92,36 @@ function OptionBoard({
           let putAskOnclick = () => {};
 
           if (callDetail !== undefined) {
+            // have call option has this strike price
             callAsk = callDetail.bestAskPrice.toFixed(6);
             callBid = callDetail.bestBidPrice.toFixed(6);
             callOnclick = () => { setBaseAsset(call); };
 
             callBidOnclick = () => {
-              setSelectedOrders([callDetail.bestBid]);
+              setSelectedOrders(callDetail.bestBid ? [callDetail.bestBid] : []);
               setTradeType('bid');
               setBaseAsset(call);
             };
             callAskOnclick = () => {
-              setSelectedOrders([callDetail.bestAsk]);
+              setSelectedOrders(callDetail.bestAsk ? [callDetail.bestAsk] : []);
               setTradeType('ask');
               setBaseAsset(call);
             };
           }
-          // has this option pair
           if (putDetail !== undefined) {
+            // has put option has this strike price
             putAsk = putDetail.bestAskPrice.toFixed(6);
             putBid = putDetail.bestBidPrice.toFixed(6);
             putOnclick = () => { setBaseAsset(put); };
+
             putBidOnclick = () => {
               setBaseAsset(put);
-              setSelectedOrders([putDetail.bestBid]);
+              setSelectedOrders(putDetail.bestBid ? [putDetail.bestBid] : []);
               setTradeType('bid');
             };
             putAskOnclick = () => {
               setBaseAsset(put);
-              setSelectedOrders([putDetail.bestAsk]);
+              setSelectedOrders(putDetail.bestAsk ? [putDetail.bestAsk] : []);
               setTradeType('ask');
             };
           }
