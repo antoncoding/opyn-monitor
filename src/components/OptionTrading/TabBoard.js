@@ -10,6 +10,8 @@ import { order as OrderType, option as OptionType } from '../types';
 
 function Orders({
   asks, bids, option, user, quoteAsset,
+  tradeType,
+  selectedOrders,
   setTradeType,
   setSelectedOrders,
 }) {
@@ -29,7 +31,9 @@ function Orders({
             bids={bids}
             option={option}
             quoteAsset={quoteAsset}
+            tradeType={tradeType}
             setTradeType={setTradeType}
+            selectedOrders={selectedOrders}
             setSelectedOrders={setSelectedOrders}
           />
         )
@@ -51,6 +55,8 @@ Orders.propTypes = {
     addr: PropTypes.string.isRequired,
     symbol: PropTypes.string.isRequired,
   }).isRequired,
+  tradeType: PropTypes.string.isRequired,
+  selectedOrders: PropTypes.arrayOf(OrderType).isRequired,
   setTradeType: PropTypes.func.isRequired,
   setSelectedOrders: PropTypes.func.isRequired,
 };

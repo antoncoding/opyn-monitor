@@ -1,5 +1,5 @@
 /* eslint-disable no-restricted-syntax */
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { DataView, Timer } from '@aragon/ui';
 
@@ -9,20 +9,48 @@ import { AskText, BidText } from './styled';
 import * as zeroXUtil from '../../utils/0x';
 
 function OrderBook({
-  asks, bids, option, quoteAsset, setTradeType, setSelectedOrders,
+  asks, bids, option, quoteAsset, setTradeType, setSelectedOrders, selectedOrders, tradeType,
 }) {
   const [askPage, setAskPage] = useState(0);
   const [bidPage, setBidPage] = useState(0);
 
-  const onSelectAskEntry = (entries) => {
+  const [askSelectedIndexs, setAskSelectedIndexes] = useState([]);
+  const [bidSelectedIndexs, setBidSelectedIndexes] = useState([]);
+
+  const onSelectAskEntry = (entries, indexes) => {
     setTradeType('bid'); // Filling ask orders is a bid
     setSelectedOrders(entries);
+    setAskSelectedIndexes(indexes);
   };
 
-  const onSelectBidEntry = (entries) => {
+  const onSelectBidEntry = (entries, indexes) => {
     setTradeType('ask'); // Filling bid orders is a ask
     setSelectedOrders(entries);
+    setBidSelectedIndexes(indexes);
   };
+
+  // everytime tradeType or selectedOrders changed, the selection is updated
+  useEffect(() => {
+    if (tradeType === 'bid') { // user select and ask order
+      setBidSelectedIndexes([]); // reset bid selections
+      const selectedIdxs = [];
+      for (let i = 0; i < asks.length; i += 1) {
+        if (selectedOrders.map((o) => o.metaData.orderHash).includes(asks[i].metaData.orderHash)) {
+          selectedIdxs.push(i);
+        }
+      }
+      setAskSelectedIndexes(selectedIdxs);
+    } else {
+      setAskSelectedIndexes([]);
+      const selectedIdxs = [];
+      for (let i = 0; i < bids.length; i += 1) {
+        if (selectedOrders.map((o) => o.metaData.orderHash).includes(bids[i].metaData.orderHash)) {
+          selectedIdxs.push(i);
+        }
+      }
+      setBidSelectedIndexes(selectedIdxs);
+    }
+  }, [selectedOrders, tradeType, asks, bids]);
 
   return (
     <>
@@ -34,6 +62,8 @@ function OrderBook({
             onPageChange={setAskPage}
             entries={asks}
             onSelectEntries={onSelectAskEntry}
+            // If other operation reset selected orders, should change selected accordingly
+            selection={askSelectedIndexs}
             renderSelectionCount={(x) => `${x} Orders Selected`}
             fields={['price', 'amount', 'filled', 'expiration']}
             renderEntry={(order) => [
@@ -51,6 +81,7 @@ function OrderBook({
             onPageChange={setBidPage}
             entries={bids}
             onSelectEntries={onSelectBidEntry}
+            selection={bidSelectedIndexs}
             renderSelectionCount={(x) => `${x} Orders Selected`}
             fields={['price', 'amount', 'filled', 'expiration']}
             renderEntry={(order) => [
@@ -77,6 +108,8 @@ OrderBook.propTypes = {
     addr: PropTypes.string.isRequired,
     symbol: PropTypes.string.isRequired,
   }).isRequired,
+  tradeType: PropTypes.string.isRequired,
+  selectedOrders: PropTypes.arrayOf(OrderType).isRequired,
   setTradeType: PropTypes.func.isRequired,
   setSelectedOrders: PropTypes.func.isRequired,
 };

@@ -165,7 +165,8 @@ function OptionTrading({ user, theme }) {
             user={user}
             option={baseAsset}
             quoteAsset={quoteAsset}
-
+            tradeType={tradeType}
+            selectedOrders={selectedOrders}
             setTradeType={setTradeType}
             setSelectedOrders={setSelectedOrders}
           />

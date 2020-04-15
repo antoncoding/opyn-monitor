@@ -106,8 +106,8 @@ function BuyAndSell({
 
     // calculate quote asset
     // price 0.0001 WETH, amount 10 => need 0.001 weth
-    // const quoteAmount = price.times(amountBN);
-    // setQuoteAssetAmount(quoteAmount);
+    const quoteAmount = rate.times(amountBN);
+    setQuoteAssetAmount(quoteAmount);
   };
 
   const onChangeRate = (newrate) => {
@@ -118,8 +118,13 @@ function BuyAndSell({
     const rateBN = new BigNumber(newrate);
     setRate(rateBN);
 
-    // const quoteAmount = rateBN.times(baseAssetAmount);
-    // setQuoteAssetAmount(quoteAmount);
+    const quoteAmount = rateBN.times(baseAssetAmount);
+    setQuoteAssetAmount(quoteAmount);
+
+    // adjusting rate will not be filling orders anymore
+    if (selectedOrders.length > 0) {
+      setSelectedOrders([]);
+    }
   };
 
   const createBidOrder = async () => {
