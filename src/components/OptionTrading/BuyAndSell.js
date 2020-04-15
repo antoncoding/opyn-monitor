@@ -34,20 +34,17 @@ function BuyAndSell({
   baseAssetDecimals,
   quoteAssetDecimals,
   collateralDecimals,
-  // quoteAssetBalance, // :BigNumber,
-  // collateralBalance, // :BigNumber,
-  // orders,
 }) {
   const theme = useTheme();
 
-  // const [quoteAssetAmount, setQuoteAssetAmount] = useState(new BigNumber(0));
+  const [quoteAssetAmount, setQuoteAssetAmount] = useState(new BigNumber(0));
   const [baseAssetAmount, setBaseAssetAmount] = useState(new BigNumber(0));
-  const [price, setPrice] = useState(new BigNumber(0));
+  const [rate, setRate] = useState(new BigNumber(0));
 
   // gasPrice is needed to calculate 0x fee
   const [fastGasPrice, setFastGasPrice] = useState(new BigNumber(5)); //  in GWei
 
-  const quoteAssetAmount = price.times(baseAssetAmount);
+  // const quoteAssetAmount = price.times(baseAssetAmount);
   const expiry = parseInt(Date.now() / 1000 + 86400, 10);
 
   const isFillingOrders = selectedOrders.length > 0;
@@ -73,25 +70,31 @@ function BuyAndSell({
 
   // when selected orders changed
   useEffect(() => {
+    // This update only take effect when user has selected orders
+    if (selectedOrders.length === 0) return;
     const selectedFillables = getOrdersTotalFillables(selectedOrders);
+    let baseAmountTotal = new BigNumber(0);
+    let quoteAmountTotal = new BigNumber(0);
+    // Step 1. set oToken and WETH amount to order total and change price
     if (tradeType === 'bid') {
       // ask: takerAsset: weth, makerAsset: oToken
 
-      // update amounot oToken to total order amount
-      const baseAmountTotal = toTokenUnitsBN(selectedFillables.totalFillableMakerAmount, baseAssetDecimals);
-      setBaseAssetAmount(baseAmountTotal);
+      baseAmountTotal = toTokenUnitsBN(selectedFillables.totalFillableMakerAmount, baseAssetDecimals);
+      quoteAmountTotal = toTokenUnitsBN(selectedFillables.totalFillableTakerAmount, quoteAssetDecimals);
     } else {
       // comming bids: takerAsset: oToken, makerAsset: weth
-
-      // set oToken Amount to tatal
-      const baseAmountTotal = toTokenUnitsBN(selectedFillables.totalFillableTakerAmount, baseAssetDecimals);
-      setBaseAssetAmount(baseAmountTotal);
+      baseAmountTotal = toTokenUnitsBN(selectedFillables.totalFillableTakerAmount, baseAssetDecimals);
+      quoteAmountTotal = toTokenUnitsBN(selectedFillables.totalFillableMakerAmount, quoteAssetDecimals);
     }
+    setBaseAssetAmount(baseAmountTotal);
+    setQuoteAssetAmount(quoteAmountTotal);
+    const aggregateRate = quoteAmountTotal.div(baseAmountTotal);
+    setRate(aggregateRate);
 
     // return () => {
     //   console.log('clean up');
     // };
-  }, [selectedOrders, baseAssetDecimals, tradeType]);
+  }, [selectedOrders, baseAssetDecimals, tradeType, quoteAssetDecimals]);
 
   const onChangeBaseAmount = (amount) => {
     if (!amount) {
@@ -107,13 +110,13 @@ function BuyAndSell({
     // setQuoteAssetAmount(quoteAmount);
   };
 
-  const onChangeRate = (rate) => {
-    if (!rate) {
-      setPrice(new BigNumber(0));
+  const onChangeRate = (newrate) => {
+    if (!newrate) {
+      setRate(new BigNumber(0));
       return;
     }
-    const rateBN = new BigNumber(rate);
-    setPrice(rateBN);
+    const rateBN = new BigNumber(newrate);
+    setRate(rateBN);
 
     // const quoteAmount = rateBN.times(baseAssetAmount);
     // setQuoteAssetAmount(quoteAmount);
@@ -232,7 +235,7 @@ function BuyAndSell({
             wide
             type="number"
             onChange={(e) => onChangeRate(e.target.value)}
-            value={price.toNumber()}
+            value={rate.toNumber()}
             // disabled={isFillingOrders}
           />
 
