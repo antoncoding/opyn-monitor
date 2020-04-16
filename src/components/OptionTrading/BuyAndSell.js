@@ -6,7 +6,7 @@ import {
 import styled from 'styled-components';
 import BigNumber from 'bignumber.js';
 import {
-  createOrder, broadcastOrders, getAskPrice, getOrdersTotalFillables, getGasPrice,
+  createOrder, broadcastOrders, getAskPrice, getOrdersTotalFillables, getGasPrice, getFillAmountsOfOrders,
 } from '../../utils/0x';
 import { signOrder, fillOrder } from '../../utils/web3';
 import { toTokenUnitsBN, toBaseUnitBN } from '../../utils/number';
@@ -38,7 +38,12 @@ function BuyAndSell({
   const theme = useTheme();
 
   const [quoteAssetAmount, setQuoteAssetAmount] = useState(new BigNumber(0));
-  const [baseAssetAmount, setBaseAssetAmount] = useState(new BigNumber(0));
+
+  // these two add up to total oToken displayed on the Amount section
+  const [baseAmountToFill, setBaseAmountToFill] = useState(new BigNumber(0));
+  const [baseAmountToCreate, setBaseAmountToCreate] = useState(new BigNumber(0));
+
+
   const [rate, setRate] = useState(new BigNumber(0));
 
   // gasPrice is needed to calculate 0x fee
@@ -52,11 +57,10 @@ function BuyAndSell({
     totalFillableTakerAmount: new BigNumber(0),
   });
 
-  // Under some circumstances, we use this flag prevent useEffect updates
-  // const [flagFixAmount, setFlagFixAmount] = useState(false)
+  const [isFillingAndCreating, setIsFillingAndCreating] = useState(false);
 
-  const isFillingOrders = selectedOrders.length > 0;
-  const feeInETH = isFillingOrders
+  const hasSelectedOrders = selectedOrders.length > 0;
+  const feeInETH = hasSelectedOrders
     ? fastGasPrice.times(new BigNumber(selectedOrders.length)).times(new BigNumber(0.00015))
     : new BigNumber(0);
 
@@ -79,26 +83,34 @@ function BuyAndSell({
   // when selected orders changed
   useEffect(() => {
     // This update only take effect when user has selected orders
-    if (selectedOrders.length === 0) return;
+    if (selectedOrders.length === 0) {
+      setBaseAmountToFill(new BigNumber(0));
+      return;
+    }
+    setIsFillingAndCreating(false);
+
     const selectedFillables = getOrdersTotalFillables(selectedOrders);
-    let baseAmountTotal = new BigNumber(0);
-    let quoteAmountTotal = new BigNumber(0);
-    // Step 1. set oToken and WETH amount to order total and change price
+    let baseMaxFillingAmount = new BigNumber(0);
+    let quoteMaxFillingAmount = new BigNumber(0);
+    // Step 1. set oToken and WETH amount to order total
     if (tradeType === 'buy') {
       // ask: takerAsset: weth, makerAsset: oToken
-      baseAmountTotal = toTokenUnitsBN(selectedFillables.totalFillableMakerAmount, baseAssetDecimals);
-      quoteAmountTotal = toTokenUnitsBN(selectedFillables.totalFillableTakerAmount, quoteAssetDecimals);
+      baseMaxFillingAmount = toTokenUnitsBN(selectedFillables.totalFillableMakerAmount, baseAssetDecimals);
+      quoteMaxFillingAmount = toTokenUnitsBN(selectedFillables.totalFillableTakerAmount, quoteAssetDecimals);
     } else {
       // comming bids: takerAsset: oToken, makerAsset: weth
-      baseAmountTotal = toTokenUnitsBN(selectedFillables.totalFillableTakerAmount, baseAssetDecimals);
-      quoteAmountTotal = toTokenUnitsBN(selectedFillables.totalFillableMakerAmount, quoteAssetDecimals);
+      baseMaxFillingAmount = toTokenUnitsBN(selectedFillables.totalFillableTakerAmount, baseAssetDecimals);
+      quoteMaxFillingAmount = toTokenUnitsBN(selectedFillables.totalFillableMakerAmount, quoteAssetDecimals);
     }
-    setBaseAssetAmount(baseAmountTotal);
-    setQuoteAssetAmount(quoteAmountTotal);
+    setBaseAmountToFill(baseMaxFillingAmount);
+    setBaseAmountToCreate(new BigNumber(0));
+    // setBaseAssetAmount(baseMaxFillingAmount);
+    setQuoteAssetAmount(quoteMaxFillingAmount);
 
     setSelectedOrdersFillable(selectedFillables);
 
-    const aggregateRate = quoteAmountTotal.div(baseAmountTotal);
+    // Change Price according to total base / quote
+    const aggregateRate = quoteMaxFillingAmount.div(baseMaxFillingAmount);
     setRate(aggregateRate);
   }, [selectedOrders, baseAssetDecimals, tradeType, quoteAssetDecimals]);
 
@@ -106,35 +118,64 @@ function BuyAndSell({
   const onChangeBaseAmount = (amount) => {
     // 1. Update amount field
     if (!amount) {
-      setBaseAssetAmount(new BigNumber(0));
+      setBaseAmountToFill(new BigNumber(0));
+      setBaseAmountToCreate(new BigNumber(0));
       return;
     }
     const amountBN = new BigNumber(amount);
-    setBaseAssetAmount(amountBN);
 
-    // 2. If user has selected order, check if the amount is covered by selected orders
-    if (selectedOrders.length > 0) {
+    // If is filling Mode
+    if (hasSelectedOrders) {
       const totalOtokenInSelectedOrders = tradeType === 'buy'
-        ? selectedOrderFillables.totalFillableMakerAmount // oToken is the maker asset of ask orders
-        : selectedOrderFillables.totalFillableTakerAmount;
+        ? toTokenUnitsBN(selectedOrderFillables.totalFillableMakerAmount, baseAssetDecimals) // oToken is the maker asset of ask orders
+        : toTokenUnitsBN(selectedOrderFillables.totalFillableTakerAmount, baseAssetDecimals);
 
-      // user lower the amount
-      const target = toBaseUnitBN(amountBN, baseAssetDecimals);
-      if (totalOtokenInSelectedOrders.gt(target)) {
-        // Disable this now because updating selectedOrders will trigger another useEffect, update amount again
+
+      // user is filling lower than all orders combined
+      if (totalOtokenInSelectedOrders.gt(amountBN)) {
+        // [FILLING MODE]
+        console.log('FILLING MODE');
+        setIsFillingAndCreating(false);
+        setBaseAmountToFill(amountBN);
+        setBaseAmountToCreate(new BigNumber(0));
+
+        // 1. Change selected orders
+        // ## Disabled now because updating selectedOrders will trigger another useEffect, update amount again
         // const newSelectedOrders = findMinOrdersForAmount(selectedOrders, target,
         //   tradeType === 'buy' ? 'maker' : 'taker');
         // if (newSelectedOrders.length !== selectedOrders.length) {
         //   // setSelectedOrders(newSelectedOrders);
         // }
 
-      }
-    }
+        // 2. Update Rates
+        const baseAmountTotal = toBaseUnitBN(amountBN, baseAssetDecimals);
+        const quoteAmountTotal = tradeType === 'buy'
+          ? getFillAmountsOfOrders(selectedOrders, undefined, baseAmountTotal).sumTakerAmount
+          : getFillAmountsOfOrders(selectedOrders, baseAmountTotal, undefined).sumMakerAmount;
 
-    // calculate quote asset
-    // price 0.0001 WETH, amount 10 => need 0.001 weth
-    const quoteAmount = rate.times(amountBN);
-    setQuoteAssetAmount(quoteAmount);
+        const quoteAmountTk = toTokenUnitsBN(quoteAmountTotal, quoteAssetDecimals);
+        setRate(quoteAmountTk.div(amountBN));
+        setQuoteAssetAmount(quoteAmountTk);
+      } else {
+        // [CREATING AND FILLING MODE]
+        console.log('CREATING + FILLING');
+        setIsFillingAndCreating(true);
+
+        setBaseAmountToFill(totalOtokenInSelectedOrders);
+        setBaseAmountToCreate(amountBN.minus(totalOtokenInSelectedOrders));
+
+        // Fix rate at current
+      }
+    } else {
+      // [CREATING MODE]
+      console.log('CREATING');
+      setBaseAmountToFill(new BigNumber(0));
+      setBaseAmountToCreate(amountBN);
+
+      // create mode wont change rate when put in amount
+      const quoteAmount = rate.times(amountBN);
+      setQuoteAssetAmount(quoteAmount);
+    }
   };
 
   const onChangeRate = (newrate) => {
@@ -145,13 +186,14 @@ function BuyAndSell({
     const rateBN = new BigNumber(newrate);
     setRate(rateBN);
 
-    const quoteAmount = rateBN.times(baseAssetAmount);
-    setQuoteAssetAmount(quoteAmount);
-
     // adjusting rate will not be filling orders anymore
-    if (selectedOrders.length > 0) {
+    if (hasSelectedOrders) {
       setSelectedOrders([]);
     }
+
+    // enter create mode.
+    const quoteAmount = rateBN.times((baseAmountToCreate));
+    setQuoteAssetAmount(quoteAmount);
   };
 
   const createBidOrder = async () => {
@@ -162,7 +204,7 @@ function BuyAndSell({
         quoteAsset,
         baseAsset,
         toBaseUnitBN(quoteAssetAmount, quoteAssetDecimals),
-        toBaseUnitBN(baseAssetAmount, baseAssetDecimals),
+        toBaseUnitBN(baseAmountToCreate, baseAssetDecimals),
         expiry,
       );
     } else {
@@ -170,7 +212,7 @@ function BuyAndSell({
         user,
         baseAsset,
         quoteAsset,
-        toBaseUnitBN(baseAssetAmount, baseAssetDecimals),
+        toBaseUnitBN(baseAmountToCreate, baseAssetDecimals),
         toBaseUnitBN(quoteAssetAmount, quoteAssetDecimals),
         expiry,
       );
@@ -180,15 +222,15 @@ function BuyAndSell({
   };
 
   const fillOrders = async () => {
+    // NEED UPDATE
     const orderToFill = selectedOrders[0];
     let takeAmount;
     if (tradeType === 'buy') {
-      // filling an ask order:
       const orderPrice = getAskPrice(selectedOrders[0], baseAssetDecimals, quoteAssetDecimals);
-      const takeAmountInToken = orderPrice.times(baseAssetAmount);
+      const takeAmountInToken = orderPrice.times(baseAmountToFill);
       takeAmount = toBaseUnitBN(takeAmountInToken, baseAssetDecimals);
     } else {
-      takeAmount = toBaseUnitBN(baseAssetAmount, baseAssetDecimals);
+      takeAmount = toBaseUnitBN(baseAmountToFill, baseAssetDecimals);
     }
 
     await fillOrder(
@@ -198,6 +240,10 @@ function BuyAndSell({
       toBaseUnitBN(feeInETH, 18).toString(),
       fastGasPrice.toString(),
     );
+  };
+
+  const fillAndCreate = async () => {
+    console.log('not here yet');
   };
 
   return (
@@ -259,7 +305,7 @@ function BuyAndSell({
             wide
             type="number"
             onChange={(e) => onChangeBaseAmount(e.target.value)}
-            value={baseAssetAmount.toNumber()}
+            value={baseAmountToCreate.plus(baseAmountToFill).toNumber()}
           />
 
           <Label>Price per token</Label>
@@ -268,7 +314,6 @@ function BuyAndSell({
             type="number"
             onChange={(e) => onChangeRate(e.target.value)}
             value={rate.toNumber()}
-            // disabled={isFillingOrders}
           />
 
           <BottomTextWrapper>
@@ -295,14 +340,22 @@ function BuyAndSell({
         </LowerPart>
       </Wrapper>
       <Flex>
-        { isFillingOrders
-          ? (
-            <Button
-              onClick={fillOrders}
-              label="Fill Orders"
-              wide
-            />
-          )
+        { hasSelectedOrders // is filling orders
+          ? isFillingAndCreating
+            ? (
+              <Button
+                onClick={fillAndCreate}
+                label="Fill And Create"
+                wide
+              />
+            )
+            : (
+              <Button
+                onClick={fillOrders}
+                label="Fill Orders"
+                wide
+              />
+            )
           : (
             <Button
               onClick={createBidOrder}

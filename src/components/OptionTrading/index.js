@@ -69,7 +69,7 @@ function OptionTrading({ user, theme }) {
     updateBaseBalance();
     updateVaultData();
     const idOrderBook = setInterval(updateOrderBook, 1000);
-    const idBaseBalance = setInterval(updateBaseBalance, 5000);
+    const idBaseBalance = setInterval(updateBaseBalance, 7500);
     const idUpdateVault = setInterval(updateVaultData, 10000);
     return () => {
       isCancelled = true;
@@ -89,7 +89,7 @@ function OptionTrading({ user, theme }) {
       }
     };
     updateQuoteBalance();
-    const idQuoteAssetBalance = setInterval(updateQuoteBalance, 5000);
+    const idQuoteAssetBalance = setInterval(updateQuoteBalance, 7500);
     return () => {
       isCancelled = true;
       clearInterval(idQuoteAssetBalance);

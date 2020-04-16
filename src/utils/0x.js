@@ -1,3 +1,4 @@
+/* eslint-disable no-restricted-syntax */
 import { assetDataUtils } from '@0x/order-utils';
 import BigNumber from 'bignumber.js';
 import { WETH } from '../constants/contracts';
@@ -278,7 +279,6 @@ export const getGasPrice = async () => {
  * @param {string} targetAsset maker or taker
  */
 export const findMinOrdersForAmount = (selectedOrders, targetAmount, targetAsset) => {
-  console.log('find min orders ');
   let sum = new BigNumber(0);
   const requiredOrders = [];
   // eslint-disable-next-line no-restricted-syntax
@@ -294,4 +294,51 @@ export const findMinOrdersForAmount = (selectedOrders, targetAmount, targetAsset
     }
   }
   return requiredOrders;
+};
+
+/**
+ * @description Loop through selected orders and see what's the exact taker amount
+ * and maker amount fulfilling the requirement
+ * @param {Array} selectedOrders
+ * @param {BigNumber | undefined} targetTakerAstAmount
+ * @param {BigNumber | undefined} targetMakerAstAmount
+ * @return {{ sumTakerAmount: BigNumber, sumMakerAmount:BigNumber }}
+ */
+export const getFillAmountsOfOrders = (selectedOrders, targetTakerAstAmount, targetMakerAstAmount) => {
+  // const fillables = getRemainingMakerAndTakerAmount(selectedOrders);
+  let sumTakerAmount = new BigNumber(0);
+  let sumMakerAmount = new BigNumber(0);
+  for (const order of selectedOrders) {
+    const {
+      remainingMakerAssetAmount: makerAmount,
+      remainingTakerAssetAmount: takerAmount,
+    } = getRemainingMakerAndTakerAmount(order);
+    if (targetTakerAstAmount !== undefined) {
+      if (sumTakerAmount.plus(takerAmount).lte(targetTakerAstAmount)) {
+        sumTakerAmount = sumTakerAmount.plus(takerAmount);
+        sumMakerAmount = sumMakerAmount.plus(makerAmount);
+      } else {
+        const takerAmountNeeded = targetTakerAstAmount.minus(sumTakerAmount);
+        const makerAmountNeeded = takerAmountNeeded.div(takerAmount).times(makerAmount);
+        sumTakerAmount = sumTakerAmount.plus(takerAmountNeeded);
+        sumMakerAmount = sumMakerAmount.plus(makerAmountNeeded);
+        break;
+      }
+    } else if (targetMakerAstAmount !== undefined) {
+      // user enter mekr ast amount
+      if (sumMakerAmount.plus(makerAmount).lte(targetMakerAstAmount)) {
+        sumTakerAmount = sumTakerAmount.plus(takerAmount);
+        sumMakerAmount = sumMakerAmount.plus(makerAmount);
+      } else {
+        const makerAmountNeeded = targetMakerAstAmount.minus(sumMakerAmount);
+        const takerAmountNeeded = makerAmountNeeded.div(makerAmount).multipliedBy(takerAmount);
+        sumTakerAmount = sumTakerAmount.plus(takerAmountNeeded);
+        sumMakerAmount = sumMakerAmount.plus(makerAmountNeeded);
+        break;
+      }
+    } else {
+      throw new Error('wrong input to CalculateMixRate');
+    }
+  }
+  return { sumTakerAmount, sumMakerAmount };
 };
