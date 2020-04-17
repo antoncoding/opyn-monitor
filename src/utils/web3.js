@@ -434,11 +434,11 @@ export const signOrder = async (order) => {
 };
 
 
-export const fillOrder = async (order, amt, signature, value, gasPrice) => {
+export const fillOrders = async (orders, amts, signatures, value, gasPrice) => {
   const account = await checkConnectedAndGetAddress();
   const exchange = new web3.eth.Contract(ZX_ExchagneABI, ZeroX_Exchange);
   await exchange.methods
-    .fillOrder(order, amt, signature)
+    .batchFillOrders(orders, amts, signatures)
     .send({
       from: account,
       value, // Protocol fee: gas to be gas price * 150

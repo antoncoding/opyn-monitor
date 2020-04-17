@@ -6,9 +6,9 @@ import {
 import styled from 'styled-components';
 import BigNumber from 'bignumber.js';
 import {
-  createOrder, broadcastOrders, getAskPrice, getOrdersTotalFillables, getGasPrice, getFillAmountsOfOrders,
+  createOrder, broadcastOrders, getOrdersTotalFillables, getGasPrice, getFillAmountsOfOrders,
 } from '../../utils/0x';
-import { signOrder, fillOrder } from '../../utils/web3';
+import { signOrder, fillOrders } from '../../utils/web3';
 import { toTokenUnitsBN, toBaseUnitBN } from '../../utils/number';
 import { vault as VaultType, order as OrderType } from '../types';
 // import { eth_calls } from '../../constants/options';
@@ -40,6 +40,7 @@ function BuyAndSell({
   const toast = useToast();
 
   const [quoteAssetAmount, setQuoteAssetAmount] = useState(new BigNumber(0));
+  const [fillingtakerAmounts, setFillingTakerAmounts] = useState([]);
 
   // these two add up to total oToken displayed on the Amount section
   const [baseAmountToFill, setBaseAmountToFill] = useState(new BigNumber(0));
@@ -92,6 +93,8 @@ function BuyAndSell({
     setIsFillingAndCreating(false);
 
     const selectedFillables = getOrdersTotalFillables(selectedOrders);
+    setFillingTakerAmounts(selectedFillables.fillableTakerAmounts);
+
     let baseMaxFillingAmount = new BigNumber(0);
     let quoteMaxFillingAmount = new BigNumber(0);
     // Step 1. set oToken and WETH amount to order total
@@ -151,9 +154,18 @@ function BuyAndSell({
 
         // 2. Update Rates
         const baseAmountTotal = toBaseUnitBN(amountBN, baseAssetDecimals);
-        const quoteAmountTotal = tradeType === 'buy'
-          ? getFillAmountsOfOrders(selectedOrders, undefined, baseAmountTotal).sumTakerAmount
-          : getFillAmountsOfOrders(selectedOrders, baseAmountTotal, undefined).sumMakerAmount;
+
+        let quoteAmountTotal;
+        if (tradeType === 'buy') {
+          const fillingAmounts = getFillAmountsOfOrders(selectedOrders, undefined, baseAmountTotal);
+          quoteAmountTotal = fillingAmounts.sumTakerAmount;
+          setFillingTakerAmounts(fillingAmounts.takerAmountArray);
+        } else {
+          // bid order: maker weth,
+          const fillingAmounts = getFillAmountsOfOrders(selectedOrders, baseAmountTotal, undefined);
+          quoteAmountTotal = fillingAmounts.sumMakerAmount;
+          setFillingTakerAmounts(fillingAmounts.takerAmountArray); // only need to record taker amount array
+        }
 
         const quoteAmountTk = toTokenUnitsBN(quoteAmountTotal, quoteAssetDecimals);
         setRate(quoteAmountTk.div(amountBN));
@@ -227,22 +239,22 @@ function BuyAndSell({
     }
   };
 
-  const fillOrders = async () => {
+  const clickFillOrders = async () => {
     // NEED UPDATE
-    const orderToFill = selectedOrders[0];
-    let takeAmount;
-    if (tradeType === 'buy') {
-      const orderPrice = getAskPrice(selectedOrders[0], baseAssetDecimals, quoteAssetDecimals);
-      const takeAmountInToken = orderPrice.times(baseAmountToFill);
-      takeAmount = toBaseUnitBN(takeAmountInToken, baseAssetDecimals);
-    } else {
-      takeAmount = toBaseUnitBN(baseAmountToFill, baseAssetDecimals);
-    }
+    // const orderToFill = selectedOrders[0];
+    // let takeAmount;
+    // if (tradeType === 'buy') {
+    // const orderPrice = getAskPrice(selectedOrders[0], baseAssetDecimals, quoteAssetDecimals);
+    // const takeAmountInToken = orderPrice.times(baseAmountToFill);
+    // takeAmount = toBaseUnitBN(takeAmountInToken, baseAssetDecimals);
+    // } else {
+    // takeAmount = toBaseUnitBN(baseAmountToFill, baseAssetDecimals);
 
-    await fillOrder(
-      orderToFill.order,
-      takeAmount.toString(),
-      orderToFill.order.signature,
+    console.log(JSON.stringify(selectedOrders, null, 2));
+    await fillOrders(
+      selectedOrders.map((o) => o.order),
+      fillingtakerAmounts,
+      selectedOrders.map((o) => o.order.signature),
       toBaseUnitBN(feeInETH, 18).toString(),
       fastGasPrice.toString(),
     );
@@ -370,7 +382,7 @@ function BuyAndSell({
             )
             : (
               <Button
-                onClick={fillOrders}
+                onClick={clickFillOrders}
                 label="Fill Orders"
                 wide
               />

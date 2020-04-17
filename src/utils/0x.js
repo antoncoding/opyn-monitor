@@ -166,10 +166,9 @@ export const broadcastOrders = async (orders) => {
     },
     body: JSON.stringify(orders),
   });
+  if (res.status === 200) return;
   const jsonRes = await res.json();
-  if (jsonRes.status !== 200) {
-    throw jsonRes.validationErrors[0].reason;
-  }
+  throw jsonRes.validationErrors[0].reason;
 };
 
 /**
@@ -222,7 +221,7 @@ export const getRemainingMakerAndTakerAmount = (order) => {
 /**
  *
  * @param {{}[]} orders
- * @return {{totalFillableTakerAmount: BigNumber,totalFillableMakerAmount:BigNumber}}
+ * @return {{totalFillableTakerAmount: BigNumber,totalFillableMakerAmount:BigNumber, fillableTakerAmounts: string[]}}
  */
 export const getOrdersTotalFillables = (orders) => {
   const totalFillableTakerAmount = orders
@@ -233,7 +232,9 @@ export const getOrdersTotalFillables = (orders) => {
     .map((order) => getRemainingMakerAndTakerAmount(order).remainingMakerAssetAmount)
     .reduce((prev, next) => prev.plus(new BigNumber(next)), new BigNumber(0));
 
-  return { totalFillableTakerAmount, totalFillableMakerAmount };
+  const fillableTakerAmounts = orders.map((o) => o.metaData.remainingFillableTakerAssetAmount);
+
+  return { totalFillableTakerAmount, totalFillableMakerAmount, fillableTakerAmounts };
 };
 
 /**
@@ -282,12 +283,16 @@ export const findMinOrdersForAmount = (selectedOrders, targetAmount, targetAsset
  * @param {Array} selectedOrders
  * @param {BigNumber | undefined} targetTakerAstAmount
  * @param {BigNumber | undefined} targetMakerAstAmount
- * @return {{ sumTakerAmount: BigNumber, sumMakerAmount:BigNumber }}
+ * @return {{
+ *  sumTakerAmount: BigNumber,
+ *  sumMakerAmount:BigNumber
+ *  takerAmountArray: string[]}}
  */
 export const getFillAmountsOfOrders = (selectedOrders, targetTakerAstAmount, targetMakerAstAmount) => {
   // const fillables = getRemainingMakerAndTakerAmount(selectedOrders);
   let sumTakerAmount = new BigNumber(0);
   let sumMakerAmount = new BigNumber(0);
+  const takerAmountArray = [];
   for (const order of selectedOrders) {
     const {
       remainingMakerAssetAmount: makerAmount,
@@ -297,11 +302,13 @@ export const getFillAmountsOfOrders = (selectedOrders, targetTakerAstAmount, tar
       if (sumTakerAmount.plus(takerAmount).lte(targetTakerAstAmount)) {
         sumTakerAmount = sumTakerAmount.plus(takerAmount);
         sumMakerAmount = sumMakerAmount.plus(makerAmount);
+        takerAmountArray.push(takerAmount.toString());
       } else {
         const takerAmountNeeded = targetTakerAstAmount.minus(sumTakerAmount);
         const makerAmountNeeded = takerAmountNeeded.div(takerAmount).times(makerAmount);
         sumTakerAmount = sumTakerAmount.plus(takerAmountNeeded);
         sumMakerAmount = sumMakerAmount.plus(makerAmountNeeded);
+        takerAmountArray.push(takerAmountNeeded.toString());
         break;
       }
     } else if (targetMakerAstAmount !== undefined) {
@@ -309,16 +316,18 @@ export const getFillAmountsOfOrders = (selectedOrders, targetTakerAstAmount, tar
       if (sumMakerAmount.plus(makerAmount).lte(targetMakerAstAmount)) {
         sumTakerAmount = sumTakerAmount.plus(takerAmount);
         sumMakerAmount = sumMakerAmount.plus(makerAmount);
+        takerAmountArray.push(takerAmount.toString());
       } else {
         const makerAmountNeeded = targetMakerAstAmount.minus(sumMakerAmount);
         const takerAmountNeeded = makerAmountNeeded.div(makerAmount).multipliedBy(takerAmount);
         sumTakerAmount = sumTakerAmount.plus(takerAmountNeeded);
         sumMakerAmount = sumMakerAmount.plus(makerAmountNeeded);
+        takerAmountArray.push(takerAmountNeeded.toString());
         break;
       }
     } else {
       throw new Error('wrong input to CalculateMixRate');
     }
   }
-  return { sumTakerAmount, sumMakerAmount };
+  return { sumTakerAmount, sumMakerAmount, takerAmountArray };
 };
