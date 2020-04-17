@@ -8,7 +8,10 @@ import { insurances, eth_options } from '../../constants/options';
 import { Comment, CheckBox } from '../common';
 import { getPreference, storePreference } from '../../utils/storage';
 
+import tracker from '../../utils/tracker';
+
 function AllContracts() {
+  tracker.pageview('/options/');
   const storedOptionTab = getPreference('optionTab', '0');
   const storedShowExpired = getPreference('showExpired', '0');
 

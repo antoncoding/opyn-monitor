@@ -9,12 +9,14 @@ import OptionInfoBox from './OptionInfoBox';
 
 import { getDecimals, getERC20Symbol } from '../../utils/infura';
 import { getAllVaultsForOption } from '../../utils/graph';
+import tracker from '../../utils/tracker';
 
 import { ETH_ADDRESS } from '../../constants/contracts';
 import { allOptions } from '../../constants/options';
 
 function OptionPage({ user }) {
   const { token } = useParams();
+  tracker.pageview(`/option/${token}`);
   const option = allOptions.find((o) => o.addr === token);
 
   const [vaults, setVaults] = useState([]);
