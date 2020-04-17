@@ -62,6 +62,25 @@ export const eth_puts = [
     uniswapExchange: '0xD2840757B0DeF8fBC2A7DC990CEF75975C2d3F0e',
     expiry: 1587715200,
   },
+  {
+    addr: '0x461cd647add2159e85ad57141cb5371566fceed3',
+    title: 'ETH Put $160 05/01/20',
+
+    // constants in contract
+    symbol: 'oETH $160 Put',
+    name: 'Opyn ETH Put $160 05/01/20',
+    decimals: 7,
+    oracle: '0x7054e08461e3eCb7718B63540adDB3c3A1746415',
+    collateral: '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48',
+    collateralDecimals: 6,
+    underlying: '0x0000000000000000000000000000000000000000',
+    strike: '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48',
+    strikePrice: 1.6e-5,
+    minRatio: 1,
+    exchange: '0x39246c4f3f6592c974ebc44f80ba6dc69b817c71',
+    uniswapExchange: '0xd03f7298aE74a8618711Ec43F45Ad2225F141aa4',
+    expiry: 1588320000,
+  },
 ];
 
 // Fake data only for 0x testing
