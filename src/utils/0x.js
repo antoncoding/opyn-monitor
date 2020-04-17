@@ -166,7 +166,10 @@ export const broadcastOrders = async (orders) => {
     },
     body: JSON.stringify(orders),
   });
-  return res;
+  const jsonRes = await res.json();
+  if (jsonRes.status !== 200) {
+    throw jsonRes.validationErrors[0].reason;
+  }
 };
 
 /**

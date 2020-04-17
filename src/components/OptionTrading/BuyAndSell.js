@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import {
-  Button, useTheme, TextInput, Help,
+  Button, useTheme, TextInput, Help, useToast,
 } from '@aragon/ui';
 import styled from 'styled-components';
 import BigNumber from 'bignumber.js';
@@ -37,6 +37,7 @@ function BuyAndSell({
   collateralDecimals,
 }) {
   const theme = useTheme();
+  const toast = useToast();
 
   const [quoteAssetAmount, setQuoteAssetAmount] = useState(new BigNumber(0));
 
@@ -219,7 +220,11 @@ function BuyAndSell({
       );
     }
     const signedOrder = await signOrder(order);
-    await broadcastOrders([signedOrder]);
+    try {
+      await broadcastOrders([signedOrder]);
+    } catch (error) {
+      toast(error);
+    }
   };
 
   const fillOrders = async () => {
