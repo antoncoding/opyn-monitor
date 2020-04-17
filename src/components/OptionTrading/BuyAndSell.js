@@ -111,7 +111,6 @@ function BuyAndSell({
     setBaseAmountToCreate(new BigNumber(0));
     // setBaseAssetAmount(baseMaxFillingAmount);
     setQuoteAssetAmount(quoteMaxFillingAmount);
-
     setSelectedOrdersFillable(selectedFillables);
 
     // Change Price according to total base / quote
@@ -128,6 +127,11 @@ function BuyAndSell({
       return;
     }
     const amountBN = new BigNumber(amount);
+    if (amountBN.lte(0)) {
+      setBaseAmountToFill(new BigNumber(0));
+      setBaseAmountToCreate(new BigNumber(0));
+      return;
+    }
 
     // If is filling Mode
     if (hasSelectedOrders) {
@@ -135,9 +139,8 @@ function BuyAndSell({
         ? toTokenUnitsBN(selectedOrderFillables.totalFillableMakerAmount, baseAssetDecimals) // oToken is the maker asset of ask orders
         : toTokenUnitsBN(selectedOrderFillables.totalFillableTakerAmount, baseAssetDecimals);
 
-
       // user is filling lower than all orders combined
-      if (totalOtokenInSelectedOrders.gt(amountBN)) {
+      if (totalOtokenInSelectedOrders.gte(amountBN)) {
         // [FILLING MODE]
         console.log('FILLING MODE');
         setIsFillingAndCreating(false);
@@ -161,7 +164,6 @@ function BuyAndSell({
           quoteAmountTotal = fillingAmounts.sumTakerAmount;
           setFillingTakerAmounts(fillingAmounts.takerAmountArray);
         } else {
-          // bid order: maker weth,
           const fillingAmounts = getFillAmountsOfOrders(selectedOrders, baseAmountTotal, undefined);
           quoteAmountTotal = fillingAmounts.sumMakerAmount;
           setFillingTakerAmounts(fillingAmounts.takerAmountArray); // only need to record taker amount array
@@ -178,7 +180,9 @@ function BuyAndSell({
         setBaseAmountToFill(totalOtokenInSelectedOrders);
         setBaseAmountToCreate(amountBN.minus(totalOtokenInSelectedOrders));
 
-        // Fix rate at current
+        // Fix rate at current, dont have to change.
+        const quoteAmount = rate.times(amountBN);
+        setQuoteAssetAmount(quoteAmount);
       }
     } else {
       // [CREATING MODE]
@@ -210,14 +214,14 @@ function BuyAndSell({
     setQuoteAssetAmount(quoteAmount);
   };
 
-  const createBidOrder = async () => {
+  const clickCreateOrder = async () => {
     let order;
     if (tradeType === 'buy') {
       order = createOrder(
         user,
         quoteAsset,
         baseAsset,
-        toBaseUnitBN(quoteAssetAmount, quoteAssetDecimals),
+        toBaseUnitBN(baseAmountToCreate.times(rate), quoteAssetDecimals),
         toBaseUnitBN(baseAmountToCreate, baseAssetDecimals),
         expiry,
       );
@@ -227,7 +231,7 @@ function BuyAndSell({
         baseAsset,
         quoteAsset,
         toBaseUnitBN(baseAmountToCreate, baseAssetDecimals),
-        toBaseUnitBN(quoteAssetAmount, quoteAssetDecimals),
+        toBaseUnitBN(baseAmountToCreate.times(rate), quoteAssetDecimals),
         expiry,
       );
     }
@@ -240,17 +244,6 @@ function BuyAndSell({
   };
 
   const clickFillOrders = async () => {
-    // NEED UPDATE
-    // const orderToFill = selectedOrders[0];
-    // let takeAmount;
-    // if (tradeType === 'buy') {
-    // const orderPrice = getAskPrice(selectedOrders[0], baseAssetDecimals, quoteAssetDecimals);
-    // const takeAmountInToken = orderPrice.times(baseAmountToFill);
-    // takeAmount = toBaseUnitBN(takeAmountInToken, baseAssetDecimals);
-    // } else {
-    // takeAmount = toBaseUnitBN(baseAmountToFill, baseAssetDecimals);
-
-    console.log(JSON.stringify(selectedOrders, null, 2));
     await fillOrders(
       selectedOrders.map((o) => o.order),
       fillingtakerAmounts,
@@ -260,8 +253,9 @@ function BuyAndSell({
     );
   };
 
-  const fillAndCreate = async () => {
-    console.log('not here yet');
+  const clickFillAndCreate = async () => {
+    await clickCreateOrder();
+    await clickFillOrders();
   };
 
   return (
@@ -375,7 +369,7 @@ function BuyAndSell({
           ? isFillingAndCreating
             ? (
               <Button
-                onClick={fillAndCreate}
+                onClick={clickFillAndCreate}
                 label="Fill And Create"
                 wide
               />
@@ -389,7 +383,7 @@ function BuyAndSell({
             )
           : (
             <Button
-              onClick={createBidOrder}
+              onClick={clickCreateOrder}
               label={tradeType === 'buy' ? 'Buy' : 'Sell'}
               wide
             />
