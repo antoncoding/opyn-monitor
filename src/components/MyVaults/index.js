@@ -17,6 +17,7 @@ import { getAllVaultsForUser } from '../../utils/graph';
 import { getPreference, storePreference } from '../../utils/storage';
 import { calculateRatio, calculateStrikeValueInCollateral } from '../../utils/calculation';
 import tracker from '../../utils/tracker';
+import OpenVaultModal from './OpenVaultModal';
 
 const Promise = require('bluebird');
 
@@ -140,11 +141,15 @@ function MyVaults({ user }) {
               <DataView
                 fields={['Token', 'contract', 'manage']}
                 entries={tokensToOpen}
-                renderEntry={({ oToken, oTokenName }) => [
-                  oTokenName,
-                  <IdentityBadge entity={oToken} shorten={false} />,
-                  <OpenVaultButton oToken={oToken} user={user} />,
-                ]}
+                renderEntry={({ oToken, oTokenName }) => {
+                  const option = allOptions.filter((o) => o.addr === oToken);
+                  return [
+                    oTokenName,
+                    <IdentityBadge entity={oToken} shorten={false} />,
+                    <OpenVaultModal user={user} option={option} />,
+                  // <OpenVaultButton oToken={oToken} user={user} />,
+                  ];
+                }}
               />
             </div>
           ) : (
