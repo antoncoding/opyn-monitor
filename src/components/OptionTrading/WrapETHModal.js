@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState } from 'react';
 import BigNumber from 'bignumber.js';
 import PropTypes from 'prop-types';
 
@@ -7,21 +7,13 @@ import {
 } from '@aragon/ui';
 import { BalanceBlock, SectionTitle } from '../common';
 
-import { getBalance } from '../../utils/infura';
 import { wrapETH, unwrapETH } from '../../utils/web3';
 import { toBaseUnitBN, toTokenUnitsBN } from '../../utils/number';
 
-function WrapETHModal({ wethBalance, user }) {
+function WrapETHModal({ wethBalance, ethBalance }) {
   const [opened, setOpen] = useState(false);
   const [wrapAmount, setWrapAmount] = useState(BigNumber(0));
   const [unWrapAmount, setUnwrapAmount] = useState(BigNumber(0));
-  const [userETHBalance, setUserETHBalance] = useState(BigNumber(0));
-
-  useMemo(async () => {
-    if (user === '') return;
-    const balance = await getBalance(user);
-    setUserETHBalance(new BigNumber(balance));
-  }, user);
 
   const onChangeWrapAmount = (event) => {
     const amount = event.target.value;
@@ -48,7 +40,7 @@ function WrapETHModal({ wethBalance, user }) {
         <SectionTitle title="Wrap ETH to WETH" />
         {/* <div style={{ display: 'flex' }}> */}
         <div style={{ padding: '2%' }}>
-          <BalanceBlock asset="ETH Balance" balance={userETHBalance.toNumber()} />
+          <BalanceBlock asset="ETH Balance" balance={ethBalance.toNumber()} />
         </div>
 
         {/* </div> */}
@@ -88,7 +80,7 @@ function WrapETHModal({ wethBalance, user }) {
 
 WrapETHModal.propTypes = {
   wethBalance: PropTypes.instanceOf(BigNumber).isRequired,
-  user: PropTypes.string.isRequired,
+  ethBalance: PropTypes.instanceOf(BigNumber).isRequired,
 };
 
 export default WrapETHModal;

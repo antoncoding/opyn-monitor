@@ -115,7 +115,7 @@ function OptionTrading({ user, theme }) {
         <LeftPart>
           {/* Buy And Sell */}
           <Header primary={
-            <WrapETHModal wethBalance={quoteAssetBalance} user={user} />
+            <WrapETHModal wethBalance={quoteAssetBalance} ethBalance={userETHBalance} />
           }
           />
           <Header
