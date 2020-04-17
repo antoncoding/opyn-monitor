@@ -76,6 +76,7 @@ export const eth_puts = [
     underlying: '0x0000000000000000000000000000000000000000',
     strike: '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48',
     strikePrice: 1.6e-5,
+    strikePriceInUSD: 160,
     minRatio: 1,
     exchange: '0x39246c4f3f6592c974ebc44f80ba6dc69b817c71',
     uniswapExchange: '0xd03f7298aE74a8618711Ec43F45Ad2225F141aa4',

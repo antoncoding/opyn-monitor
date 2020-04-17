@@ -53,8 +53,7 @@ function App() {
           {/* Trading */}
           <Route path="/trades/eth/">
             <OptionTrading
-              user="0xeb919ADce5908185A6F6C860Ab42812e83ED355A"
-              // user="0x6924a03bb710eaf199ab6ac9f2bb148215ae9b5d" // 0x
+              user="0x47DBb61b56C37Dd47f4f208aD693062b78e4c958"
               theme={theme}
             />
           </Route>

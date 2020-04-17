@@ -28,6 +28,7 @@ function BuyAndSell({
   quoteAssetSymbol, // "WETH"
   collateralSymbol, // // USDC
 
+  ethBalance, // in ETH (0.5)
   baseAssetBalance,
   quoteAssetBalance,
 
@@ -258,7 +259,20 @@ function BuyAndSell({
             <TopPartText>{toTokenUnitsBN(baseAssetBalance, baseAssetDecimals).toFormat(4)}</TopPartText>
           </FlexWrapper>
           <FlexWrapper>
-            <div>{quoteAssetSymbol}</div>
+            <div>ETH</div>
+            <TopPartText>{ethBalance.toFormat(4)}</TopPartText>
+          </FlexWrapper>
+          <FlexWrapper>
+            <div>
+              <Flex>
+                <p style={{ paddingRight: '5px' }}>{quoteAssetSymbol}</p>
+                <Help hint="What is WETH?">
+                  WETH is Wraped ETH.
+                  <br />
+                  You need to convert your ETH to WETH if you want to create a buy order.
+                </Help>
+              </Flex>
+            </div>
             <TopPartText>{toTokenUnitsBN(quoteAssetBalance, quoteAssetDecimals).toFormat(4)}</TopPartText>
           </FlexWrapper>
         </TopPart>
@@ -378,6 +392,7 @@ BuyAndSell.propTypes = {
   quoteAssetSymbol: PropTypes.string.isRequired,
   collateralSymbol: PropTypes.string.isRequired,
 
+  ethBalance: PropTypes.instanceOf(BigNumber).isRequired,
   baseAssetBalance: PropTypes.instanceOf(BigNumber).isRequired,
   quoteAssetBalance: PropTypes.instanceOf(BigNumber).isRequired,
 

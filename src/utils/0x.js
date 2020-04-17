@@ -112,29 +112,6 @@ async function request(path) {
   return res.json();
 }
 
-export function connectWebSocket(_orders, setBuyOrders) {
-  const socket = new WebSocket('wss://api.0x.org/sra/v3');
-  socket.onopen = () => {
-    // console.log(`socket open ${e}`);
-    socket.send(JSON.stringify({
-      type: 'subscribe',
-      channel: 'orders',
-      requestId: '123e4567-e89b-12d3-a456-426655440000',
-      makerAssetProxyId: '0xf47261b0',
-      makerAssetData: '0x6b175474e89094c44da98b954eedeac495271d0f',
-      takerAssetProxyId: '0xf47261b0',
-      takerAssetData: '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2',
-    }));
-  };
-  socket.onmessage = (event) => {
-    const data = JSON.parse(event.data);
-    const entry = data.payload[0];
-
-    const newOrders = _orders.concat(entry);
-    setBuyOrders(newOrders);
-  };
-}
-
 /**
  *
  * @param {*} entry

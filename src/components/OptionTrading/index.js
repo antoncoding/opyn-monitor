@@ -7,8 +7,9 @@ import BigNumber from 'bignumber.js';
 import OptionBoard from './OptionBoard';
 import TabBoard from './TabBoard';
 import BuyAndSell from './BuyAndSell';
+import WrapETHModal from './WrapETHModal';
 
-import { getTokenBalance, getDecimals } from '../../utils/infura';
+import { getTokenBalance, getDecimals, getBalance } from '../../utils/infura';
 import { getOrderBook, isValid } from '../../utils/0x';
 import { getVault } from '../../utils/graph';
 import { approve } from '../../utils/web3';
@@ -31,6 +32,7 @@ function OptionTrading({ user, theme }) {
   const [selectedOrders, setSelectedOrders] = useState([]);
 
   // user balance
+  const [userETHBalance, setUserETHBalance] = useState(BigNumber(0)); // in eth
   const [baseAssetBalance, setBaseAssetBalance] = useState(BigNumber(0));
   const [quoteAssetBalance, setQuoteAssetBalance] = useState(BigNumber(0));
 
@@ -69,7 +71,7 @@ function OptionTrading({ user, theme }) {
     updateBaseBalance();
     updateVaultData();
     const idOrderBook = setInterval(updateOrderBook, 1000);
-    const idBaseBalance = setInterval(updateBaseBalance, 7500);
+    const idBaseBalance = setInterval(updateBaseBalance, 10000);
     const idUpdateVault = setInterval(updateVaultData, 10000);
     return () => {
       isCancelled = true;
@@ -83,13 +85,18 @@ function OptionTrading({ user, theme }) {
   useEffect(() => {
     let isCancelled = false;
     const updateQuoteBalance = async () => {
-      const quoteBalance = await getTokenBalance(quoteAsset.addr, user);
+      if (user === '') return;
+      const [quoteBalance, ethBalance] = await Promise.all([
+        getTokenBalance(quoteAsset.addr, user),
+        getBalance(user),
+      ]);
       if (!isCancelled) {
+        setUserETHBalance(new BigNumber(ethBalance));
         setQuoteAssetBalance(new BigNumber(quoteBalance));
       }
     };
     updateQuoteBalance();
-    const idQuoteAssetBalance = setInterval(updateQuoteBalance, 7500);
+    const idQuoteAssetBalance = setInterval(updateQuoteBalance, 10000);
     return () => {
       isCancelled = true;
       clearInterval(idQuoteAssetBalance);
@@ -107,7 +114,10 @@ function OptionTrading({ user, theme }) {
       <FlexWrapper>
         <LeftPart>
           {/* Buy And Sell */}
-          <Header />
+          <Header primary={
+            <WrapETHModal wethBalance={quoteAssetBalance} user={user} />
+          }
+          />
           <Header
             primary={(
               <Button
@@ -133,8 +143,11 @@ function OptionTrading({ user, theme }) {
             baseAssetSymbol={baseAsset.symbol}
             collateralSymbol={baseAsset.collateralSymbol}
             quoteAssetSymbol={quoteAsset.symbol}
+
+            ethBalance={userETHBalance}
             baseAssetBalance={baseAssetBalance}
             quoteAssetBalance={quoteAssetBalance}
+
             baseAssetDecimals={baseAsset.decimals}
             quoteAssetDecimals={quoteAsset.decimals}
             collateralDecimals={collateralDecimals}

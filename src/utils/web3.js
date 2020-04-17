@@ -13,7 +13,7 @@ import { notify } from './blockNative';
 import { getAllowance, getPremiumToPay } from './infura';
 import { getPreference } from './storage';
 import {
-  ETH_ADDRESS, Kollateral_Liquidator, Kollateral_Invoker, KETH, ZeroX_Exchange,
+  ETH_ADDRESS, Kollateral_Liquidator, Kollateral_Invoker, KETH, ZeroX_Exchange, WETH,
 } from '../constants/contracts';
 
 const oTokenABI = require('../constants/abi/OptionContract.json');
@@ -21,6 +21,7 @@ const exchangeABI = require('../constants/abi/OptionExchange.json');
 const uniswapExchangeABI = require('../constants/abi/UniswapExchange.json');
 const invokerABI = require('../constants/abi/KollateralInvoker.json');
 const ZX_ExchagneABI = require('../constants/abi/ZeroX_Exchange.json');
+const wrapETHABI = require('../constants/abi/WETH.json');
 
 const DEADLINE_FROM_NOW = 60 * 15;
 const UINT256_MAX = '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff';
@@ -395,6 +396,32 @@ export const removeLiquidity = async (uniswapAddr, pool_token_amount, min_eth_we
 /*
  * 0x Protocols
  */
+export const wrapETH = async (amountInWei) => {
+  const account = await checkConnectedAndGetAddress();
+  const weth = new web3.eth.Contract(wrapETHABI, WETH);
+  await weth.methods
+    .deposit()
+    .send({
+      from: account,
+      value: amountInWei,
+    })
+    .on('transactionHash', (hash) => {
+      notify.hash(hash);
+    });
+};
+
+export const unwrapETH = async (amountInWei) => {
+  const account = await checkConnectedAndGetAddress();
+  const weth = new web3.eth.Contract(wrapETHABI, WETH);
+  await weth.methods
+    .withdraw(amountInWei)
+    .send({
+      from: account,
+    })
+    .on('transactionHash', (hash) => {
+      notify.hash(hash);
+    });
+};
 
 /**
 * Sign Order
