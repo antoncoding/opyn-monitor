@@ -16,11 +16,13 @@ import OptionExchange from './OptionExchange';
 import AddLiquidity from './AddLiquidity';
 import RemoveLiquidity from './RemoveLiquidity';
 
+import tracker from '../../utils/tracker';
+
 function UniswapPool({ user }) {
   const liquidityTokenDecimals = 18;
 
   const { token } = useParams();
-
+  tracker.pageview(`trade/${token}`);
   const option = allOptions.find((o) => o.addr === token);
   const {
     uniswapExchange, decimals, symbol, exchange,

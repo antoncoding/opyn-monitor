@@ -28,7 +28,6 @@ function VaultOwnerList({
         strike, minRatio, strikePrice, oracle, collateral, collateralDecimals,
       } = option;
 
-
       const strikeValueInCollateral = await calculateStrikeValueInCollateral(
         collateral,
         strike,
@@ -72,7 +71,7 @@ function VaultOwnerList({
     };
 
     updateInfo();
-    const id = setInterval(updateInfo, 12000);
+    const id = setInterval(updateInfo, 20000);
 
     return () => {
       isCancelled = true;

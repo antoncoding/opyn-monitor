@@ -16,10 +16,12 @@ import {
 import { getAllVaultsForUser } from '../../utils/graph';
 import { getPreference, storePreference } from '../../utils/storage';
 import { calculateRatio, calculateStrikeValueInCollateral } from '../../utils/calculation';
+import tracker from '../../utils/tracker';
 
 const Promise = require('bluebird');
 
 function MyVaults({ user }) {
+  tracker.pageview('/myvaults');
   const [opendVaults, setOpenedVaults] = useState([]);
   const [tokensToOpen, setTokensToOpen] = useState([]);
 

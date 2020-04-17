@@ -7,10 +7,11 @@ import { insurances, eth_options } from '../../constants/options';
 
 import { Comment, CheckBox } from '../common';
 import { storePreference, getPreference } from '../../utils/storage';
+import tracker from '../../utils/tracker';
 
-function AllContracts() {
+function TradeLanding() {
   const history = useHistory();
-
+  tracker.pageview('/trade/');
   const goToTrade = (addr) => {
     history.push(`/trade/${addr}`);
   };
@@ -59,4 +60,4 @@ function AllContracts() {
   );
 }
 
-export default AllContracts;
+export default TradeLanding;

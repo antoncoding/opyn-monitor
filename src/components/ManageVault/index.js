@@ -23,10 +23,11 @@ import { redeem } from '../../utils/web3';
 
 import { ETH_ADDRESS } from '../../constants/contracts';
 import { allOptions } from '../../constants/options';
+import tracker from '../../utils/tracker';
 
 function ManageVault({ user }) {
   const { token, owner } = useParams();
-
+  tracker.pageview(`/manage/${token}`);
   const option = allOptions.find((o) => o.addr === token);
   const {
     decimals, symbol, oracle, strike, strikePrice, minRatio,
@@ -107,7 +108,7 @@ function ManageVault({ user }) {
       }
     }
     updateInfo();
-    const id = setInterval(updateInfo, 10000);
+    const id = setInterval(updateInfo, 15000);
 
     return () => {
       isCancelled = true;

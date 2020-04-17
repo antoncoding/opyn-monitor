@@ -15,6 +15,7 @@ const ETH_ADDR = '0x0000000000000000000000000000000000000000';
 
 // ENS
 export const resolveENS = async (ensName) => {
+  console.log('infura resolve ETNS');
   const address = await ens.resolver(ensName).addr();
   return address.toLowerCase();
 };
@@ -48,6 +49,7 @@ export const getERC20Symbol = async (erc20Token) => {
 };
 
 export const getTotalSupply = async (erc20) => {
+  console.log('get total supply');
   const token = new web3.eth.Contract(optionContractABI, erc20);
   const totalSupply = await token.methods.totalSupply().call();
   return totalSupply;
