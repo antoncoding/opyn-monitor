@@ -8,7 +8,7 @@ function HomePage() {
 
   return (
     <>
-      <Header primary="Welcome to Opyn Dashboard" />
+      <Header primary="Welcome to Opyn Monitor" />
       <div style={{ padding: 5, opacity: 0.5 }}> Tools for DeFi Risk Management. </div>
       <div style={{ padding: '1%', display: 'flex', alignItems: 'center' }}>
         <div style={{ width: '30%', marginRight: '3%' }}>
