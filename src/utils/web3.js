@@ -34,7 +34,7 @@ const onboard = Onboard({
     },
   },
   walletSelect: {
-    description: 'Please select a wallet to connect to Opyn Dashboard',
+    description: 'Please select a wallet to connect to Opyn Monitor',
     wallets: [
       { walletName: 'metamask' },
       {

@@ -8,12 +8,13 @@ import {
   formatDigits, compareVaultRatio, compareVaultIssued, toTokenUnitsBN,
 } from '../../utils/number';
 import { calculateRatio, calculateStrikeValueInCollateral } from '../../utils/calculation';
-
+import { allOptions } from '../../constants/options';
 
 function VaultOwnerList({
-  oToken, user, vaults, option, collateralIsETH,
+  user, token, vaults, collateralIsETH,
 }) {
-  const vaultUsesCollateral = option.collateral !== option.strike;
+  const option = allOptions.find((o) => o.addr === token);
+  const vaultUsesCollateral = option.collateral.addr !== option.strike.addr;
 
   const [isLoading, setIsLoading] = useState(true);
   const [vaultsWithDetail, setVaultDetail] = useState([]);
@@ -25,14 +26,14 @@ function VaultOwnerList({
     const updateInfo = async () => {
       if (vaults.length === 0) return;
       const {
-        strike, minRatio, strikePrice, oracle, collateral, collateralDecimals,
+        strike, minRatio, strikePrice, oracle, collateral,
       } = option;
 
       const strikeValueInCollateral = await calculateStrikeValueInCollateral(
-        collateral,
-        strike,
+        collateral.addr,
+        strike.addr,
         oracle,
-        collateralDecimals,
+        collateral.decimals,
       );
       const vaultDetail = vaults
         .map((vault) => {
@@ -59,7 +60,6 @@ function VaultOwnerList({
             ratio,
             useCollateral: vaultUsesCollateral,
             isSafe: ratio > minRatio,
-            oToken,
           };
         })
         .sort(vaultUsesCollateral ? compareVaultRatio : compareVaultIssued);
@@ -71,13 +71,13 @@ function VaultOwnerList({
     };
 
     updateInfo();
-    const id = setInterval(updateInfo, 20000);
+    const id = setInterval(updateInfo, 60000);
 
     return () => {
       isCancelled = true;
       clearInterval(id);
     };
-  }, [collateralIsETH, oToken, option, user, vaultUsesCollateral, vaults]);
+  }, [collateralIsETH, option, user, vaultUsesCollateral, vaults]);
 
   return (
     <>
@@ -94,7 +94,7 @@ function VaultOwnerList({
         }) => [
           <IdentityBadge entity={owner} shorten />,
           formatDigits(
-            toTokenUnitsBN(collateral, option.collateralDecimals).toNumber(),
+            toTokenUnitsBN(collateral, option.collateral.decimals).toNumber(),
             6,
           ),
           formatDigits(
@@ -105,7 +105,6 @@ function VaultOwnerList({
           RatioTag({ isSafe, ratio, useCollateral }),
           <VaultModal
             option={option}
-            oToken={oToken}
             owner={owner}
             collateral={collateral}
             isSafe={isSafe}
@@ -121,10 +120,9 @@ function VaultOwnerList({
 }
 
 VaultOwnerList.propTypes = {
-  oToken: PropTypes.string.isRequired,
   user: PropTypes.string.isRequired,
   vaults: PropTypes.arrayOf(MyPTypes.vault).isRequired,
-  option: MyPTypes.option.isRequired,
+  token: PropTypes.string.isRequired,
   collateralIsETH: PropTypes.bool.isRequired,
 };
 

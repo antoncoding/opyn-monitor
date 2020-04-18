@@ -11,6 +11,12 @@ export const vault = PropTypes.shape({
 //   collateral: PropTypes.string,
 // });
 
+export const token = PropTypes.shape({
+  addr: PropTypes.string.isRequired,
+  decimals: PropTypes.number.isRequired,
+  symbol: PropTypes.string.isRequired,
+});
+
 export const option = PropTypes.shape({
   addr: PropTypes.string.isRequired,
   title: PropTypes.string.isRequired,
@@ -18,10 +24,9 @@ export const option = PropTypes.shape({
   name: PropTypes.string.isRequired,
   decimals: PropTypes.number.isRequired,
   oracle: PropTypes.string.isRequired,
-  collateral: PropTypes.string.isRequired,
-  collateralDecimals: PropTypes.number.isRequired,
-  underlying: PropTypes.string.isRequired,
-  strike: PropTypes.string.isRequired,
+  collateral: token.isRequired,
+  underlying: token.isRequired,
+  strike: token.isRequired,
   strikePrice: PropTypes.number.isRequired,
   minRatio: PropTypes.number.isRequired,
   exchange: PropTypes.string.isRequired,

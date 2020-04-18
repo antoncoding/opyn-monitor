@@ -21,27 +21,16 @@ import {
   toTokenUnitsBN, toBaseUnitBN, formatDigits, compareVaultIssued,
 } from '../../utils/number';
 
+import { ETH_ADDRESS } from '../../constants/contracts';
+import { allOptions } from '../../constants/options';
 
-/**
- *
- * @param {{
- * oToken: string,
- * option: { decimals: number, underlying:string, collateralDecimals: Number }
- * underlyingDecimals: Number
- * underlyingSymbol: string
- * vaults: { collateral:string, oTokensIssued: string, owner:string, symbol:string }[]
- * underlyingIsETH: boolean
- * }} param0
- */
 function ExerciseModal({
   user,
-  oToken,
-  option,
+  token,
   vaults,
-  underlyingDecimals,
-  underlyingSymbol,
-  underlyingIsETH,
 }) {
+  const option = allOptions.find((o) => o.addr === token);
+  const underlyingIsETH = option.underlying.addr === ETH_ADDRESS;
   const [userUnderlyingBalance, setUserUnderlyingBalance] = useState(new BigNumber(0));
   const [userOTokenBalance, setUserOTokenBalance] = useState(new BigNumber(0));
 
@@ -69,15 +58,15 @@ function ExerciseModal({
       userUnderlying = new BigNumber(await getBalance(user));
     } else {
       userUnderlying = toTokenUnitsBN(
-        await getTokenBalance(option.underlying, user),
-        underlyingDecimals,
+        await getTokenBalance(option.underlying.addr, user),
+        option.underlying.decimals,
       );
     }
-    const userOTkns = toTokenUnitsBN(await getTokenBalance(oToken, user), option.decimals);
+    const userOTkns = toTokenUnitsBN(await getTokenBalance(option.addr, user), option.decimals);
 
     setUserUnderlyingBalance(userUnderlying);
     setUserOTokenBalance(userOTkns);
-  }, [oToken, option.decimals, option.underlying, underlyingDecimals, underlyingIsETH, user, opened]);
+  }, [option, underlyingIsETH, user, opened]);
 
   const onSelectEntries = (entries, indexes) => {
     setSelectedIndexes(indexes);
@@ -108,10 +97,10 @@ function ExerciseModal({
     const exeAmtBN = new BigNumber(amount);
     setExerciseAmount(exeAmtBN);
     const underlyingRawAmt = await getUnderlyingRequiredToExercise(
-      oToken,
+      option.addr,
       toBaseUnitBN(exeAmtBN, option.decimals).toString(),
     );
-    const underlyingRequired = toTokenUnitsBN(underlyingRawAmt, underlyingDecimals);
+    const underlyingRequired = toTokenUnitsBN(underlyingRawAmt, option.underlying.decimals);
     setUnderlyringRequired(underlyingRequired);
 
     // check current selection has enought tokens
@@ -136,7 +125,7 @@ function ExerciseModal({
                 symbol={option.symbol}
                 forceDisplay
               />
-              <PriceSection label=" +" amt={userUnderlyingBalance.toNumber()} symbol={underlyingSymbol} />
+              <PriceSection label=" +" amt={userUnderlyingBalance.toNumber()} symbol={option.underlying.symbol} />
             </div>
           )}
         />
@@ -159,7 +148,7 @@ function ExerciseModal({
                 <PriceSection
                   label="+ Underlyring"
                   amt={underlyringRequired.toNumber()}
-                  symbol={underlyingSymbol}
+                  symbol={option.underlying.symbol}
                 />
               </div>
             )}
@@ -176,7 +165,7 @@ function ExerciseModal({
           renderEntry={({ owner, collateral, oTokensIssued }) => [
             <IdentityBadge entity={owner} />,
             formatDigits(toTokenUnitsBN(oTokensIssued, option.decimals).toNumber(), 5),
-            formatDigits(toTokenUnitsBN(collateral, option.collateralDecimals).toNumber(), 5),
+            formatDigits(toTokenUnitsBN(collateral, option.collateral.decimals).toNumber(), 5),
           ]}
         />
         <br />
@@ -187,8 +176,8 @@ function ExerciseModal({
           onClick={async () => {
             const vaultowners = selectedIndexes.map((index) => vaults[index].owner);
             exercise(
-              oToken,
-              option.underlying,
+              option.addr,
+              option.underlying.addr,
               toBaseUnitBN(exerciseAmount, option.decimals).toString(),
               vaultowners,
             );
@@ -201,12 +190,8 @@ function ExerciseModal({
 
 ExerciseModal.propTypes = {
   user: PropTypes.string.isRequired,
-  oToken: PropTypes.string.isRequired,
-  option: myType.option.isRequired,
+  token: PropTypes.string.isRequired,
   vaults: PropTypes.arrayOf(myType.vault).isRequired,
-  underlyingDecimals: PropTypes.number.isRequired,
-  underlyingSymbol: PropTypes.string.isRequired,
-  underlyingIsETH: PropTypes.bool.isRequired,
 };
 
 export default ExerciseModal;

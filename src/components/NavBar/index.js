@@ -16,7 +16,6 @@ function NavBar({
     const home = history.location.pathname === '/';
     updateIsHome(home);
   }, [history.location.pathname]);
-
   return (
     <Bar
       primary={
@@ -32,22 +31,32 @@ function NavBar({
               />
             </div>
             <LinkButton
+              title="Home"
+              onClick={() => {
+                history.push('/');
+              }}
+              isSelected={history.location.pathname === '/'}
+            />
+            <LinkButton
               title="My Vaults"
               onClick={() => {
                 history.push('/myvaults/');
               }}
+              isSelected={history.location.pathname === '/myvaults/'}
             />
             <LinkButton
               title="All Contracts"
               onClick={() => {
                 history.push('/options/');
               }}
+              isSelected={history.location.pathname === '/options/'}
             />
             <LinkButton
               title="Trade"
               onClick={() => {
                 history.push('/trade/');
               }}
+              isSelected={history.location.pathname === '/trade/'}
             />
           </>
         )
@@ -70,11 +79,11 @@ NavBar.propTypes = {
   setUser: PropTypes.func.isRequired,
 };
 
-function LinkButton({ title, onClick }) {
+function LinkButton({ title, onClick, isSelected = false }) {
   return (
     <div style={{ paddingLeft: 40 }}>
       <LinkBase onClick={onClick}>
-        <div style={{ padding: '1%', opacity: 0.5, fontSize: 17 }}>{title}</div>
+        <div style={{ padding: '1%', opacity: isSelected ? 1 : 0.5, fontSize: 17 }}>{title}</div>
       </LinkBase>
     </div>
   );
@@ -83,6 +92,7 @@ function LinkButton({ title, onClick }) {
 LinkButton.propTypes = {
   title: PropTypes.string.isRequired,
   onClick: PropTypes.func.isRequired,
+  isSelected: PropTypes.bool.isRequired,
 };
 
 export default NavBar;

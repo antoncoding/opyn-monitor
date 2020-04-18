@@ -3,14 +3,16 @@ import PropTypes from 'prop-types';
 import { Box, Split, IdentityBadge } from '@aragon/ui';
 
 import BigNumber from 'bignumber.js';
-import * as MyPTypes from '../types';
 
 import { getTotalSupply, getBalance, getTokenBalance } from '../../utils/infura';
 import { toTokenUnitsBN } from '../../utils/number';
+import { allOptions } from '../../constants/options';
 
 function OptionOverview({
-  oToken, tokenSymbol, option, collateralIsETH,
+  token,
+  collateralIsETH,
 }) {
+  const option = allOptions.find((o) => o.addr === token);
   const [totalCollateral, setTotalCollateral] = useState(new BigNumber(0));
   const [totalSupply, setTotalSupply] = useState(new BigNumber(0));
 
@@ -19,12 +21,12 @@ function OptionOverview({
     async function init() {
       let totalCollt;
       if (collateralIsETH) {
-        totalCollt = new BigNumber(await getBalance(oToken));
+        totalCollt = new BigNumber(await getBalance(option.addr));
       } else {
-        const rawCollateralBalance = await getTokenBalance(option.collateral, oToken);
-        totalCollt = toTokenUnitsBN(rawCollateralBalance, option.collateralDecimals);
+        const rawCollateralBalance = await getTokenBalance(option.collateral.addr, option.addr);
+        totalCollt = toTokenUnitsBN(rawCollateralBalance, option.collateral.decimals);
       }
-      const supply = await getTotalSupply(oToken);
+      const supply = await getTotalSupply(option.addr);
       if (!isCancelled) {
         setTotalCollateral(totalCollt);
         setTotalSupply(toTokenUnitsBN(supply, option.decimals));
@@ -35,7 +37,7 @@ function OptionOverview({
     return () => {
       isCancelled = true;
     };
-  }, [option.collateralDecimals, collateralIsETH, oToken, option.collateral, option.decimals]);
+  }, [collateralIsETH, option]);
 
   return (
     <>
@@ -44,12 +46,14 @@ function OptionOverview({
           <Split
             primary={(
               <Box heading="contract" padding={15}>
-                <IdentityBadge entity={oToken} shorten={false} />
+                <IdentityBadge entity={option.addr} shorten={false} />
               </Box>
             )}
             secondary={(
               <Box heading="Total Collateral" padding={15}>
                 {totalCollateral.toFormat(4)}
+                {' '}
+                {option.collateral.symbol}
               </Box>
             )}
           />
@@ -58,7 +62,7 @@ function OptionOverview({
           <Box heading="total supply" padding={15}>
             {totalSupply.toFormat(4)}
             {' '}
-            {tokenSymbol}
+            {option.symbol}
           </Box>
         )}
       />
@@ -67,9 +71,7 @@ function OptionOverview({
 }
 
 OptionOverview.propTypes = {
-  oToken: PropTypes.string.isRequired,
-  tokenSymbol: PropTypes.string.isRequired,
-  option: MyPTypes.option.isRequired,
+  token: PropTypes.string.isRequired,
   collateralIsETH: PropTypes.bool.isRequired,
 };
 
