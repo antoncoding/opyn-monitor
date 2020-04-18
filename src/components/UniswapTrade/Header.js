@@ -8,7 +8,7 @@ import { BalanceBlock, AddressBlock } from '../common';
  *
  * @param {{ poolTokenBalance: BigNumber, poolETHBalance: BigNumber }}
  */
-const HeaderDashboard = ({
+const TradePageHeader = ({
   symbol, poolETHBalance, poolTokenBalance, uniswapExchange,
 }) => (
   <div style={{ padding: '2%', display: 'flex', alignItems: 'center' }}>
@@ -26,11 +26,11 @@ const HeaderDashboard = ({
   </div>
 );
 
-HeaderDashboard.propTypes = {
+TradePageHeader.propTypes = {
   symbol: PropTypes.string.isRequired,
   poolETHBalance: PropTypes.instanceOf(BigNumber).isRequired,
   poolTokenBalance: PropTypes.instanceOf(BigNumber).isRequired,
   uniswapExchange: PropTypes.string.isRequired,
 };
 
-export default HeaderDashboard;
+export default TradePageHeader;
