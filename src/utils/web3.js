@@ -22,8 +22,6 @@ const INFURA_KEY = process.env.REACT_APP_INFURA_KEY;
 const BLOCKNATIVE_KEY = process.env.REACT_APP_BLOCKNATIVE_KEY;
 const FORTMATIC_KEY = process.env.REACT_APP_FORTMATIC_KEY;
 
-console.log(`using key ${INFURA_KEY}`);
-
 let web3;
 
 const onboard = Onboard({
