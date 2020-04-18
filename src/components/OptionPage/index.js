@@ -7,7 +7,6 @@ import ExerciseModal from './ExerciseModal';
 import VaultsList from './VaultsList';
 import OptionInfoBox from './OptionInfoBox';
 
-import { getDecimals, getERC20Symbol } from '../../utils/infura';
 import { getAllVaultsForOption } from '../../utils/graph';
 import tracker from '../../utils/tracker';
 
@@ -21,26 +20,13 @@ function OptionPage({ user }) {
 
   const [vaults, setVaults] = useState([]);
 
-  const [underlyingDecimals, setUnderlyingDecimals] = useState(18);
-  const [underlyingSymbol, setUnderlyingSymbol] = useState('ETH');
-
-  const collateralIsETH = option.collateral === ETH_ADDRESS;
-  const underlyingIsETH = option.underlying === ETH_ADDRESS;
+  const collateralIsETH = option.collateral.addr === ETH_ADDRESS;
 
   useMemo(async () => {
-    if (!underlyingIsETH) {
-      const [_decimals, _symbol] = await Promise.all([
-        getDecimals(option.underlying),
-        getERC20Symbol(option.underlying),
-      ]);
-      setUnderlyingDecimals(_decimals);
-      setUnderlyingSymbol(_symbol);
-    }
-
     // Get All vaults once
     const allVaults = await getAllVaultsForOption(token);
     setVaults(allVaults);
-  }, [option.underlying, token, underlyingIsETH]);
+  }, [token]);
 
   return (
     <>
@@ -49,31 +35,22 @@ function OptionPage({ user }) {
         secondary={(
           <ExerciseModal
             user={user}
-            oToken={token}
-            option={option}
-            underlyingDecimals={underlyingDecimals}
-            underlyingSymbol={underlyingSymbol}
-            underlyingIsETH={underlyingIsETH}
+            token={token}
             vaults={vaults}
           />
         )}
       />
       {/* Basic Info Header */}
       <OptionInfoBox
-        tokenSymbol={option.symbol}
-        oToken={token}
-        user={user}
-        vaults={vaults}
-        option={option}
+        token={token}
         collateralIsETH={collateralIsETH}
       />
       {/* List of Vaults */}
       <VaultsList
-        oToken={token}
+        token={token}
         user={user}
         vaults={vaults}
         collateralIsETH={collateralIsETH}
-        option={option}
       />
     </>
   );

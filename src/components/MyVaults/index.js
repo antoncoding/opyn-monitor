@@ -50,10 +50,10 @@ function MyVaults({ user }) {
       const isOpened = entry !== undefined;
       if (isOpened) {
         const strikeValueInCollateral = await calculateStrikeValueInCollateral(
-          option.collateral,
-          option.strike,
+          option.collateral.addr,
+          option.strike.addr,
           option.oracle,
-          option.collateralDecimals,
+          option.collateral.decimals,
         );
         const ratio = calculateRatio(
           entry.collateral,
@@ -65,7 +65,7 @@ function MyVaults({ user }) {
           oToken: option.addr,
           oTokenName: option.title,
           collateral: entry.collateral,
-          collateralDecimals: option.collateralDecimals,
+          collateralDecimals: option.collateral.decimals,
           expiry: option.expiry,
           ratio,
         });
