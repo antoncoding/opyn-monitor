@@ -8,7 +8,7 @@ import NoWalletView from './NoWallet';
 
 import { allOptions } from '../../constants/options';
 import {
-  SectionTitle, ManageVaultButton, OpenVaultButton, Comment, CheckBox,
+  SectionTitle, ManageVaultButton, Comment, CheckBox,
 } from '../common';
 import {
   formatDigits, compareVaultRatio, toTokenUnitsBN,
@@ -142,12 +142,11 @@ function MyVaults({ user }) {
                 fields={['Token', 'contract', 'manage']}
                 entries={tokensToOpen}
                 renderEntry={({ oToken, oTokenName }) => {
-                  const option = allOptions.filter((o) => o.addr === oToken);
+                  const option = allOptions.find((o) => o.addr === oToken);
                   return [
                     oTokenName,
                     <IdentityBadge entity={oToken} shorten={false} />,
                     <OpenVaultModal user={user} option={option} />,
-                  // <OpenVaultButton oToken={oToken} user={user} />,
                   ];
                 }}
               />

@@ -252,9 +252,9 @@ export const removeUnderlying = async (token) => {
     });
 };
 
-export const approve = async (oTokenAddr, spender, amt) => {
+export const approve = async (tokenAddr, spender, amt) => {
   const account = await checkConnectedAndGetAddress();
-  const oToken = new web3.eth.Contract(oTokenABI, oTokenAddr);
+  const oToken = new web3.eth.Contract(oTokenABI, tokenAddr);
   await oToken.methods
     .approve(spender, amt)
     .send({ from: account })
@@ -304,6 +304,37 @@ export const openVault = async (oTokenAddr) => {
       notify.hash(hash);
     });
 };
+
+export const openVaultAddCollateralAndMint = async (oTokenAddr, collateralAsset, collateralAmt, tokenAmount) => {
+  const account = await checkConnectedAndGetAddress();
+  const oToken = new web3.eth.Contract(oTokenABI, oTokenAddr);
+  if (collateralAsset === ETH_ADDRESS) {
+    await oToken.methods
+      .createETHCollateralOption(tokenAmount, account)
+      .send({
+        from: account,
+        value: collateralAmt,
+      })
+      .on('transactionHash', (hash) => {
+        notify.hash(hash);
+      });
+  } else {
+    // check allowance
+    const allowance = await getAllowance(collateralAsset, account, oTokenAddr);
+    if (new BigNumber(allowance).lt(new BigNumber(collateralAmt))) {
+      await approve(collateralAsset, oTokenAddr, UINT256_MAX);
+    }
+    await oToken.methods
+      .createERC20CollateralOption(tokenAmount, collateralAmt, account)
+      .send({
+        from: account,
+      })
+      .on('transactionHash', (hash) => {
+        notify.hash(hash);
+      });
+  }
+};
+
 
 // Option Exchange
 
