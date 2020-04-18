@@ -107,7 +107,7 @@ function ManageVault({ user }) {
       }
     }
     updateInfo();
-    const id = setInterval(updateInfo, 15000);
+    const id = setInterval(updateInfo, 60000);
 
     return () => {
       isCancelled = true;

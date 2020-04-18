@@ -24,7 +24,6 @@ function VaultOwnerList({
   useEffect(() => {
     let isCancelled = false;
     const updateInfo = async () => {
-      console.log('update info');
       if (vaults.length === 0) return;
       const {
         strike, minRatio, strikePrice, oracle, collateral,
@@ -72,7 +71,7 @@ function VaultOwnerList({
     };
 
     updateInfo();
-    const id = setInterval(updateInfo, 20000);
+    const id = setInterval(updateInfo, 60000);
 
     return () => {
       isCancelled = true;

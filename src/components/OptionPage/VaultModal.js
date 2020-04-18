@@ -30,11 +30,13 @@ import { KETH, DAI, USDC } from '../../constants/contracts';
 
 /**
  *
- * @param {{ option:{
+ * @param {{
+ * option:{
  * decimals:number,
  * exchange:string, collateral:{ addr:string, decimals: number, symbol:string}, symbol:string }
- * oTokensIssued: string
- * , exchange:string}} param0
+ * oTokensIssued: string,
+ * collateralAmount: string,
+ * exchange:string}} param0
  */
 function VaultModal({
   option,
@@ -57,6 +59,7 @@ function VaultModal({
     let isCancelled = false;
     async function getData() {
       if (!opened) return;
+      if (!useCollateral) return;
       const maxLiquidatable = await getMaxLiquidatable(option.addr, owner);
       if (!isCancelled) {
         setLiquidateAmt(toTokenUnitsBN(maxLiquidatable, option.decimals).toNumber());
@@ -67,7 +70,7 @@ function VaultModal({
     return () => {
       isCancelled = true;
     };
-  }, [option, opened, owner]);
+  }, [option, opened, owner, useCollateral]);
 
   return (
     <>
