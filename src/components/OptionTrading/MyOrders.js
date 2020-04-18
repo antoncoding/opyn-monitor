@@ -43,7 +43,8 @@ function MyOrders({
         onPageChange={setMyOrdersPage}
         onSelectEntries={setSelectedOrders}
         fields={['digest', 'type', 'price', 'amount', 'filled', 'expiration', '']}
-        entries={userAsks.concat(userBids)}
+        entries={userAsks.concat(userBids)
+          .sort((a, b) => (a.order.expirationTimeSeconds > b.order.expirationTimeSeconds ? 1 : -1))}
         renderEntry={(order) => [// call, put, callDetail, putDetail, strikePrice
           order.metaData.orderHash.slice(2, 8),
           order.type === 'Ask' ? <AskText>{order.type}</AskText> : <BidText>{order.type}</BidText>,
