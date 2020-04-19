@@ -13,12 +13,13 @@ function Footer({ theme }) {
     bottom: '0',
     height: '50px',
     width: '100%',
-    fontSize: '12px',
+    fontSize: '14px',
   };
 
   return (
     <div style={style}>
       Powered By
+      {' '}
       <Link external href="https://opyn.co/#/">
         Opyn
       </Link>
@@ -26,7 +27,6 @@ function Footer({ theme }) {
       <Link external href="https://ui.aragon.org/">
         Aragon UI
       </Link>
-      ,
       {', '}
       <Link external href="https://www.blocknative.com/">
         Blocknative
@@ -36,11 +36,16 @@ function Footer({ theme }) {
         Kollateral
       </Link>
       {'. '}
-      Hosted on
-      <Link external href="https://github.com/antoncoding/opyn-liquidator">
-        GitHub
-      </Link>
-      .
+      Hosted on GitHub:
+      {/* </div> */}
+      <iframe
+        title="star"
+        src="https://ghbtns.com/github-btn.html?user=antoncoding&repo=opyn-liquidator&type=star&count=true"
+        frameBorder="0"
+        scrolling="0"
+        width="160px"
+        height="18px"
+      />
     </div>
   );
 }
