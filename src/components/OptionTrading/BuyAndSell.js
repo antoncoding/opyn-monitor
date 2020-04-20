@@ -72,6 +72,8 @@ function BuyAndSell({
   // for weth side panel
   const [panelOpend, setPanelOpended] = useState(false);
 
+  const [activeButton, setActiveButton] = useState(null);
+
   // update gasPrice
   useEffect(() => {
     let isCanceled = false;
@@ -346,6 +348,13 @@ function BuyAndSell({
               value={rate.toNumber()}
             />
 
+            <Label>Valid Until</Label>
+            <GroupButtonWrapper>
+              {['1 Hour', '1 Day', '1 week'].map((x,i)=>
+                <GroupButton onClick={()=> setActiveButton(i)} key={x} index={i} isActive={activeButton===i}>{x}</GroupButton>
+              )}
+            </GroupButtonWrapper>
+
             <BottomTextWrapper>
               <BottomText>{tradeType === 'buy' ? 'Cost' : 'Earn'}</BottomText>
               <BottomText>{`${quoteAssetAmount.toFixed(4)} WETH`}</BottomText>
@@ -512,4 +521,33 @@ const BottomTextWrapper = styled(FlexWrapper)`
   height: 27px;
   border-bottom: solid 1px #979797;
   border-bottom-style: dotted;
+`;
+const GroupButtonWrapper = styled.div`
+  display: flex;
+  justify-content: center;
+  // background: #405071;
+  color: #FFFFFF;
+  white-space: nowrap;
+  // border: 1px solid #2C3A58;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  align-items: center;
+  border-radius: 5px;
+`;
+const GroupButton = styled.div`
+  height: 40px;
+  width: 33%;
+  border: 1px solid #2C3A58;
+  border-width: ${props => props.index === 1 ? '1px 0px' : '1px'};
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  border-top-left-radius: ${props => props.index === 0 ? '5px' : '0px'};
+  border-bottom-left-radius: ${props => props.index === 0 ? '5px' : '0px'};
+  border-top-right-radius: ${props => props.index === 2 ? '5px' : '0px'};
+  border-bottom-right-radius: ${props => props.index === 2 ? '5px' : '0px'};
+  background: ${props => props.isActive ? '#08BEE5' : '#405071'} ;
+  :active {
+    transform: translateY(-1px)
+  }
 `;
