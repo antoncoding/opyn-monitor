@@ -55,7 +55,6 @@ function BuyAndSell({
   const [fastGasPrice, setFastGasPrice] = useState(new BigNumber(5)); //  in GWei
 
   // const quoteAssetAmount = price.times(baseAssetAmount);
-  const expiry = parseInt(Date.now() / 1000 + 86400, 10);
 
   const [selectedOrderFillables, setSelectedOrdersFillable] = useState({
     totalFillableMakerAmount: new BigNumber(0),
@@ -72,7 +71,12 @@ function BuyAndSell({
   // for weth side panel
   const [panelOpend, setPanelOpended] = useState(false);
 
-  const [activeButton, setActiveButton] = useState(null);
+  // expiry button
+  const [activeButton, setActiveButton] = useState(0);
+  const expirySeconds = activeButton === 0
+    ? 3600 : (activeButton === 1 ? 86400 : 604800);
+  const expiry = parseInt(Date.now() / 1000 + expirySeconds, 10);
+
 
   // update gasPrice
   useEffect(() => {
