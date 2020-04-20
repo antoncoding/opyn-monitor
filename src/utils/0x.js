@@ -120,7 +120,7 @@ async function request(path) {
 export const isValid = (entry) => {
   const notExpired = parseInt(entry.order.expirationTimeSeconds, 10) > Date.now() / 1000;
   // notDust: not very good
-  const notDust = true; // new BigNumber(entry.metaData.remainingFillableTakerAssetAmount)
+  const notDust = getOrderFillRatio(entry) < 100;
   //   .gt(new BigNumber(0.0001).times(new BigNumber(10).pow(takerAssetDecimals)));
   return notExpired && notDust;
 };

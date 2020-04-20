@@ -354,7 +354,17 @@ function BuyAndSell({
 
             <Label>Valid For</Label>
             <GroupButtonWrapper>
-              {['1 Hour', '1 Day', '1 week'].map((x, i) => <GroupButton theme={theme} onClick={() => setActiveButton(i)} key={x} index={i} isActive={activeButton === i}>{x}</GroupButton>)}
+              {['1 Hour', '1 Day', '1 week'].map((x, i) => (
+                <GroupButton
+                  theme={theme}
+                  onClick={() => setActiveButton(i)}
+                  key={x}
+                  index={i}
+                  isActive={activeButton === i}
+                >
+                  {x}
+                </GroupButton>
+              ))}
             </GroupButtonWrapper>
 
             <BottomTextWrapper>
