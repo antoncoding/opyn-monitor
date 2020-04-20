@@ -1,20 +1,19 @@
 import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
-import { Header, Button } from '@aragon/ui';
+import { Header } from '@aragon/ui';
 
 import styled from 'styled-components';
 import BigNumber from 'bignumber.js';
 import OptionBoard from './OptionBoard';
 import TabBoard from './TabBoard';
 import BuyAndSell from './BuyAndSell';
-// import WrapETHModal from './WrapETHModal';
 
 import { getTokenBalance } from '../../utils/infura';
 import { getOrderBook, isValid } from '../../utils/0x';
 import { getVault } from '../../utils/graph';
-import { approve } from '../../utils/web3';
+// import { approve } from '../../utils/web3';
 import { eth_puts, eth_calls } from '../../constants/options';
-import { ZeroX_ERC20Proxy } from '../../constants/contracts';
+// import { ZeroX_ERC20Proxy } from '../../constants/contracts';
 
 const quoteAsset = {
   symbol: 'WETH',
@@ -102,24 +101,8 @@ function OptionTrading({ user, theme }) {
       <FlexWrapper>
         <LeftPart>
           <Header />
-          <Header
-            primary={(
-              <Button
-                label="Enable oToken"
-                onClick={() => {
-                  approve(baseAsset.addr, ZeroX_ERC20Proxy);
-                }}
-              />
-          )}
-            secondary={(
-              <Button
-                label="Enable WETH"
-                onClick={() => {
-                  approve(quoteAsset.addr, ZeroX_ERC20Proxy);
-                }}
-              />
-)}
-          />
+          <Header />
+
           <BuyAndSell
             user={user}
             baseAsset={baseAsset}
@@ -173,30 +156,24 @@ OptionTrading.propTypes = {
   theme: PropTypes.string.isRequired,
 };
 
-// const FixBottom = styled.div`
-//   margin-top: auto;
-// `;
 
 const LeftPart = styled.div`
   width: 20%;
   padding-right: 1.5%;
-  display: flex;
-  flex-direction: column;
 `;
 
 const RightPart = styled.div`
-  width: 70%;
-  display: flex;
-  flex-direction: column;
+  width: 80%;
 `;
 
 const WholeScreen = styled.div`
   textAlign: center;
-  padding-left: 4%;
-  padding-right: 4%;
+  padding-left: 7%;
+  padding-right: 7%;
   position: fixed;
   left: 0;
-  top: 7%;
+  right: 0;
+  top: 6%;
   width: 100%;
   height: 100%;
 `;

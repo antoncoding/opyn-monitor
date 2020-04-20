@@ -8,11 +8,13 @@ import BigNumber from 'bignumber.js';
 import {
   createOrder, broadcastOrders, getOrdersTotalFillables, getGasPrice, getFillAmountsOfOrders,
 } from '../../utils/0x';
-import { signOrder, fillOrders } from '../../utils/web3';
+import { signOrder, fillOrders, approve } from '../../utils/web3';
 import { toTokenUnitsBN, toBaseUnitBN } from '../../utils/number';
 import WrapETHPanel from './WrapETHSidePanel';
 
 import { vault as VaultType, order as OrderType, token as TokenType } from '../types';
+import { getAllowance } from '../../utils/infura';
+import { ZeroX_ERC20Proxy } from '../../constants/contracts';
 
 
 /**
@@ -228,20 +230,32 @@ function BuyAndSell({
   const clickCreateOrder = async () => {
     let order;
     if (tradeType === 'buy') {
+      const quoteAssetInBaseUnit = toBaseUnitBN(baseAmountToCreate.times(rate), quoteAsset.decimals);
+      const wwethAllowance = new BigNumber(await getAllowance(quoteAsset.addr, user, ZeroX_ERC20Proxy));
+      if (wwethAllowance.lt(quoteAssetInBaseUnit)) {
+        toast(`Please approve 0x to spend your oToken ${quoteAsset.symbol}`);
+        await approve(quoteAsset.addr, ZeroX_ERC20Proxy);
+      }
       order = createOrder(
         user,
         quoteAsset.addr,
         baseAsset.addr,
-        toBaseUnitBN(baseAmountToCreate.times(rate), quoteAsset.decimals),
+        quoteAssetInBaseUnit,
         toBaseUnitBN(baseAmountToCreate, baseAsset.decimals),
         expiry,
       );
     } else {
+      const baseAssetInBaseUnit = toBaseUnitBN(baseAmountToCreate, baseAsset.decimals);
+      const tokenAllowance = new BigNumber(await getAllowance(baseAsset.addr, user, ZeroX_ERC20Proxy));
+      if (tokenAllowance.lt(baseAssetInBaseUnit)) {
+        toast(`Please approve 0x to spend your oToken ${baseAsset.symbol}`);
+        await approve(baseAsset.addr, ZeroX_ERC20Proxy);
+      }
       order = createOrder(
         user,
         baseAsset.addr,
         quoteAsset.addr,
-        toBaseUnitBN(baseAmountToCreate, baseAsset.decimals),
+        baseAssetInBaseUnit,
         toBaseUnitBN(baseAmountToCreate.times(rate), quoteAsset.decimals),
         expiry,
       );
