@@ -351,7 +351,7 @@ function BuyAndSell({
             <Label>Valid Until</Label>
             <GroupButtonWrapper>
               {['1 Hour', '1 Day', '1 week'].map((x,i)=>
-                <GroupButton onClick={()=> setActiveButton(i)} key={x} index={i} isActive={activeButton===i}>{x}</GroupButton>
+                <GroupButton theme={theme} onClick={()=> setActiveButton(i)} key={x} index={i} isActive={activeButton===i}>{x}</GroupButton>
               )}
             </GroupButtonWrapper>
 
@@ -525,10 +525,8 @@ const BottomTextWrapper = styled(FlexWrapper)`
 const GroupButtonWrapper = styled.div`
   display: flex;
   justify-content: center;
-  // background: #405071;
-  color: #FFFFFF;
+  color: ${props => props.theme.content};
   white-space: nowrap;
-  // border: 1px solid #2C3A58;
   box-shadow: 0 1px 3px rgba(0,0,0,0.1);
   align-items: center;
   border-radius: 5px;
@@ -536,7 +534,7 @@ const GroupButtonWrapper = styled.div`
 const GroupButton = styled.div`
   height: 40px;
   width: 33%;
-  border: 1px solid #2C3A58;
+  border: 1px solid ${props => props.theme.border};
   border-width: ${props => props.index === 1 ? '1px 0px' : '1px'};
   display: flex;
   justify-content: center;
@@ -546,8 +544,8 @@ const GroupButton = styled.div`
   border-bottom-left-radius: ${props => props.index === 0 ? '5px' : '0px'};
   border-top-right-radius: ${props => props.index === 2 ? '5px' : '0px'};
   border-bottom-right-radius: ${props => props.index === 2 ? '5px' : '0px'};
-  background: ${props => props.isActive ? '#08BEE5' : '#405071'} ;
+  background: ${props => props.isActive ? props.theme.surfacePressed : props.theme.surface} ;
   :active {
-    transform: translateY(-1px)
+    transform: translateY(1px)
   }
 `;
