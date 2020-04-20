@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import {
-  Button, useTheme, TextInput, Help, useToast,
+  Button, useTheme, TextInput, Help, useToast, LinkBase,
 } from '@aragon/ui';
 import styled from 'styled-components';
 import BigNumber from 'bignumber.js';
@@ -10,8 +10,10 @@ import {
 } from '../../utils/0x';
 import { signOrder, fillOrders } from '../../utils/web3';
 import { toTokenUnitsBN, toBaseUnitBN } from '../../utils/number';
+import WrapETHPanel from './WrapETHSidePanel';
+
 import { vault as VaultType, order as OrderType, token as TokenType } from '../types';
-// import { eth_calls } from '../../constants/options';
+
 
 /**
  *
@@ -33,17 +35,9 @@ function BuyAndSell({
   quoteAsset,
   collateral,
 
-  // baseAssetSymbol, // "oETH"
-  // quoteAssetSymbol, // "WETH"
-  // collateralSymbol, // // USDC
-
-  ethBalance, // in ETH (0.5)
+  // ethBalance, // in ETH (0.5)
   baseAssetBalance,
   quoteAssetBalance,
-
-  // baseAssetDecimals,
-  // quoteAssetDecimals,
-  // collateralDecimals,
 }) {
   const theme = useTheme();
   const toast = useToast();
@@ -54,7 +48,6 @@ function BuyAndSell({
   // these two add up to total oToken displayed on the Amount section
   const [baseAmountToFill, setBaseAmountToFill] = useState(new BigNumber(0));
   const [baseAmountToCreate, setBaseAmountToCreate] = useState(new BigNumber(0));
-
 
   const [rate, setRate] = useState(new BigNumber(0));
 
@@ -75,6 +68,9 @@ function BuyAndSell({
   const feeInETH = hasSelectedOrders
     ? fastGasPrice.times(new BigNumber(selectedOrders.length)).times(new BigNumber(0.00015))
     : new BigNumber(0);
+
+  // for weth side panel
+  const [panelOpend, setPanelOpended] = useState(false);
 
   // update gasPrice
   useEffect(() => {
@@ -268,138 +264,135 @@ function BuyAndSell({
   };
 
   return (
-    <BuyAndSellBlock theme={theme}>
-      <Header theme={theme}>
-        <Wrapper>Balance</Wrapper>
-      </Header>
-      <Wrapper>
-        <TopPart theme={theme}>
-          <FlexWrapper>
-            <div>{baseAsset.symbol}</div>
-            <TopPartText>{toTokenUnitsBN(baseAssetBalance, baseAsset.decimals).toFormat(4)}</TopPartText>
-          </FlexWrapper>
-          <FlexWrapper>
-            <div>ETH</div>
-            <TopPartText>{ethBalance.toFormat(4)}</TopPartText>
-          </FlexWrapper>
+    <>
+      <BuyAndSellBlock theme={theme}>
+        <Header theme={theme}>
+          <Wrapper>Balance</Wrapper>
+        </Header>
+        <Wrapper>
+          <TopPart theme={theme}>
+            <FlexWrapper>
+              <div>{baseAsset.symbol}</div>
+              <TopPartText>{toTokenUnitsBN(baseAssetBalance, baseAsset.decimals).toFormat(4)}</TopPartText>
+            </FlexWrapper>
+            <FlexWrapper>
+              <div>
+                <Flex>
+                  <p style={{ paddingRight: '5px' }}>
+                    <LinkBase onClick={() => setPanelOpended(true)}>
+                      {quoteAsset.symbol}
+                    </LinkBase>
+                  </p>
+                  <Help hint="What is WETH?">
+                    WETH is Wraped ETH, the erc20 version of ETH. You musst have WETH to create and fill orders on 0x.
+                    {' '}
+                    <LinkBase onClick={() => setPanelOpended(true)}>Click here and wrap/unwrap now!</LinkBase>
+                  </Help>
+                </Flex>
+              </div>
+              <TopPartText>{toTokenUnitsBN(quoteAssetBalance, quoteAsset.decimals).toFormat(4)}</TopPartText>
+            </FlexWrapper>
+          </TopPart>
           <FlexWrapper>
             <div>
-              <Flex>
-                <p style={{ paddingRight: '5px' }}>{quoteAsset.symbol}</p>
-                <Help hint="What is WETH?">
-                  WETH is Wraped ETH.
-                  <br />
-                  You need to convert your ETH to WETH if you want to create a buy order.
-                </Help>
-              </Flex>
+              Collateral (
+              {collateral.symbol}
+              )
             </div>
-            <TopPartText>{toTokenUnitsBN(quoteAssetBalance, quoteAsset.decimals).toFormat(4)}</TopPartText>
+            <TopPartText>
+              { vault
+                ? toTokenUnitsBN(vault.collateral, collateral.decimals).toFormat(4)
+                : Number(0).toFixed(4)}
+            </TopPartText>
           </FlexWrapper>
-        </TopPart>
-        <FlexWrapper>
-          <div>
-            Collateral (
-            {collateral.symbol}
-            )
-          </div>
-          <TopPartText>
-            { vault
-              ? toTokenUnitsBN(vault.collateral, collateral.decimals).toFormat(4)
-              : Number(0).toFixed(4)}
-          </TopPartText>
-        </FlexWrapper>
-      </Wrapper>
-      <Wrapper>
-        <TabWrapper theme={theme}>
-          <Tab
-            active={tradeType === 'buy'}
-            onClick={() => {
-              setSelectedOrders([]);
-              setTradeType('buy');
-            }}
-            theme={theme}
-          >
-            Buy
-          </Tab>
-          <Tab
-            active={tradeType === 'sell'}
-            onClick={() => {
-              setSelectedOrders([]);
-              setTradeType('sell');
-            }}
-            theme={theme}
-          >
-            Sell
+        </Wrapper>
+        <Wrapper>
+          <TabWrapper theme={theme}>
+            <Tab
+              active={tradeType === 'buy'}
+              onClick={() => {
+                setSelectedOrders([]);
+                setTradeType('buy');
+              }}
+              theme={theme}
+            >
+              Buy
+            </Tab>
+            <Tab
+              active={tradeType === 'sell'}
+              onClick={() => {
+                setSelectedOrders([]);
+                setTradeType('sell');
+              }}
+              theme={theme}
+            >
+              Sell
+            </Tab>
+          </TabWrapper>
+          <LowerPart>
+            <Label>Amount</Label>
+            <TextInput
+              wide
+              type="number"
+              onChange={(e) => onChangeBaseAmount(e.target.value)}
+              value={baseAmountToCreate.plus(baseAmountToFill).toNumber()}
+            />
 
-          </Tab>
-        </TabWrapper>
-        <LowerPart>
-          <Label>Amount</Label>
-          <TextInput
-            wide
-            type="number"
-            onChange={(e) => onChangeBaseAmount(e.target.value)}
-            value={baseAmountToCreate.plus(baseAmountToFill).toNumber()}
-          />
+            <Label>Price per token</Label>
+            <TextInput
+              wide
+              type="number"
+              onChange={(e) => onChangeRate(e.target.value)}
+              value={rate.toNumber()}
+            />
 
-          <Label>Price per token</Label>
-          <TextInput
-            wide
-            type="number"
-            onChange={(e) => onChangeRate(e.target.value)}
-            value={rate.toNumber()}
-          />
-
-          <BottomTextWrapper>
-            <BottomText>{tradeType === 'buy' ? 'Cost' : 'Earn'}</BottomText>
-            <BottomText>{`${quoteAssetAmount.toFixed(4)} WETH`}</BottomText>
-          </BottomTextWrapper>
-          <BottomTextWrapper>
-            <BottomText>
-              <Flex>
-                <p style={{ paddingRight: '5px' }}>Fee</p>
-                <Help hint="Why am I paying?">
-                  The fee is charged by 0x.
-                  The higher your gasPirce is, the higher you will be charged for.
-                </Help>
-              </Flex>
-            </BottomText>
-            <BottomText>{`${feeInETH} ETH` }</BottomText>
-            {/* </div> */}
-          </BottomTextWrapper>
-          {/* <BottomTextWrapper>
-            <BottomText>Total Cost</BottomText>
-            <BottomText>$429</BottomText>
-          </BottomTextWrapper> */}
-        </LowerPart>
-      </Wrapper>
-      <Flex>
-        { hasSelectedOrders // is filling orders
-          ? isFillingAndCreating
-            ? (
-              <Button
-                onClick={clickFillAndCreate}
-                label="Fill And Create"
-                wide
-              />
-            )
+            <BottomTextWrapper>
+              <BottomText>{tradeType === 'buy' ? 'Cost' : 'Earn'}</BottomText>
+              <BottomText>{`${quoteAssetAmount.toFixed(4)} WETH`}</BottomText>
+            </BottomTextWrapper>
+            <BottomTextWrapper>
+              <BottomText>
+                <Flex>
+                  <p style={{ paddingRight: '5px' }}>Fee</p>
+                  <Help hint="Why am I paying?">
+                    The fee is charged by 0x.
+                    The higher your gasPirce is, the higher you will be charged for.
+                  </Help>
+                </Flex>
+              </BottomText>
+              <BottomText>{`${feeInETH} ETH` }</BottomText>
+            </BottomTextWrapper>
+          </LowerPart>
+        </Wrapper>
+        <Flex>
+          { hasSelectedOrders // is filling orders
+            ? isFillingAndCreating
+              ? (
+                <Button
+                  onClick={clickFillAndCreate}
+                  label="Fill And Create"
+                  wide
+                />
+              )
+              : (
+                <Button
+                  onClick={clickFillOrders}
+                  label="Fill Orders"
+                  wide
+                />
+              )
             : (
               <Button
-                onClick={clickFillOrders}
-                label="Fill Orders"
+                onClick={clickCreateOrder}
+                label={tradeType === 'buy' ? 'Create Buy Order' : 'Create Sell Order'}
                 wide
               />
-            )
-          : (
-            <Button
-              onClick={clickCreateOrder}
-              label={tradeType === 'buy' ? 'Create Buy Order' : 'Create Sell Order'}
-              wide
-            />
-          )}
+            )}
 
-      </Flex>
-    </BuyAndSellBlock>
+        </Flex>
+      </BuyAndSellBlock>
+      <WrapETHPanel user={user} opened={panelOpend} setOpen={setPanelOpended} wethBalance={quoteAssetBalance} />
+    </>
   );
 }
 
@@ -412,7 +405,7 @@ BuyAndSell.propTypes = {
   collateral: TokenType.isRequired,
 
 
-  ethBalance: PropTypes.instanceOf(BigNumber).isRequired,
+  // ethBalance: PropTypes.instanceOf(BigNumber).isRequired,
   baseAssetBalance: PropTypes.instanceOf(BigNumber).isRequired,
   quoteAssetBalance: PropTypes.instanceOf(BigNumber).isRequired,
 

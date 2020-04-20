@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 import { DataView, Timer } from '@aragon/ui';
 
 import { toTokenUnitsBN } from '../../utils/number';
-import { order as OrderType, option as OptionType } from '../types';
+import { order as OrderType, option as OptionType, token as TokenType } from '../types';
 import { AskText, BidText } from './styled';
 import * as zeroXUtil from '../../utils/0x';
 
@@ -103,11 +103,7 @@ OrderBook.propTypes = {
   asks: PropTypes.arrayOf(OrderType).isRequired,
   bids: PropTypes.arrayOf(OrderType).isRequired,
   option: OptionType.isRequired,
-  quoteAsset: PropTypes.shape({
-    decimals: PropTypes.number.isRequired,
-    addr: PropTypes.string.isRequired,
-    symbol: PropTypes.string.isRequired,
-  }).isRequired,
+  quoteAsset: TokenType.isRequired,
   tradeType: PropTypes.string.isRequired,
   selectedOrders: PropTypes.arrayOf(OrderType).isRequired,
   setTradeType: PropTypes.func.isRequired,

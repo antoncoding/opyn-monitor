@@ -7,9 +7,9 @@ import BigNumber from 'bignumber.js';
 import OptionBoard from './OptionBoard';
 import TabBoard from './TabBoard';
 import BuyAndSell from './BuyAndSell';
-import WrapETHModal from './WrapETHModal';
+// import WrapETHModal from './WrapETHModal';
 
-import { getTokenBalance, getBalance } from '../../utils/infura';
+import { getTokenBalance } from '../../utils/infura';
 import { getOrderBook, isValid } from '../../utils/0x';
 import { getVault } from '../../utils/graph';
 import { approve } from '../../utils/web3';
@@ -32,7 +32,7 @@ function OptionTrading({ user, theme }) {
   const [selectedOrders, setSelectedOrders] = useState([]);
 
   // user balance
-  const [userETHBalance, setUserETHBalance] = useState(BigNumber(0)); // in eth
+  // const [userETHBalance, setUserETHBalance] = useState(BigNumber(0)); // in eth
   const [baseAssetBalance, setBaseAssetBalance] = useState(BigNumber(0));
   const [quoteAssetBalance, setQuoteAssetBalance] = useState(BigNumber(0));
 
@@ -84,17 +84,13 @@ function OptionTrading({ user, theme }) {
     let isCancelled = false;
     const updateQuoteBalance = async () => {
       if (user === '') return;
-      const [quoteBalance, ethBalance] = await Promise.all([
-        getTokenBalance(quoteAsset.addr, user),
-        getBalance(user),
-      ]);
+      const quoteBalance = await getTokenBalance(quoteAsset.addr, user);
       if (!isCancelled) {
-        setUserETHBalance(new BigNumber(ethBalance));
         setQuoteAssetBalance(new BigNumber(quoteBalance));
       }
     };
     updateQuoteBalance();
-    const idQuoteAssetBalance = setInterval(updateQuoteBalance, 10000);
+    const idQuoteAssetBalance = setInterval(updateQuoteBalance, 20000);
     return () => {
       isCancelled = true;
       clearInterval(idQuoteAssetBalance);
@@ -105,11 +101,7 @@ function OptionTrading({ user, theme }) {
     <WholeScreen>
       <FlexWrapper>
         <LeftPart>
-          {/* Buy And Sell */}
-          <Header primary={
-            <WrapETHModal wethBalance={quoteAssetBalance} ethBalance={userETHBalance} />
-          }
-          />
+          <Header />
           <Header
             primary={(
               <Button
@@ -134,7 +126,6 @@ function OptionTrading({ user, theme }) {
             quoteAsset={quoteAsset}
             collateral={baseAsset.collateral}
 
-            ethBalance={userETHBalance}
             baseAssetBalance={baseAssetBalance}
             quoteAssetBalance={quoteAssetBalance}
 
