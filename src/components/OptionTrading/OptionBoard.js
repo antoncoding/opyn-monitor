@@ -116,7 +116,6 @@ function OptionBoard({
 
             putBidOnclick = () => {
               setBaseAsset(put);
-              console.log('putDetail.bestBid', putDetail.bestBid);
               setTradeType('sell');
               setSelectedOrders(putDetail.bestBid ? [putDetail.bestBid] : []);
             };

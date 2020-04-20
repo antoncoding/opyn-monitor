@@ -4,7 +4,7 @@ import BigNumber from 'bignumber.js';
 import PropTypes from 'prop-types';
 
 import {
-  SidePanel, Button, TextInput, Split,
+  SidePanel, Button, TextInput,
 } from '@aragon/ui';
 import { BalanceBlock, SectionTitle, Comment } from '../common';
 
@@ -59,6 +59,7 @@ function WrapETHModal({
 
   return (
     <SidePanel
+      title=""
       opened={opened}
       onClose={() => { setOpen(false); }}
     >
@@ -69,34 +70,39 @@ function WrapETHModal({
       </div>
 
       {/* </div> */}
-      <Split
-        primary={<TextInput wide type="number" value={wrapAmount.toNumber()} onChange={onChangeWrapAmount} />}
-        secondary={(
+      <div style={{ display: 'flex' }}>
+        <div style={{ width: '60%' }}>
+          <TextInput wide type="number" value={wrapAmount.toNumber()} onChange={onChangeWrapAmount} />
+        </div>
+        <div style={{ width: '30%' }}>
           <Button
             onClick={() => {
               wrapETH(toBaseUnitBN(wrapAmount, 18).toString());
             }}
             label="Wrap"
           />
-          )}
-      />
+        </div>
+      </div>
+
       <Comment text="After you wrap your ETH to WETH, you can unwrap them back to ETH anytime." />
       <br />
       <SectionTitle title="Unwrap WETH" />
       <div style={{ padding: '2%' }}>
         <BalanceBlock asset="Your WETH Balance" balance={toTokenUnitsBN(wethBalance, 18).toNumber()} />
       </div>
-      <Split
-        primary={<TextInput wide type="number" value={unWrapAmount.toNumber()} onChange={onChangeUnWrapAmount} />}
-        secondary={(
+      <div style={{ display: 'flex' }}>
+        <div style={{ width: '60%' }}>
+          <TextInput wide type="number" value={unWrapAmount.toNumber()} onChange={onChangeUnWrapAmount} />
+        </div>
+        <div style={{ width: '30%' }}>
           <Button
             onClick={() => {
               unwrapETH(toBaseUnitBN(unWrapAmount, 18).toString());
             }}
             label="Unwrap"
           />
-          )}
-      />
+        </div>
+      </div>
     </SidePanel>
   );
 }
