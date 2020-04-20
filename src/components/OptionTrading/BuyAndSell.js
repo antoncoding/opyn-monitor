@@ -348,11 +348,9 @@ function BuyAndSell({
               value={rate.toNumber()}
             />
 
-            <Label>Valid Until</Label>
+            <Label>Valid For</Label>
             <GroupButtonWrapper>
-              {['1 Hour', '1 Day', '1 week'].map((x,i)=>
-                <GroupButton theme={theme} onClick={()=> setActiveButton(i)} key={x} index={i} isActive={activeButton===i}>{x}</GroupButton>
-              )}
+              {['1 Hour', '1 Day', '1 week'].map((x, i) => <GroupButton theme={theme} onClick={() => setActiveButton(i)} key={x} index={i} isActive={activeButton === i}>{x}</GroupButton>)}
             </GroupButtonWrapper>
 
             <BottomTextWrapper>
@@ -525,7 +523,7 @@ const BottomTextWrapper = styled(FlexWrapper)`
 const GroupButtonWrapper = styled.div`
   display: flex;
   justify-content: center;
-  color: ${props => props.theme.content};
+  color: ${(props) => props.theme.content};
   white-space: nowrap;
   box-shadow: 0 1px 3px rgba(0,0,0,0.1);
   align-items: center;
@@ -534,17 +532,17 @@ const GroupButtonWrapper = styled.div`
 const GroupButton = styled.div`
   height: 40px;
   width: 33%;
-  border: 1px solid ${props => props.theme.border};
-  border-width: ${props => props.index === 1 ? '1px 0px' : '1px'};
+  border: 1px solid ${(props) => props.theme.border};
+  border-width: ${(props) => (props.index === 1 ? '1px 0px' : '1px')};
   display: flex;
   justify-content: center;
   align-items: center;
   cursor: pointer;
-  border-top-left-radius: ${props => props.index === 0 ? '5px' : '0px'};
-  border-bottom-left-radius: ${props => props.index === 0 ? '5px' : '0px'};
-  border-top-right-radius: ${props => props.index === 2 ? '5px' : '0px'};
-  border-bottom-right-radius: ${props => props.index === 2 ? '5px' : '0px'};
-  background: ${props => props.isActive ? props.theme.surfacePressed : props.theme.surface} ;
+  border-top-left-radius: ${(props) => (props.index === 0 ? '5px' : '0px')};
+  border-bottom-left-radius: ${(props) => (props.index === 0 ? '5px' : '0px')};
+  border-top-right-radius: ${(props) => (props.index === 2 ? '5px' : '0px')};
+  border-bottom-right-radius: ${(props) => (props.index === 2 ? '5px' : '0px')};
+  background: ${(props) => (props.isActive ? props.theme.surfacePressed : props.theme.surface)} ;
   :active {
     transform: translateY(1px)
   }
