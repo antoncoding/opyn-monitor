@@ -31,7 +31,7 @@ function ManageVault({ user }) {
   const option = allOptions.find((o) => o.addr === token);
   const {
     decimals, symbol, oracle, strike, strikePrice, minRatio,
-    collateral, expiry, underlying, collateralDecimals,
+    collateral, expiry, underlying,
   } = option;
 
   const [isLoading, setIsLoading] = useState(true);
@@ -51,9 +51,8 @@ function ManageVault({ user }) {
   const [noVault, setNoVault] = useState(true);
   const [newRatio, setNewRatio] = useState(ratio);
 
-  const collateralIsETH = collateral === ETH_ADDRESS;
-
-  const vaultUsesCollateral = collateral !== strike;
+  const collateralIsETH = collateral.addr === ETH_ADDRESS;
+  const vaultUsesCollateral = collateral.addr !== strike.addr;
 
   useMemo(() => {
     let isCancelled = false;
@@ -77,18 +76,18 @@ function ManageVault({ user }) {
       if (collateralIsETH) {
         collateralBalance = new BigNumber(await getBalance(user));
       } else {
-        const userColltBalance = await getTokenBalance(collateral, user);
-        collateralBalance = toTokenUnitsBN(userColltBalance, collateralDecimals);
+        const userColltBalance = await getTokenBalance(collateral.addr, user);
+        collateralBalance = toTokenUnitsBN(userColltBalance, collateral.decimals);
       }
 
       const ownerTokenBalanceBN = toTokenUnitsBN(_ownerTokenBalance, decimals);
       const userTokenBalanceBN = toTokenUnitsBN(_userTokenBalance, decimals);
 
       const strikeValInCollt = await calculateStrikeValueInCollateral(
-        collateral,
-        strike,
+        collateral.addr,
+        strike.addr,
         oracle,
-        collateralDecimals,
+        collateral.decimals,
       );
       const currentRatio = calculateRatio(
         vaultToManage.collateral,
@@ -108,7 +107,7 @@ function ManageVault({ user }) {
       }
     }
     updateInfo();
-    const id = setInterval(updateInfo, 15000);
+    const id = setInterval(updateInfo, 60000);
 
     return () => {
       isCancelled = true;
@@ -117,7 +116,6 @@ function ManageVault({ user }) {
   }, [
     collateral,
     collateralIsETH,
-    collateralDecimals,
     decimals,
     oracle,
     owner,
@@ -159,7 +157,7 @@ function ManageVault({ user }) {
             newRatio={newRatio}
             useCollateral={vaultUsesCollateral}
             collateralIsETH={collateralIsETH}
-            collateralDecimals={collateralDecimals}
+            collateralDecimals={collateral.decimals}
           />
 
           <Tabs
@@ -173,8 +171,7 @@ function ManageVault({ user }) {
               isOwner={isOwner}
               vault={vault}
               collateralAssetBalance={userCollateralAssetBalance}
-              collateralAsset={option.collateral}
-              collateralDecimals={collateralDecimals}
+              collateral={collateral}
               token={token}
               owner={owner}
               strikeValue={strikeValueInCollateral}
@@ -224,7 +221,7 @@ function ManageVault({ user }) {
               owner={owner}
               token={token}
               tokenDecimals={decimals}
-              collateralDecimals={collateralDecimals}
+              collateralDecimals={collateral.decimals}
             />
           ) : (
             <></>
@@ -234,7 +231,7 @@ function ManageVault({ user }) {
             <UnderlyingManagement
               owner={owner}
               token={token}
-              underlying={underlying}
+              underlyingDecimals={underlying.decimals}
               underlyingAmount={vault.underlying}
             />
           ) : <> </>}

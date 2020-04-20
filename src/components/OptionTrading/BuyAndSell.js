@@ -10,9 +10,17 @@ import {
 } from '../../utils/0x';
 import { signOrder, fillOrders } from '../../utils/web3';
 import { toTokenUnitsBN, toBaseUnitBN } from '../../utils/number';
-import { vault as VaultType, order as OrderType } from '../types';
+import { vault as VaultType, order as OrderType, token as TokenType } from '../types';
 // import { eth_calls } from '../../constants/options';
 
+/**
+ *
+ * @param {{
+ * baseAsset: {addr:string, decimals: number, symbol:string}
+ * quoteAsset: {addr:string, decimals: number, symbol:string}
+ * collateral: {addr:string, decimals: number, symbol:string}
+ * }} param0
+ */
 function BuyAndSell({
   user,
   tradeType, // ask || bid
@@ -23,18 +31,19 @@ function BuyAndSell({
   vault,
   baseAsset,
   quoteAsset,
+  collateral,
 
-  baseAssetSymbol, // "oETH"
-  quoteAssetSymbol, // "WETH"
-  collateralSymbol, // // USDC
+  // baseAssetSymbol, // "oETH"
+  // quoteAssetSymbol, // "WETH"
+  // collateralSymbol, // // USDC
 
   ethBalance, // in ETH (0.5)
   baseAssetBalance,
   quoteAssetBalance,
 
-  baseAssetDecimals,
-  quoteAssetDecimals,
-  collateralDecimals,
+  // baseAssetDecimals,
+  // quoteAssetDecimals,
+  // collateralDecimals,
 }) {
   const theme = useTheme();
   const toast = useToast();
@@ -100,12 +109,12 @@ function BuyAndSell({
     // Step 1. set oToken and WETH amount to order total
     if (tradeType === 'buy') {
       // ask: takerAsset: weth, makerAsset: oToken
-      baseMaxFillingAmount = toTokenUnitsBN(selectedFillables.totalFillableMakerAmount, baseAssetDecimals);
-      quoteMaxFillingAmount = toTokenUnitsBN(selectedFillables.totalFillableTakerAmount, quoteAssetDecimals);
+      baseMaxFillingAmount = toTokenUnitsBN(selectedFillables.totalFillableMakerAmount, baseAsset.decimals);
+      quoteMaxFillingAmount = toTokenUnitsBN(selectedFillables.totalFillableTakerAmount, quoteAsset.decimals);
     } else {
       // comming bids: takerAsset: oToken, makerAsset: weth
-      baseMaxFillingAmount = toTokenUnitsBN(selectedFillables.totalFillableTakerAmount, baseAssetDecimals);
-      quoteMaxFillingAmount = toTokenUnitsBN(selectedFillables.totalFillableMakerAmount, quoteAssetDecimals);
+      baseMaxFillingAmount = toTokenUnitsBN(selectedFillables.totalFillableTakerAmount, baseAsset.decimals);
+      quoteMaxFillingAmount = toTokenUnitsBN(selectedFillables.totalFillableMakerAmount, quoteAsset.decimals);
     }
     setBaseAmountToFill(baseMaxFillingAmount);
     setBaseAmountToCreate(new BigNumber(0));
@@ -116,7 +125,7 @@ function BuyAndSell({
     // Change Price according to total base / quote
     const aggregateRate = quoteMaxFillingAmount.div(baseMaxFillingAmount);
     setRate(aggregateRate);
-  }, [selectedOrders, baseAssetDecimals, tradeType, quoteAssetDecimals]);
+  }, [selectedOrders, baseAsset, tradeType, quoteAsset]);
 
 
   const onChangeBaseAmount = (amount) => {
@@ -136,8 +145,8 @@ function BuyAndSell({
     // If is filling Mode
     if (hasSelectedOrders) {
       const totalOtokenInSelectedOrders = tradeType === 'buy'
-        ? toTokenUnitsBN(selectedOrderFillables.totalFillableMakerAmount, baseAssetDecimals) // oToken is the maker asset of ask orders
-        : toTokenUnitsBN(selectedOrderFillables.totalFillableTakerAmount, baseAssetDecimals);
+        ? toTokenUnitsBN(selectedOrderFillables.totalFillableMakerAmount, baseAsset.decimals) // oToken is the maker asset of ask orders
+        : toTokenUnitsBN(selectedOrderFillables.totalFillableTakerAmount, baseAsset.decimals);
 
       // user is filling lower than all orders combined
       if (totalOtokenInSelectedOrders.gte(amountBN)) {
@@ -156,7 +165,7 @@ function BuyAndSell({
         // }
 
         // 2. Update Rates
-        const baseAmountTotal = toBaseUnitBN(amountBN, baseAssetDecimals);
+        const baseAmountTotal = toBaseUnitBN(amountBN, baseAsset.decimals);
 
         let quoteAmountTotal;
         if (tradeType === 'buy') {
@@ -169,7 +178,7 @@ function BuyAndSell({
           setFillingTakerAmounts(fillingAmounts.takerAmountArray); // only need to record taker amount array
         }
 
-        const quoteAmountTk = toTokenUnitsBN(quoteAmountTotal, quoteAssetDecimals);
+        const quoteAmountTk = toTokenUnitsBN(quoteAmountTotal, quoteAsset.decimals);
         setRate(quoteAmountTk.div(amountBN));
         setQuoteAssetAmount(quoteAmountTk);
       } else {
@@ -219,19 +228,19 @@ function BuyAndSell({
     if (tradeType === 'buy') {
       order = createOrder(
         user,
-        quoteAsset,
-        baseAsset,
-        toBaseUnitBN(baseAmountToCreate.times(rate), quoteAssetDecimals),
-        toBaseUnitBN(baseAmountToCreate, baseAssetDecimals),
+        quoteAsset.addr,
+        baseAsset.addr,
+        toBaseUnitBN(baseAmountToCreate.times(rate), quoteAsset.decimals),
+        toBaseUnitBN(baseAmountToCreate, baseAsset.decimals),
         expiry,
       );
     } else {
       order = createOrder(
         user,
-        baseAsset,
-        quoteAsset,
-        toBaseUnitBN(baseAmountToCreate, baseAssetDecimals),
-        toBaseUnitBN(baseAmountToCreate.times(rate), quoteAssetDecimals),
+        baseAsset.addr,
+        quoteAsset.addr,
+        toBaseUnitBN(baseAmountToCreate, baseAsset.decimals),
+        toBaseUnitBN(baseAmountToCreate.times(rate), quoteAsset.decimals),
         expiry,
       );
     }
@@ -266,8 +275,8 @@ function BuyAndSell({
       <Wrapper>
         <TopPart theme={theme}>
           <FlexWrapper>
-            <div>{baseAssetSymbol}</div>
-            <TopPartText>{toTokenUnitsBN(baseAssetBalance, baseAssetDecimals).toFormat(4)}</TopPartText>
+            <div>{baseAsset.symbol}</div>
+            <TopPartText>{toTokenUnitsBN(baseAssetBalance, baseAsset.decimals).toFormat(4)}</TopPartText>
           </FlexWrapper>
           <FlexWrapper>
             <div>ETH</div>
@@ -276,7 +285,7 @@ function BuyAndSell({
           <FlexWrapper>
             <div>
               <Flex>
-                <p style={{ paddingRight: '5px' }}>{quoteAssetSymbol}</p>
+                <p style={{ paddingRight: '5px' }}>{quoteAsset.symbol}</p>
                 <Help hint="What is WETH?">
                   WETH is Wraped ETH.
                   <br />
@@ -284,18 +293,18 @@ function BuyAndSell({
                 </Help>
               </Flex>
             </div>
-            <TopPartText>{toTokenUnitsBN(quoteAssetBalance, quoteAssetDecimals).toFormat(4)}</TopPartText>
+            <TopPartText>{toTokenUnitsBN(quoteAssetBalance, quoteAsset.decimals).toFormat(4)}</TopPartText>
           </FlexWrapper>
         </TopPart>
         <FlexWrapper>
           <div>
             Collateral (
-            {collateralSymbol}
+            {collateral.symbol}
             )
           </div>
           <TopPartText>
             { vault
-              ? toTokenUnitsBN(vault.collateral, collateralDecimals).toFormat(4)
+              ? toTokenUnitsBN(vault.collateral, collateral.decimals).toFormat(4)
               : Number(0).toFixed(4)}
           </TopPartText>
         </FlexWrapper>
@@ -384,7 +393,7 @@ function BuyAndSell({
           : (
             <Button
               onClick={clickCreateOrder}
-              label={tradeType === 'buy' ? 'Buy' : 'Sell'}
+              label={tradeType === 'buy' ? 'Create Buy Order' : 'Create Sell Order'}
               wide
             />
           )}
@@ -396,20 +405,16 @@ function BuyAndSell({
 
 BuyAndSell.propTypes = {
   user: PropTypes.string.isRequired,
-  baseAsset: PropTypes.string.isRequired,
-  quoteAsset: PropTypes.string.isRequired,
-  // theme: PropTypes.string.isRequired,
-  baseAssetSymbol: PropTypes.string.isRequired,
-  quoteAssetSymbol: PropTypes.string.isRequired,
-  collateralSymbol: PropTypes.string.isRequired,
+
+  // three types of tokens
+  quoteAsset: TokenType.isRequired,
+  baseAsset: TokenType.isRequired,
+  collateral: TokenType.isRequired,
+
 
   ethBalance: PropTypes.instanceOf(BigNumber).isRequired,
   baseAssetBalance: PropTypes.instanceOf(BigNumber).isRequired,
   quoteAssetBalance: PropTypes.instanceOf(BigNumber).isRequired,
-
-  baseAssetDecimals: PropTypes.number.isRequired,
-  quoteAssetDecimals: PropTypes.number.isRequired,
-  collateralDecimals: PropTypes.number.isRequired,
 
   vault: VaultType,
 

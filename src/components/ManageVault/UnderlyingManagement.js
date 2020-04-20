@@ -4,27 +4,21 @@ import {
   Box, DataView, Button, TransactionBadge,
 } from '@aragon/ui';
 import { BalanceBlock } from '../common';
-import { getDecimals } from '../../utils/infura';
 import { removeUnderlying } from '../../utils/web3';
 import { getRemoveUnderlyingHistory } from '../../utils/graph';
 import { formatDigits, toTokenUnitsBN, timeSince } from '../../utils/number';
 
 function RemoveUnderlying({
-  owner, token, underlying, underlyingAmount,
+  owner, token, underlyingDecimals, underlyingAmount,
 }) {
   const [isLoading, setIsLoading] = useState(true);
   const [entries, setEntries] = useState([]);
-  const [underlyingDecimals, setUnderlyingDecimals] = useState(18);
 
   useMemo(async () => {
-    const [actions, uDecimals] = await Promise.all([
-      getRemoveUnderlyingHistory(owner, token),
-      getDecimals(underlying),
-    ]);
+    const actions = await getRemoveUnderlyingHistory(owner, token);
     setEntries(actions);
     setIsLoading(false);
-    setUnderlyingDecimals(uDecimals);
-  }, [owner, token, underlying]);
+  }, [owner, token]);
 
   return (
     <>
@@ -70,7 +64,7 @@ function RemoveUnderlying({
 RemoveUnderlying.propTypes = {
   owner: PropTypes.string.isRequired,
   token: PropTypes.string.isRequired,
-  underlying: PropTypes.string.isRequired,
+  underlyingDecimals: PropTypes.number.isRequired,
   underlyingAmount: PropTypes.string.isRequired,
 };
 

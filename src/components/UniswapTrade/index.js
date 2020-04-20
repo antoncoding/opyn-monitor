@@ -11,7 +11,7 @@ import { toTokenUnitsBN } from '../../utils/number';
 
 import { allOptions } from '../../constants/options';
 
-import DashBoard from './Header';
+import TradePageHeader from './Header';
 import OptionExchange from './OptionExchange';
 import AddLiquidity from './AddLiquidity';
 import RemoveLiquidity from './RemoveLiquidity';
@@ -97,7 +97,7 @@ function UniswapPool({ user }) {
     <>
       <Header primary="Exchange" />
 
-      <DashBoard
+      <TradePageHeader
         user={user}
         symbol={symbol}
         poolETHBalance={poolETHBalance}

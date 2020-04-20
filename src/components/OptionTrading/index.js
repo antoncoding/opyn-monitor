@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useMemo } from 'react';
+import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import { Header, Button } from '@aragon/ui';
 
@@ -9,7 +9,7 @@ import TabBoard from './TabBoard';
 import BuyAndSell from './BuyAndSell';
 import WrapETHModal from './WrapETHModal';
 
-import { getTokenBalance, getDecimals, getBalance } from '../../utils/infura';
+import { getTokenBalance, getBalance } from '../../utils/infura';
 import { getOrderBook, isValid } from '../../utils/0x';
 import { getVault } from '../../utils/graph';
 import { approve } from '../../utils/web3';
@@ -36,8 +36,6 @@ function OptionTrading({ user, theme }) {
   const [baseAssetBalance, setBaseAssetBalance] = useState(BigNumber(0));
   const [quoteAssetBalance, setQuoteAssetBalance] = useState(BigNumber(0));
 
-  // Collateral info for baseAsset
-  const [collateralDecimals, setCollateralDecimals] = useState(18);
   const [vault, setVault] = useState({});
 
 
@@ -71,7 +69,7 @@ function OptionTrading({ user, theme }) {
     updateBaseBalance();
     updateVaultData();
     const idOrderBook = setInterval(updateOrderBook, 1000);
-    const idBaseBalance = setInterval(updateBaseBalance, 10000);
+    const idBaseBalance = setInterval(updateBaseBalance, 30000);
     const idUpdateVault = setInterval(updateVaultData, 10000);
     return () => {
       isCancelled = true;
@@ -103,12 +101,6 @@ function OptionTrading({ user, theme }) {
     };
   }, [user]);
 
-  // get collateral decimals
-  useMemo(async () => {
-    const cltrDecimals = await getDecimals(baseAsset.collateral);
-    setCollateralDecimals(cltrDecimals);
-  }, [baseAsset.collateral]);
-
   return (
     <WholeScreen>
       <FlexWrapper>
@@ -138,19 +130,14 @@ function OptionTrading({ user, theme }) {
           />
           <BuyAndSell
             user={user}
-            baseAsset={baseAsset.addr}
-            quoteAsset={quoteAsset.addr}
-            baseAssetSymbol={baseAsset.symbol}
-            collateralSymbol={baseAsset.collateralSymbol}
-            quoteAssetSymbol={quoteAsset.symbol}
+            baseAsset={baseAsset}
+            quoteAsset={quoteAsset}
+            collateral={baseAsset.collateral}
 
             ethBalance={userETHBalance}
             baseAssetBalance={baseAssetBalance}
             quoteAssetBalance={quoteAssetBalance}
 
-            baseAssetDecimals={baseAsset.decimals}
-            quoteAssetDecimals={quoteAsset.decimals}
-            collateralDecimals={collateralDecimals}
             vault={vault}
             theme={theme}
 

@@ -30,20 +30,21 @@ import { KETH, DAI, USDC } from '../../constants/contracts';
 
 /**
  *
- * @param {{ option:{
+ * @param {{
+ * option:{
  * decimals:number,
- * exchange:string, collateral:string, symbol:string, collateralDecimals:Number}
- * oTokensIssued: string
- * , exchange:string}} param0
+ * exchange:string, collateral:{ addr:string, decimals: number, symbol:string}, symbol:string }
+ * oTokensIssued: string,
+ * collateralAmount: string,
+ * exchange:string}} param0
  */
 function VaultModal({
   option,
   useCollateral,
-  oToken,
   owner,
   collateral, // amount of collateral of this vault
-  isSafe,
   oTokensIssued,
+  isSafe,
   ratio,
   collateralIsETH,
 }) {
@@ -58,7 +59,8 @@ function VaultModal({
     let isCancelled = false;
     async function getData() {
       if (!opened) return;
-      const maxLiquidatable = await getMaxLiquidatable(oToken, owner);
+      if (!useCollateral) return;
+      const maxLiquidatable = await getMaxLiquidatable(option.addr, owner);
       if (!isCancelled) {
         setLiquidateAmt(toTokenUnitsBN(maxLiquidatable, option.decimals).toNumber());
       }
@@ -68,7 +70,7 @@ function VaultModal({
     return () => {
       isCancelled = true;
     };
-  }, [option.decimals, oToken, opened, owner]);
+  }, [option, opened, owner, useCollateral]);
 
   return (
     <>
@@ -84,7 +86,7 @@ function VaultModal({
           entriesPerPage={1}
           renderEntry={(vault) => [
             <IdentityBadge entity={vault.owner} shorten />,
-            formatDigits(toTokenUnitsBN(vault.collateral, option.collateralDecimals), 5),
+            formatDigits(toTokenUnitsBN(vault.collateral, option.collateral.decimals), 5),
             formatDigits(toTokenUnitsBN(vault.oTokensIssued, option.decimals), 5),
             formatDigits(vault.ratio, 4),
             RatioTag({ isSafe: vault.isSafe, ratio, useCollateral }),
@@ -112,13 +114,13 @@ function VaultModal({
                 wide
                 onClick={() => {
                   if (collateralIsETH) {
-                    addETHCollateral(oToken, owner, addValue);
+                    addETHCollateral(option.addr, owner, addValue);
                   } else {
                     addERC20Collateral(
-                      option.collateral,
-                      oToken,
+                      option.collateral.addr,
+                      option.addr,
                       owner,
-                      toBaseUnitBN(addValue, option.collateralDecimals).toString(),
+                      toBaseUnitBN(addValue, option.collateral.decimals).toString(),
                     );
                   }
                 }}
@@ -150,7 +152,7 @@ function VaultModal({
                     disabled={isSafe}
                     label="Liquidate"
                     onClick={() => {
-                      liquidate(oToken, owner, toBaseUnitBN(liquidateAmt, option.decimals)).catch(
+                      liquidate(option.addr, owner, toBaseUnitBN(liquidateAmt, option.decimals)).catch(
                         (error) => {
                           toast(error.toString());
                         },
@@ -177,7 +179,7 @@ function VaultModal({
                 label="DAI"
                 disabled={isSafe}
                 onClick={() => {
-                  kollateralLiquidate(oToken, option.exchange, owner, DAI).catch((error) => {
+                  kollateralLiquidate(option.addr, option.exchange, owner, DAI).catch((error) => {
                     toast(error.toString());
                   });
                 }}
@@ -189,7 +191,7 @@ function VaultModal({
                 label="USDC"
                 disabled={isSafe}
                 onClick={() => {
-                  kollateralLiquidate(oToken, option.exchange, owner, USDC).catch((error) => {
+                  kollateralLiquidate(option.addr, option.exchange, owner, USDC).catch((error) => {
                     toast(error.toString());
                   });
                 }}
@@ -200,7 +202,7 @@ function VaultModal({
                 label="ETH"
                 disabled={isSafe}
                 onClick={() => {
-                  kollateralLiquidate(oToken, option.exchange, owner, KETH).catch((error) => {
+                  kollateralLiquidate(option.addr, option.exchange, owner, KETH).catch((error) => {
                     toast(error.toString());
                   });
                 }}
@@ -219,7 +221,6 @@ function VaultModal({
 VaultModal.propTypes = {
   option: MyPTypes.option.isRequired,
   useCollateral: PropTypes.bool.isRequired,
-  oToken: PropTypes.string.isRequired,
   owner: PropTypes.string.isRequired,
   collateral: PropTypes.string.isRequired,
   isSafe: PropTypes.bool.isRequired,

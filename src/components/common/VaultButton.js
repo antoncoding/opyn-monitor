@@ -32,7 +32,7 @@ function OpenVaultButton({ oToken, user, goToMangePage = true }) {
   return (
     <Button
       onClick={() => openAndGoToVault(oToken)}
-      label="Open Vault"
+      label="Open"
     />
   );
 }
