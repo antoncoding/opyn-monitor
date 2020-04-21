@@ -583,8 +583,8 @@ const GroupButton = styled.div`
   border-bottom-left-radius: ${(props) => (props.index === 0 ? '5px' : '0px')};
   border-top-right-radius: ${(props) => (props.index === 2 ? '5px' : '0px')};
   border-bottom-right-radius: ${(props) => (props.index === 2 ? '5px' : '0px')};
-  background: ${(props) => (props.disabled ? props.theme.surfacePressed
-    : props.isActive ? props.theme.surfacePressed : props.theme.surface)} ;
+  background: ${(props) => (props.disabled ? props.theme.surface
+    : props.isActive ? props.theme.surfaceHighlight : props.theme.surface)} ;
   :active {
     transform: translateY(1px)
   }
