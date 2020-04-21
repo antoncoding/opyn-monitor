@@ -36,16 +36,13 @@ function Footer({ theme }) {
         Kollateral
       </Link>
       {'. '}
-      Hosted on GitHub:
+      Hosted on
+      {' '}
+      {' '}
+      <Link external href="https://github.com/antoncoding/opyn-liquidator">
+        GitHub
+      </Link>
       {/* </div> */}
-      <iframe
-        title="star"
-        src="https://ghbtns.com/github-btn.html?user=antoncoding&repo=opyn-liquidator&type=star&count=true"
-        frameBorder="0"
-        scrolling="0"
-        width="160px"
-        height="18px"
-      />
     </div>
   );
 }
