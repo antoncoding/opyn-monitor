@@ -149,7 +149,7 @@ function OptionBoard({
             <Cell onClick={callOnclick} text={lastCallPrice} type="normal" />,
             <Cell onClick={callBidOnclick} text={callBid} type="bid" />,
             <Cell onClick={callAskOnclick} text={callAsk} type="ask" />,
-            <Cell onClick={() => {}} text={strikePrice} type="normal" fontSize={20} />,
+            <div style={{ fontSize: 20, width: '60px', padding: '10px' }}>{strikePrice}</div>,
             <Cell onClick={putOnclick} text={lastPutPrice} type="normal" />,
             <Cell onClick={putBidOnclick} text={putBid} type="bid" />,
             <Cell onClick={putAskOnclick} text={putAsk} type="ask" />,
@@ -224,7 +224,7 @@ function groupByDate(puts, calls, putStats, callStats) {
 }
 
 function Cell({
-  onClick, text, type, fontSize = 20,
+  onClick, text, type,
 }) {
   return (
     <LinkBase onClick={onClick}>
@@ -242,7 +242,7 @@ function Cell({
             {' '}
           </AskText>
         ) : (
-          <div style={{ fontSize }}>
+          <div>
             {' '}
             {text}
             {' '}
@@ -257,9 +257,4 @@ Cell.propTypes = {
   onClick: PropTypes.func.isRequired,
   text: PropTypes.string.isRequired,
   type: PropTypes.string.isRequired,
-  fontSize: PropTypes.number,
-};
-
-Cell.defaultProps = {
-  fontSize: 20,
 };
