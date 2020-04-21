@@ -39,6 +39,7 @@ function MyOrders({
     <>
       <DataView
         entriesPerPage={4}
+        statusEmpty={<div>No Open Orders</div>}
         page={myOrdersPage}
         onPageChange={setMyOrdersPage}
         onSelectEntries={setSelectedOrders}

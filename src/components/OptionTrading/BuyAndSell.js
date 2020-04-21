@@ -382,6 +382,7 @@ function BuyAndSell({
             <GroupButtonWrapper>
               {['1 Hour', '1 Day', '1 Week'].map((x, i) => (
                 <GroupButton
+                  disabled={hasSelectedOrders && !isFillingAndCreating}
                   theme={theme}
                   onClick={() => setActiveButton(i)}
                   key={x}
@@ -582,7 +583,8 @@ const GroupButton = styled.div`
   border-bottom-left-radius: ${(props) => (props.index === 0 ? '5px' : '0px')};
   border-top-right-radius: ${(props) => (props.index === 2 ? '5px' : '0px')};
   border-bottom-right-radius: ${(props) => (props.index === 2 ? '5px' : '0px')};
-  background: ${(props) => (props.isActive ? props.theme.surfacePressed : props.theme.surface)} ;
+  background: ${(props) => (props.disabled ? props.theme.surfacePressed
+    : props.isActive ? props.theme.surfacePressed : props.theme.surface)} ;
   :active {
     transform: translateY(1px)
   }

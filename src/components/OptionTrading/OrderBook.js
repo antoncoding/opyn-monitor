@@ -57,6 +57,7 @@ function OrderBook({
       <div style={{ display: 'flex' }}>
         <div style={{ width: '50%' }}>
           <DataView
+            statusEmpty={<div>No Sell Orders</div>}
             entriesPerPage={4}
             page={askPage}
             onPageChange={setAskPage}
@@ -76,6 +77,7 @@ function OrderBook({
         </div>
         <div style={{ width: '50%' }}>
           <DataView
+            statusEmpty={<div>No Buy Orders</div>}
             entriesPerPage={4}
             page={bidPage}
             onPageChange={setBidPage}
