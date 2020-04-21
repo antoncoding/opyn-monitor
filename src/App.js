@@ -51,9 +51,9 @@ function App() {
             <ManageVault user={user} />
           </Route>
           {/* Trading */}
-          <Route path="/trades/eth/">
+          <Route path="/trade/eth-options/">
             <OptionTrading
-              user="0x47DBb61b56C37Dd47f4f208aD693062b78e4c958"
+              user={user}
               theme={theme}
             />
           </Route>

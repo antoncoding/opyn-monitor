@@ -228,11 +228,15 @@ function BuyAndSell({
   };
 
   const clickCreateOrder = async () => {
+    if (user === '') {
+      toast('Please connect wallet first');
+      return;
+    }
     let order;
     if (tradeType === 'buy') {
       const quoteAssetInBaseUnit = toBaseUnitBN(baseAmountToCreate.times(rate), quoteAsset.decimals);
-      const wwethAllowance = new BigNumber(await getAllowance(quoteAsset.addr, user, ZeroX_ERC20Proxy));
-      if (wwethAllowance.lt(quoteAssetInBaseUnit)) {
+      const wethAllowance = new BigNumber(await getAllowance(quoteAsset.addr, user, ZeroX_ERC20Proxy));
+      if (wethAllowance.lt(quoteAssetInBaseUnit)) {
         toast(`Please approve 0x to spend your oToken ${quoteAsset.symbol}`);
         await approve(quoteAsset.addr, ZeroX_ERC20Proxy);
       }
@@ -304,9 +308,9 @@ function BuyAndSell({
                     </LinkBase>
                   </p>
                   <Help hint="What is WETH?">
-                    WETH is Wraped ETH, the erc20 version of ETH. You musst have WETH to create and fill orders on 0x.
+                    WETH is Wraped ETH, the erc20 version of ETH. You must have WETH to create and fill orders on 0x.
                     {' '}
-                    <LinkBase onClick={() => setPanelOpended(true)}>Click here and wrap/unwrap now!</LinkBase>
+                    <LinkBase onClick={() => setPanelOpended(true)}>Click here to wrap your ETH now!</LinkBase>
                   </Help>
                 </Flex>
               </div>
@@ -320,7 +324,7 @@ function BuyAndSell({
               )
             </div>
             <TopPartText>
-              { vault
+              { vault.collateral
                 ? toTokenUnitsBN(vault.collateral, collateral.decimals).toFormat(4)
                 : Number(0).toFixed(4)}
             </TopPartText>
@@ -356,6 +360,8 @@ function BuyAndSell({
               type="number"
               onChange={(e) => onChangeBaseAmount(e.target.value)}
               value={baseAmountToCreate.plus(baseAmountToFill).toNumber()}
+              adornmentPosition="end"
+              adornment={baseAsset.symbol}
             />
 
             <Label>Price per token</Label>
@@ -364,9 +370,11 @@ function BuyAndSell({
               type="number"
               onChange={(e) => onChangeRate(e.target.value)}
               value={rate.toNumber()}
+              adornmentPosition="end"
+              adornment={quoteAsset.symbol}
             />
 
-            <Label>Valid For</Label>
+            <Label>Expires After</Label>
             <GroupButtonWrapper>
               {['1 Hour', '1 Day', '1 week'].map((x, i) => (
                 <GroupButton
@@ -382,7 +390,7 @@ function BuyAndSell({
             </GroupButtonWrapper>
 
             <BottomTextWrapper>
-              <BottomText>{tradeType === 'buy' ? 'Cost' : 'Earn'}</BottomText>
+              <BottomText>{tradeType === 'buy' ? 'Cost' : 'Premium'}</BottomText>
               <BottomText>{`${quoteAssetAmount.toFixed(4)} WETH`}</BottomText>
             </BottomTextWrapper>
             <BottomTextWrapper>

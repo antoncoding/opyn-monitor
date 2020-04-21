@@ -83,14 +83,16 @@ export async function getBasePairAskAndBids(options) {
     let bestAskPrice = 0;
     let bestBidPrice = 0;
     let bestAsk; let bestBid;
-    if (asks.records.length > 0) {
-      const validAsks = asks.records.filter((record) => isValid(record, decimals));
+    const validAsks = asks.records.filter((record) => isValid(record, decimals));
+    if (validAsks.length > 0) {
+      // const validAsks = asks.records.filter((record) => isValid(record, decimals));
       const { makerAssetAmount: askTokenAmt, takerAssetAmount: askWETHAmt } = validAsks[0].order;
       bestAskPrice = toTokenUnitsBN(askWETHAmt, 18).div(toTokenUnitsBN(askTokenAmt, decimals));
       bestAsk = validAsks[0];
     }
-    if (bids.records.length > 0) {
-      const validBids = bids.records.filter((record) => isValid(record, decimals));
+    const validBids = bids.records.filter((record) => isValid(record, decimals));
+    if (validBids.length > 0) {
+      // const validBids = bids.records.filter((record) => isValid(record, decimals));
       const { makerAssetAmount: bidWETHAmt, takerAssetAmount: bidTokenAmt } = validBids[0].order;
       bestBidPrice = toTokenUnitsBN(bidWETHAmt, 18).div(toTokenUnitsBN(bidTokenAmt, decimals));
       bestBid = validBids[0];

@@ -56,7 +56,7 @@ function NavBar({
               onClick={() => {
                 history.push('/trade/');
               }}
-              isSelected={history.location.pathname === '/trade/'}
+              isSelected={history.location.pathname.includes('/trade/')}
             />
           </>
         )
