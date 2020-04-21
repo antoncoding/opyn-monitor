@@ -399,7 +399,7 @@ function BuyAndSell({
                   <p style={{ paddingRight: '5px' }}>Fee</p>
                   <Help hint="Why am I paying?">
                     The fee is charged by 0x.
-                    The higher your gasPirce is, the higher you will be charged for.
+                    The higher your gasPrice is, the higher you will be charged for.
                   </Help>
                 </Flex>
               </BottomText>
