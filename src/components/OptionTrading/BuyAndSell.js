@@ -12,7 +12,11 @@ import { signOrder, fillOrders, approve } from '../../utils/web3';
 import { toTokenUnitsBN, toBaseUnitBN } from '../../utils/number';
 import WrapETHPanel from './WrapETHSidePanel';
 
-import { vault as VaultType, order as OrderType, token as TokenType } from '../types';
+import {
+  // vault as VaultType,
+  order as OrderType,
+  token as TokenType,
+} from '../types';
 import { getAllowance } from '../../utils/infura';
 import { ZeroX_ERC20Proxy } from '../../constants/contracts';
 
@@ -32,10 +36,10 @@ function BuyAndSell({
   setTradeType,
   setSelectedOrders,
 
-  vault,
+  // vault,
   baseAsset,
   quoteAsset,
-  collateral,
+  // collateral,
 
   // ethBalance, // in ETH (0.5)
   baseAssetBalance,
@@ -317,18 +321,18 @@ function BuyAndSell({
               <TopPartText>{toTokenUnitsBN(quoteAssetBalance, quoteAsset.decimals).toFormat(4)}</TopPartText>
             </FlexWrapper>
           </TopPart>
-          <FlexWrapper>
+          {/* <FlexWrapper>
             <div>
               Collateral (
               {collateral.symbol}
               )
             </div>
             <TopPartText>
-              { vault.collateral
+              { vault
                 ? toTokenUnitsBN(vault.collateral, collateral.decimals).toFormat(4)
                 : Number(0).toFixed(4)}
             </TopPartText>
-          </FlexWrapper>
+          </FlexWrapper> */}
         </Wrapper>
         <Wrapper>
           <TabWrapper theme={theme}>
@@ -376,7 +380,7 @@ function BuyAndSell({
 
             <Label>Expires After</Label>
             <GroupButtonWrapper>
-              {['1 Hour', '1 Day', '1 week'].map((x, i) => (
+              {['1 Hour', '1 Day', '1 Week'].map((x, i) => (
                 <GroupButton
                   theme={theme}
                   onClick={() => setActiveButton(i)}
@@ -445,14 +449,14 @@ BuyAndSell.propTypes = {
   // three types of tokens
   quoteAsset: TokenType.isRequired,
   baseAsset: TokenType.isRequired,
-  collateral: TokenType.isRequired,
+  // collateral: TokenType.isRequired,
 
 
   // ethBalance: PropTypes.instanceOf(BigNumber).isRequired,
   baseAssetBalance: PropTypes.instanceOf(BigNumber).isRequired,
   quoteAssetBalance: PropTypes.instanceOf(BigNumber).isRequired,
 
-  vault: VaultType,
+  // vault: VaultType,
 
   tradeType: PropTypes.string.isRequired,
   setTradeType: PropTypes.func.isRequired,
@@ -461,14 +465,14 @@ BuyAndSell.propTypes = {
   setSelectedOrders: PropTypes.func.isRequired,
 };
 
-BuyAndSell.defaultProps = {
-  vault: {
-    owner: '',
-    oTokensIssued: '0',
-    collateral: '0',
-    underlying: '0',
-  },
-};
+// BuyAndSell.defaultProps = {
+//   vault: {
+//     owner: '',
+//     oTokensIssued: '0',
+//     collateral: '0',
+//     underlying: '0',
+//   },
+// };
 
 export default BuyAndSell;
 
