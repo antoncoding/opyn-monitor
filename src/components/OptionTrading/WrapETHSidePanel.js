@@ -4,7 +4,7 @@ import BigNumber from 'bignumber.js';
 import PropTypes from 'prop-types';
 
 import {
-  SidePanel, Button, TextInput,
+  SidePanel, Button, TextInput, useTheme,
 } from '@aragon/ui';
 import { BalanceBlock, SectionTitle, Comment } from '../common';
 
@@ -13,8 +13,9 @@ import { toBaseUnitBN, toTokenUnitsBN } from '../../utils/number';
 import { getBalance } from '../../utils/infura';
 
 function WrapETHModal({
-  user, wethBalance, opened, setOpen,
+  user, wethBalance, opened, setOpen, helperText, setHelperText,
 }) {
+  const theme = useTheme();
   const [wrapAmount, setWrapAmount] = useState(BigNumber(0));
   const [unWrapAmount, setUnwrapAmount] = useState(BigNumber(0));
 
@@ -61,9 +62,17 @@ function WrapETHModal({
     <SidePanel
       title=""
       opened={opened}
-      onClose={() => { setOpen(false); }}
+      onClose={() => {
+        setOpen(false);
+        setHelperText('');
+      }}
     >
       <br />
+
+      <div style={{ color: theme.warning }}>
+        {helperText}
+      </div>
+
       <SectionTitle title="Wrap WETH" />
       <div style={{ padding: '2%' }}>
         <BalanceBlock asset="Your ETH Balance" balance={ethBalance.toNumber()} />
@@ -110,6 +119,8 @@ function WrapETHModal({
 
 WrapETHModal.propTypes = {
   user: PropTypes.string.isRequired,
+  helperText: PropTypes.string.isRequired,
+  setHelperText: PropTypes.func.isRequired,
   wethBalance: PropTypes.instanceOf(BigNumber).isRequired,
   opened: PropTypes.bool.isRequired,
   setOpen: PropTypes.func.isRequired,

@@ -76,6 +76,7 @@ function BuyAndSell({
 
   // for weth side panel
   const [panelOpend, setPanelOpended] = useState(false);
+  const [wethPanelHelperText, setPanelHelperText] = useState('');
 
   // expiry button
   const [activeButton, setActiveButton] = useState(0);
@@ -164,15 +165,7 @@ function BuyAndSell({
         setBaseAmountToFill(amountBN);
         setBaseAmountToCreate(new BigNumber(0));
 
-        // 1. Change selected orders
-        // ## Disabled now because updating selectedOrders will trigger another useEffect, update amount again
-        // const newSelectedOrders = findMinOrdersForAmount(selectedOrders, target,
-        //   tradeType === 'buy' ? 'maker' : 'taker');
-        // if (newSelectedOrders.length !== selectedOrders.length) {
-        //   // setSelectedOrders(newSelectedOrders);
-        // }
-
-        // 2. Update Rates
+        // Update Rates
         const baseAmountTotal = toBaseUnitBN(amountBN, baseAsset.decimals);
 
         let quoteAmountTotal;
@@ -239,6 +232,14 @@ function BuyAndSell({
     let order;
     if (tradeType === 'buy') {
       const quoteAssetInBaseUnit = toBaseUnitBN(baseAmountToCreate.times(rate), quoteAsset.decimals);
+      // check quote asset balance
+      if (quoteAssetInBaseUnit.gt(quoteAssetBalance)) {
+        setPanelHelperText('You dont have enough WETH to make this order, you may need to wrap some ETH into WETH.');
+        setPanelOpended(true);
+        return;
+      }
+
+      // check quote asset allowance
       const wethAllowance = new BigNumber(await getAllowance(quoteAsset.addr, user, ZeroX_ERC20Proxy));
       if (wethAllowance.lt(quoteAssetInBaseUnit)) {
         toast(`Please approve 0x to spend your oToken ${quoteAsset.symbol}`);
@@ -439,7 +440,14 @@ function BuyAndSell({
 
         </Flex>
       </BuyAndSellBlock>
-      <WrapETHPanel user={user} opened={panelOpend} setOpen={setPanelOpended} wethBalance={quoteAssetBalance} />
+      <WrapETHPanel
+        user={user}
+        opened={panelOpend}
+        setOpen={setPanelOpended}
+        wethBalance={quoteAssetBalance}
+        helperText={wethPanelHelperText}
+        setHelperText={setPanelHelperText}
+      />
     </>
   );
 }
@@ -482,7 +490,7 @@ const FlexWrapper = styled.div`
   justify-content: space-between;
   margin: 18px 0;
 `;
-const BuyAndSellBlock = styled.div`
+const BuyAndSellBlock = styled.div`  
   width: 100%;
   min-height: 509px;
   display: flex;
@@ -546,9 +554,6 @@ const Flex = styled.div`
   display:flex;
   width: 90%;
 `;
-// const Half = styled.div`
-//   width: 50%;
-// `;
 const TabWrapper = styled.div`
   width: 100%;
   display: flex;

@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import {
-  DataView, DropDown, LinkBase, Radio,
+  DataView, DropDown, LinkBase, Radio, Header,
 } from '@aragon/ui';
 import { AskText, BidText } from './styled';
 
@@ -49,14 +49,15 @@ function OptionBoard({
 
   return (
     <div>
-      <div style={{ display: 'flex' }}>
-        <DropDown
-          items={optionsByDate.map((item) => item.expiryText)}
-          selected={selectedExpiryIdx}
-          onChange={setExpiryIdx}
-        />
-      </div>
-      <div style={{ display: 'flex' }}>
+      <Header primary="ETH Option Trading" />
+      {/* <div style={{ display: 'flex' }}> */}
+      <DropDown
+        items={optionsByDate.map((item) => item.expiryText)}
+        selected={selectedExpiryIdx}
+        onChange={setExpiryIdx}
+      />
+      {/* </div> */}
+      <div style={{ display: 'flex', padding: '0px' }}>
         <SectionTitle title="Calls" />
         <div
           style={{

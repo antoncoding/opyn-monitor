@@ -100,7 +100,6 @@ function OptionTrading({ user, theme }) {
         <LeftPart>
           <Header />
           <Header />
-
           <BuyAndSell
             user={user}
             baseAsset={baseAsset}
@@ -121,7 +120,7 @@ function OptionTrading({ user, theme }) {
           />
         </LeftPart>
         <RightPart>
-          <Header primary="Trade ETH Options" />
+          {/* <Header primary="Trade ETH Options" /> */}
           <OptionBoard
             puts={eth_puts}
             calls={eth_calls}
