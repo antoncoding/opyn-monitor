@@ -168,12 +168,14 @@ const WholeScreen = styled.div`
   textAlign: center;
   padding-left: 7%;
   padding-right: 7%;
-  position: fixed;
+  position:fixed;
+  overflow-y:scroll;
+  overflow-x:hidden;
   left: 0;
-  right: 0;
+  bottom: 0;
   top: 6%;
   width: 100%;
-  height: 100%;
+  overflow: auto
 `;
 
 const FlexWrapper = styled.div`
