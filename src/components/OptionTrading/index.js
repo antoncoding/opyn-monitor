@@ -11,9 +11,7 @@ import BuyAndSell from './BuyAndSell';
 import { getTokenBalance } from '../../utils/infura';
 import { getOrderBook, isValid } from '../../utils/0x';
 import { getVault } from '../../utils/graph';
-// import { approve } from '../../utils/web3';
 import { eth_puts, eth_calls } from '../../constants/options';
-// import { ZeroX_ERC20Proxy } from '../../constants/contracts';
 
 const quoteAsset = {
   symbol: 'WETH',
