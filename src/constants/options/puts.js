@@ -15,6 +15,7 @@ export const eth_puts = [
     underlying: tokens.OPYN_ETH,
     strike: tokens.USDC,
     strikePrice: 1e-6,
+    strikePriceInUSD: 100,
     minRatio: 1,
     exchange: '0x39246c4f3f6592c974ebc44f80ba6dc69b817c71',
     uniswapExchange: '0x30651Fc7F912f5E40AB22F3D34C2159431Fb1c4F',
@@ -33,6 +34,7 @@ export const eth_puts = [
     underlying: tokens.OPYN_ETH,
     strike: tokens.USDC,
     strikePrice: 1e-6,
+    strikePriceInUSD: 100,
     minRatio: 1,
     exchange: '0x39246c4f3f6592c974ebc44f80ba6dc69b817c71',
     uniswapExchange: '0x5734a78b1985B47dF3fbf1736c278F57c2C30983',
@@ -41,7 +43,6 @@ export const eth_puts = [
   {
     addr: '0xaefc7b368f7b536c9e5e3f342bf534931ce58584',
     title: 'ETH Put $150 04/24/20',
-
     // constants in contract
     symbol: 'oETH $150 Put',
     name: 'Opyn ETH Put $150 04/24/20',
@@ -51,6 +52,7 @@ export const eth_puts = [
     underlying: tokens.OPYN_ETH,
     strike: tokens.USDC,
     strikePrice: 1.5e-5,
+    strikePriceInUSD: 150,
     minRatio: 1,
     exchange: '0x39246c4f3f6592c974ebc44f80ba6dc69b817c71',
     uniswapExchange: '0xD2840757B0DeF8fBC2A7DC990CEF75975C2d3F0e',
@@ -69,6 +71,7 @@ export const eth_puts = [
     underlying: tokens.OPYN_ETH,
     strike: tokens.USDC,
     strikePrice: 1.6e-5,
+    strikePriceInUSD: 160,
     minRatio: 1,
     exchange: '0x39246c4f3f6592c974ebc44f80ba6dc69b817c71',
     uniswapExchange: '0xd03f7298aE74a8618711Ec43F45Ad2225F141aa4',

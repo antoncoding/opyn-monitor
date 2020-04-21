@@ -1,19 +1,27 @@
 /* eslint-disable camelcase */
 import Web3 from 'web3';
 import BigNumber from 'bignumber.js';
+import { MetamaskSubprovider } from '@0x/subproviders';
+import { signatureUtils } from '@0x/order-utils';
 import Onboard from 'bnc-onboard';
 
+// import { ContractWrappers } from '@0x/contract-wrappers';
+// import { getContractAddressesForChainOrThrow } from '@0x/contract-addresses';
+
+// import {} from '@'
 import { notify } from './blockNative';
 import { getAllowance, getPremiumToPay } from './infura';
 import { getPreference } from './storage';
 import {
-  ETH_ADDRESS, Kollateral_Liquidator, Kollateral_Invoker, KETH,
+  ETH_ADDRESS, Kollateral_Liquidator, Kollateral_Invoker, KETH, ZeroX_Exchange, WETH,
 } from '../constants/contracts';
 
 const oTokenABI = require('../constants/abi/OptionContract.json');
 const exchangeABI = require('../constants/abi/OptionExchange.json');
 const uniswapExchangeABI = require('../constants/abi/UniswapExchange.json');
 const invokerABI = require('../constants/abi/KollateralInvoker.json');
+const ZX_ExchagneABI = require('../constants/abi/ZeroX_Exchange.json');
+const wrapETHABI = require('../constants/abi/WETH.json');
 
 const DEADLINE_FROM_NOW = 60 * 15;
 const UINT256_MAX = '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff';
@@ -252,7 +260,7 @@ export const removeUnderlying = async (token) => {
     });
 };
 
-export const approve = async (tokenAddr, spender, amt) => {
+export const approve = async (tokenAddr, spender, amt = UINT256_MAX) => {
   const account = await checkConnectedAndGetAddress();
   const oToken = new web3.eth.Contract(oTokenABI, tokenAddr);
   await oToken.methods
@@ -408,6 +416,75 @@ export const removeLiquidity = async (uniswapAddr, pool_token_amount, min_eth_we
   const deadline = Math.ceil(Date.now() / 1000) + DEADLINE_FROM_NOW;
   await uniswapExchange.methods
     .removeLiquidity(pool_token_amount, min_eth_wei, min_tokens, deadline)
+    .send({
+      from: account,
+    })
+    .on('transactionHash', (hash) => {
+      notify.hash(hash);
+    });
+};
+
+/*
+ * 0x Protocols
+ */
+export const wrapETH = async (amountInWei) => {
+  const account = await checkConnectedAndGetAddress();
+  const weth = new web3.eth.Contract(wrapETHABI, WETH);
+  await weth.methods
+    .deposit()
+    .send({
+      from: account,
+      value: amountInWei,
+    })
+    .on('transactionHash', (hash) => {
+      notify.hash(hash);
+    });
+};
+
+export const unwrapETH = async (amountInWei) => {
+  const account = await checkConnectedAndGetAddress();
+  const weth = new web3.eth.Contract(wrapETHABI, WETH);
+  await weth.methods
+    .withdraw(amountInWei)
+    .send({
+      from: account,
+    })
+    .on('transactionHash', (hash) => {
+      notify.hash(hash);
+    });
+};
+
+/**
+* Sign Order
+* @param {*} order
+*/
+export const signOrder = async (order) => {
+  const account = await checkConnectedAndGetAddress();
+  const provider = new MetamaskSubprovider(web3.currentProvider);
+  return signatureUtils.ecSignOrderAsync(provider, order, account);
+};
+
+
+export const fillOrders = async (orders, amts, signatures, value, gasPrice) => {
+  const account = await checkConnectedAndGetAddress();
+  const exchange = new web3.eth.Contract(ZX_ExchagneABI, ZeroX_Exchange);
+  await exchange.methods
+    .batchFillOrders(orders, amts, signatures)
+    .send({
+      from: account,
+      value, // Protocol fee: gas to be gas price * 150
+      gasPrice: web3.utils.toWei(gasPrice, 'gwei'), // gwei to wei
+    })
+    .on('transactionHash', (hash) => {
+      notify.hash(hash);
+    });
+};
+
+export const cancelOrders = async (orders) => {
+  const account = await checkConnectedAndGetAddress();
+  const exchange = new web3.eth.Contract(ZX_ExchagneABI, ZeroX_Exchange);
+  await exchange.methods
+    .batchCancelOrders(orders)
     .send({
       from: account,
     })

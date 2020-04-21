@@ -7,6 +7,7 @@ import HelperText from './HelpText';
 import PriceSection from './PriceSection';
 import Comment from './Comment';
 import { ManageVaultButton, OpenVaultButton } from './VaultButton';
+import Wrapper from './Wrapper';
 import CheckBox from './CheckBox';
 
 export {
@@ -21,4 +22,5 @@ export {
   OpenVaultButton,
   PriceSection,
   Comment,
+  Wrapper,
 };
