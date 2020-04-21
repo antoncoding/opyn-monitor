@@ -125,6 +125,7 @@ function OptionTrading({ user, theme }) {
           <OptionBoard
             puts={eth_puts}
             calls={eth_calls}
+            baseAsset={baseAsset}
             setBaseAsset={setBaseAsset}
             setTradeType={setTradeType}
             setSelectedOrders={setSelectedOrders}

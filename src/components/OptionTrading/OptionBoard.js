@@ -1,16 +1,18 @@
 /* eslint-disable no-restricted-syntax */
 import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
-import { DataView, DropDown, LinkBase } from '@aragon/ui';
+import {
+  DataView, DropDown, LinkBase, Radio,
+} from '@aragon/ui';
 import { AskText, BidText } from './styled';
 
 import { SectionTitle } from '../common';
 
 import { getBasePairAskAndBids } from '../../utils/0x';
-import { option as OptionType } from '../types';
+import { option as OptionType, token as TokenType } from '../types';
 
 function OptionBoard({
-  calls, puts, setBaseAsset, setTradeType, setSelectedOrders,
+  calls, puts, baseAsset, setBaseAsset, setTradeType, setSelectedOrders,
 }) {
   const [putStats, setPutStats] = useState([]);
   const [callStats, setCallStats] = useState([]);
@@ -67,8 +69,18 @@ function OptionBoard({
       </div>
       {/* Calls */}
       <DataView
-            // mode="table"
-        fields={['last', 'bid', 'ask', 'strike', 'last', 'bid', 'ask']}
+        mode="table"
+        fields={[
+          { label: 'select', align: 'start' },
+          { label: 'last', align: 'start' },
+          { label: 'bid', align: 'start' },
+          { label: 'ask', align: 'start' },
+          { label: 'strike', align: 'start' },
+          { label: 'last', align: 'start' },
+          { label: 'bid', align: 'start' },
+          { label: 'ask', align: 'start' },
+          { label: 'select', align: 'end' },
+        ]}
         entries={optionsByDate[selectedExpiryIdx] ? optionsByDate[selectedExpiryIdx].entry : []}
         renderEntry={({
           call,
@@ -127,13 +139,27 @@ function OptionBoard({
           }
 
           return [
-            <LinkBase onClick={callOnclick}>{lastCallPrice}</LinkBase>,
-            <LinkBase onClick={callBidOnclick}><BidText>{callBid}</BidText></LinkBase>,
-            <LinkBase onClick={callAskOnclick}><AskText>{callAsk}</AskText></LinkBase>,
-            <div style={{ fontSize: 20 }}>{strikePrice}</div>,
-            <LinkBase onClick={putOnclick}>{lastPutPrice}</LinkBase>,
-            <LinkBase onClick={putBidOnclick}><BidText>{putBid}</BidText></LinkBase>,
-            <LinkBase onClick={putAskOnclick}><AskText>{putAsk}</AskText></LinkBase>,
+            <div style={{ width: '80px' }}>
+              <Radio
+                disabled={!call}
+                onChange={() => setBaseAsset(call)}
+                checked={call && call.addr === baseAsset.addr}
+              />
+            </div>,
+            <Cell onClick={callOnclick} text={lastCallPrice} type="normal" />,
+            <Cell onClick={callBidOnclick} text={callBid} type="bid" />,
+            <Cell onClick={callAskOnclick} text={callAsk} type="ask" />,
+            <Cell onClick={() => {}} text={strikePrice} type="normal" fontSize={20} />,
+            <Cell onClick={putOnclick} text={lastPutPrice} type="normal" />,
+            <Cell onClick={putBidOnclick} text={putBid} type="bid" />,
+            <Cell onClick={putAskOnclick} text={putAsk} type="ask" />,
+            <div style={{ width: '20px' }}>
+              <Radio
+                disabled={!put}
+                onChange={() => (setBaseAsset(put))}
+                checked={put && put.addr === baseAsset.addr}
+              />
+            </div>,
           ];
         }}
       />
@@ -144,6 +170,7 @@ function OptionBoard({
 OptionBoard.propTypes = {
   calls: PropTypes.arrayOf(OptionType).isRequired,
   puts: PropTypes.arrayOf(OptionType).isRequired,
+  baseAsset: TokenType.isRequired,
   setBaseAsset: PropTypes.func.isRequired,
   setTradeType: PropTypes.func.isRequired,
   setSelectedOrders: PropTypes.func.isRequired,
@@ -195,3 +222,44 @@ function groupByDate(puts, calls, putStats, callStats) {
   }
   return result;
 }
+
+function Cell({
+  onClick, text, type, fontSize = 20,
+}) {
+  return (
+    <LinkBase onClick={onClick}>
+      <div style={{ width: '80px', textAlign: 'center' }}>
+        { type === 'bid' ? (
+          <BidText>
+            {' '}
+            {text}
+            {' '}
+          </BidText>
+        ) : type === 'ask' ? (
+          <AskText>
+            {' '}
+            {text}
+            {' '}
+          </AskText>
+        ) : (
+          <div style={{ fontSize }}>
+            {' '}
+            {text}
+            {' '}
+          </div>
+        ) }
+      </div>
+    </LinkBase>
+  );
+}
+
+Cell.propTypes = {
+  onClick: PropTypes.func.isRequired,
+  text: PropTypes.string.isRequired,
+  type: PropTypes.string.isRequired,
+  fontSize: PropTypes.number,
+};
+
+Cell.defaultProps = {
+  fontSize: 20,
+};
