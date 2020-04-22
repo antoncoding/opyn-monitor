@@ -23,6 +23,7 @@ jobs:
         REACT_APP_BLOCKNATIVE_KEY: ${{ secrets.REACT_APP_BLOCKNATIVE_KEY }}
         REACT_APP_FORTMATIC_KEY: ${{ secrets.REACT_APP_FORTMATIC_KEY }}
         REACT_APP_INFURA_KEY: ${{ secrets.REACT_APP_INFURA_KEY }}
+        REACT_APP_INFURA_KEY2: ${{ secrets.REACT_APP_INFURA_KEY2 }}
         REACT_APP_GA_PROJECT_ID: ${{ secrets.REACT_APP_GA_PROJECT_ID }}
 
     - name: Deploy

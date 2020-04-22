@@ -6,7 +6,8 @@ const optionContractABI = require('../constants/abi/OptionContract.json');
 const optionExchangeABI = require('../constants/abi/OptionExchange.json');
 const oracleABI = require('../constants/abi/Oracle.json');
 
-const INFURA_KEY = process.env.REACT_APP_INFURA_KEY;
+const KEYS = [process.env.REACT_APP_INFURA_KEY, process.env.REACT_APP_INFURA_KEY2].filter((k) => k);
+const INFURA_KEY = KEYS[Math.floor(Math.random() * KEYS.length)];
 
 const web3 = new Web3(`https://mainnet.infura.io/v3/${INFURA_KEY}`);
 const ens = new ENS(web3);
