@@ -44,6 +44,19 @@ function OptionBoard({
     };
   }, [calls, puts, quoteAsset]);
 
+  // onchange expiry
+  useEffect(() => {
+    for (const { call, put } of optionsByDate[selectedExpiryIdx].entry) {
+      if (call !== undefined) {
+        setBaseAsset(call);
+        return;
+      } if (put !== undefined) {
+        setBaseAsset(put);
+        return;
+      }
+    }
+  }, [selectedExpiryIdx, optionsByDate, setBaseAsset]);
+
   return (
     <div>
       <div style={{ display: 'flex' }}>

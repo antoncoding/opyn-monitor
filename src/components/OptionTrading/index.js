@@ -18,7 +18,9 @@ import * as tokens from '../../constants/tokens';
 const quoteAsset = tokens.USDC;
 
 function OptionTrading({ user, theme }) {
-  const [baseAsset, setBaseAsset] = useState(eth_puts[1]); // put 100
+  const [baseAsset, setBaseAsset] = useState(
+    eth_puts.concat(eth_calls).find((o) => o.expiry > Date.now() / 1000),
+  );
 
   const [asks, setAsks] = useState([]);
   const [bids, setBids] = useState([]);
