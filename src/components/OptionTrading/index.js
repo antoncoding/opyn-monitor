@@ -10,7 +10,7 @@ import BuyAndSell from './BuyAndSell';
 
 import { getTokenBalance } from '../../utils/infura';
 import { getOrderBook, isValid } from '../../utils/0x';
-import { getVault } from '../../utils/graph';
+// import { getVault } from '../../utils/graph';
 import { eth_puts, eth_calls } from '../../constants/options';
 
 import * as tokens from '../../constants/tokens';
@@ -33,7 +33,7 @@ function OptionTrading({ user, theme }) {
   const [baseAssetBalance, setBaseAssetBalance] = useState(BigNumber(0));
   const [quoteAssetBalance, setQuoteAssetBalance] = useState(BigNumber(0));
 
-  const [vault, setVault] = useState({});
+  // const [vault, setVault] = useState({});
 
 
   // BaseAsset changeed: Update orderbook and base asset
@@ -42,6 +42,7 @@ function OptionTrading({ user, theme }) {
 
     // update orderbook
     const updateOrderBook = async () => {
+      console.log('orderbook update');
       const res = await getOrderBook(baseAsset.addr, quoteAsset.addr);
       if (!isCancelled) {
         setAsks(res.asks.records.filter((record) => isValid(record)));
@@ -57,22 +58,22 @@ function OptionTrading({ user, theme }) {
       }
     };
 
-    const updateVaultData = async () => {
-      if (user === '') return;
-      const userVault = await getVault(user, baseAsset.addr);
-      if (!isCancelled) setVault(userVault);
-    };
+    // const updateVaultData = async () => {
+    //   if (user === '') return;
+    //   const userVault = await getVault(user, baseAsset.addr);
+    //   if (!isCancelled) setVault(userVault);
+    // };
     updateOrderBook();
     updateBaseBalance();
-    updateVaultData();
-    const idOrderBook = setInterval(updateOrderBook, 1000);
+    // updateVaultData();
+    const idOrderBook = setInterval(updateOrderBook, 2000);
     const idBaseBalance = setInterval(updateBaseBalance, 30000);
-    const idUpdateVault = setInterval(updateVaultData, 10000);
+    // const idUpdateVault = setInterval(updateVaultData, 10000);
     return () => {
       isCancelled = true;
       clearInterval(idOrderBook);
       clearInterval(idBaseBalance);
-      clearInterval(idUpdateVault);
+      // clearInterval(idUpdateVault);
     };
   }, [baseAsset, user]);
 
@@ -110,7 +111,7 @@ function OptionTrading({ user, theme }) {
             baseAssetBalance={baseAssetBalance}
             quoteAssetBalance={quoteAssetBalance}
 
-            vault={vault}
+            // vault={vault}
             theme={theme}
 
             tradeType={tradeType}

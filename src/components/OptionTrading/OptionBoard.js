@@ -25,6 +25,7 @@ function OptionBoard({
   useEffect(() => {
     let isCancelled = false;
     const updateBoardStats = async () => {
+      console.log('update board');
       const [callData, putData] = await Promise.all([
         getBasePairAskAndBids(calls, quoteAsset),
         getBasePairAskAndBids(puts, quoteAsset),
@@ -36,7 +37,7 @@ function OptionBoard({
       }
     };
     updateBoardStats();
-    const id = setInterval(updateBoardStats, 3000);
+    const id = setInterval(updateBoardStats, 5000);
 
     return () => {
       clearInterval(id);
