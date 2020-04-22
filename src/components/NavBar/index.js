@@ -67,8 +67,8 @@ function NavBar({
                 history.push('/trade/oeth-usdc');
               }}
               isSelected={history.location.pathname.includes('/trade/')}
-            /> */}
-            {/* <Tag> beta </Tag> */}
+            />
+            <Tag> beta </Tag> */}
           </>
         )
       }
