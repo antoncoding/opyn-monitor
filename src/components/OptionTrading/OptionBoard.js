@@ -25,7 +25,6 @@ function OptionBoard({
   useEffect(() => {
     let isCancelled = false;
     const updateBoardStats = async () => {
-      console.log('update board');
       const [callData, putData] = await Promise.all([
         getBasePairAskAndBids(calls, quoteAsset),
         getBasePairAskAndBids(puts, quoteAsset),

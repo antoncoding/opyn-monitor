@@ -42,7 +42,6 @@ function OptionTrading({ user, theme }) {
 
     // update orderbook
     const updateOrderBook = async () => {
-      console.log('orderbook update');
       const res = await getOrderBook(baseAsset.addr, quoteAsset.addr);
       if (!isCancelled) {
         setAsks(res.asks.records.filter((record) => isValid(record)));
