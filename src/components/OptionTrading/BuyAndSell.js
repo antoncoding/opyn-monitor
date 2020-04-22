@@ -20,6 +20,7 @@ import {
 import { getAllowance } from '../../utils/infura';
 import { ZeroX_ERC20Proxy } from '../../constants/contracts';
 
+import { WETH } from '../../constants/tokens';
 
 /**
  *
@@ -42,8 +43,8 @@ function BuyAndSell({
   // collateral,
 
   // ethBalance, // in ETH (0.5)
-  baseAssetBalance,
-  quoteAssetBalance,
+  baseAssetBalance, // in base uinit
+  quoteAssetBalance, // in base Unit
 }) {
   const theme = useTheme();
   const toast = useToast();
@@ -224,6 +225,23 @@ function BuyAndSell({
     setQuoteAssetAmount(quoteAmount);
   };
 
+  const checkAndAllowQuoteAsset = async (quoteAssetAmountBase) => {
+    // const quoteAssetInBaseUnit = toBaseUnitBN(quoteAssetAmount, quoteAsset.decimals);
+    const quoteAllowance = new BigNumber(await getAllowance(quoteAsset.addr, user, ZeroX_ERC20Proxy));
+    if (quoteAllowance.lt(quoteAssetAmountBase)) {
+      toast(`Please approve 0x to spend your oToken ${quoteAsset.symbol}`);
+      await approve(quoteAsset.addr, ZeroX_ERC20Proxy);
+    }
+  };
+
+  const checkAndAllowBaseAsset = async (baseAssetAmountBase) => {
+    const tokenAllowance = new BigNumber(await getAllowance(baseAsset.addr, user, ZeroX_ERC20Proxy));
+    if (tokenAllowance.lt(baseAssetAmountBase)) {
+      toast(`Please approve 0x to spend your oToken ${baseAsset.symbol}`);
+      await approve(baseAsset.addr, ZeroX_ERC20Proxy);
+    }
+  };
+
   const clickCreateOrder = async () => {
     if (user === '') {
       toast('Please connect wallet first');
@@ -234,17 +252,18 @@ function BuyAndSell({
       const quoteAssetInBaseUnit = toBaseUnitBN(baseAmountToCreate.times(rate), quoteAsset.decimals);
       // check quote asset balance
       if (quoteAssetInBaseUnit.gt(quoteAssetBalance)) {
-        setPanelHelperText('You dont have enough WETH to make this order, you may need to wrap some ETH into WETH.');
-        setPanelOpended(true);
-        return;
+        if (quoteAsset.addr === WETH.addr) {
+          setPanelHelperText('You dont have enough WETH to make this order, you may need to wrap some ETH into WETH.');
+          setPanelOpended(true);
+          return;
+        }
+        toast(`Insufficient ${quoteAsset.symbol}`);
       }
 
       // check quote asset allowance
-      const wethAllowance = new BigNumber(await getAllowance(quoteAsset.addr, user, ZeroX_ERC20Proxy));
-      if (wethAllowance.lt(quoteAssetInBaseUnit)) {
-        toast(`Please approve 0x to spend your oToken ${quoteAsset.symbol}`);
-        await approve(quoteAsset.addr, ZeroX_ERC20Proxy);
-      }
+      await checkAndAllowQuoteAsset(quoteAssetInBaseUnit);
+
+      // create order
       order = createOrder(
         user,
         quoteAsset.addr,
@@ -255,11 +274,8 @@ function BuyAndSell({
       );
     } else {
       const baseAssetInBaseUnit = toBaseUnitBN(baseAmountToCreate, baseAsset.decimals);
-      const tokenAllowance = new BigNumber(await getAllowance(baseAsset.addr, user, ZeroX_ERC20Proxy));
-      if (tokenAllowance.lt(baseAssetInBaseUnit)) {
-        toast(`Please approve 0x to spend your oToken ${baseAsset.symbol}`);
-        await approve(baseAsset.addr, ZeroX_ERC20Proxy);
-      }
+      await checkAndAllowBaseAsset(baseAssetInBaseUnit);
+
       order = createOrder(
         user,
         baseAsset.addr,
@@ -278,6 +294,12 @@ function BuyAndSell({
   };
 
   const clickFillOrders = async () => {
+    const takerAmountBase = fillingtakerAmounts.reduce((prev, cur) => prev.plus(new BigNumber(cur)), new BigNumber(0));
+    if (tradeType === 'buy') {
+      await checkAndAllowQuoteAsset(takerAmountBase);
+    } else {
+      await checkAndAllowBaseAsset(takerAmountBase);
+    }
     await fillOrders(
       selectedOrders.map((o) => o.order),
       fillingtakerAmounts,
@@ -312,11 +334,13 @@ function BuyAndSell({
                       {quoteAsset.symbol}
                     </LinkBase>
                   </p>
-                  <Help hint="What is WETH?">
-                    WETH is Wraped ETH, the erc20 version of ETH. You must have WETH to create and fill orders on 0x.
-                    {' '}
-                    <LinkBase onClick={() => setPanelOpended(true)}>Click here to wrap your ETH now!</LinkBase>
-                  </Help>
+                  { quoteAsset.symbol === WETH.addr ? (
+                    <Help hint="What is WETH?">
+                      WETH is Wraped ETH, the erc20 version of ETH. You must have WETH to create and fill orders on 0x.
+                      {' '}
+                      <LinkBase onClick={() => setPanelOpended(true)}>Click here to wrap your ETH now!</LinkBase>
+                    </Help>
+                  ) : <></> }
                 </Flex>
               </div>
               <TopPartText>{toTokenUnitsBN(quoteAssetBalance, quoteAsset.decimals).toFormat(4)}</TopPartText>
@@ -397,7 +421,7 @@ function BuyAndSell({
 
             <BottomTextWrapper>
               <BottomText>{tradeType === 'buy' ? 'Cost' : 'Premium'}</BottomText>
-              <BottomText>{`${quoteAssetAmount.toFixed(4)} WETH`}</BottomText>
+              <BottomText>{`${quoteAssetAmount.toFixed(4)} ${quoteAsset.symbol}`}</BottomText>
             </BottomTextWrapper>
             <BottomTextWrapper>
               <BottomText>

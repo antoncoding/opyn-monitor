@@ -13,11 +13,9 @@ import { getOrderBook, isValid } from '../../utils/0x';
 import { getVault } from '../../utils/graph';
 import { eth_puts, eth_calls } from '../../constants/options';
 
-const quoteAsset = {
-  symbol: 'WETH',
-  addr: '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2',
-  decimals: 18,
-}; // WETH
+import * as tokens from '../../constants/tokens';
+
+const quoteAsset = tokens.USDC;
 
 function OptionTrading({ user, theme }) {
   const [baseAsset, setBaseAsset] = useState(eth_puts[1]); // put 100
@@ -124,6 +122,7 @@ function OptionTrading({ user, theme }) {
           <OptionBoard
             puts={eth_puts}
             calls={eth_calls}
+            quoteAsset={quoteAsset}
             baseAsset={baseAsset}
             setBaseAsset={setBaseAsset}
             setTradeType={setTradeType}

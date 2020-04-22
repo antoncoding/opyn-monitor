@@ -1,7 +1,7 @@
 /* eslint-disable no-restricted-syntax */
 import { assetDataUtils } from '@0x/order-utils';
 import BigNumber from 'bignumber.js';
-import { WETH } from '../constants/contracts';
+import { USDC } from '../constants/tokens';
 
 import { toTokenUnitsBN } from './number';
 
@@ -75,11 +75,12 @@ export async function getOrderBook(base, quote) {
 /**
  * get oToken:WETH stats (v1) for all options
  * @param {Array<{addr:string, decimals:number}>} options
+ * @param {{addr:string, decimals:number}} quoteAsset
  * @return {Promise<Arrya< option: address, bestAskPrice: BigNumber, bestAskPrice:BigNumber, bestAsk:{}, bestBid:{} >>}
  */
-export async function getBasePairAskAndBids(options) {
+export async function getBasePairAskAndBids(options, quoteAsset) {
   const bestAskAndBids = await Promise.map(options, async ({ addr: option, decimals }) => {
-    const { asks, bids } = await getOrderBook(option, WETH);
+    const { asks, bids } = await getOrderBook(option, USDC.addr);
     let bestAskPrice = 0;
     let bestBidPrice = 0;
     let bestAsk; let bestBid;
@@ -87,14 +88,14 @@ export async function getBasePairAskAndBids(options) {
     if (validAsks.length > 0) {
       // const validAsks = asks.records.filter((record) => isValid(record, decimals));
       const { makerAssetAmount: askTokenAmt, takerAssetAmount: askWETHAmt } = validAsks[0].order;
-      bestAskPrice = toTokenUnitsBN(askWETHAmt, 18).div(toTokenUnitsBN(askTokenAmt, decimals));
+      bestAskPrice = toTokenUnitsBN(askWETHAmt, quoteAsset.decimals).div(toTokenUnitsBN(askTokenAmt, decimals));
       bestAsk = validAsks[0];
     }
     const validBids = bids.records.filter((record) => isValid(record, decimals));
     if (validBids.length > 0) {
       // const validBids = bids.records.filter((record) => isValid(record, decimals));
       const { makerAssetAmount: bidWETHAmt, takerAssetAmount: bidTokenAmt } = validBids[0].order;
-      bestBidPrice = toTokenUnitsBN(bidWETHAmt, 18).div(toTokenUnitsBN(bidTokenAmt, decimals));
+      bestBidPrice = toTokenUnitsBN(bidWETHAmt, quoteAsset.decimals).div(toTokenUnitsBN(bidTokenAmt, decimals));
       bestBid = validBids[0];
     }
 

@@ -12,7 +12,7 @@ import { getBasePairAskAndBids } from '../../utils/0x';
 import { option as OptionType, token as TokenType } from '../types';
 
 function OptionBoard({
-  calls, puts, baseAsset, setBaseAsset, setTradeType, setSelectedOrders,
+  calls, puts, baseAsset, quoteAsset, setBaseAsset, setTradeType, setSelectedOrders,
 }) {
   const [putStats, setPutStats] = useState([]);
   const [callStats, setCallStats] = useState([]);
@@ -27,8 +27,8 @@ function OptionBoard({
     const updateBoardStats = async () => {
       // console.log('update board');
       const [callData, putData] = await Promise.all([
-        getBasePairAskAndBids(calls),
-        getBasePairAskAndBids(puts),
+        getBasePairAskAndBids(calls, quoteAsset),
+        getBasePairAskAndBids(puts, quoteAsset),
       ]);
 
       // console.log(putData);
@@ -45,7 +45,7 @@ function OptionBoard({
       clearInterval(id);
       isCancelled = true;
     };
-  }, [calls, puts]);
+  }, [calls, puts, quoteAsset]);
 
   return (
     <div>
@@ -175,6 +175,7 @@ OptionBoard.propTypes = {
   calls: PropTypes.arrayOf(OptionType).isRequired,
   puts: PropTypes.arrayOf(OptionType).isRequired,
   baseAsset: TokenType.isRequired,
+  quoteAsset: TokenType.isRequired,
   setBaseAsset: PropTypes.func.isRequired,
   setTradeType: PropTypes.func.isRequired,
   setSelectedOrders: PropTypes.func.isRequired,
