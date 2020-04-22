@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
-import { Header } from '@aragon/ui';
-
-import styled from 'styled-components';
 import BigNumber from 'bignumber.js';
+import styled from 'styled-components';
+
+import { Header } from '@aragon/ui';
 import OptionBoard from './OptionBoard';
 import TabBoard from './TabBoard';
 import BuyAndSell from './BuyAndSell';
@@ -97,7 +97,8 @@ function OptionTrading({ user, theme }) {
       <FlexWrapper>
         <LeftPart>
           <Header />
-          <Header />
+          <br />
+          <br />
           <BuyAndSell
             user={user}
             baseAsset={baseAsset}
@@ -165,8 +166,8 @@ const RightPart = styled.div`
 
 const WholeScreen = styled.div`
   textAlign: center;
-  padding-left: 7%;
-  padding-right: 7%;
+  padding-left: 5%;
+  padding-right: 5%;
   position:fixed;
   overflow-y:scroll;
   overflow-x:hidden;

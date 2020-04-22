@@ -68,8 +68,8 @@ function OrderBook({
             renderSelectionCount={(x) => `${x} Orders Selected`}
             fields={['price', 'amount', 'filled', 'expiration']}
             renderEntry={(order) => [
-              <AskText>{zeroXUtil.getAskPrice(order, option.decimals, quoteAsset.decimals).toFixed(6)}</AskText>,
-              toTokenUnitsBN(order.order.makerAssetAmount, option.decimals).toFixed(3),
+              <AskText>{zeroXUtil.getAskPrice(order, option.decimals, quoteAsset.decimals).toFixed(4)}</AskText>,
+              toTokenUnitsBN(order.order.makerAssetAmount, option.decimals).toFixed(4),
               `${zeroXUtil.getOrderFillRatio(order)}%`,
               <Timer format="hms" showIcon end={new Date(order.order.expirationTimeSeconds * 1000)} />,
             ]}
@@ -87,8 +87,8 @@ function OrderBook({
             renderSelectionCount={(x) => `${x} Orders Selected`}
             fields={['price', 'amount', 'filled', 'expiration']}
             renderEntry={(order) => [
-              <BidText>{zeroXUtil.getBidPrice(order, quoteAsset.decimals, option.decimals).toFixed(6)}</BidText>,
-              toTokenUnitsBN(order.order.takerAssetAmount, option.decimals).toFixed(3),
+              <BidText>{zeroXUtil.getBidPrice(order, quoteAsset.decimals, option.decimals).toFixed(4)}</BidText>,
+              toTokenUnitsBN(order.order.takerAssetAmount, option.decimals).toFixed(4),
               `${zeroXUtil.getOrderFillRatio(order)}%`,
               <Timer format="hms" showIcon end={new Date(order.order.expirationTimeSeconds * 1000)} />,
             ]}

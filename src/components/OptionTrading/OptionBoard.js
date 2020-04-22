@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import {
-  DataView, DropDown, LinkBase, Radio, Header,
+  DataView, DropDown, LinkBase, Radio, Header, Tag,
 } from '@aragon/ui';
 import { AskText, BidText } from './styled';
 
@@ -25,13 +25,10 @@ function OptionBoard({
   useEffect(() => {
     let isCancelled = false;
     const updateBoardStats = async () => {
-      // console.log('update board');
       const [callData, putData] = await Promise.all([
         getBasePairAskAndBids(calls, quoteAsset),
         getBasePairAskAndBids(puts, quoteAsset),
       ]);
-
-      // console.log(putData);
 
       if (!isCancelled) {
         setCallStats(callData);
@@ -39,7 +36,7 @@ function OptionBoard({
       }
     };
     updateBoardStats();
-    const id = setInterval(updateBoardStats, 5000);
+    const id = setInterval(updateBoardStats, 3000);
 
     return () => {
       clearInterval(id);
@@ -49,13 +46,24 @@ function OptionBoard({
 
   return (
     <div>
-      <Header primary="ETH Option Trading" />
+      <div style={{ display: 'flex' }}>
+        {' '}
+        <Header primary="Option Trading" />
+        {' '}
+        <div style={{ paddingTop: '24px' }}>
+          <Tag> beta </Tag>
+        </div>
+        <div style={{ paddingTop: '28px', paddingLeft: '36px' }}>
+          <DropDown
+            items={optionsByDate.map((item) => item.expiryText)}
+            selected={selectedExpiryIdx}
+            onChange={setExpiryIdx}
+          />
+        </div>
+      </div>
+
       {/* <div style={{ display: 'flex' }}> */}
-      <DropDown
-        items={optionsByDate.map((item) => item.expiryText)}
-        selected={selectedExpiryIdx}
-        onChange={setExpiryIdx}
-      />
+
       {/* </div> */}
       <div style={{ display: 'flex', padding: '0px' }}>
         <SectionTitle title="Calls" />
@@ -108,8 +116,8 @@ function OptionBoard({
 
           if (callDetail !== undefined) {
             // have call option has this strike price
-            callAsk = callDetail.bestAskPrice.toFixed(6);
-            callBid = callDetail.bestBidPrice.toFixed(6);
+            callAsk = callDetail.bestAskPrice.toFixed(4);
+            callBid = callDetail.bestBidPrice.toFixed(4);
             callOnclick = () => { setBaseAsset(call); };
 
             callBidOnclick = () => {
@@ -125,8 +133,8 @@ function OptionBoard({
           }
           if (putDetail !== undefined) {
             // has put option has this strike price
-            putAsk = putDetail.bestAskPrice.toFixed(6);
-            putBid = putDetail.bestBidPrice.toFixed(6);
+            putAsk = putDetail.bestAskPrice.toFixed(4);
+            putBid = putDetail.bestBidPrice.toFixed(4);
             putOnclick = () => { setBaseAsset(put); };
 
             putBidOnclick = () => {
@@ -233,7 +241,7 @@ function Cell({
 }) {
   return (
     <LinkBase onClick={onClick}>
-      <div style={{ width: '80px', textAlign: 'center' }}>
+      <div style={{ width: '60px', textAlign: 'center' }}>
         { type === 'bid' ? (
           <BidText>
             {' '}

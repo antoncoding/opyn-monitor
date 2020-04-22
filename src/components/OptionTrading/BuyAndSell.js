@@ -212,7 +212,7 @@ function BuyAndSell({
       setRate(new BigNumber(0));
       return;
     }
-    const rateBN = new BigNumber(newrate);
+    const rateBN = new BigNumber(new BigNumber(newrate).toFixed(4));
     setRate(rateBN);
 
     // adjusting rate will not be filling orders anymore
@@ -225,13 +225,33 @@ function BuyAndSell({
     setQuoteAssetAmount(quoteAmount);
   };
 
-  const checkAndAllowQuoteAsset = async (quoteAssetAmountBase) => {
-    // const quoteAssetInBaseUnit = toBaseUnitBN(quoteAssetAmount, quoteAsset.decimals);
+  const checkAndAllowQuoteAsset = async (quoteAssetAmountInBase) => {
     const quoteAllowance = new BigNumber(await getAllowance(quoteAsset.addr, user, ZeroX_ERC20Proxy));
-    if (quoteAllowance.lt(quoteAssetAmountBase)) {
+    if (quoteAllowance.lt(quoteAssetAmountInBase)) {
       toast(`Please approve 0x to spend your oToken ${quoteAsset.symbol}`);
       await approve(quoteAsset.addr, ZeroX_ERC20Proxy);
     }
+  };
+
+  const checkQuoteAssetBalance = (quoteAssetAmountInBase) => {
+    if (quoteAssetAmountInBase.gt(quoteAssetBalance)) {
+      if (quoteAsset.addr === WETH.addr) {
+        setPanelHelperText('You dont have enough WETH to make this order, you may need to wrap some ETH into WETH.');
+        setPanelOpended(true);
+        return false;
+      }
+      toast(`Insufficient ${quoteAsset.symbol}`);
+      return false;
+    }
+    return true;
+  };
+
+  const checkBaseAssetBalance = (baseAssetAmountInBase) => {
+    if (baseAssetAmountInBase.gt(baseAssetBalance)) {
+      toast(`Insufficient ${baseAsset.symbol}`);
+      return false;
+    }
+    return true;
   };
 
   const checkAndAllowBaseAsset = async (baseAssetAmountBase) => {
@@ -250,15 +270,9 @@ function BuyAndSell({
     let order;
     if (tradeType === 'buy') {
       const quoteAssetInBaseUnit = toBaseUnitBN(baseAmountToCreate.times(rate), quoteAsset.decimals);
+
       // check quote asset balance
-      if (quoteAssetInBaseUnit.gt(quoteAssetBalance)) {
-        if (quoteAsset.addr === WETH.addr) {
-          setPanelHelperText('You dont have enough WETH to make this order, you may need to wrap some ETH into WETH.');
-          setPanelOpended(true);
-          return;
-        }
-        toast(`Insufficient ${quoteAsset.symbol}`);
-      }
+      if (!checkQuoteAssetBalance(quoteAssetInBaseUnit)) return;
 
       // check quote asset allowance
       await checkAndAllowQuoteAsset(quoteAssetInBaseUnit);
@@ -274,6 +288,9 @@ function BuyAndSell({
       );
     } else {
       const baseAssetInBaseUnit = toBaseUnitBN(baseAmountToCreate, baseAsset.decimals);
+
+      if (!checkBaseAssetBalance(baseAssetInBaseUnit)) return;
+
       await checkAndAllowBaseAsset(baseAssetInBaseUnit);
 
       order = createOrder(
@@ -296,8 +313,10 @@ function BuyAndSell({
   const clickFillOrders = async () => {
     const takerAmountBase = fillingtakerAmounts.reduce((prev, cur) => prev.plus(new BigNumber(cur)), new BigNumber(0));
     if (tradeType === 'buy') {
+      if (!checkQuoteAssetBalance(takerAmountBase)) return;
       await checkAndAllowQuoteAsset(takerAmountBase);
     } else {
+      if (!checkBaseAssetBalance(takerAmountBase)) return;
       await checkAndAllowBaseAsset(takerAmountBase);
     }
     await fillOrders(
@@ -393,7 +412,7 @@ function BuyAndSell({
               adornment={baseAsset.symbol}
             />
 
-            <Label>Price per token</Label>
+            <Label>Price Per Token</Label>
             <TextInput
               wide
               type="number"
@@ -428,8 +447,8 @@ function BuyAndSell({
                 <Flex>
                   <p style={{ paddingRight: '5px' }}>Fee</p>
                   <Help hint="Why am I paying?">
-                    The fee is charged by 0x.
-                    The higher your gasPrice is, the higher you will be charged for.
+                    This is the protocol fee charged by 0x.
+                    In addition to this, you still need to pay for gas if you are taking orders.
                   </Help>
                 </Flex>
               </BottomText>
@@ -443,7 +462,7 @@ function BuyAndSell({
               ? (
                 <Button
                   onClick={clickFillAndCreate}
-                  label="Fill And Create"
+                  label="Create And Fill"
                   wide
                 />
               )
