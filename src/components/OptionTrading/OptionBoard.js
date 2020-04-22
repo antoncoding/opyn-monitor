@@ -72,15 +72,17 @@ function OptionBoard({
       <DataView
         mode="table"
         fields={[
-          { label: 'select', align: 'start' },
+
           { label: 'last', align: 'start' },
           { label: 'bid', align: 'start' },
           { label: 'ask', align: 'start' },
+          { label: ' ', align: 'start' },
           { label: 'strike', align: 'start' },
+          { label: ' ', align: 'start' },
           { label: 'last', align: 'start' },
           { label: 'bid', align: 'start' },
           { label: 'ask', align: 'start' },
-          { label: 'select', align: 'end' },
+
         ]}
         entries={optionsByDate[selectedExpiryIdx] ? optionsByDate[selectedExpiryIdx].entry : []}
         renderEntry={({
@@ -140,27 +142,28 @@ function OptionBoard({
           }
 
           return [
-            <div style={{ width: '80px' }}>
+            <Cell onClick={callOnclick} text={lastCallPrice} type="normal" />,
+            <Cell onClick={callBidOnclick} text={callBid} type="bid" />,
+            <Cell onClick={callAskOnclick} text={callAsk} type="ask" />,
+            <div style={{ width: '30px' }}>
               <Radio
                 disabled={!call}
                 onChange={() => setBaseAsset(call)}
                 checked={call && call.addr === baseAsset.addr}
               />
             </div>,
-            <Cell onClick={callOnclick} text={lastCallPrice} type="normal" />,
-            <Cell onClick={callBidOnclick} text={callBid} type="bid" />,
-            <Cell onClick={callAskOnclick} text={callAsk} type="ask" />,
-            <div style={{ fontSize: 20, width: '60px', padding: '10px' }}>{strikePrice}</div>,
-            <Cell onClick={putOnclick} text={lastPutPrice} type="normal" />,
-            <Cell onClick={putBidOnclick} text={putBid} type="bid" />,
-            <Cell onClick={putAskOnclick} text={putAsk} type="ask" />,
-            <div style={{ width: '20px' }}>
+            <div style={{ fontSize: 20, width: '50px', padding: '10px' }}>{strikePrice}</div>,
+            <div style={{ width: '30px' }}>
               <Radio
                 disabled={!put}
                 onChange={() => (setBaseAsset(put))}
                 checked={put && put.addr === baseAsset.addr}
               />
             </div>,
+            <Cell onClick={putOnclick} text={lastPutPrice} type="normal" />,
+            <Cell onClick={putBidOnclick} text={putBid} type="bid" />,
+            <Cell onClick={putAskOnclick} text={putAsk} type="ask" />,
+
           ];
         }}
       />
