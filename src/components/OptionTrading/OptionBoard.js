@@ -44,9 +44,9 @@ function OptionBoard({
     };
   }, [calls, puts, quoteAsset]);
 
-  // onchange expiry
-  useEffect(() => {
-    for (const { call, put } of optionsByDate[selectedExpiryIdx].entry) {
+  const onExpiryChange = (idx) => {
+    setExpiryIdx(idx);
+    for (const { call, put } of optionsByDate[idx].entry) {
       if (call !== undefined) {
         setBaseAsset(call);
         return;
@@ -55,7 +55,7 @@ function OptionBoard({
         return;
       }
     }
-  }, [selectedExpiryIdx, optionsByDate, setBaseAsset]);
+  };
 
   return (
     <div>
@@ -70,7 +70,7 @@ function OptionBoard({
           <DropDown
             items={optionsByDate.map((item) => item.expiryText)}
             selected={selectedExpiryIdx}
-            onChange={setExpiryIdx}
+            onChange={onExpiryChange}
           />
         </div>
       </div>

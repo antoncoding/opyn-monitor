@@ -39,7 +39,7 @@ function HomePage() {
             description="Buy, Sell or Provided Liquidity."
             iconUrl="https://opyn.co/static/media/3.4da8b24d.svg"
             onClick={() => {
-              history.push('./trade');
+              history.push('/uniswap/');
             }}
           />
         </div>
