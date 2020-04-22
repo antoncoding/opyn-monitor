@@ -51,15 +51,15 @@ function App() {
             <ManageVault user={user} />
           </Route>
           {/* Trading */}
-          <Route path="/trade/eth-options/">
+          <Route path="/trade/oeth-usdc/">
             <OptionTrading
               user={user}
               theme={theme}
             />
           </Route>
           {/* <Route path="/trades/test/"><ZEROXTest /></Route> */}
-          <Route path="/trade/:token/"><Uniswap user={user} /></Route>
-          <Route path="/trade/">
+          <Route path="/uniswap/:token/"><Uniswap user={user} /></Route>
+          <Route path="/uniswap/">
             <Trade />
           </Route>
           {/* HomePage */}

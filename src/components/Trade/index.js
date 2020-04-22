@@ -11,16 +11,16 @@ import tracker from '../../utils/tracker';
 
 function TradeLanding() {
   const history = useHistory();
-  tracker.pageview('/trade/');
+  tracker.pageview('/uniswap/');
   const goToTrade = (addr) => {
-    history.push(`/trade/${addr}`);
+    history.push(`/uniswap/${addr}`);
   };
 
   const [showExpired, setShowExpired] = useState(getPreference('showExpired', '0') === '1');
 
   return (
     <>
-      <Header primary="Trade" />
+      <Header primary="Trade on Uniswap" />
       <div style={{ display: 'flex' }}>
         <Comment text="Buy or Sell DeFi Insurance" />
         <div style={{ marginLeft: 'auto' }}>
