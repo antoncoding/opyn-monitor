@@ -84,8 +84,8 @@ function OpenVaultModal({ user, option }) {
     await openVaultAddCollateralAndMint(
       option.addr,
       option.collateral.addr,
-      toBaseUnitBN(collateralAmt, option.collateral.decimals),
-      toBaseUnitBN(mintTokenAmt, option.decimals),
+      toBaseUnitBN(collateralAmt, option.collateral.decimals).toString(),
+      toBaseUnitBN(mintTokenAmt, option.decimals).toString(),
     );
     history.push(`/manage/${option.addr}/${user}`);
   };
