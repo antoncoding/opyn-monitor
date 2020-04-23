@@ -90,7 +90,7 @@ export const eth_puts = [
     underlying: tokens.OPYN_ETH,
     strike: tokens.USDC,
     strikePrice: 1.5e-5,
-    strikePriceInUSD: 160,
+    strikePriceInUSD: 150,
     minRatio: 1,
     exchange: '0x39246c4f3f6592c974ebc44f80ba6dc69b817c71',
     uniswapExchange: '0x75B865EA22a2b6633038E15647357268C7F9Ac54',
