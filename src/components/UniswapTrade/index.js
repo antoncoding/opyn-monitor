@@ -25,7 +25,7 @@ function UniswapPool({ user }) {
   tracker.pageview(`trade/${token}`);
   const option = allOptions.find((o) => o.addr === token);
   const {
-    uniswapExchange, decimals, symbol, exchange,
+    uniswapExchange, decimals, symbol, exchange, strikePriceInUSD,
   } = option;
 
   const [poolTokenBalance, setPoolTokenBalance] = useState(new BigNumber(0));
@@ -106,6 +106,7 @@ function UniswapPool({ user }) {
       />
 
       <OptionExchange
+        strikePriceInUSD={strikePriceInUSD}
         symbol={symbol}
         tokenBalance={userTokenBalance}
         token={token}

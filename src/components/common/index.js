@@ -5,6 +5,7 @@ import SectionTitle from './SectionTitle';
 import MaxButton from './MaxButton';
 import HelperText from './HelpText';
 import PriceSection from './PriceSection';
+import WarningText from './Warning';
 import Comment from './Comment';
 import { ManageVaultButton, OpenVaultButton } from './VaultButton';
 import Wrapper from './Wrapper';
@@ -23,4 +24,5 @@ export {
   PriceSection,
   Comment,
   Wrapper,
+  WarningText,
 };

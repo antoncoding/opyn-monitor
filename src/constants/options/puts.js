@@ -93,7 +93,7 @@ export const eth_puts = [
     strikePriceInUSD: 160,
     minRatio: 1,
     exchange: '0x39246c4f3f6592c974ebc44f80ba6dc69b817c71',
-    uniswapExchange: '0x6e809644b310db8783f3fe2a435389e984d776942378cff299376b2dcfd691fb',
+    uniswapExchange: '0x75B865EA22a2b6633038E15647357268C7F9Ac54',
     expiry: 1590739200,
   },
 ];

@@ -5,6 +5,7 @@ import {
 } from '@aragon/ui';
 import styled from 'styled-components';
 import BigNumber from 'bignumber.js';
+import { WarningText } from '../common';
 import {
   createOrder, broadcastOrders, getOrdersTotalFillables, getGasPrice, getFillAmountsOfOrders,
 } from '../../utils/0x';
@@ -403,6 +404,9 @@ function BuyAndSell({
           </TabWrapper>
           <LowerPart>
             <Label>Amount</Label>
+            { baseAsset.symbol.toLowerCase().includes('call')
+              ? <WarningText text={`Buy ${baseAsset.strikePriceInUSD} ${baseAsset.symbol} to hedge 1 ETH.`} />
+              : <></> }
             <TextInput
               wide
               type="number"

@@ -4,11 +4,14 @@ import {
   Box, TextInput, Button, IconCirclePlus, IconCircleMinus,
 } from '@aragon/ui';
 import BigNumber from 'bignumber.js';
+import {
+  WarningText, BalanceBlock, MaxButton, PriceSection,
+} from '../common';
 import { buyOTokensFromExchange, sellOTokensFromExchange } from '../../utils/web3';
 
 import { getPremiumToPay, getPremiumReceived } from '../../utils/infura';
 
-import { BalanceBlock, MaxButton, PriceSection } from '../common';
+
 import { toBaseUnitBN, fromWei } from '../../utils/number';
 
 /**
@@ -19,7 +22,7 @@ import { toBaseUnitBN, fromWei } from '../../utils/number';
  * }} param0
  */
 function OptionExchange({
-  symbol, tokenBalance, token, exchange, decimals,
+  symbol, tokenBalance, token, exchange, decimals, strikePriceInUSD,
 }) {
   const [buyAmt, setBuyAmt] = useState(new BigNumber(0));
   const [sellAmt, setSellAmt] = useState(new BigNumber(0));
@@ -140,16 +143,24 @@ function OptionExchange({
           <PriceSection label="Premium" amt={premiumReceived} />
         </div>
       </div>
+      { symbol.toLowerCase().includes('call')
+        ? <WarningText text={`Buy ${strikePriceInUSD} ${symbol} to hedge 1 ETH`} />
+        : <></> }
     </Box>
   );
 }
 
 OptionExchange.propTypes = {
   symbol: PropTypes.string.isRequired,
+  strikePriceInUSD: PropTypes.number,
   tokenBalance: PropTypes.instanceOf(BigNumber).isRequired,
   token: PropTypes.string.isRequired,
   exchange: PropTypes.string.isRequired,
   decimals: PropTypes.number.isRequired,
+};
+
+OptionExchange.defaultProps = {
+  strikePriceInUSD: 0,
 };
 
 export default OptionExchange;
