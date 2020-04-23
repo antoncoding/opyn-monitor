@@ -195,6 +195,9 @@ function ManageVault({ user }) {
               decimals={decimals}
               symbol={symbol}
               setNewRatio={setNewRatio}
+              // for call heler text
+              strikePriceInUSD={option.strikePriceInUSD}
+              collateralSymbol={option.collateral.symbol}
             />
           ) : (
             <></>

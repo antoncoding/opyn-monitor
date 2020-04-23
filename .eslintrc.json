@@ -27,7 +27,7 @@
         "react/jsx-filename-extension": "off",
         "prefer-destructuring": "off",
         "no-nested-ternary": "off",
-        "max-len": ["error", { "code": 120, "ignoreTrailingComments": true }],
+        "max-len": ["error", { "code": 130, "ignoreTrailingComments": true }],
         "jsx-curly-spacing": "off",
         "no-use-before-define": "off",
         "camelcase": "off"

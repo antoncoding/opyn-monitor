@@ -13,7 +13,7 @@ import {
 
 import BigNumber from 'bignumber.js';
 import {
-  SectionTitle, OpenVaultButton, Comment, HelperText,
+  SectionTitle, OpenVaultButton, Comment, HelperText, WarningText,
 } from '../common';
 import * as myType from '../types';
 
@@ -135,6 +135,9 @@ function OpenVaultModal({ user, option }) {
               />
             </div>
           </div>
+          { option.symbol.toLowerCase().includes('call')
+            ? <WarningText text={`1 ${option.collateral.symbol} can create ${option.strikePriceInUSD} ${option.symbol}`} />
+            : <></>}
           <Button label="Mint" onClick={mint} />
           { ratio === Infinity
             ? <> </>

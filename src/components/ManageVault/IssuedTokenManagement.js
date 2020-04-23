@@ -5,7 +5,7 @@ import {
   Box, TextInput, Button, IconCirclePlus, IconCircleMinus,
 } from '@aragon/ui';
 import { burnOToken, issueOToken } from '../../utils/web3';
-import { BalanceBlock, MaxButton } from '../common';
+import { BalanceBlock, MaxButton, WarningText } from '../common';
 import { toBaseUnitBN, toTokenUnitsBN } from '../../utils/number';
 import { calculateRatio } from '../../utils/calculation';
 import * as MyPTypes from '../types';
@@ -29,6 +29,8 @@ function IssuedTokenManagement({
   decimals,
   symbol,
   setNewRatio,
+  strikePriceInUSD,
+  collateralSymbol,
 }) {
   const [issueAmt, setIssueAmt] = useState(new BigNumber(0));
   const [burnAmt, setBurnAmt] = useState(new BigNumber(0));
@@ -157,6 +159,9 @@ function IssuedTokenManagement({
           </div>
         </div>
       </div>
+      { symbol.toLowerCase().includes('call')
+        ? <WarningText text={`1 ${collateralSymbol} can create ${strikePriceInUSD} ${symbol}`} />
+        : <></>}
     </Box>
   );
 }
@@ -172,6 +177,9 @@ IssuedTokenManagement.propTypes = {
   decimals: PropTypes.number.isRequired,
   symbol: PropTypes.string.isRequired,
   setNewRatio: PropTypes.func.isRequired,
+  //
+  strikePriceInUSD: PropTypes.number.isRequired,
+  collateralSymbol: PropTypes.string.isRequired,
 };
 
 export default IssuedTokenManagement;
