@@ -1,7 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { useHistory } from 'react-router-dom';
-import { Header, Box, LinkBase } from '@aragon/ui';
+import {
+  Header, Box, LinkBase, Tag,
+} from '@aragon/ui';
 
 function HomePage() {
   const history = useHistory();
@@ -35,26 +37,45 @@ function HomePage() {
 
         <div style={{ width: '30%', marginLeft: '3%' }}>
           <MainButton
-            title="Trade"
+            title="Exchange"
             description="Buy, Sell or Provided Liquidity."
-            iconUrl="https://opyn.co/static/media/3.4da8b24d.svg"
+            iconUrl="https://i.imgur.com/4eX8GlY.png"
+            // iconUrl="https://opyn.co/static/media/3.4da8b24d.svg"
             onClick={() => {
               history.push('/uniswap/');
             }}
           />
         </div>
+
       </div>
+      <div style={{ padding: '1%', display: 'flex', alignItems: 'center' }}>
+        <div style={{ width: '30%' }}>
+          <MainButton
+            title="Trade"
+            tag="new"
+            description="Trade ETH Options on 0x"
+            iconUrl="https://cdn.worldvectorlogo.com/logos/0x-virtual-money-.svg"
+            onClick={() => {
+              history.push('/trade/oeth-usdc');
+            }}
+          />
+        </div>
+      </div>
+
     </>
   );
 }
 
 function MainButton({
-  title, description, iconUrl, onClick,
+  title, description, iconUrl, onClick, tag,
 }) {
   return (
     <LinkBase onClick={onClick} style={{ width: '100%' }}>
       <Box>
-        <div style={{ padding: 10, fontSize: 18 }}>{title}</div>
+        <div style={{ padding: 10, fontSize: 18 }}>
+          {title}
+          {tag ? <Tag>{tag}</Tag> : <></>}
+        </div>
         <img alt="icon" style={{ padding: 10, height: 64 }} src={iconUrl} />
         <div style={{ paddingTop: 5, opacity: 0.5 }}>
           {' '}
@@ -69,9 +90,14 @@ function MainButton({
 
 MainButton.propTypes = {
   title: PropTypes.string.isRequired,
+  tag: PropTypes.string,
   description: PropTypes.string.isRequired,
   iconUrl: PropTypes.string.isRequired,
   onClick: PropTypes.func.isRequired,
+};
+
+MainButton.defaultProps = {
+  tag: '',
 };
 
 export default HomePage;
