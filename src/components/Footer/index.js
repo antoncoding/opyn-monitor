@@ -1,9 +1,11 @@
 import React from 'react';
-
+import { useHistory } from 'react-router-dom';
 import { Link } from '@aragon/ui';
 import PropTypes from 'prop-types';
 
 function Footer({ theme }) {
+  const history = useHistory();
+
   const style = {
     backgroundColor: theme === 'light' ? '#F8F8F8' : '#35425e',
     textAlign: 'center',
@@ -17,33 +19,37 @@ function Footer({ theme }) {
   };
 
   return (
-    <div style={style}>
-      Powered By
-      {' '}
-      <Link external href="https://opyn.co/#/">
-        Opyn
-      </Link>
-      {', '}
-      <Link external href="https://ui.aragon.org/">
-        Aragon UI
-      </Link>
-      {', '}
-      <Link external href="https://www.blocknative.com/">
-        Blocknative
-      </Link>
-      {'. '}
-      <Link external href="https://www.kollateral.co/">
-        Kollateral
-      </Link>
-      {'. '}
-      Hosted on
-      {' '}
-      {' '}
-      <Link external href="https://github.com/antoncoding/opyn-liquidator">
-        GitHub
-      </Link>
-      {/* </div> */}
-    </div>
+    history.location.pathname.includes('/trade/')
+      ? <></>
+      : (
+        <div style={style}>
+          Powered By
+          {' '}
+          <Link external href="https://opyn.co/#/">
+            Opyn
+          </Link>
+          {', '}
+          <Link external href="https://ui.aragon.org/">
+            Aragon UI
+          </Link>
+          {', '}
+          <Link external href="https://www.blocknative.com/">
+            Blocknative
+          </Link>
+          {'. '}
+          <Link external href="https://www.kollateral.co/">
+            Kollateral
+          </Link>
+          {'. '}
+          Hosted on
+          {' '}
+          {' '}
+          <Link external href="https://github.com/antoncoding/opyn-liquidator">
+            GitHub
+          </Link>
+          {/* </div> */}
+        </div>
+      )
   );
 }
 

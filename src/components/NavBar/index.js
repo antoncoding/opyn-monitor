@@ -3,8 +3,7 @@ import PropTypes from 'prop-types';
 import { useHistory } from 'react-router-dom';
 
 import {
-  Bar, BackButton, LinkBase,
-  // Tag,
+  Bar, BackButton, LinkBase, Tag,
 } from '@aragon/ui';
 import ConnectButton from './ConnectButton';
 import ChangeModeButton from './SettingsButton';
@@ -61,14 +60,14 @@ function NavBar({
               }}
               isSelected={history.location.pathname.includes('/uniswap/')}
             />
-            {/* <LinkButton
+            <LinkButton
               title="Trade"
               onClick={() => {
                 history.push('/trade/oeth-usdc');
               }}
               isSelected={history.location.pathname.includes('/trade/')}
             />
-            <Tag> beta </Tag> */}
+            <Tag> beta </Tag>
           </>
         )
       }

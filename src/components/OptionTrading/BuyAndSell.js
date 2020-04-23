@@ -94,7 +94,7 @@ function BuyAndSell({
       if (!isCanceled) setFastGasPrice(new BigNumber(fast).div(new BigNumber(10)));
     }
     fetchGasPrice();
-    const id = setInterval(fetchGasPrice, 30000);
+    const id = setInterval(fetchGasPrice, 10000);
 
     return () => {
       isCanceled = true;
