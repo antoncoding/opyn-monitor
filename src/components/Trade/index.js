@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import {
-  Header, DataView, IdentityBadge, Button,
+  Header, DataView, IdentityBadge, Button, IconShare,
 } from '@aragon/ui';
 import { insurances, eth_options } from '../../constants/options';
 
@@ -41,7 +41,10 @@ function TradeLanding() {
         renderEntry={({ addr, title }) => [
           <>{title}</>,
           <IdentityBadge entity={addr} shorten={false} />,
-          <Button onClick={() => goToTrade(addr)}> Start Trading </Button>,
+          <div style={{ display: 'flex' }}>
+            <Button onClick={() => goToTrade(addr)}> Start Trading </Button>
+            <GoToUniswapFunction token={addr} />
+          </div>,
         ]}
       />
       <br />
@@ -53,10 +56,26 @@ function TradeLanding() {
         renderEntry={({ addr, title }) => [
           <>{title}</>,
           <IdentityBadge entity={addr} shorten={false} />,
-          <Button onClick={() => goToTrade(addr)}> Start Trading </Button>,
+          <div style={{ display: 'flex' }}>
+            <Button onClick={() => goToTrade(addr)}> Start Trading </Button>
+            <GoToUniswapFunction token={addr} />
+          </div>,
+
         ]}
       />
     </>
+  );
+}
+
+function GoToUniswapFunction({ token }) {
+  return (
+    <Button onClick={() => window.open(
+      `https://uniswap.exchange/swap?inputCurrency=${token}`,
+      '_blank',
+    )}
+    >
+      <img alt="uniswap" src="https://i.imgur.com/4eX8GlY.png" style={{ padding: 2, height: 25, width: 23 }} />
+    </Button>
   );
 }
 
