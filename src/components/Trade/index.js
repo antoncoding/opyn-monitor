@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import {
-  Header, DataView, IdentityBadge, Button, IconShare,
+  Header, DataView, IdentityBadge, Button,
 } from '@aragon/ui';
 import { insurances, eth_options } from '../../constants/options';
 
