@@ -39,7 +39,13 @@ function MyOrders({
     <>
       <DataView
         entriesPerPage={4}
-        statusEmpty={<div>No Open Orders</div>}
+        statusEmpty={(
+          <div>
+            No Open Orders for
+            {' '}
+            {option.title}
+          </div>
+)}
         page={myOrdersPage}
         onPageChange={setMyOrdersPage}
         onSelectEntries={setSelectedOrders}
