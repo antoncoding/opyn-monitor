@@ -14,39 +14,65 @@ import { option as OptionType, token as TokenType } from '../types';
 function OptionBoard({
   calls, puts, baseAsset, quoteAsset, setBaseAsset, setTradeType, setSelectedOrders,
 }) {
-  const [putStats, setPutStats] = useState([]);
-  const [callStats, setCallStats] = useState([]);
+  const optionsByDate = groupByDate(puts, calls);
 
+  const [isLoading, setIsLoading] = useState(true);
   const [selectedExpiryIdx, setExpiryIdx] = useState(0);
+  const [entriesToDisplay, setEntriesToDisplay] = useState([]);
 
-  const optionsByDate = groupByDate(puts, calls, putStats, callStats);
-
-  // get option status
+  // on expiry change: start the call and put update function on the options of that day
   useEffect(() => {
+    setIsLoading(true);
     let isCancelled = false;
+
     const updateBoardStats = async () => {
+      const callsOfExpiry = optionsByDate[selectedExpiryIdx].pairs
+        .filter((pair) => pair.call !== undefined)
+        .map((pair) => pair.call);
+
+      const putsOfExpiry = optionsByDate[selectedExpiryIdx].pairs
+        .filter((pair) => pair.put !== undefined)
+        .map((pair) => pair.put);
+
       const [callData, putData] = await Promise.all([
-        getBasePairAskAndBids(calls, quoteAsset),
-        getBasePairAskAndBids(puts, quoteAsset),
+        getBasePairAskAndBids(callsOfExpiry, quoteAsset),
+        getBasePairAskAndBids(putsOfExpiry, quoteAsset),
       ]);
 
+      const displayEntries = [];
+      optionsByDate[selectedExpiryIdx].pairs.forEach((pair) => {
+        const { call, put, strikePrice } = pair;
+        const entry = { strikePrice };
+        if (call !== undefined) {
+          // has call option on this strikePrice
+          entry.call = call;
+          entry.callDetail = callData.find((c) => c.option === call.addr);
+        }
+        if (put !== undefined) {
+          entry.put = put;
+          entry.putDetail = putData.find((p) => p.option === put.addr);
+        }
+        displayEntries.push(entry);
+      });
+
       if (!isCancelled) {
-        setCallStats(callData);
-        setPutStats(putData);
+        setIsLoading(false);
+        setEntriesToDisplay(displayEntries);
       }
     };
     updateBoardStats();
-    const id = setInterval(updateBoardStats, 5000);
+    const id = setInterval(updateBoardStats, 3000);
 
     return () => {
       clearInterval(id);
       isCancelled = true;
     };
-  }, [calls, puts, quoteAsset]);
+  }, [selectedExpiryIdx, quoteAsset, calls, puts, optionsByDate]);
 
+  // when selection change: update selected order to the first option of the expiry
   const onExpiryChange = (idx) => {
     setExpiryIdx(idx);
-    for (const { call, put } of optionsByDate[idx].entry) {
+    for (const { call, put } of optionsByDate[idx].pairs) {
       if (call !== undefined) {
         setBaseAsset(call);
         return;
@@ -92,8 +118,8 @@ function OptionBoard({
       {/* Calls */}
       <DataView
         mode="table"
+        status={isLoading ? 'loading' : 'default'}
         fields={[
-
           { label: 'last', align: 'start' },
           { label: 'bid', align: 'start' },
           { label: 'ask', align: 'start' },
@@ -105,7 +131,7 @@ function OptionBoard({
           { label: 'ask', align: 'start' },
 
         ]}
-        entries={optionsByDate[selectedExpiryIdx] ? optionsByDate[selectedExpiryIdx].entry : []}
+        entries={entriesToDisplay}
         renderEntry={({
           call,
           put,
@@ -208,11 +234,10 @@ export default OptionBoard;
  *
  * @param {Array<{strikePriceInUSD:number, addr:string, expiry:number}>} puts
  * @param {Array<{strikePriceInUSD:number, addr:string, expiry:number}>} calls
- * @param {Array<{option: string, bestBidPrice: BigNumber, bestAskPrice: BigNumber}>} putStats
- * @param {Array<{option: string, bestBidPrice: BigNumber, bestAskPrice: BigNumber}>} callStats
- * @returns {} key: expiry in string, value: array of { call, put, callDetail, putDetail, strikePrice}
+ * @returns {{ expiry:number, expiryText:string, pairs: {call: {}, put: {}, strikePrice: number }[] }[]}
+ * key: expiry in string, value: array of { call, put, callDetail, putDetail, strikePrice}
  */
-function groupByDate(puts, calls, putStats, callStats) {
+function groupByDate(puts, calls) {
   const result = [];
   const allOptions = puts.concat(calls).filter((option) => option.expiry > Date.now() / 1000);
   const distinctExpirys = [...new Set(allOptions.map((option) => option.expiry))];
@@ -224,27 +249,23 @@ function groupByDate(puts, calls, putStats, callStats) {
     ];
 
     // const allStrikesForThisDay = {};
-    const entries = [];
+    const pairs = [];
     for (const strikePrice of strikePrices) {
       const put = puts.find((o) => o.strikePriceInUSD === strikePrice && o.expiry === expiry);
       const call = calls.find((o) => o.strikePriceInUSD === strikePrice && o.expiry === expiry);
-      const putDetail = put ? putStats.find((p) => p.option === put.addr) : undefined;
-      const callDetail = call ? callStats.find((c) => c.option === call.addr) : undefined;
-      entries.push({
+      pairs.push({
         strikePrice,
         call,
         put,
-        callDetail,
-        putDetail,
       });
     }
-    entries.sort((a, b) => (a.strikePrice > b.strikePrice ? 1 : -1));
+    pairs.sort((a, b) => (a.strikePrice > b.strikePrice ? 1 : -1));
     const expiryText = new Date(expiry * 1000).toDateString();
     result.push({
+      expiry,
       expiryText,
-      entry: entries,
+      pairs,
     });
-    // result[expiryKey] = entryRow;
   }
   return result;
 }

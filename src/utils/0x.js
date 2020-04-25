@@ -76,7 +76,7 @@ export async function getOrderBook(base, quote) {
  * get oToken:WETH stats (v1) for all options
  * @param {Array<{addr:string, decimals:number}>} options
  * @param {{addr:string, decimals:number}} quoteAsset
- * @return {Promise<Arrya< option: address, bestAskPrice: BigNumber, bestAskPrice:BigNumber, bestAsk:{}, bestBid:{} >>}
+ * @return {Promise<Array< {option: string, bestAskPrice: BigNumber, bestAskPrice:BigNumber, bestAsk:{}, bestBid:{}} >>}
  */
 export async function getBasePairAskAndBids(options, quoteAsset) {
   const bestAskAndBids = await Promise.map(options, async ({ addr: option, decimals }) => {
