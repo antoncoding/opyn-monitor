@@ -76,31 +76,46 @@ export async function getOrderBook(base, quote) {
  * get oToken:WETH stats (v1) for all options
  * @param {Array<{addr:string, decimals:number}>} options
  * @param {{addr:string, decimals:number}} quoteAsset
- * @return {Promise<Array< {option: string, bestAskPrice: BigNumber, bestAskPrice:BigNumber, bestAsk:{}, bestBid:{}} >>}
+ * @return {Promise<Array<
+ * {option: string, bestAskPrice: BigNumber, bestAskPrice:BigNumber,
+ * totalBidAmt:BigNumber, totalAskAmt:BigNumber,
+ * bestAsk:{}, bestBid:{}
+ * }>>}
  */
 export async function getBasePairAskAndBids(options, quoteAsset) {
   const bestAskAndBids = await Promise.map(options, async ({ addr: option, decimals }) => {
     const { asks, bids } = await getOrderBook(option, USDC.addr);
+    let totalBidAmt = new BigNumber(0);
+    let totalAskAmt = new BigNumber(0);
     let bestAskPrice = 0;
     let bestBidPrice = 0;
     let bestAsk; let bestBid;
     const validAsks = asks.records.filter((record) => isValid(record, decimals));
     if (validAsks.length > 0) {
-      // const validAsks = asks.records.filter((record) => isValid(record, decimals));
-      const { makerAssetAmount: askTokenAmt, takerAssetAmount: askWETHAmt } = validAsks[0].order;
-      bestAskPrice = toTokenUnitsBN(askWETHAmt, quoteAsset.decimals).div(toTokenUnitsBN(askTokenAmt, decimals));
+      totalAskAmt = validAsks
+        .reduce((prev, cur) => prev.plus(toTokenUnitsBN(
+          getRemainingMakerAndTakerAmount(cur).remainingMakerAssetAmount, decimals,
+        )), new BigNumber(0));
+
+      const { makerAssetAmount: askTokenAmt, takerAssetAmount: askQuoteAmt } = validAsks[0].order;
+      bestAskPrice = toTokenUnitsBN(askQuoteAmt, quoteAsset.decimals).div(toTokenUnitsBN(askTokenAmt, decimals));
       bestAsk = validAsks[0];
     }
+
     const validBids = bids.records.filter((record) => isValid(record, decimals));
     if (validBids.length > 0) {
-      // const validBids = bids.records.filter((record) => isValid(record, decimals));
-      const { makerAssetAmount: bidWETHAmt, takerAssetAmount: bidTokenAmt } = validBids[0].order;
-      bestBidPrice = toTokenUnitsBN(bidWETHAmt, quoteAsset.decimals).div(toTokenUnitsBN(bidTokenAmt, decimals));
+      totalBidAmt = validBids
+        .reduce((prev, cur) => prev.plus(toTokenUnitsBN(
+          cur.metaData.remainingFillableTakerAssetAmount, decimals,
+        )), new BigNumber(0));
+
+      const { makerAssetAmount: bidQuoteAmt, takerAssetAmount: bidTokenAmt } = validBids[0].order;
+      bestBidPrice = toTokenUnitsBN(bidQuoteAmt, quoteAsset.decimals).div(toTokenUnitsBN(bidTokenAmt, decimals));
       bestBid = validBids[0];
     }
 
     return {
-      option, bestAskPrice, bestBidPrice, bestAsk, bestBid,
+      option, bestAskPrice, bestBidPrice, bestAsk, bestBid, totalBidAmt, totalAskAmt,
     };
   });
   return bestAskAndBids;

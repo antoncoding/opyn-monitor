@@ -9,13 +9,15 @@ import { AskText, BidText } from './styled';
 import { SectionTitle } from '../common';
 
 import { getBasePairAskAndBids } from '../../utils/0x';
-import { option as OptionType, token as TokenType } from '../types';
+import { token as TokenType } from '../types';
+
+import { eth_puts, eth_calls } from '../../constants/options';
+
+const optionsByDate = groupByDate(eth_puts, eth_calls);
 
 function OptionBoard({
-  calls, puts, baseAsset, quoteAsset, setBaseAsset, setTradeType, setSelectedOrders,
+  baseAsset, quoteAsset, setBaseAsset, setTradeType, setSelectedOrders,
 }) {
-  const optionsByDate = groupByDate(puts, calls);
-
   const [isLoading, setIsLoading] = useState(true);
   const [selectedExpiryIdx, setExpiryIdx] = useState(0);
   const [entriesToDisplay, setEntriesToDisplay] = useState([]);
@@ -67,7 +69,7 @@ function OptionBoard({
       clearInterval(id);
       isCancelled = true;
     };
-  }, [selectedExpiryIdx, quoteAsset, calls, puts, optionsByDate]);
+  }, [selectedExpiryIdx, quoteAsset]);
 
   // when selection change: update selected order to the first option of the expiry
   const onExpiryChange = (idx) => {
@@ -122,13 +124,17 @@ function OptionBoard({
         fields={[
           { label: 'last', align: 'start' },
           { label: 'bid', align: 'start' },
+          { label: 'amt', align: 'start' },
           { label: 'ask', align: 'start' },
+          { label: 'amt', align: 'start' },
           { label: ' ', align: 'start' },
           { label: 'strike', align: 'start' },
           { label: ' ', align: 'start' },
           { label: 'last', align: 'start' },
           { label: 'bid', align: 'start' },
+          { label: 'amt', align: 'start' },
           { label: 'ask', align: 'start' },
+          { label: 'amt', align: 'last' },
 
         ]}
         entries={entriesToDisplay}
@@ -142,6 +148,8 @@ function OptionBoard({
           const lastCallPrice = '-';
           let callAsk = '-';
           let callBid = '-';
+          let callBidAmt = '-';
+          let callAskAmt = '-';
           let callOnclick = () => {};
           let callBidOnclick = () => {};
           let callAskOnclick = () => {};
@@ -149,6 +157,8 @@ function OptionBoard({
           const lastPutPrice = '-';
           let putAsk = '-';
           let putBid = '-';
+          let putBidAmt = '-';
+          let putAskAmt = '-';
           let putOnclick = () => {};
           let putBidOnclick = () => {};
           let putAskOnclick = () => {};
@@ -157,6 +167,8 @@ function OptionBoard({
             // have call option has this strike price
             callAsk = callDetail.bestAskPrice.toFixed(4);
             callBid = callDetail.bestBidPrice.toFixed(4);
+            callAskAmt = callDetail.totalAskAmt.toFixed(2);
+            callBidAmt = callDetail.totalBidAmt.toFixed(2);
             callOnclick = () => { setBaseAsset(call); };
 
             callBidOnclick = () => {
@@ -174,6 +186,9 @@ function OptionBoard({
             // has put option has this strike price
             putAsk = putDetail.bestAskPrice.toFixed(4);
             putBid = putDetail.bestBidPrice.toFixed(4);
+            putAskAmt = putDetail.totalAskAmt.toFixed(2);
+            putBidAmt = putDetail.totalBidAmt.toFixed(2);
+
             putOnclick = () => { setBaseAsset(put); };
 
             putBidOnclick = () => {
@@ -191,7 +206,10 @@ function OptionBoard({
           return [
             <Cell onClick={callOnclick} text={lastCallPrice} type="normal" />,
             <Cell onClick={callBidOnclick} text={callBid} type="bid" />,
+            <Cell onClick={callBidOnclick} text={callBidAmt} type="normal" />,
+
             <Cell onClick={callAskOnclick} text={callAsk} type="ask" />,
+            <Cell onClick={callAskOnclick} text={callAskAmt} type="normal" />,
             <div style={{ width: '30px' }}>
               <Radio
                 disabled={!call}
@@ -209,7 +227,9 @@ function OptionBoard({
             </div>,
             <Cell onClick={putOnclick} text={lastPutPrice} type="normal" />,
             <Cell onClick={putBidOnclick} text={putBid} type="bid" />,
+            <Cell onClick={putBidOnclick} text={putBidAmt} type="normal" />,
             <Cell onClick={putAskOnclick} text={putAsk} type="ask" />,
+            <Cell onClick={putBidOnclick} text={putAskAmt} type="normal" />,
 
           ];
         }}
@@ -219,8 +239,6 @@ function OptionBoard({
 }
 
 OptionBoard.propTypes = {
-  calls: PropTypes.arrayOf(OptionType).isRequired,
-  puts: PropTypes.arrayOf(OptionType).isRequired,
   baseAsset: TokenType.isRequired,
   quoteAsset: TokenType.isRequired,
   setBaseAsset: PropTypes.func.isRequired,

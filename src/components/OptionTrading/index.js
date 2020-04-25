@@ -123,8 +123,6 @@ function OptionTrading({ user, theme }) {
         <RightPart>
           {/* <Header primary="Trade ETH Options" /> */}
           <OptionBoard
-            puts={eth_puts}
-            calls={eth_calls}
             quoteAsset={quoteAsset}
             baseAsset={baseAsset}
             setBaseAsset={setBaseAsset}
