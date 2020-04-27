@@ -135,7 +135,6 @@ export async function getRemoveUnderlyingHistory(owner, option) {
   return response.data.removeUnderlyingActions;
 }
 
-
 const postQuery = async (query) => {
   const options = {
     method: 'POST',

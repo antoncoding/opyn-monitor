@@ -49,9 +49,6 @@ export const calculateRatio = (collateral, tokenIssued, strikePrice, strikeValue
   const tokenIssuedBN = new BigNumber(tokenIssued);
   const strikePriceBN = new BigNumber(strikePrice);
   // const strikeValueInCollateralBN = new BigNumber(strikeValueInCollateral.toString())
-  const result = colalteralBN
-    .div(tokenIssuedBN)
-    .div(strikePriceBN)
-    .div(strikeValueInCollateral);
+  const result = colalteralBN.div(tokenIssuedBN).div(strikePriceBN).div(strikeValueInCollateral);
   return result.toNumber();
 };

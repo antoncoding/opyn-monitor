@@ -15,7 +15,6 @@ const ETH_ADDR = '0x0000000000000000000000000000000000000000';
 
 // ENS
 export const resolveENS = async (ensName) => {
-  console.log('infura resolve ETNS');
   const address = await ens.resolver(ensName).addr();
   return address.toLowerCase();
 };
@@ -28,14 +27,12 @@ export const resolveENS = async (ensName) => {
  */
 export const getTokenBalance = async (erc20Token, user) => {
   if (user === '') return '0';
-  console.log(`infura getTokenBalance ${erc20Token} for ${user}`);
   const oTokenContract = new web3.eth.Contract(optionContractABI, erc20Token);
   const balance = await oTokenContract.methods.balanceOf(user).call();
   return balance;
 };
 
 export const getDecimals = async (erc20Token) => {
-  console.log(`infura getDecimals ${erc20Token}`);
   if (erc20Token === ETH_ADDR) return 18;
   const oTokenContract = new web3.eth.Contract(optionContractABI, erc20Token);
   const decimals = await oTokenContract.methods.decimals().call();
@@ -43,13 +40,11 @@ export const getDecimals = async (erc20Token) => {
 };
 
 export const getERC20Symbol = async (erc20Token) => {
-  console.log(`infura getERC20Symbol ${erc20Token}`);
   const oTokenContract = new web3.eth.Contract(optionContractABI, erc20Token);
   return oTokenContract.methods.symbol().call();
 };
 
 export const getTotalSupply = async (erc20) => {
-  console.log('get total supply');
   const token = new web3.eth.Contract(optionContractABI, erc20);
   const totalSupply = await token.methods.totalSupply().call();
   return totalSupply;
@@ -64,7 +59,6 @@ export const getTotalSupply = async (erc20) => {
  * @return {Promise<number>}
  */
 export const getMaxLiquidatable = async (oToken, vaultOwner) => {
-  console.log(`infura getMaxLiquidatable ${oToken}`);
   const oTokenContract = new web3.eth.Contract(optionContractABI, oToken);
   const maxVaultLiquidatable = await oTokenContract.methods
     .maxOTokensLiquidatable(vaultOwner)
@@ -79,7 +73,6 @@ export const getMaxLiquidatable = async (oToken, vaultOwner) => {
  * @return {Promise<string>}
  */
 export const getUnderlyingRequiredToExercise = async (oToken, tokenToExercise) => {
-  console.log(`infura getUnderlyingRequiredToExercise ${oToken}`);
   const oTokenContract = new web3.eth.Contract(optionContractABI, oToken);
   const underlyringRequired = await oTokenContract.methods
     .underlyingRequiredToExercise(tokenToExercise)
@@ -96,7 +89,6 @@ export const getUnderlyingRequiredToExercise = async (oToken, tokenToExercise) =
  * @return {Promise<string>}
  */
 export const getAllowance = async (contract, user, spender) => {
-  console.log('infura get Allowance');
   const token = new web3.eth.Contract(optionContractABI, contract);
   const allowance = await token.methods.allowance(user, spender).call();
   return allowance;
@@ -108,7 +100,6 @@ export const getAllowance = async (contract, user, spender) => {
  */
 export const getBalance = async (address) => {
   if (address === '') return '0';
-  console.log(`infura getBalance ${address}`);
   const balance = await web3.eth.getBalance(address);
   return web3.utils.fromWei(balance);
 };
@@ -120,7 +111,6 @@ export const getBalance = async (address) => {
  * @returns {Promise<string>}
  */
 export const getPrice = async (oracleAddr, token) => {
-  console.log(`infura getPrice ${token}`);
   const oracle = new web3.eth.Contract(oracleABI, oracleAddr);
   const price = await oracle.methods.getPrice(token).call();
   return price; // unit: wei/ per token
@@ -133,14 +123,12 @@ export const getPremiumToPay = async (
   buyAmt,
   paymentToken = ETH_ADDR,
 ) => {
-  console.log('infura getPremiumToPay');
   const exchange = new web3.eth.Contract(optionExchangeABI, exchangeAddr);
   const premiumToPay = await exchange.methods.premiumToPay(tokenToBuy, paymentToken, buyAmt).call();
   return premiumToPay;
 };
 
 export const getPremiumReceived = async (exchangeAddr, tokenToSell, sellAmt) => {
-  console.log('infura getPremiumReceived');
   const exchange = new web3.eth.Contract(optionExchangeABI, exchangeAddr);
   const payoutToken = ETH_ADDR;
   const premiumReceived = await exchange.methods

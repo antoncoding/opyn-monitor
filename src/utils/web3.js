@@ -13,7 +13,12 @@ import { notify } from './blockNative';
 import { getAllowance, getPremiumToPay } from './infura';
 import { getPreference } from './storage';
 import {
-  ETH_ADDRESS, Kollateral_Liquidator, Kollateral_Invoker, KETH, ZeroX_Exchange, WETH,
+  ETH_ADDRESS,
+  Kollateral_Liquidator,
+  Kollateral_Invoker,
+  KETH,
+  ZeroX_Exchange,
+  WETH,
 } from '../constants/contracts';
 
 const oTokenABI = require('../constants/abi/OptionContract.json');
@@ -59,7 +64,6 @@ const onboard = Onboard({
     ],
   },
 });
-
 
 export const updateModalMode = async (theme) => {
   const darkMode = theme === 'dark';
@@ -313,7 +317,12 @@ export const openVault = async (oTokenAddr) => {
     });
 };
 
-export const openVaultAddCollateralAndMint = async (oTokenAddr, collateralAsset, collateralAmt, tokenAmount) => {
+export const openVaultAddCollateralAndMint = async (
+  oTokenAddr,
+  collateralAsset,
+  collateralAmt,
+  tokenAmount,
+) => {
   const account = await checkConnectedAndGetAddress();
   const oToken = new web3.eth.Contract(oTokenABI, oTokenAddr);
   if (collateralAsset === ETH_ADDRESS) {
@@ -342,7 +351,6 @@ export const openVaultAddCollateralAndMint = async (oTokenAddr, collateralAsset,
       });
   }
 };
-
 
 // Option Exchange
 
@@ -455,15 +463,14 @@ export const unwrapETH = async (amountInWei) => {
 };
 
 /**
-* Sign Order
-* @param {*} order
-*/
+ * Sign Order
+ * @param {*} order
+ */
 export const signOrder = async (order) => {
   const account = await checkConnectedAndGetAddress();
   const provider = new MetamaskSubprovider(web3.currentProvider);
   return signatureUtils.ecSignOrderAsync(provider, order, account);
 };
-
 
 export const fillOrders = async (orders, amts, signatures, value, gasPrice) => {
   const account = await checkConnectedAndGetAddress();
