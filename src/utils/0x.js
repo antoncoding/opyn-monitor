@@ -167,7 +167,7 @@ export const createOrder = (maker, makerAsset, takerAsset, makerAssetAmount, tak
     salt,
     exchangeAddress: '0x61935cbdd02287b511119ddb11aeb42f1593b7ef',
     feeRecipientAddress: '0x1000000000000000000000000000000000000011',
-    expirationTimeSeconds: expiry.toString(), // 4/20
+    expirationTimeSeconds: expiry.toString(),
     makerFeeAssetData: '0x',
     chainId: 1,
     takerFeeAssetData: '0x',
@@ -175,6 +175,10 @@ export const createOrder = (maker, makerAsset, takerAsset, makerAssetAmount, tak
   return order;
 };
 
+/**
+ * Send orders to the mesh node
+ * @param {*} orders
+ */
 export const broadcastOrders = async (orders) => {
   const url = `${endpoint}sra/v3/orders`;
   const res = await fetch(url, {
