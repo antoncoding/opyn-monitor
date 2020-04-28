@@ -5,7 +5,7 @@ import {
 } from '@aragon/ui';
 import { getPreference, checkAddressAndAddToStorage } from '../../utils/storage';
 
-import { Comment } from '../common';
+import { Comment } from '../common/index.ts';
 import { isAddress } from '../../utils/number';
 import { resolveENS } from '../../utils/infura';
 

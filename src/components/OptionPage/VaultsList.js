@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { DataView, IdentityBadge } from '@aragon/ui';
 import VaultModal from './VaultModal';
-import { SectionTitle, RatioTag } from '../common';
+import { SectionTitle, RatioTag } from '../common/index.ts';
 import * as MyPTypes from '../types';
 import {
   formatDigits, compareVaultRatio, compareVaultIssued, toTokenUnitsBN,

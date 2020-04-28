@@ -15,7 +15,7 @@ import BigNumber from 'bignumber.js';
 
 import * as myType from '../types';
 import { exercise } from '../../utils/web3';
-import { PriceSection } from '../common';
+import { PriceSection } from '../common/index.ts';
 import { getUnderlyingRequiredToExercise, getBalance, getTokenBalance } from '../../utils/infura';
 import {
   toTokenUnitsBN, toBaseUnitBN, formatDigits, compareVaultIssued,

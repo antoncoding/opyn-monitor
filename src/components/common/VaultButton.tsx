@@ -12,7 +12,7 @@ function ManageVaultButton({ oToken, owner }) {
     history.push(`/manage/${oToken}/${owner}`);
   };
 
-  return <Button onClick={() => goToManagePage(oToken, owner)} label="Manage" />;
+  return <Button onClick={() => goToManagePage()} label="Manage" />;
 }
 
 ManageVaultButton.propTypes = {
@@ -20,8 +20,13 @@ ManageVaultButton.propTypes = {
   owner: PropTypes.string.isRequired,
 };
 
+type openVaultButtonProps = {
+  oToken: string,
+  user: string,
+  goToMangePage? : boolean
+}
 
-function OpenVaultButton({ oToken, user, goToMangePage = true }) {
+function OpenVaultButton({ oToken, user, goToMangePage = true }:openVaultButtonProps) {
   const history = useHistory();
 
   const openAndGoToVault = async () => {
@@ -31,20 +36,11 @@ function OpenVaultButton({ oToken, user, goToMangePage = true }) {
 
   return (
     <Button
-      onClick={() => openAndGoToVault(oToken)}
+      onClick={openAndGoToVault}
       label="Open"
     />
   );
 }
 
-OpenVaultButton.propTypes = {
-  oToken: PropTypes.string.isRequired,
-  user: PropTypes.string.isRequired,
-  goToMangePage: PropTypes.bool,
-};
-
-OpenVaultButton.defaultProps = {
-  goToMangePage: true,
-};
 
 export { ManageVaultButton, OpenVaultButton };

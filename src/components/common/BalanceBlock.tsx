@@ -1,9 +1,14 @@
 import React from 'react';
-import PropTypes from 'prop-types';
+// import PropTypes from 'prop-types';
 
 import BigNumber from 'bignumber.js';
 
-function BalanceBlock({ asset, balance }) {
+type BlanceBlockProps = {
+  asset: string,
+  balance: BigNumber | string | number
+}
+
+function BalanceBlock({ asset, balance }: BlanceBlockProps) {
   let integer = '0';
   let digits = '0';
   if (new BigNumber(balance).gt(new BigNumber(0))) {
@@ -28,14 +33,5 @@ function BalanceBlock({ asset, balance }) {
     </>
   );
 }
-
-BalanceBlock.propTypes = {
-  asset: PropTypes.string.isRequired,
-  balance: PropTypes.oneOfType([
-    PropTypes.instanceOf(BigNumber),
-    PropTypes.string,
-    PropTypes.number,
-  ]).isRequired,
-};
 
 export default BalanceBlock;

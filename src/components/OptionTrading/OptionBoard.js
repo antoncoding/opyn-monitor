@@ -6,9 +6,9 @@ import {
 } from '@aragon/ui';
 import { AskText, BidText } from './styled';
 
-import { SectionTitle } from '../common';
+import { SectionTitle } from '../common/index.ts';
 
-import { getBasePairAskAndBids } from '../../utils/0x';
+import { getBasePairAskAndBids } from '../../utils/0x.ts';
 import { token as TokenType } from '../types';
 
 import { eth_puts, eth_calls } from '../../constants/options';

@@ -6,7 +6,7 @@ import {
 import BigNumber from 'bignumber.js';
 import { removeLiquidity } from '../../utils/web3';
 
-import { BalanceBlock, MaxButton, PriceSection } from '../common';
+import { BalanceBlock, MaxButton, PriceSection } from '../common/index.ts';
 import { toBaseUnitBN } from '../../utils/number';
 
 /**

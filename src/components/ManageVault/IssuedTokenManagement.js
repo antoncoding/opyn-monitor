@@ -5,7 +5,7 @@ import {
   Box, TextInput, Button, IconCirclePlus, IconCircleMinus,
 } from '@aragon/ui';
 import { burnOToken, issueOToken } from '../../utils/web3';
-import { BalanceBlock, MaxButton, WarningText } from '../common';
+import { BalanceBlock, MaxButton, WarningText } from '../common/index.ts';
 import { toBaseUnitBN, toTokenUnitsBN } from '../../utils/number';
 import { calculateRatio } from '../../utils/calculation.ts';
 import * as MyPTypes from '../types';

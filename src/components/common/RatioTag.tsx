@@ -1,8 +1,12 @@
 import React from 'react';
 import { Tag } from '@aragon/ui';
-import Proptypes from 'prop-types';
 
-function RatioTag({ isSafe, ratio, useCollateral = true }) {
+type RatioTagProps = {
+  isSafe: boolean,
+  ratio: number,
+  useCollateral? : boolean,
+}
+function RatioTag({ isSafe, ratio, useCollateral = true }:RatioTagProps) {
   return !useCollateral ? (
     <Tag color="#78827a" background="#c0c2c0">
       Cool
@@ -24,14 +28,5 @@ function RatioTag({ isSafe, ratio, useCollateral = true }) {
   );
 }
 
-RatioTag.propTypes = {
-  isSafe: Proptypes.bool.isRequired,
-  ratio: Proptypes.number.isRequired,
-  useCollateral: Proptypes.bool,
-};
-
-RatioTag.defaultProps = {
-  useCollateral: true,
-};
 
 export default RatioTag;

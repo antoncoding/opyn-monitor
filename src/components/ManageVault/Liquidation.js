@@ -7,7 +7,7 @@ import {
 import PropTypes from 'prop-types';
 import BigNumber from 'bignumber.js';
 
-import { BalanceBlock, MaxButton } from '../common';
+import { BalanceBlock, MaxButton } from '../common/index.ts';
 import { liquidate } from '../../utils/web3';
 import { getMaxLiquidatable } from '../../utils/infura';
 import { getLiquidationHistory } from '../../utils/graph';

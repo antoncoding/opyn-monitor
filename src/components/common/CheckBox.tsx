@@ -1,9 +1,14 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { Checkbox, useTheme } from '@aragon/ui';
 import styled from 'styled-components';
 
-function MyCheckBox({ text, checked, onCheck }) {
+type checkBoxProps = {
+  text: string,
+  checked: boolean,
+  onCheck: Function
+}
+
+function MyCheckBox({ text, checked, onCheck }: checkBoxProps) {
   const theme = useTheme();
   return (
     <CheckBoxWrapper theme={theme}>
@@ -18,12 +23,6 @@ function MyCheckBox({ text, checked, onCheck }) {
     </CheckBoxWrapper>
   );
 }
-
-MyCheckBox.propTypes = {
-  text: PropTypes.string.isRequired,
-  checked: PropTypes.bool.isRequired,
-  onCheck: PropTypes.func.isRequired,
-};
 
 export default MyCheckBox;
 

@@ -13,7 +13,7 @@ import LiquidationHistory from './Liquidation';
 import ExerciseHistory from './Exercise';
 import UnderlyingManagement from './UnderlyingManagement';
 
-import { Comment } from '../common';
+import { Comment } from '../common/index.ts';
 
 import { toTokenUnitsBN } from '../../utils/number';
 import { calculateRatio, calculateStrikeValueInCollateral } from '../../utils/calculation.ts';

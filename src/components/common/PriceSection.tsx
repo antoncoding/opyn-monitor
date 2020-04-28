@@ -1,10 +1,9 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import BigNumber from 'bignumber.js';
 
 function PriceSection({
   label, amt, symbol = '', forceDisplay = false,
-}) {
+}:{label:string, amt: string|number|BigNumber, symbol?:string, forceDisplay?:boolean }) {
   const amtBN = new BigNumber(amt);
   if (amtBN.gt(new BigNumber(0)) || forceDisplay) {
     return (
@@ -18,20 +17,5 @@ function PriceSection({
   return <div style={{ padding: 3, opacity: 0.5 }} />;
 }
 
-PriceSection.propTypes = {
-  label: PropTypes.string.isRequired,
-  symbol: PropTypes.string,
-  amt: PropTypes.oneOfType([
-    PropTypes.string,
-    PropTypes.number,
-    PropTypes.instanceOf(BigNumber),
-  ]).isRequired,
-  forceDisplay: PropTypes.bool,
-};
-
-PriceSection.defaultProps = {
-  symbol: '',
-  forceDisplay: false,
-};
 
 export default PriceSection;

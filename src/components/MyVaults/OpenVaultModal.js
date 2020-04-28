@@ -14,7 +14,7 @@ import {
 import BigNumber from 'bignumber.js';
 import {
   SectionTitle, OpenVaultButton, Comment, HelperText, WarningText,
-} from '../common';
+} from '../common/index.ts';
 import * as myType from '../types';
 
 import { openVaultAddCollateralAndMint } from '../../utils/web3';

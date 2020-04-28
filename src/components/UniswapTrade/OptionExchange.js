@@ -6,7 +6,7 @@ import {
 import BigNumber from 'bignumber.js';
 import {
   WarningText, BalanceBlock, MaxButton, PriceSection,
-} from '../common';
+} from '../common/index.ts';
 import { buyOTokensFromExchange, sellOTokensFromExchange } from '../../utils/web3';
 
 import { getPremiumToPay, getPremiumReceived } from '../../utils/infura';

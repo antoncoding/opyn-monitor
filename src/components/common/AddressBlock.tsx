@@ -1,8 +1,12 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { IdentityBadge } from '@aragon/ui';
 
-function AddressBlock({ label, address }) {
+type AddressBlockProps = {
+  label:string,
+  address: string
+}
+
+function AddressBlock({ label, address }: AddressBlockProps) {
   return (
     <>
       <div style={{ fontSize: 16, padding: 3 }}>{label}</div>
@@ -12,10 +16,5 @@ function AddressBlock({ label, address }) {
     </>
   );
 }
-
-AddressBlock.propTypes = {
-  label: PropTypes.string.isRequired,
-  address: PropTypes.string.isRequired,
-};
 
 export default AddressBlock;

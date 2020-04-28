@@ -5,7 +5,7 @@ import {
   ButtonBase,
 } from '@aragon/ui';
 
-function MaxButton({ onClick }) {
+function MaxButton({ onClick }:{ onClick: Function }) {
   return (
     <div style={{ padding: 3 }}>
       <ButtonBase onClick={onClick}>

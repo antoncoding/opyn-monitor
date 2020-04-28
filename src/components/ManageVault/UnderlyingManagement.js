@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import {
   Box, DataView, Button, TransactionBadge,
 } from '@aragon/ui';
-import { BalanceBlock } from '../common';
+import { BalanceBlock } from '../common/index.ts';
 import { removeUnderlying } from '../../utils/web3';
 import { getRemoveUnderlyingHistory } from '../../utils/graph';
 import { formatDigits, toTokenUnitsBN, timeSince } from '../../utils/number';

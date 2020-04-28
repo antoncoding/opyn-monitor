@@ -12,8 +12,7 @@ import { cancelOrders } from '../../utils/web3';
 import { toTokenUnitsBN } from '../../utils/number';
 import { order as OrderType, option as OptionType } from '../types';
 import { AskText, BidText } from './styled';
-// import { SectionTitle } from '../common';
-import * as zeroXUtil from '../../utils/0x';
+import * as zeroXUtil from '../../utils/0x.ts';
 
 function MyOrders({
   asks, bids, option, user, quoteAsset,

@@ -6,7 +6,7 @@ import {
 } from '@aragon/ui';
 import { addLiquidity } from '../../utils/web3';
 
-import { BalanceBlock, MaxButton, PriceSection } from '../common';
+import { BalanceBlock, MaxButton, PriceSection } from '../common/index.ts';
 import { toBaseUnitBN } from '../../utils/number';
 
 /**

@@ -1,7 +1,7 @@
 import React from 'react';
 
 import PropTypes from 'prop-types';
-import { BalanceBlock, RatioTag, HelperText } from '../common';
+import { BalanceBlock, RatioTag, HelperText } from '../common/index.ts';
 import { formatDigits, toTokenUnitsBN } from '../../utils/number';
 import * as MyPTypes from '../types';
 

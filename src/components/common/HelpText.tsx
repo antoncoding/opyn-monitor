@@ -1,7 +1,6 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 
-function HelperText({ label, amt }) {
+function HelperText({ label, amt }: { label: string, amt: string }) {
   if (parseFloat(amt) > 0) {
     return (
       <div style={{ padding: 3, opacity: 0.5 }}>
@@ -16,9 +15,5 @@ function HelperText({ label, amt }) {
   } return <div style={{ padding: 3, opacity: 0.5 }} />;
 }
 
-HelperText.propTypes = {
-  label: PropTypes.string.isRequired,
-  amt: PropTypes.string.isRequired,
-};
 
 export default HelperText;

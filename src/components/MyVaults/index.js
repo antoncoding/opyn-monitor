@@ -9,7 +9,7 @@ import NoWalletView from './NoWallet';
 import { allOptions } from '../../constants/options';
 import {
   SectionTitle, ManageVaultButton, Comment, CheckBox,
-} from '../common';
+} from '../common/index.ts';
 import {
   formatDigits, compareVaultRatio, toTokenUnitsBN,
 } from '../../utils/number';

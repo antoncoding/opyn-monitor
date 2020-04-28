@@ -2,7 +2,7 @@ import React from 'react';
 import BigNumber from 'bignumber.js';
 import PropTypes from 'prop-types';
 
-import { BalanceBlock, AddressBlock } from '../common';
+import { BalanceBlock, AddressBlock } from '../common/index.ts';
 
 /**
  *

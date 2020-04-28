@@ -5,7 +5,7 @@ import {
 } from '@aragon/ui';
 import styled from 'styled-components';
 import BigNumber from 'bignumber.js';
-import { WarningText } from '../common';
+import { WarningText } from '../common/index.ts';
 import {
   createOrder, broadcastOrders, getOrdersTotalFillables, getGasPrice, getFillAmountsOfOrders,
 } from '../../utils/0x.ts';

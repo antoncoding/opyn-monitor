@@ -6,7 +6,7 @@ import {
 } from '@aragon/ui';
 import { addETHCollateral, addERC20Collateral, removeCollateral } from '../../utils/web3';
 
-import { BalanceBlock, MaxButton } from '../common';
+import { BalanceBlock, MaxButton } from '../common/index.ts';
 
 import { formatDigits, toTokenUnitsBN, toBaseUnitBN } from '../../utils/number';
 import { calculateRatio } from '../../utils/calculation.ts';

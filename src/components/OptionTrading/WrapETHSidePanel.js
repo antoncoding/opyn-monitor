@@ -6,7 +6,7 @@ import PropTypes from 'prop-types';
 import {
   SidePanel, Button, TextInput, useTheme,
 } from '@aragon/ui';
-import { BalanceBlock, SectionTitle, Comment } from '../common';
+import { BalanceBlock, SectionTitle, Comment } from '../common/index.ts';
 
 import { wrapETH, unwrapETH } from '../../utils/web3';
 import { toBaseUnitBN, toTokenUnitsBN } from '../../utils/number';
