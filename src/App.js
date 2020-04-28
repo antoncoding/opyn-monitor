@@ -7,7 +7,7 @@ import { storePreference, getPreference } from './utils/storage';
 import NavBar from './components/NavBar';
 import HomePage from './components/HomePage';
 import AllOptoins from './components/AllContracts';
-import Trade from './components/Trade';
+import Trade from './components/Trade/index';
 import OptionTrading from './components/OptionTrading';
 import MyVaults from './components/MyVaults';
 import OptionPage from './components/OptionPage';
