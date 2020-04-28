@@ -19,7 +19,7 @@ import * as myType from '../types';
 
 import { openVaultAddCollateralAndMint } from '../../utils/web3';
 import { toBaseUnitBN } from '../../utils/number';
-import { calculateStrikeValueInCollateral, calculateRatio } from '../../utils/calculation';
+import { calculateStrikeValueInCollateral, calculateRatio } from '../../utils/calculation.ts';
 
 function OpenVaultModal({ user, option }) {
   const toast = useToast();

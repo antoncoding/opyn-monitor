@@ -15,7 +15,7 @@ import {
 } from '../../utils/number';
 import { getAllVaultsForUser } from '../../utils/graph';
 import { getPreference, storePreference } from '../../utils/storage';
-import { calculateRatio, calculateStrikeValueInCollateral } from '../../utils/calculation';
+import { calculateRatio, calculateStrikeValueInCollateral } from '../../utils/calculation.ts';
 import tracker from '../../utils/tracker';
 import OpenVaultModal from './OpenVaultModal';
 

@@ -16,7 +16,7 @@ import UnderlyingManagement from './UnderlyingManagement';
 import { Comment } from '../common';
 
 import { toTokenUnitsBN } from '../../utils/number';
-import { calculateRatio, calculateStrikeValueInCollateral } from '../../utils/calculation';
+import { calculateRatio, calculateStrikeValueInCollateral } from '../../utils/calculation.ts';
 import { getTokenBalance, getBalance } from '../../utils/infura';
 import { getVault } from '../../utils/graph';
 import { redeem } from '../../utils/web3';

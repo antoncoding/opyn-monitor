@@ -7,7 +7,7 @@ import {
 import { burnOToken, issueOToken } from '../../utils/web3';
 import { BalanceBlock, MaxButton, WarningText } from '../common';
 import { toBaseUnitBN, toTokenUnitsBN } from '../../utils/number';
-import { calculateRatio } from '../../utils/calculation';
+import { calculateRatio } from '../../utils/calculation.ts';
 import * as MyPTypes from '../types';
 /**
  *

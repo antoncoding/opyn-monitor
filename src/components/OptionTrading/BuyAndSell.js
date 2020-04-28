@@ -8,7 +8,7 @@ import BigNumber from 'bignumber.js';
 import { WarningText } from '../common';
 import {
   createOrder, broadcastOrders, getOrdersTotalFillables, getGasPrice, getFillAmountsOfOrders,
-} from '../../utils/0x';
+} from '../../utils/0x.ts';
 import { signOrder, fillOrders, approve } from '../../utils/web3';
 import { toTokenUnitsBN, toBaseUnitBN } from '../../utils/number';
 import WrapETHPanel from './WrapETHSidePanel';

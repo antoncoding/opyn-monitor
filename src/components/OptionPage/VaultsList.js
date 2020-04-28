@@ -7,7 +7,7 @@ import * as MyPTypes from '../types';
 import {
   formatDigits, compareVaultRatio, compareVaultIssued, toTokenUnitsBN,
 } from '../../utils/number';
-import { calculateRatio, calculateStrikeValueInCollateral } from '../../utils/calculation';
+import { calculateRatio, calculateStrikeValueInCollateral } from '../../utils/calculation.ts';
 import { allOptions } from '../../constants/options';
 
 function VaultOwnerList({

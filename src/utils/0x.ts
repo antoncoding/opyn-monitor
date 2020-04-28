@@ -4,69 +4,26 @@ import BigNumber from 'bignumber.js';
 import { USDC } from '../constants/tokens';
 
 import { toTokenUnitsBN } from './number';
+import * as types from '../types'
 
 const Promise = require('bluebird');
 
 const endpoint = 'https://api.0x.org/';
 
+type entries = {
+  total:number,
+  page:number,
+  perPage:number,
+  records: types.order[]
+}
+
+
 /**
  * get orderbook: BASE:QUOTE
- * @param {string} base
- * @param {string} quote
- * @return {Promise<{
-  bids: {total: number, page: number, perPage: number, records: {
-    order: {
-      signature: string,
-      senderAddress: string,
-      makerAddress: string,
-      takerAddress: string,
-      makerFee: string,
-      takerFee: string,
-      makerAssetAmount: string,
-      takerAssetAmount: string,
-      makerAssetData: string,
-      takerAssetData: string,
-      salt: string,
-      exchangeAddress: string,
-      feeRecipientAddress: string,
-      expirationTimeSeconds: string,
-      makerFeeAssetData: string,
-      chainId: number,
-      takerFeeAssetData: string
-    },
-    metaData: {
-      orderHash: string,
-      remainingFillableTakerAssetAmount: string
-    }
-  }[]},
-  asks: {total: number, page: number, perPage: number, records: {
-    order: {
-      signature: string,
-      senderAddress: string,
-      makerAddress: string,
-      takerAddress: string,
-      makerFee: string,
-      takerFee: string,
-      makerAssetAmount: string,
-      takerAssetAmount: string,
-      makerAssetData: string,
-      takerAssetData: string,
-      salt: string,
-      exchangeAddress: string,
-      feeRecipientAddress: string,
-      expirationTimeSeconds: string,
-      makerFeeAssetData: string,
-      chainId: number,
-      takerFeeAssetData: string
-    },
-    metaData: {
-      orderHash: string,
-      remainingFillableTakerAssetAmount: string
-    }
-  }[]}
-}>}
  */
-export async function getOrderBook(base, quote) {
+export async function getOrderBook(base:string, quote:string): Promise<{
+  asks:entries, bids:entries
+}> {
   const baseAsset = assetDataUtils.encodeERC20AssetData(base);
   const quoteAsset = assetDataUtils.encodeERC20AssetData(quote);
   return request(`sra/v3/orderbook?baseAssetData=${baseAsset}&quoteAssetData=${quoteAsset}&perPage=${100}`);
@@ -82,15 +39,21 @@ export async function getOrderBook(base, quote) {
  * bestAsk:{}, bestBid:{}
  * }>>}
  */
-export async function getBasePairAskAndBids(options, quoteAsset) {
+export async function getBasePairAskAndBids(options: types.option[], quoteAsset:types.token): Promise<{
+  option: string, bestAskPrice: BigNumber, bestBidPrice: BigNumber, totalBidAmt: BigNumber,
+  totalAskAmt: BigNumber, 
+  bestAsk: types.order | undefined, 
+  bestBid: types.order | undefined
+}[]> {
   const bestAskAndBids = await Promise.map(options, async ({ addr: option, decimals }) => {
     const { asks, bids } = await getOrderBook(option, USDC.addr);
     let totalBidAmt = new BigNumber(0);
     let totalAskAmt = new BigNumber(0);
-    let bestAskPrice = 0;
-    let bestBidPrice = 0;
-    let bestAsk; let bestBid;
-    const validAsks = asks.records.filter((record) => isValid(record, decimals));
+    let bestAskPrice = new BigNumber(0);
+    let bestBidPrice = new BigNumber(0);
+    let bestAsk: types.order|undefined; 
+    let bestBid: types.order|undefined;
+    const validAsks = asks.records.filter((record) => isValid(record));
     if (validAsks.length > 0) {
       totalAskAmt = validAsks
         .reduce((prev, cur) => prev.plus(toTokenUnitsBN(
@@ -102,7 +65,7 @@ export async function getBasePairAskAndBids(options, quoteAsset) {
       bestAsk = validAsks[0];
     }
 
-    const validBids = bids.records.filter((record) => isValid(record, decimals));
+    const validBids = bids.records.filter((record) => isValid(record));
     if (validBids.length > 0) {
       totalBidAmt = validBids
         .reduce((prev, cur) => prev.plus(toTokenUnitsBN(
@@ -125,34 +88,24 @@ export async function getBasePairAskAndBids(options, quoteAsset) {
  *
  * @param {string} path
  */
-async function request(path) {
+async function request(path:string): Promise<any> {
   const res = await fetch(`${endpoint}${path}`);
   return res.json();
 }
 
 /**
- *
- * @param {*} entry
- * @param {*} decimals
+ * Return true if the order is valid
  */
-export const isValid = (entry) => {
+export const isValid = (entry: types.order) => {
   const notExpired = parseInt(entry.order.expirationTimeSeconds, 10) > Date.now() / 1000;
-  // notDust: not very good
-  const notDust = getOrderFillRatio(entry) < 100;
-  //   .gt(new BigNumber(0.0001).times(new BigNumber(10).pow(takerAssetDecimals)));
+  const notDust = parseInt(getOrderFillRatio(entry)) < 100;
   return notExpired && notDust;
 };
 
 /**
  * Create Order Object
- * @param {string} maker
- * @param {string} makerAsset Bid: quoteAsset, Ask: baseAsset
- * @param {string} takerAsset Bid: baseAsset, Ask: quoteAsset
- * @param {BigNumber} makerAssetAmount
- * @param {BigNumber} takerAssetAmount
- * @param {number} expiry
  */
-export const createOrder = (maker, makerAsset, takerAsset, makerAssetAmount, takerAssetAmount, expiry) => {
+export const createOrder = (maker:string, makerAsset:string, takerAsset:string, makerAssetAmount:BigNumber, takerAssetAmount:BigNumber, expiry:number) => {
   const salt = BigNumber.random(20).times(new BigNumber(10).pow(new BigNumber(20))).integerValue().toString(10);
   const order = {
     senderAddress: '0x0000000000000000000000000000000000000000',
@@ -179,7 +132,7 @@ export const createOrder = (maker, makerAsset, takerAsset, makerAssetAmount, tak
  * Send orders to the mesh node
  * @param {*} orders
  */
-export const broadcastOrders = async (orders) => {
+export const broadcastOrders = async (orders: types.order[]) => {
   const url = `${endpoint}sra/v3/orders`;
   const res = await fetch(url, {
     method: 'POST',
@@ -194,12 +147,9 @@ export const broadcastOrders = async (orders) => {
 };
 
 /**
- *
- * @param {{}} bid
- * @param {number} makerAssetDecimals WETH decimals
- * @param {number} takerAssetDecimals oTokenDecimals
+ * Calculate the price of a bid order
  */
-export const getBidPrice = (bid, makerAssetDecimals, takerAssetDecimals) => {
+export const getBidPrice = (bid: types.order, makerAssetDecimals:number, takerAssetDecimals:number):BigNumber => {
   const makerAssetAmount = toTokenUnitsBN(bid.order.makerAssetAmount, makerAssetDecimals);
   const takerAssetAmount = toTokenUnitsBN(bid.order.takerAssetAmount, takerAssetDecimals);
   return makerAssetAmount.div(takerAssetAmount);
@@ -207,22 +157,17 @@ export const getBidPrice = (bid, makerAssetDecimals, takerAssetDecimals) => {
 
 /**
  * Calculate price of an ask order
- * @param {{}} ask
- * @param {number} makerAssetDecimals oToken Decimal
- * @param {number} takerAssetDecimals WETH decimals
  * @description maker want to sell oToken
  * takerAssetAmount 100 weth
  * makerAssetAmount 1 oToken
  */
-export const getAskPrice = (ask, makerAssetDecimals, takerAssetDecimals) => {
+export const getAskPrice = (ask: types.order, makerAssetDecimals:number, takerAssetDecimals:number): BigNumber => {
   const makerAssetAmount = toTokenUnitsBN(ask.order.makerAssetAmount, makerAssetDecimals);
   const takerAssetAmount = toTokenUnitsBN(ask.order.takerAssetAmount, takerAssetDecimals);
   return takerAssetAmount.div(makerAssetAmount);
 };
-new BigNumber()
-  .div(new BigNumber());
 
-export const getOrderFillRatio = (order) => new BigNumber(100)
+export const getOrderFillRatio = (order: types.order) => new BigNumber(100)
   .minus(new BigNumber(order.metaData.remainingFillableTakerAssetAmount)
     .div(new BigNumber(order.order.takerAssetAmount))
     .times(100)).toFixed(2);
@@ -232,7 +177,9 @@ export const getOrderFillRatio = (order) => new BigNumber(100)
  * @param {*} order
  * @return { {remainingTakerAssetAmount: BigNumber, remainingMakerAssetAmount: BigNumber} }
  */
-export const getRemainingMakerAndTakerAmount = (order) => {
+export const getRemainingMakerAndTakerAmount = (order: types.order): {
+  remainingTakerAssetAmount: BigNumber,
+  remainingMakerAssetAmount: BigNumber } => {
   const remainingTakerAssetAmount = new BigNumber(order.metaData.remainingFillableTakerAssetAmount);
   const makerAssetAmountBN = new BigNumber(order.order.makerAssetAmount);
   const takerAssetAmountBN = new BigNumber(order.order.takerAssetAmount);
@@ -243,9 +190,13 @@ export const getRemainingMakerAndTakerAmount = (order) => {
 /**
  *
  * @param {{}[]} orders
- * @return {{totalFillableTakerAmount: BigNumber,totalFillableMakerAmount:BigNumber, fillableTakerAmounts: string[]}}
+ * @return {}
  */
-export const getOrdersTotalFillables = (orders) => {
+export const getOrdersTotalFillables = (orders: types.order[]): {
+  totalFillableTakerAmount: BigNumber,
+  totalFillableMakerAmount:BigNumber, 
+  fillableTakerAmounts: string[]
+} => {
   const totalFillableTakerAmount = orders
     .map((order) => new BigNumber(order.metaData.remainingFillableTakerAssetAmount))
     .reduce((prev, next) => prev.plus(new BigNumber(next)), new BigNumber(0));
@@ -260,30 +211,23 @@ export const getOrdersTotalFillables = (orders) => {
 };
 
 /**
- * @return {Promise<{
- * fast:number, fastest:number, safeLow:number, average:number,
- * block_time:number, blockNum:number speed:number,
- * safeLowWait:number, avgWait:number, fastWait:number, fastestWait:number}>}
+ * Get lastest gas price info from ethgasstation
  */
-export const getGasPrice = async () => {
+export const getGasPrice = async (): Promise<{
+  fast: number, fastest: number ,safeLow: number,average: number,block_time: number,speed: number,safeLowWait: number,avgWait: number,fastWait: number,fastestWait: number,}> => {
   const url = 'https://ethgasstation.info/json/ethgasAPI.json';
   const res = await fetch(url);
   return res.json();
 };
 
+type targetAsset = 'maker' | 'taker'
 
 /**
  * Return Minimal orders needed for target amount
- * @param {{order: {
-      makerAssetAmount: string,
-      takerAssetAmount: string,
-    }}[]} selectedOrders
- * @param {BigNumber} targetAmount
- * @param {string} targetAsset maker or taker
  */
-export const findMinOrdersForAmount = (selectedOrders, targetAmount, targetAsset) => {
+export const findMinOrdersForAmount = (selectedOrders: types.order[], targetAmount: BigNumber, targetAsset: targetAsset) => {
   let sum = new BigNumber(0);
-  const requiredOrders = [];
+  const requiredOrders: types.order[] = [];
   // eslint-disable-next-line no-restricted-syntax
   for (const order of selectedOrders) {
     const amount = targetAsset === 'maker'
@@ -302,19 +246,20 @@ export const findMinOrdersForAmount = (selectedOrders, targetAmount, targetAsset
 /**
  * @description Loop through selected orders and see what's the exact taker amount
  * and maker amount fulfilling the requirement
- * @param {Array} selectedOrders
- * @param {BigNumber | undefined} targetTakerAstAmount
- * @param {BigNumber | undefined} targetMakerAstAmount
- * @return {{
- *  sumTakerAmount: BigNumber,
- *  sumMakerAmount:BigNumber
- *  takerAmountArray: string[]}}
  */
-export const getFillAmountsOfOrders = (selectedOrders, targetTakerAstAmount, targetMakerAstAmount) => {
+export const getFillAmountsOfOrders = (
+  selectedOrders: types.order[], 
+  targetTakerAstAmount: BigNumber | undefined, 
+  targetMakerAstAmount: BigNumber | undefined
+  ): {
+    sumTakerAmount:BigNumber,
+    sumMakerAmount: BigNumber,
+    takerAmountArray: string[]
+  } => {
   // const fillables = getRemainingMakerAndTakerAmount(selectedOrders);
   let sumTakerAmount = new BigNumber(0);
   let sumMakerAmount = new BigNumber(0);
-  const takerAmountArray = [];
+  const takerAmountArray: string[] = [];
   for (const order of selectedOrders) {
     const {
       remainingMakerAssetAmount: makerAmount,

@@ -9,7 +9,7 @@ import { addETHCollateral, addERC20Collateral, removeCollateral } from '../../ut
 import { BalanceBlock, MaxButton } from '../common';
 
 import { formatDigits, toTokenUnitsBN, toBaseUnitBN } from '../../utils/number';
-import { calculateRatio } from '../../utils/calculation';
+import { calculateRatio } from '../../utils/calculation.ts';
 import { ETH_ADDRESS } from '../../constants/contracts';
 import * as MyPTypes from '../types';
 

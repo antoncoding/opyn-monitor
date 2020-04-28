@@ -5,11 +5,7 @@ import { MetamaskSubprovider } from '@0x/subproviders';
 import { signatureUtils } from '@0x/order-utils';
 import Onboard from 'bnc-onboard';
 
-// import { ContractWrappers } from '@0x/contract-wrappers';
-// import { getContractAddressesForChainOrThrow } from '@0x/contract-addresses';
-
-// import {} from '@'
-import { notify } from './blockNative';
+import { notify } from './blockNative.ts';
 import { getAllowance, getPremiumToPay } from './infura';
 import { getPreference } from './storage';
 import {
