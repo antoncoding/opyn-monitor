@@ -41,7 +41,7 @@ function Footer({ theme } : { theme:string }) {
           Hosted on
           {' '}
           {' '}
-          <Link external href="https://github.com/antoncoding/opyn-liquidator">
+          <Link external href="https://github.com/antoncoding/opyn-monitor">
             GitHub
           </Link>
         </div>
