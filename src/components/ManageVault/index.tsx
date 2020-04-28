@@ -206,7 +206,7 @@ function ManageVault({ user }: { user: string }) {
               symbol={symbol}
               setNewRatio={setNewRatio}
               // for call heler text
-              strikePriceInUSD={option!.strikePriceInUSD}
+              strikePriceInUSD={(option as types.ETHOption).strikePriceInUSD}
               collateralSymbol={collateral.symbol}
             />
           ) : (

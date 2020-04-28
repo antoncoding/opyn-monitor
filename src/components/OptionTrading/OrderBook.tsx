@@ -1,21 +1,32 @@
 /* eslint-disable no-restricted-syntax */
 import React, { useState, useEffect } from 'react';
-import PropTypes from 'prop-types';
+
 import { DataView, Timer } from '@aragon/ui';
 
 import { toTokenUnitsBN } from '../../utils/number';
-import { order as OrderType, option as OptionType, token as TokenType } from '../types';
+import * as types from '../../types';
 import { AskText, BidText } from './styled';
 import * as zeroXUtil from '../../utils/0x';
 
+type OrderbookProps = {
+  asks: types.order[],
+  bids: types.order[],
+  option: types.option,
+  quoteAsset: types.token,
+  tradeType: types.tradeType,
+  selectedOrders: types.order[],
+  setTradeType: Function,
+  setSelectedOrders: Function,
+};
+
 function OrderBook({
   asks, bids, option, quoteAsset, setTradeType, setSelectedOrders, selectedOrders, tradeType,
-}) {
+}:OrderbookProps) {
   const [askPage, setAskPage] = useState(0);
   const [bidPage, setBidPage] = useState(0);
 
-  const [askSelectedIndexs, setAskSelectedIndexes] = useState([]);
-  const [bidSelectedIndexs, setBidSelectedIndexes] = useState([]);
+  const [askSelectedIndexs, setAskSelectedIndexes] = useState<number[]>([]);
+  const [bidSelectedIndexs, setBidSelectedIndexes] = useState<number[]>([]);
 
   const onSelectAskEntry = (entries, indexes) => {
     setTradeType('buy'); // Filling ask orders is a bid
@@ -33,7 +44,7 @@ function OrderBook({
   useEffect(() => {
     if (tradeType === 'buy') { // user select and ask order
       setBidSelectedIndexes([]); // reset bid selections
-      const selectedIdxs = [];
+      const selectedIdxs: number[] = [];
       for (let i = 0; i < asks.length; i += 1) {
         if (selectedOrders.map((o) => o.metaData.orderHash).includes(asks[i].metaData.orderHash)) {
           selectedIdxs.push(i);
@@ -42,7 +53,7 @@ function OrderBook({
       setAskSelectedIndexes(selectedIdxs);
     } else {
       setAskSelectedIndexes([]);
-      const selectedIdxs = [];
+      const selectedIdxs: number[] = [];
       for (let i = 0; i < bids.length; i += 1) {
         if (selectedOrders.map((o) => o.metaData.orderHash).includes(bids[i].metaData.orderHash)) {
           selectedIdxs.push(i);
@@ -100,16 +111,5 @@ function OrderBook({
     </>
   );
 }
-
-OrderBook.propTypes = {
-  asks: PropTypes.arrayOf(OrderType).isRequired,
-  bids: PropTypes.arrayOf(OrderType).isRequired,
-  option: OptionType.isRequired,
-  quoteAsset: TokenType.isRequired,
-  tradeType: PropTypes.string.isRequired,
-  selectedOrders: PropTypes.arrayOf(OrderType).isRequired,
-  setTradeType: PropTypes.func.isRequired,
-  setSelectedOrders: PropTypes.func.isRequired,
-};
 
 export default OrderBook;

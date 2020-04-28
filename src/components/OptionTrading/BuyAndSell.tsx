@@ -1,36 +1,48 @@
 import React, { useState, useEffect } from 'react';
-import PropTypes from 'prop-types';
 import {
   Button, useTheme, TextInput, Help, useToast, LinkBase,
 } from '@aragon/ui';
-import styled from 'styled-components';
+
+import { BuyAndSellBlock, Wrapper, BottomTextWrapper, BottomText, Header,
+  BuySellTopPart,
+  FlexWrapper,
+  BuySellTopPartText,
+  Flex,
+  TabWrapper,
+  Tab,
+  BuySellLowerPart,
+  Label,
+  GroupButtonWrapper,
+  GroupButton, } from './styled'
+
 import BigNumber from 'bignumber.js';
-import { WarningText } from '../common/index.ts';
+import { WarningText } from '../common/index';
 import {
   createOrder, broadcastOrders, getOrdersTotalFillables, getGasPrice, getFillAmountsOfOrders,
-} from '../../utils/0x.ts';
+} from '../../utils/0x';
 import { signOrder, fillOrders, approve } from '../../utils/web3';
 import { toTokenUnitsBN, toBaseUnitBN } from '../../utils/number';
 import WrapETHPanel from './WrapETHSidePanel';
 
-import {
-  // vault as VaultType,
-  order as OrderType,
-  token as TokenType,
-} from '../types';
 import { getAllowance } from '../../utils/infura';
 import { ZeroX_ERC20Proxy } from '../../constants/contracts';
 
 import { WETH } from '../../constants/tokens';
 
-/**
- *
- * @param {{
- * baseAsset: {addr:string, decimals: number, symbol:string}
- * quoteAsset: {addr:string, decimals: number, symbol:string}
- * collateral: {addr:string, decimals: number, symbol:string}
- * }} param0
- */
+import * as types from '../../types'
+
+type BuyAndSellProps = {
+  user:string,
+  tradeType: types.tradeType,
+  selectedOrders: types.order[], //
+  setSelectedOrders: Function,
+  setTradeType: Function,
+  baseAsset: types.ETHOption,
+  quoteAsset: types.token,
+  baseAssetBalance: BigNumber,
+  quoteAssetBalance: BigNumber,
+}
+
 function BuyAndSell({
   user,
   tradeType, // ask || bid
@@ -46,12 +58,12 @@ function BuyAndSell({
   // ethBalance, // in ETH (0.5)
   baseAssetBalance, // in base uinit
   quoteAssetBalance, // in base Unit
-}) {
+}: BuyAndSellProps) {
   const theme = useTheme();
   const toast = useToast();
 
   const [quoteAssetAmount, setQuoteAssetAmount] = useState(new BigNumber(0));
-  const [fillingtakerAmounts, setFillingTakerAmounts] = useState([]);
+  const [fillingtakerAmounts, setFillingTakerAmounts] = useState<string[]>([]);
 
   // these two add up to total oToken displayed on the Amount section
   const [baseAmountToFill, setBaseAmountToFill] = useState(new BigNumber(0));
@@ -84,7 +96,7 @@ function BuyAndSell({
   const [activeButton, setActiveButton] = useState(0);
   const expirySeconds = activeButton === 0
     ? 3600 : (activeButton === 1 ? 86400 : 604800);
-  const expiry = parseInt(Date.now() / 1000 + expirySeconds, 10);
+  const expiry = parseInt((Date.now() / 1000).toString(), 10) + expirySeconds;
 
 
   // update gasPrice
@@ -247,7 +259,7 @@ function BuyAndSell({
     return true;
   };
 
-  const checkBaseAssetBalance = (baseAssetAmountInBase) => {
+  const checkBaseAssetBalance = (baseAssetAmountInBase: BigNumber) => {
     if (baseAssetAmountInBase.gt(baseAssetBalance)) {
       toast(`Insufficient ${baseAsset.symbol}`);
       return false;
@@ -255,7 +267,7 @@ function BuyAndSell({
     return true;
   };
 
-  const checkAndAllowBaseAsset = async (baseAssetAmountBase) => {
+  const checkAndAllowBaseAsset = async (baseAssetAmountBase: BigNumber) => {
     const tokenAllowance = new BigNumber(await getAllowance(baseAsset.addr, user, ZeroX_ERC20Proxy));
     if (tokenAllowance.lt(baseAssetAmountBase)) {
       toast(`Please approve 0x to spend your oToken ${baseAsset.symbol}`);
@@ -341,10 +353,10 @@ function BuyAndSell({
           <Wrapper>Balance</Wrapper>
         </Header>
         <Wrapper>
-          <TopPart theme={theme}>
+          <BuySellTopPart theme={theme}>
             <FlexWrapper>
               <div>{baseAsset.symbol}</div>
-              <TopPartText>{toTokenUnitsBN(baseAssetBalance, baseAsset.decimals).toFormat(4)}</TopPartText>
+              <BuySellTopPartText>{toTokenUnitsBN(baseAssetBalance, baseAsset.decimals).toFormat(4)}</BuySellTopPartText>
             </FlexWrapper>
             <FlexWrapper>
               <div>
@@ -363,21 +375,9 @@ function BuyAndSell({
                   ) : <></> }
                 </Flex>
               </div>
-              <TopPartText>{toTokenUnitsBN(quoteAssetBalance, quoteAsset.decimals).toFormat(4)}</TopPartText>
+              <BuySellTopPartText>{toTokenUnitsBN(quoteAssetBalance, quoteAsset.decimals).toFormat(4)}</BuySellTopPartText>
             </FlexWrapper>
-          </TopPart>
-          {/* <FlexWrapper>
-            <div>
-              Collateral (
-              {collateral.symbol}
-              )
-            </div>
-            <TopPartText>
-              { vault
-                ? toTokenUnitsBN(vault.collateral, collateral.decimals).toFormat(4)
-                : Number(0).toFixed(4)}
-            </TopPartText>
-          </FlexWrapper> */}
+          </BuySellTopPart>
         </Wrapper>
         <Wrapper>
           <TabWrapper theme={theme}>
@@ -402,7 +402,7 @@ function BuyAndSell({
               Sell
             </Tab>
           </TabWrapper>
-          <LowerPart>
+          <BuySellLowerPart>
             <Label>Amount</Label>
             { baseAsset.symbol.toLowerCase().includes('call')
               ? <WarningText text={`Buy ${baseAsset.strikePriceInUSD} ${baseAsset.symbol} to hedge 1 ETH.`} />
@@ -458,7 +458,7 @@ function BuyAndSell({
               </BottomText>
               <BottomText>{`${feeInETH} ETH` }</BottomText>
             </BottomTextWrapper>
-          </LowerPart>
+          </BuySellLowerPart>
         </Wrapper>
         <Flex>
           { hasSelectedOrders // is filling orders
@@ -499,145 +499,6 @@ function BuyAndSell({
   );
 }
 
-BuyAndSell.propTypes = {
-  user: PropTypes.string.isRequired,
-
-  // three types of tokens
-  quoteAsset: TokenType.isRequired,
-  baseAsset: TokenType.isRequired,
-  // collateral: TokenType.isRequired,
-
-
-  // ethBalance: PropTypes.instanceOf(BigNumber).isRequired,
-  baseAssetBalance: PropTypes.instanceOf(BigNumber).isRequired,
-  quoteAssetBalance: PropTypes.instanceOf(BigNumber).isRequired,
-
-  // vault: VaultType,
-
-  tradeType: PropTypes.string.isRequired,
-  setTradeType: PropTypes.func.isRequired,
-
-  selectedOrders: PropTypes.arrayOf(OrderType).isRequired,
-  setSelectedOrders: PropTypes.func.isRequired,
-};
-
-// BuyAndSell.defaultProps = {
-//   vault: {
-//     owner: '',
-//     oTokensIssued: '0',
-//     collateral: '0',
-//     underlying: '0',
-//   },
-// };
-
 export default BuyAndSell;
 
-const FlexWrapper = styled.div`
-  display: flex;
-  justify-content: space-between;
-  margin: 18px 0;
-`;
-const BuyAndSellBlock = styled.div`  
-  width: 100%;
-  min-height: 509px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  border: 1px solid ${(props) => props.theme.border};
-  padding-bottom: 10px;
-  border-radius: 5px;
-  background-color: ${(props) => props.theme.surface};
-`;
-const Header = styled.div`
-  width: 100%;
-  height: 35px;
-  font-size: 13px;
-  font-family: aragon-ui;
-  border-bottom: 1px solid ${(props) => props.theme.border};
-  background-color: ${(props) => props.theme.surface};
-  color: ${(props) => props.theme.contentSecondary};
-  display: flex;
-  align-items: center;
-  padding: 10px 0;
-  justify-content: center;
-  // font-weight: bold;
-`;
-const TopPart = styled.div`
-  margin: 10px 0;
-  background-color: ${(props) => props.theme.surface};
-  min-height: 50px;
-`;
-const TopPartText = styled.div``;
-const LowerPart = styled.div`
-  background-color: ${(props) => props.theme.background};
-`;
-const Tab = styled.div`
-  width: 50%;
-  height: 50px;
-  color: ${(props) => (props.active ? props.theme.content : props.theme.surfaceContentSecondary)};
-  justify-content: center;
-  display: flex;
-  align-items: center;
-  border-bottom: ${(props) => (props.active ? `2px solid ${props.theme.selected}` : `1px solid ${props.theme.border}`)};
-  cursor: pointer;
-`;
-const Label = styled.div`
-  height: 14px;
-  font-size: 14px;
-  color: ${(props) => props.theme.content};
-  margin: 20px 0 15px 0;
-`;
 
-const BottomText = styled.div`
-  height: 20px;
-`;
-const Wrapper = styled.div`
-  width: 90%;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-`;
-const Flex = styled.div`
-  display:flex;
-  width: 90%;
-`;
-const TabWrapper = styled.div`
-  width: 100%;
-  display: flex;
-  background-color: ${(props) => props.theme.surface};
-  padding-top: 10px;
-  border: ${(props) => props.theme.border}
-`;
-const BottomTextWrapper = styled(FlexWrapper)`
-  height: 27px;
-  border-bottom: solid 1px #979797;
-  border-bottom-style: dotted;
-`;
-const GroupButtonWrapper = styled.div`
-  display: flex;
-  justify-content: center;
-  color: ${(props) => props.theme.content};
-  white-space: nowrap;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-  align-items: center;
-  border-radius: 5px;
-`;
-const GroupButton = styled.div`
-  height: 40px;
-  width: 33%;
-  border: 1px solid ${(props) => props.theme.border};
-  border-width: ${(props) => (props.index === 1 ? '1px 0px' : '1px')};
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  cursor: pointer;
-  border-top-left-radius: ${(props) => (props.index === 0 ? '5px' : '0px')};
-  border-bottom-left-radius: ${(props) => (props.index === 0 ? '5px' : '0px')};
-  border-top-right-radius: ${(props) => (props.index === 2 ? '5px' : '0px')};
-  border-bottom-right-radius: ${(props) => (props.index === 2 ? '5px' : '0px')};
-  background: ${(props) => (props.disabled ? props.theme.surface
-    : props.isActive ? props.theme.surfaceHighlight : props.theme.surface)} ;
-  :active {
-    transform: translateY(1px)
-  }
-`;

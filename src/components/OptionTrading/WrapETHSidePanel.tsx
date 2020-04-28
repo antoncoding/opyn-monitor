@@ -1,25 +1,35 @@
-/* eslint-disable consistent-return */
 import React, { useState, useEffect } from 'react';
 import BigNumber from 'bignumber.js';
-import PropTypes from 'prop-types';
+
 
 import {
   SidePanel, Button, TextInput, useTheme,
 } from '@aragon/ui';
-import { BalanceBlock, SectionTitle, Comment } from '../common/index.ts';
+import { BalanceBlock, SectionTitle, Comment } from '../common/index';
 
 import { wrapETH, unwrapETH } from '../../utils/web3';
 import { toBaseUnitBN, toTokenUnitsBN } from '../../utils/number';
 import { getBalance } from '../../utils/infura';
 
+
+
+type WrapETHModalProps = {
+  user: string,
+  helperText: string,
+  setHelperText: Function,
+  wethBalance: BigNumber,
+  opened: boolean,
+  setOpen: Function,
+};
+
 function WrapETHModal({
   user, wethBalance, opened, setOpen, helperText, setHelperText,
-}) {
+}: WrapETHModalProps) {
   const theme = useTheme();
-  const [wrapAmount, setWrapAmount] = useState(BigNumber(0));
-  const [unWrapAmount, setUnwrapAmount] = useState(BigNumber(0));
+  const [wrapAmount, setWrapAmount] = useState(new BigNumber(0));
+  const [unWrapAmount, setUnwrapAmount] = useState(new BigNumber(0));
 
-  const [ethBalance, setETHBalance] = useState(BigNumber(0));
+  const [ethBalance, setETHBalance] = useState(new BigNumber(0));
 
   const onChangeWrapAmount = (event) => {
     const amount = event.target.value;
@@ -115,15 +125,5 @@ function WrapETHModal({
     </SidePanel>
   );
 }
-
-
-WrapETHModal.propTypes = {
-  user: PropTypes.string.isRequired,
-  helperText: PropTypes.string.isRequired,
-  setHelperText: PropTypes.func.isRequired,
-  wethBalance: PropTypes.instanceOf(BigNumber).isRequired,
-  opened: PropTypes.bool.isRequired,
-  setOpen: PropTypes.func.isRequired,
-};
 
 export default WrapETHModal;

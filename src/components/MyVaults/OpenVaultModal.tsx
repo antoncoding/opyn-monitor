@@ -140,7 +140,7 @@ function OpenVaultModal({ user, option }: openVaultModalProps) {
             </div>
           </div>
           { option.symbol.toLowerCase().includes('call')
-            ? <WarningText text={`1 ${option.collateral.symbol} can create ${option.strikePriceInUSD} ${option.symbol}`} />
+            ? <WarningText text={`1 ${option.collateral.symbol} can create ${(option as types.ETHOption).strikePriceInUSD} ${option.symbol}`} />
             : <></>}
           <Button label="Mint" onClick={mint} />
           { ratio === Infinity

@@ -39,12 +39,7 @@ export async function getOrderBook(base:string, quote:string): Promise<{
  * bestAsk:{}, bestBid:{}
  * }>>}
  */
-export async function getBasePairAskAndBids(options: types.option[], quoteAsset:types.token): Promise<{
-  option: string, bestAskPrice: BigNumber, bestBidPrice: BigNumber, totalBidAmt: BigNumber,
-  totalAskAmt: BigNumber, 
-  bestAsk: types.order | undefined, 
-  bestBid: types.order | undefined
-}[]> {
+export async function getBasePairAskAndBids(options: types.option[], quoteAsset:types.token): Promise<types.OptionRealTimeStat[]> {
   const bestAskAndBids = await Promise.map(options, async ({ addr: option, decimals }) => {
     const { asks, bids } = await getOrderBook(option, USDC.addr);
     let totalBidAmt = new BigNumber(0);

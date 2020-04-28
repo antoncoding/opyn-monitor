@@ -16,6 +16,7 @@ import AddLiquidity from './AddLiquidity';
 import RemoveLiquidity from './RemoveLiquidity';
 
 import tracker from '../../utils/tracker';
+import * as types from '../../types'
 
 function UniswapPool({ user }: {user: string}) {
   const liquidityTokenDecimals = 18;
@@ -27,7 +28,7 @@ function UniswapPool({ user }: {user: string}) {
 
   const option = allOptions.find((o) => o.addr === token);
   const {
-    uniswapExchange, decimals, symbol, exchange, strikePriceInUSD,
+    uniswapExchange, decimals, symbol, exchange,
   } = option!;
 
   const [poolTokenBalance, setPoolTokenBalance] = useState(new BigNumber(0));
@@ -107,7 +108,7 @@ function UniswapPool({ user }: {user: string}) {
       />
 
       <UniswapBuySell
-        strikePriceInUSD={strikePriceInUSD}
+        strikePriceInUSD={(option as types.ETHOption).strikePriceInUSD}
         symbol={symbol}
         tokenBalance={userTokenBalance}
         token={token}

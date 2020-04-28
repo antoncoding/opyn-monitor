@@ -1,26 +1,54 @@
-/* eslint-disable no-restricted-syntax */
 import React, { useState, useEffect } from 'react';
-import PropTypes from 'prop-types';
 import {
   DataView, DropDown, LinkBase, Radio, Header, Tag,
 } from '@aragon/ui';
 import { AskText, BidText } from './styled';
 
-import { SectionTitle } from '../common/index.ts';
+import { SectionTitle } from '../common';
 
-import { getBasePairAskAndBids } from '../../utils/0x.ts';
-import { token as TokenType } from '../types';
+import { getBasePairAskAndBids } from '../../utils/0x';
+import * as types from '../../types';
 
 import { eth_puts, eth_calls } from '../../constants/options';
 
 const optionsByDate = groupByDate(eth_puts, eth_calls);
 
+
+type dataViewEntryType = {
+  strikePrice: number,
+  call?: types.ETHOption,
+  callDetail?: types.OptionRealTimeStat,
+  put?: types.ETHOption,
+  putDetail?: types.OptionRealTimeStat
+}
+
+
+type strikePricePair = {
+  strikePrice: number,
+  call: types.ETHOption | undefined,
+  put: types.ETHOption | undefined
+}
+
+type entriesForExpiry = { 
+  expiry: number, 
+  expiryText: string, 
+  pairs: strikePricePair[]
+}
+
+type OptionBoardProps = {
+  baseAsset: types.token,
+  quoteAsset: types.token,
+  setBaseAsset: Function,
+  setTradeType: Function,
+  setSelectedOrders: Function,
+};
+
 function OptionBoard({
   baseAsset, quoteAsset, setBaseAsset, setTradeType, setSelectedOrders,
-}) {
+}:OptionBoardProps) {
   const [isLoading, setIsLoading] = useState(true);
   const [selectedExpiryIdx, setExpiryIdx] = useState(0);
-  const [entriesToDisplay, setEntriesToDisplay] = useState([]);
+  const [entriesToDisplay, setEntriesToDisplay] = useState<dataViewEntryType[]>([]);
 
   // on expiry change: start the call and put update function on the options of that day
   useEffect(() => {
@@ -37,14 +65,14 @@ function OptionBoard({
         .map((pair) => pair.put);
 
       const [callData, putData] = await Promise.all([
-        getBasePairAskAndBids(callsOfExpiry, quoteAsset),
-        getBasePairAskAndBids(putsOfExpiry, quoteAsset),
+        getBasePairAskAndBids(callsOfExpiry as types.ETHOption[] , quoteAsset),
+        getBasePairAskAndBids(putsOfExpiry as types.ETHOption[], quoteAsset),
       ]);
 
-      const displayEntries = [];
+      const displayEntries: dataViewEntryType[] = [];
       optionsByDate[selectedExpiryIdx].pairs.forEach((pair) => {
         const { call, put, strikePrice } = pair;
-        const entry = { strikePrice };
+        const entry: dataViewEntryType = { strikePrice };
         if (call !== undefined) {
           // has call option on this strikePrice
           entry.call = call;
@@ -150,18 +178,18 @@ function OptionBoard({
           let callBid = '-';
           let callBidAmt = '-';
           let callAskAmt = '-';
-          let callOnclick = () => {};
-          let callBidOnclick = () => {};
-          let callAskOnclick = () => {};
+          let callOnclick = () => { };
+          let callBidOnclick = () => { };
+          let callAskOnclick = () => { };
 
           const lastPutPrice = '-';
           let putAsk = '-';
           let putBid = '-';
           let putBidAmt = '-';
           let putAskAmt = '-';
-          let putOnclick = () => {};
-          let putBidOnclick = () => {};
-          let putAskOnclick = () => {};
+          let putOnclick = () => { };
+          let putBidOnclick = () => { };
+          let putAskOnclick = () => { };
 
           if (callDetail !== undefined) {
             // have call option has this strike price
@@ -238,25 +266,15 @@ function OptionBoard({
   );
 }
 
-OptionBoard.propTypes = {
-  baseAsset: TokenType.isRequired,
-  quoteAsset: TokenType.isRequired,
-  setBaseAsset: PropTypes.func.isRequired,
-  setTradeType: PropTypes.func.isRequired,
-  setSelectedOrders: PropTypes.func.isRequired,
-};
+
 
 export default OptionBoard;
 
 /**
  *
- * @param {Array<{strikePriceInUSD:number, addr:string, expiry:number}>} puts
- * @param {Array<{strikePriceInUSD:number, addr:string, expiry:number}>} calls
- * @returns {{ expiry:number, expiryText:string, pairs: {call: {}, put: {}, strikePrice: number }[] }[]}
- * key: expiry in string, value: array of { call, put, callDetail, putDetail, strikePrice}
  */
-function groupByDate(puts, calls) {
-  const result = [];
+function groupByDate(puts: types.ETHOption[], calls: types.ETHOption[]): entriesForExpiry[] {
+  const result: entriesForExpiry[] = [];
   const allOptions = puts.concat(calls).filter((option) => option.expiry > Date.now() / 1000);
   const distinctExpirys = [...new Set(allOptions.map((option) => option.expiry))];
 
@@ -267,7 +285,7 @@ function groupByDate(puts, calls) {
     ];
 
     // const allStrikesForThisDay = {};
-    const pairs = [];
+    const pairs: strikePricePair[] = [];
     for (const strikePrice of strikePrices) {
       const put = puts.find((o) => o.strikePriceInUSD === strikePrice && o.expiry === expiry);
       const call = calls.find((o) => o.strikePriceInUSD === strikePrice && o.expiry === expiry);
@@ -288,13 +306,19 @@ function groupByDate(puts, calls) {
   return result;
 }
 
+type CellProps = {
+  onClick: Function,
+  text: string,
+  type: 'bid' | 'ask' | 'normal'
+}
+
 function Cell({
   onClick, text, type,
-}) {
+}:CellProps) {
   return (
     <LinkBase onClick={onClick}>
       <div style={{ width: '60px', textAlign: 'center' }}>
-        { type === 'bid' ? (
+        {type === 'bid' ? (
           <BidText>
             {' '}
             {text}
@@ -307,19 +331,14 @@ function Cell({
             {' '}
           </AskText>
         ) : (
-          <div>
-            {' '}
-            {text}
-            {' '}
-          </div>
-        ) }
+              <div>
+                {' '}
+                {text}
+                {' '}
+              </div>
+            )}
       </div>
     </LinkBase>
   );
 }
 
-Cell.propTypes = {
-  onClick: PropTypes.func.isRequired,
-  text: PropTypes.string.isRequired,
-  type: PropTypes.string.isRequired,
-};

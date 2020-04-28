@@ -7,10 +7,6 @@ export const vault = PropTypes.shape({
   underlying: PropTypes.string,
 });
 
-// export const detailVault = PropTypes.shape({
-//   oTokensIssued: PropTypes.string,
-//   collateral: PropTypes.string,
-// });
 
 export const token = PropTypes.shape({
   addr: PropTypes.string.isRequired,

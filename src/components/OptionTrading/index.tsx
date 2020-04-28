@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import PropTypes from 'prop-types';
 import BigNumber from 'bignumber.js';
 import styled from 'styled-components';
 
@@ -9,18 +8,18 @@ import TabBoard from './TabBoard';
 import BuyAndSell from './BuyAndSell';
 
 import { getTokenBalance } from '../../utils/infura';
-import { getOrderBook, isValid } from '../../utils/0x.ts';
+import { getOrderBook, isValid } from '../../utils/0x';
 // import { getVault } from '../../utils/graph';
 import { eth_puts, eth_calls } from '../../constants/options';
-
+import * as types from '../../types'
 import * as tokens from '../../constants/tokens';
 
 import tracker from '../../utils/tracker';
 
 const quoteAsset = tokens.USDC;
 
-function OptionTrading({ user }) {
-  const [baseAsset, setBaseAsset] = useState(
+function OptionTrading({ user }: { user: string }) {
+  const [baseAsset, setBaseAsset] = useState<types.ETHOption | undefined>(
     eth_puts.concat(eth_calls).find((o) => o.expiry > Date.now() / 1000),
   );
 
@@ -28,16 +27,16 @@ function OptionTrading({ user }) {
     tracker.pageview('/trade/');
   }, []);
 
-  const [asks, setAsks] = useState([]);
-  const [bids, setBids] = useState([]);
+  const [asks, setAsks] = useState<types.order[]>([]);
+  const [bids, setBids] = useState<types.order[]>([]);
 
-  const [tradeType, setTradeType] = useState('buy');
+  const [tradeType, setTradeType] = useState<types.tradeType>('buy');
   const [selectedOrders, setSelectedOrders] = useState([]);
 
   // user balance
   // const [userETHBalance, setUserETHBalance] = useState(BigNumber(0)); // in eth
-  const [baseAssetBalance, setBaseAssetBalance] = useState(BigNumber(0));
-  const [quoteAssetBalance, setQuoteAssetBalance] = useState(BigNumber(0));
+  const [baseAssetBalance, setBaseAssetBalance] = useState(new BigNumber(0));
+  const [quoteAssetBalance, setQuoteAssetBalance] = useState(new BigNumber(0));
 
   // const [vault, setVault] = useState({});
 
@@ -48,7 +47,7 @@ function OptionTrading({ user }) {
 
     // update orderbook
     const updateOrderBook = async () => {
-      const res = await getOrderBook(baseAsset.addr, quoteAsset.addr);
+      const res = await getOrderBook(baseAsset!.addr, quoteAsset.addr);
       if (!isCancelled) {
         setAsks(res.asks.records.filter((record) => isValid(record)));
         setBids(res.bids.records.filter((record) => isValid(record)));
@@ -57,7 +56,7 @@ function OptionTrading({ user }) {
 
     // update baseAsset Balance
     const updateBaseBalance = async () => {
-      const baseBalance = await getTokenBalance(baseAsset.addr, user);
+      const baseBalance = await getTokenBalance(baseAsset!.addr, user);
       if (!isCancelled) {
         setBaseAssetBalance(new BigNumber(baseBalance));
       }
@@ -109,13 +108,13 @@ function OptionTrading({ user }) {
           <br />
           <BuyAndSell
             user={user}
-            baseAsset={baseAsset}
+            baseAsset={baseAsset!}
             quoteAsset={quoteAsset}
-            collateral={baseAsset.collateral}
 
             baseAssetBalance={baseAssetBalance}
             quoteAssetBalance={quoteAssetBalance}
 
+            // collateral={baseAsset!.collateral}
             // vault={vault}
 
             tradeType={tradeType}
@@ -129,7 +128,7 @@ function OptionTrading({ user }) {
           {/* <Header primary="Trade ETH Options" /> */}
           <OptionBoard
             quoteAsset={quoteAsset}
-            baseAsset={baseAsset}
+            baseAsset={baseAsset!}
             setBaseAsset={setBaseAsset}
             setTradeType={setTradeType}
             setSelectedOrders={setSelectedOrders}
@@ -140,7 +139,7 @@ function OptionTrading({ user }) {
             asks={asks}
             bids={bids}
             user={user}
-            option={baseAsset}
+            option={baseAsset!}
             quoteAsset={quoteAsset}
             tradeType={tradeType}
             selectedOrders={selectedOrders}
@@ -153,10 +152,6 @@ function OptionTrading({ user }) {
     </WholeScreen>
   );
 }
-
-OptionTrading.propTypes = {
-  user: PropTypes.string.isRequired,
-};
 
 
 const LeftPart = styled.div`

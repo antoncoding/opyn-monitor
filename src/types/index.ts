@@ -1,3 +1,5 @@
+import BigNumber from 'bignumber.js'
+
 export type vault = {
   owner: string,
   oTokensIssued: string,
@@ -22,14 +24,28 @@ export type option = {
   underlying: token,
   strike: token,
   strikePrice: number,
-  strikePriceInUSD?: number,
   minRatio: number,
   exchange: string,
   uniswapExchange: string,
   expiry: number,
 };
 
+export type ETHOption = option & { strikePriceInUSD: number } 
+
+export type tradeType = 'buy' | 'sell'
+
+export type OptionRealTimeStat = {
+  option: string, 
+  bestAskPrice: BigNumber, 
+  bestBidPrice: BigNumber, 
+  totalBidAmt: BigNumber,
+  totalAskAmt: BigNumber, 
+  bestAsk: order | undefined, 
+  bestBid: order | undefined
+}
+
 export type order = {
+  type?: 'Bid' | 'Ask',
   order: {
     signature: string
     senderAddress: string
