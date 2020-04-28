@@ -1,5 +1,4 @@
 import React, { useState, useMemo } from 'react';
-import PropTypes from 'prop-types';
 
 import {
   Header,
@@ -13,23 +12,28 @@ import {
 } from '@aragon/ui';
 import BigNumber from 'bignumber.js';
 
-import * as myType from '../types';
 import { exercise } from '../../utils/web3';
-import { PriceSection } from '../common/index.ts';
+import { PriceSection } from '../common/index';
 import { getUnderlyingRequiredToExercise, getBalance, getTokenBalance } from '../../utils/infura';
 import {
   toTokenUnitsBN, toBaseUnitBN, formatDigits, compareVaultIssued,
 } from '../../utils/number';
 
 import { ETH_ADDRESS } from '../../constants/contracts';
-import { allOptions } from '../../constants/options';
+import * as types from '../../types'
+
+type ExerciseModalProps = {
+  option: types.option,
+  user: string,
+  vaults: types.vaultWithoutUnderlying[]
+}
 
 function ExerciseModal({
   user,
-  token,
   vaults,
-}) {
-  const option = allOptions.find((o) => o.addr === token);
+  option
+}:ExerciseModalProps) {
+  
   const underlyingIsETH = option.underlying.addr === ETH_ADDRESS;
   const [userUnderlyingBalance, setUserUnderlyingBalance] = useState(new BigNumber(0));
   const [userOTokenBalance, setUserOTokenBalance] = useState(new BigNumber(0));
@@ -79,7 +83,7 @@ function ExerciseModal({
    */
   const checkHasEnoughToken = (entries) => {
     const sumIssued = entries.reduce(
-      (accumulator, current) => accumulator.plus(new BigNumber(current.oTokensIssued)), new BigNumber(0),
+      (accumulator:BigNumber, current: types.vaultWithoutUnderlying) => accumulator.plus(new BigNumber(current.oTokensIssued)), new BigNumber(0),
     );
     if (sumIssued.gt(new BigNumber(0)) && sumIssued.gte(toBaseUnitBN(exerciseAmount, option.decimals))) {
       setHasEnoughCollateral(true);
@@ -156,7 +160,7 @@ function ExerciseModal({
         </Box>
         <DataView
           mode="table"
-          renderSelectionCount={(count) => `${count} vaults selected`}
+          renderSelectionCount={(count: number) => `${count} vaults selected`}
           fields={['Owner', 'Issued', 'collateral']}
           entries={nonEmptyVaults}
           entriesPerPage={5}
@@ -187,11 +191,5 @@ function ExerciseModal({
     </>
   );
 }
-
-ExerciseModal.propTypes = {
-  user: PropTypes.string.isRequired,
-  token: PropTypes.string.isRequired,
-  vaults: PropTypes.arrayOf(myType.vault).isRequired,
-};
 
 export default ExerciseModal;

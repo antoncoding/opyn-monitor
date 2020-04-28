@@ -7,11 +7,14 @@ import ExerciseModal from './ExerciseModal';
 import VaultsList from './VaultsList';
 import OptionInfoBox from './OptionInfoBox';
 
-import { getAllVaultsForOption } from '../../utils/graph.ts';
+import { getAllVaultsForOption } from '../../utils/graph';
 import tracker from '../../utils/tracker';
 
 import { ETH_ADDRESS } from '../../constants/contracts';
 import { allOptions } from '../../constants/options';
+
+import * as types from '../../types'
+
 
 function OptionPage({ user }) {
   const { token } = useParams();
@@ -21,9 +24,9 @@ function OptionPage({ user }) {
 
   const option = allOptions.find((o) => o.addr === token);
 
-  const [vaults, setVaults] = useState([]);
+  const [vaults, setVaults] = useState<types.vaultWithoutUnderlying[]>([]);
 
-  const collateralIsETH = option.collateral.addr === ETH_ADDRESS;
+  const collateralIsETH = option!.collateral.addr === ETH_ADDRESS;
 
   useMemo(async () => {
     // Get All vaults once
@@ -34,23 +37,23 @@ function OptionPage({ user }) {
   return (
     <>
       <Header
-        primary={option.name}
+        primary={option!.name}
         secondary={(
           <ExerciseModal
             user={user}
-            token={token}
+            option={option!}
             vaults={vaults}
           />
         )}
       />
       {/* Basic Info Header */}
       <OptionInfoBox
-        token={token}
+        option={option!}
         collateralIsETH={collateralIsETH}
       />
       {/* List of Vaults */}
       <VaultsList
-        token={token}
+        option={option!}
         user={user}
         vaults={vaults}
         collateralIsETH={collateralIsETH}

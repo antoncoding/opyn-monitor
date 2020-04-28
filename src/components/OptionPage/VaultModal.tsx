@@ -16,7 +16,7 @@ import {
 } from '@aragon/ui';
 
 import * as MyPTypes from '../types';
-import { RatioTag, Comment } from '../common/index.ts';
+import { RatioTag, Comment } from '../common';
 
 import {
   liquidate,

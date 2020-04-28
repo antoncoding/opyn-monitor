@@ -1,23 +1,30 @@
 import React, { useState, useEffect } from 'react';
-import PropTypes from 'prop-types';
+
 import { DataView, IdentityBadge } from '@aragon/ui';
 import VaultModal from './VaultModal';
-import { SectionTitle, RatioTag } from '../common/index.ts';
-import * as MyPTypes from '../types';
+import { SectionTitle, RatioTag } from '../common';
+
 import {
   formatDigits, compareVaultRatio, compareVaultIssued, toTokenUnitsBN,
 } from '../../utils/number';
-import { calculateRatio, calculateStrikeValueInCollateral } from '../../utils/calculation.ts';
-import { allOptions } from '../../constants/options';
+
+import { calculateRatio, calculateStrikeValueInCollateral } from '../../utils/calculation';
+import * as types from '../../types'
+
+type VaultOwnerListProps = {
+  user: string,
+  option: types.option,
+  vaults: types.vaultWithoutUnderlying[],
+  collateralIsETH: boolean
+}
 
 function VaultOwnerList({
-  user, token, vaults, collateralIsETH,
-}) {
-  const option = allOptions.find((o) => o.addr === token);
+  user, option, vaults, collateralIsETH,
+}:VaultOwnerListProps) {
   const vaultUsesCollateral = option.collateral.addr !== option.strike.addr;
 
   const [isLoading, setIsLoading] = useState(true);
-  const [vaultsWithDetail, setVaultDetail] = useState([]);
+  const [vaultsWithDetail, setVaultDetail] = useState<types.vaultWithRatio[]>([]);
 
   const [page, setPage] = useState(0);
 
@@ -118,12 +125,5 @@ function VaultOwnerList({
     </>
   );
 }
-
-VaultOwnerList.propTypes = {
-  user: PropTypes.string.isRequired,
-  vaults: PropTypes.arrayOf(MyPTypes.vault).isRequired,
-  token: PropTypes.string.isRequired,
-  collateralIsETH: PropTypes.bool.isRequired,
-};
 
 export default VaultOwnerList;

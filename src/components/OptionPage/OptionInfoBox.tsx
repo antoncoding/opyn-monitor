@@ -1,25 +1,28 @@
 import React, { useState, useEffect } from 'react';
-import PropTypes from 'prop-types';
 import { Box, Split, IdentityBadge } from '@aragon/ui';
 
 import BigNumber from 'bignumber.js';
 
 import { getTotalSupply, getBalance, getTokenBalance } from '../../utils/infura';
 import { toTokenUnitsBN } from '../../utils/number';
-import { allOptions } from '../../constants/options';
+import * as types from '../../types'
+
+type OptionOverviewProps = {
+  option: types.option,
+  collateralIsETH: boolean
+}
 
 function OptionOverview({
-  token,
+  option,
   collateralIsETH,
-}) {
-  const option = allOptions.find((o) => o.addr === token);
+}:OptionOverviewProps) {
   const [totalCollateral, setTotalCollateral] = useState(new BigNumber(0));
   const [totalSupply, setTotalSupply] = useState(new BigNumber(0));
 
   useEffect(() => {
     let isCancelled = false;
     async function init() {
-      let totalCollt;
+      let totalCollt:BigNumber;
       if (collateralIsETH) {
         totalCollt = new BigNumber(await getBalance(option.addr));
       } else {
@@ -69,10 +72,5 @@ function OptionOverview({
     </>
   );
 }
-
-OptionOverview.propTypes = {
-  token: PropTypes.string.isRequired,
-  collateralIsETH: PropTypes.bool.isRequired,
-};
 
 export default OptionOverview;

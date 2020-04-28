@@ -1,7 +1,7 @@
-import React from 'react';
+import React, { ReactChild } from 'react';
 
 type commentProps = {
-  text: string
+  text: string | ReactChild
 }
 
 function Comment({ text }: commentProps) {

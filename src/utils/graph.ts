@@ -8,7 +8,7 @@ export async function getAllVaultsForOption(
   optionAddress: string
 ): Promise<
   {
-    colalteral: string;
+    collateral: string;
     oTokensIssued: string;
     owner: string;
   }[]
