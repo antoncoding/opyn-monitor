@@ -1,28 +1,31 @@
 import React, { useState } from 'react';
 import BigNumber from 'bignumber.js';
-import PropTypes from 'prop-types';
 import {
   Box, TextInput, Button, IconCirclePlus, IconCircleMinus,
 } from '@aragon/ui';
 import { addETHCollateral, addERC20Collateral, removeCollateral } from '../../utils/web3';
 
-import { BalanceBlock, MaxButton } from '../common/index.ts';
+import { BalanceBlock, MaxButton } from '../common/index';
 
 import { formatDigits, toTokenUnitsBN, toBaseUnitBN } from '../../utils/number';
-import { calculateRatio } from '../../utils/calculation.ts';
+import { calculateRatio } from '../../utils/calculation';
 import { ETH_ADDRESS } from '../../constants/contracts';
-import * as MyPTypes from '../types';
+import * as types from '../../types';
 
-/**
- *
- * @param {{
- * isOwner: boolean,
- * strikePrice:number,
- * strikeValue:BigNumber,
- * collateralAssetBalance: BigNumber
- * collateral: {addr:string, symbol:string, decimals:number}
- * }} param0
- */
+type CollateralManagementProps = {
+  isOwner: boolean,
+  vault: types.vault,
+  collateral: types.token,
+  collateralAssetBalance: BigNumber,
+  token: string,
+  owner: string,
+  strikeValue: BigNumber,
+  strikePrice: number,
+  minRatio: number,
+  setNewRatio: Function,
+
+}
+
 function CollateralManagement({
   isOwner,
   vault,
@@ -34,7 +37,7 @@ function CollateralManagement({
   strikePrice,
   minRatio,
   setNewRatio,
-}) {
+}: CollateralManagementProps) {
   const [addCollateralAmt, setAddCollateralAmt] = useState(0); // in token unit
   const [removeCollateralAmt, setRemoveCollateralAmt] = useState(0); // in token unit
 
@@ -173,18 +176,5 @@ function CollateralManagement({
     </Box>
   );
 }
-
-CollateralManagement.propTypes = {
-  isOwner: PropTypes.bool.isRequired,
-  vault: MyPTypes.vault.isRequired,
-  collateral: MyPTypes.token.isRequired,
-  collateralAssetBalance: PropTypes.instanceOf(BigNumber).isRequired,
-  token: PropTypes.string.isRequired,
-  owner: PropTypes.string.isRequired,
-  strikeValue: PropTypes.instanceOf(BigNumber).isRequired,
-  strikePrice: PropTypes.number.isRequired,
-  minRatio: PropTypes.number.isRequired,
-  setNewRatio: PropTypes.func.isRequired,
-};
 
 export default CollateralManagement;

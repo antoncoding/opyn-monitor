@@ -1,7 +1,8 @@
 /* eslint-disable import/prefer-default-export */
 import * as tokens from '../tokens';
+import { option } from '../../types'
 
-export const eth_puts = [
+export const eth_puts: option[] = [
   {
     addr: '0x48ab8a7d3bf2eb942e153e4275ae1a8988238dc7',
     title: 'ETH Put $100 04/03/20',

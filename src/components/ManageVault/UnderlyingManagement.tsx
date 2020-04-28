@@ -1,18 +1,30 @@
 import React, { useState, useMemo } from 'react';
-import PropTypes from 'prop-types';
 import {
   Box, DataView, Button, TransactionBadge,
 } from '@aragon/ui';
-import { BalanceBlock } from '../common/index.ts';
+import { BalanceBlock } from '../common/index';
 import { removeUnderlying } from '../../utils/web3';
-import { getRemoveUnderlyingHistory } from '../../utils/graph.ts';
+import { getRemoveUnderlyingHistory } from '../../utils/graph';
 import { formatDigits, toTokenUnitsBN, timeSince } from '../../utils/number';
+
+type RemoveUnderlyingHistoryEntry = {
+  amount: string;
+  timestamp: string;
+  transactionHash: string;
+}
+
+type RemoveUnderlyingProps = {
+  owner: string,
+  token: string,
+  underlyingDecimals: number,
+  underlyingAmount: string,
+}
 
 function RemoveUnderlying({
   owner, token, underlyingDecimals, underlyingAmount,
-}) {
+}: RemoveUnderlyingProps) {
   const [isLoading, setIsLoading] = useState(true);
-  const [entries, setEntries] = useState([]);
+  const [entries, setEntries] = useState<RemoveUnderlyingHistoryEntry[]>([]);
 
   useMemo(async () => {
     const actions = await getRemoveUnderlyingHistory(owner, token);
@@ -47,25 +59,18 @@ function RemoveUnderlying({
           entriesPerPage={4}
           renderEntry={({
             transactionHash, amount, timestamp,
-          }) => [
+          }: RemoveUnderlyingHistoryEntry) => [
             <TransactionBadge shorten={false} transaction={transactionHash} />,
             formatDigits(
               toTokenUnitsBN(amount, underlyingDecimals).toNumber(),
               5,
             ),
-            timeSince(parseInt(timestamp * 1000, 10)),
+            timeSince(parseInt(timestamp, 10)* 1000),
           ]}
         />
       </Box>
     </>
   );
 }
-
-RemoveUnderlying.propTypes = {
-  owner: PropTypes.string.isRequired,
-  token: PropTypes.string.isRequired,
-  underlyingDecimals: PropTypes.number.isRequired,
-  underlyingAmount: PropTypes.string.isRequired,
-};
 
 export default RemoveUnderlying;

@@ -183,7 +183,7 @@ export const addETHCollateral = async (oTokenAddr, owner, ethAmt) => {
  * @param {string} collaral
  * @param {string} oTokenAddr
  * @param {string} owner
- * @param {number|string} collateralAmt in min unit
+ * @param {number|string|BigNumber} collateralAmt in min unit
  */
 export const addERC20Collateral = async (collateral, oTokenAddr, owner, collateralAmt) => {
   const collateralAmtBN = new BigNumber(collateralAmt);

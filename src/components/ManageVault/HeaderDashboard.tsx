@@ -1,9 +1,19 @@
 import React from 'react';
 
-import PropTypes from 'prop-types';
-import { BalanceBlock, RatioTag, HelperText } from '../common/index.ts';
+import { BalanceBlock, RatioTag, HelperText } from '../common/index';
 import { formatDigits, toTokenUnitsBN } from '../../utils/number';
-import * as MyPTypes from '../types';
+import * as types from '../../types';
+
+type HeaderDashboardProps= {
+  ratio: number,
+  minRatio: number,
+  symbol: string,
+  vault: types.vault,
+  decimals: number,
+  newRatio: number,
+  collateralDecimals: number,
+  useCollateral: boolean,
+};
 
 const HeaderDashboard = ({
   ratio,
@@ -14,7 +24,7 @@ const HeaderDashboard = ({
   newRatio,
   collateralDecimals,
   useCollateral,
-}) => {
+}:HeaderDashboardProps) => {
   const tokenInUnit = vault.oTokensIssued
     ? toTokenUnitsBN(vault.oTokensIssued, decimals).toNumber()
     : '0';
@@ -71,17 +81,6 @@ const HeaderDashboard = ({
       </div>
     </div>
   );
-};
-
-HeaderDashboard.propTypes = {
-  ratio: PropTypes.number.isRequired,
-  minRatio: PropTypes.number.isRequired,
-  symbol: PropTypes.string.isRequired,
-  vault: MyPTypes.vault.isRequired,
-  decimals: PropTypes.number.isRequired,
-  newRatio: PropTypes.number.isRequired,
-  collateralDecimals: PropTypes.number.isRequired,
-  useCollateral: PropTypes.bool.isRequired,
 };
 
 export default HeaderDashboard;

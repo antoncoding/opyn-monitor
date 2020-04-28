@@ -63,17 +63,19 @@ export async function getAllVaultsForUser(
 export async function getVault(
   owner: string,
   option: string
-): Promise<{ underlying: string; colalteral: string; oTokensIssued: string }> {
+): Promise<{ underlying: string; collateral: string; oTokensIssued: string, owner: string }> {
   const query = `{
     vault(
      id: "${option.toLowerCase()}-${owner.toLowerCase()}"
     ) {
+      owner
       underlying
       collateral
       oTokensIssued
     }
   }`;
   const response = await postQuery(query);
+  console.log(response.data.vault)
   return response.data.vault;
 }
 
@@ -83,7 +85,7 @@ export async function getLiquidationHistory(
   {
     vault: {
       owner: string;
-      optionContract: {
+      optionsContract: {
         address: string;
       };
     };

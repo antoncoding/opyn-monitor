@@ -13,16 +13,17 @@ import LiquidationHistory from './Liquidation';
 import ExerciseHistory from './Exercise';
 import UnderlyingManagement from './UnderlyingManagement';
 
-import { Comment } from '../common/index.ts';
+import { Comment } from '../common/index';
 
 import { toTokenUnitsBN } from '../../utils/number';
-import { calculateRatio, calculateStrikeValueInCollateral } from '../../utils/calculation.ts';
+import { calculateRatio, calculateStrikeValueInCollateral } from '../../utils/calculation';
 import { getTokenBalance, getBalance } from '../../utils/infura';
-import { getVault } from '../../utils/graph.ts';
+import { getVault } from '../../utils/graph';
 import { redeem } from '../../utils/web3';
 
 import { ETH_ADDRESS } from '../../constants/contracts';
 import { allOptions } from '../../constants/options';
+import * as types from '../../types'
 import tracker from '../../utils/tracker';
 
 function ManageVault({ user }) {
@@ -32,17 +33,24 @@ function ManageVault({ user }) {
   }, [token]);
 
   const option = allOptions.find((o) => o.addr === token);
+  
+
   const {
     decimals, symbol, oracle, strike, strikePrice, minRatio,
-    collateral, expiry, underlying,
-  } = option;
+    collateral, expiry, underlying
+  } = option!;
 
   const [isLoading, setIsLoading] = useState(true);
 
   // Tab Navigation
   const [tabSelected, setTabSelected] = useState(0);
 
-  const [vault, setVault] = useState({});
+  const [vault, setVault] = useState<types.vault>({
+    collateral: '0',
+    oTokensIssued: '0',
+    owner,
+    underlying: '0'
+  });
   const [strikeValueInCollateral, setStrikeValue] = useState(new BigNumber(0));
   const [ratio, setRatio] = useState(0);
 
@@ -150,8 +158,7 @@ function ManageVault({ user }) {
           />
 
           <HeaderDashboard
-            owner={owner}
-            user={user}
+            // user={user}
             ratio={ratio}
             minRatio={minRatio}
             vault={vault}
@@ -159,7 +166,7 @@ function ManageVault({ user }) {
             symbol={symbol}
             newRatio={newRatio}
             useCollateral={vaultUsesCollateral}
-            collateralIsETH={collateralIsETH}
+            // collateralIsETH={collateralIsETH}
             collateralDecimals={collateral.decimals}
           />
 
@@ -199,8 +206,8 @@ function ManageVault({ user }) {
               symbol={symbol}
               setNewRatio={setNewRatio}
               // for call heler text
-              strikePriceInUSD={option.strikePriceInUSD}
-              collateralSymbol={option.collateral.symbol}
+              strikePriceInUSD={option!.strikePriceInUSD}
+              collateralSymbol={collateral.symbol}
             />
           ) : (
             <></>

@@ -1,7 +1,7 @@
 import * as tokens from '../tokens';
-
+import { option } from '../../types'
 /* eslint-disable import/prefer-default-export */
-export const insurances = [
+export const insurances: option[] = [
   {
     title: 'cDai Insurance',
     addr: '0x98cc3bd6af1880fcfda17ac477b2f612980e5e33',

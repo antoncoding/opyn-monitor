@@ -1,23 +1,32 @@
 import React, { useState } from 'react';
 import BigNumber from 'bignumber.js';
-import PropTypes from 'prop-types';
+
 import {
   Box, TextInput, Button, IconCirclePlus, IconCircleMinus,
 } from '@aragon/ui';
 import { burnOToken, issueOToken } from '../../utils/web3';
-import { BalanceBlock, MaxButton, WarningText } from '../common/index.ts';
+import { BalanceBlock, MaxButton, WarningText } from '../common/index';
 import { toBaseUnitBN, toTokenUnitsBN } from '../../utils/number';
-import { calculateRatio } from '../../utils/calculation.ts';
-import * as MyPTypes from '../types';
-/**
- *
- * @param {{
- * strikeValue: BigNumber,
- * tokenBalance: BigNumber,
- * strikePrice: Number,
- * decimals: Number
- * }} param0
- */
+import { calculateRatio } from '../../utils/calculation';
+
+import * as types from '../../types';
+
+
+type IssueTokenProps = {
+  isOwner: boolean,
+  vault: types.vault,
+  tokenBalance: BigNumber,
+  token: string,
+  strikeValue: BigNumber,
+  strikePrice: number,
+  minRatio: number,
+  decimals: number,
+  symbol: string,
+  setNewRatio: Function,
+  strikePriceInUSD: number | undefined,
+  collateralSymbol: string
+}
+
 function IssuedTokenManagement({
   isOwner,
   vault,
@@ -31,7 +40,7 @@ function IssuedTokenManagement({
   setNewRatio,
   strikePriceInUSD,
   collateralSymbol,
-}) {
+}:IssueTokenProps) {
   const [issueAmt, setIssueAmt] = useState(new BigNumber(0));
   const [burnAmt, setBurnAmt] = useState(new BigNumber(0));
 
@@ -166,20 +175,6 @@ function IssuedTokenManagement({
   );
 }
 
-IssuedTokenManagement.propTypes = {
-  isOwner: PropTypes.bool.isRequired,
-  vault: MyPTypes.vault.isRequired,
-  tokenBalance: PropTypes.instanceOf(BigNumber).isRequired,
-  token: PropTypes.string.isRequired,
-  strikeValue: PropTypes.instanceOf(BigNumber).isRequired,
-  strikePrice: PropTypes.number.isRequired,
-  minRatio: PropTypes.number.isRequired,
-  decimals: PropTypes.number.isRequired,
-  symbol: PropTypes.string.isRequired,
-  setNewRatio: PropTypes.func.isRequired,
-  //
-  strikePriceInUSD: PropTypes.number.isRequired,
-  collateralSymbol: PropTypes.string.isRequired,
-};
+
 
 export default IssuedTokenManagement;

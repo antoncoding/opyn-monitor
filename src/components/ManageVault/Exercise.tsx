@@ -5,14 +5,22 @@ import {
 } from '@aragon/ui';
 
 
-import { getExerciseHistory } from '../../utils/graph.ts';
+import { getExerciseHistory } from '../../utils/graph';
 import { formatDigits, toTokenUnitsBN, timeSince } from '../../utils/number';
+
+type exerciseEntry = {
+  amtCollateralToPay: string;
+  exerciser: string;
+  oTokensToExercise: string;
+  timestamp: string;
+  transactionHash: string;
+}
 
 function ExerciseHistory({
   owner, token, collateralDecimals, tokenDecimals,
 }) {
   const [isLoading, setIsLoading] = useState(true);
-  const [entries, setEntries] = useState([]);
+  const [entries, setEntries] = useState<exerciseEntry[]>([]);
 
   useMemo(async () => {
     const actions = await getExerciseHistory(owner, token);
@@ -31,7 +39,7 @@ function ExerciseHistory({
           entriesPerPage={4}
           renderEntry={({
             amtCollateralToPay, oTokensToExercise, exerciser, timestamp, transactionHash,
-          }) => [
+          }: exerciseEntry) => [
             <TransactionBadge transaction={transactionHash} />,
             formatDigits(
               toTokenUnitsBN(amtCollateralToPay, collateralDecimals).toNumber(),
@@ -42,7 +50,7 @@ function ExerciseHistory({
               5,
             ),
             <IdentityBadge entity={exerciser} />,
-            timeSince(parseInt(timestamp * 1000, 10)),
+            timeSince(parseInt(timestamp, 10) * 1000),
           ]}
         />
       </Box>
