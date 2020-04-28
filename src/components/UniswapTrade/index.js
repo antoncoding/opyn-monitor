@@ -20,9 +20,12 @@ import tracker from '../../utils/tracker';
 
 function UniswapPool({ user }) {
   const liquidityTokenDecimals = 18;
-
   const { token } = useParams();
-  tracker.pageview(`trade/${token}`);
+
+  useEffect(() => {
+    tracker.pageview(`/uniswap/${token}`);
+  }, [token]);
+
   const option = allOptions.find((o) => o.addr === token);
   const {
     uniswapExchange, decimals, symbol, exchange, strikePriceInUSD,

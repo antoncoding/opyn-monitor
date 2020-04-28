@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import BigNumber from 'bignumber.js';
 import {
@@ -22,7 +22,9 @@ import OpenVaultModal from './OpenVaultModal';
 const Promise = require('bluebird');
 
 function MyVaults({ user }) {
-  tracker.pageview('/myvaults');
+  useEffect(() => {
+    tracker.pageview('/myvaults/');
+  }, []);
   const [opendVaults, setOpenedVaults] = useState([]);
   const [tokensToOpen, setTokensToOpen] = useState([]);
 

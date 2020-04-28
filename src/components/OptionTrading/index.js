@@ -15,12 +15,18 @@ import { eth_puts, eth_calls } from '../../constants/options';
 
 import * as tokens from '../../constants/tokens';
 
+import tracker from '../../utils/tracker';
+
 const quoteAsset = tokens.USDC;
 
-function OptionTrading({ user, theme }) {
+function OptionTrading({ user }) {
   const [baseAsset, setBaseAsset] = useState(
     eth_puts.concat(eth_calls).find((o) => o.expiry > Date.now() / 1000),
   );
+
+  useEffect(() => {
+    tracker.pageview('/trade/');
+  }, []);
 
   const [asks, setAsks] = useState([]);
   const [bids, setBids] = useState([]);
@@ -111,7 +117,6 @@ function OptionTrading({ user, theme }) {
             quoteAssetBalance={quoteAssetBalance}
 
             // vault={vault}
-            theme={theme}
 
             tradeType={tradeType}
             setTradeType={setTradeType}
@@ -151,7 +156,7 @@ function OptionTrading({ user, theme }) {
 
 OptionTrading.propTypes = {
   user: PropTypes.string.isRequired,
-  theme: PropTypes.string.isRequired,
+  // theme: PropTypes.string.isRequired,
 };
 
 

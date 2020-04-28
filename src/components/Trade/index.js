@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import PropTypes from 'prop-types';
 import { useHistory } from 'react-router-dom';
 import {
   Header, DataView, IdentityBadge, Button,
@@ -11,7 +12,11 @@ import tracker from '../../utils/tracker';
 
 function TradeLanding() {
   const history = useHistory();
-  tracker.pageview('/uniswap/');
+
+  useEffect(() => {
+    tracker.pageview('/uniswap/');
+  }, []);
+
   const goToTrade = (addr) => {
     history.push(`/uniswap/${addr}`);
   };
@@ -70,7 +75,10 @@ function TradeLanding() {
 function GoToUniswapFunction({ token }) {
   return (
     <Button onClick={() => window.open(
-      `https://uniswap.exchange/swap?inputCurrency=${token}`,
+      tracker.event({
+        category: 'link',
+        action: 'uniswap',
+      })`https://uniswap.exchange/swap?inputCurrency=${token}`,
       '_blank',
     )}
     >
@@ -78,5 +86,9 @@ function GoToUniswapFunction({ token }) {
     </Button>
   );
 }
+
+GoToUniswapFunction.propTypes = {
+  token: PropTypes.string.isRequired,
+};
 
 export default TradeLanding;

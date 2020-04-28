@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { useParams } from 'react-router-dom';
 import { Header } from '@aragon/ui';
@@ -15,7 +15,10 @@ import { allOptions } from '../../constants/options';
 
 function OptionPage({ user }) {
   const { token } = useParams();
-  tracker.pageview(`/option/${token}`);
+  useEffect(() => {
+    tracker.pageview(`/option/${token}`);
+  }, [token]);
+
   const option = allOptions.find((o) => o.addr === token);
 
   const [vaults, setVaults] = useState([]);

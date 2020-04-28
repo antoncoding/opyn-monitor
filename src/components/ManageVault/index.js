@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import {
@@ -27,7 +27,10 @@ import tracker from '../../utils/tracker';
 
 function ManageVault({ user }) {
   const { token, owner } = useParams();
-  tracker.pageview(`/manage/${token}`);
+  useEffect(() => {
+    tracker.pageview(`/manage/${token}`);
+  }, [token]);
+
   const option = allOptions.find((o) => o.addr === token);
   const {
     decimals, symbol, oracle, strike, strikePrice, minRatio,

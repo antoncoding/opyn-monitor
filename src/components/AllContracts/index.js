@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useHistory } from 'react-router-dom';
 import {
   Header, DataView, IdentityBadge, Button, Tabs,
@@ -11,7 +11,10 @@ import { getPreference, storePreference } from '../../utils/storage';
 import tracker from '../../utils/tracker';
 
 function AllContracts() {
-  tracker.pageview('/options/');
+  useEffect(() => {
+    tracker.pageview('/options/');
+  }, []);
+
   const storedOptionTab = getPreference('optionTab', '0');
   const storedShowExpired = getPreference('showExpired', '0');
 
