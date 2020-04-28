@@ -2,8 +2,9 @@
 
 This is a frontend for users to easily manage/liquidate vaults under opyn protocol, and also buy/sell options. For more information about opyn protocol, take a look at https://opyn.co/
 
-### Contracts this UI interact with:
-* [Opyn](https://github.com/opynfinance/Convexity-Protocol) (option contract and exchange)
+### Contracts this UI interacts with:
+* [Opyn](https://github.com/opynfinance/Convexity-Protocol): option contract and exchange
+* [0x](https://0x.org/): 0x trading dex
 * [Flashloan liquidator](https://github.com/antoncoding/LiquidatorBot): Flashloan liquidator built with [Kollateral](https://www.kollateral.co/) aggregator
 
 
