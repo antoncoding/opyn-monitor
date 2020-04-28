@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useEffect } from 'react';
-import PropTypes from 'prop-types';
+
 import BigNumber from 'bignumber.js';
 import {
   Header, DataView, IdentityBadge,
@@ -30,13 +30,7 @@ export type vaultWithDetail = {
   ratio: number
 }
 
-// export type notOpenedToken = {
-//   oToken: string,
-//   oTokenName: string
-// }
-
-
-function MyVaults({ user }) {
+function MyVaults({ user }: {user: string}) {
   useEffect(() => {
     tracker.pageview('/myvaults/');
   }, []);
@@ -179,9 +173,5 @@ function MyVaults({ user }) {
     </>
   );
 }
-
-MyVaults.propTypes = {
-  user: PropTypes.string.isRequired,
-};
 
 export default MyVaults;

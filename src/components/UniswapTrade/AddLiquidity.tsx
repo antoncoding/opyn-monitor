@@ -1,25 +1,26 @@
 import React, { useState } from 'react';
-import PropTypes from 'prop-types';
 import BigNumber from 'bignumber.js';
 import {
   Box, TextInput, Button, IconCirclePlus, IconEthereum,
 } from '@aragon/ui';
 import { addLiquidity } from '../../utils/web3';
 
-import { BalanceBlock, MaxButton, PriceSection } from '../common/index.ts';
+import { BalanceBlock, MaxButton, PriceSection } from '../common/index';
 import { toBaseUnitBN } from '../../utils/number';
 
-/**
- *
- * @param {{
- * poolTokenBalance: BigNumber,
- * poolETHBalance:BigNumber,
- * liquidityTokenSupply: BigNumber,
- * userTokenBalance: BigNumber,
- * userETHBalance:BigNumber
- * uniswapExchange: string
- * }} param0
- */
+type AddliquidityProps = {
+  otoken: string,
+  otokenSymbol: string,
+  otokenDecimals: number,
+  poolTokenBalance: BigNumber,
+  poolETHBalance:BigNumber,
+  liquidityTokenSupply: BigNumber,
+  liquidityTokenDecimals: number,
+  userTokenBalance: BigNumber,
+  userETHBalance:BigNumber
+  uniswapExchange: string
+}
+
 function AddLiquidity({
   otoken,
   otokenSymbol,
@@ -31,7 +32,7 @@ function AddLiquidity({
   poolETHBalance,
   liquidityTokenDecimals,
   liquidityTokenSupply,
-}) {
+}: AddliquidityProps) {
   const SLIPPAGE_RATE = 2;
 
 
@@ -135,17 +136,5 @@ function AddLiquidity({
   );
 }
 
-AddLiquidity.propTypes = {
-  otoken: PropTypes.string.isRequired,
-  otokenSymbol: PropTypes.string.isRequired,
-  otokenDecimals: PropTypes.number.isRequired,
-  userTokenBalance: PropTypes.instanceOf(BigNumber).isRequired,
-  userETHBalance: PropTypes.instanceOf(BigNumber).isRequired,
-  uniswapExchange: PropTypes.string.isRequired,
-  poolTokenBalance: PropTypes.instanceOf(BigNumber).isRequired,
-  poolETHBalance: PropTypes.instanceOf(BigNumber).isRequired,
-  liquidityTokenDecimals: PropTypes.number.isRequired,
-  liquidityTokenSupply: PropTypes.instanceOf(BigNumber).isRequired,
-};
 
 export default AddLiquidity;

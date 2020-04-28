@@ -1,29 +1,25 @@
 import React, { useState } from 'react';
-import PropTypes from 'prop-types';
 import {
   Box, TextInput, Button, IconCircleMinus, IconFundraising,
 } from '@aragon/ui';
 import BigNumber from 'bignumber.js';
 import { removeLiquidity } from '../../utils/web3';
 
-import { BalanceBlock, MaxButton, PriceSection } from '../common/index.ts';
+import { BalanceBlock, MaxButton, PriceSection } from '../common/index';
 import { toBaseUnitBN } from '../../utils/number';
 
-/**
- *
- * @param {{
- *  otokenDecimals: number,
- *  liquidityTokenDecimals: number,
- *  otokenSymbol: string,
- *  uniswapExchange: string
- *  userliquidityTokenBalance: BigNumber
- *  poolTokenBalance: BigNumber
- *  poolETHBalance: BigNumber
- *  liquidityTokenDecimals: BigNumber
- *  liquidityTokenSupply: BigNumber
- *
- * }} param0
- */
+type RemoveLiquidityProps = {
+  otokenDecimals: number,
+  otokenSymbol: string,
+  uniswapExchange: string
+  userliquidityTokenBalance: BigNumber
+  poolTokenBalance: BigNumber
+  poolETHBalance: BigNumber
+  liquidityTokenDecimals: number,
+  liquidityTokenSupply: BigNumber
+}
+
+
 function RemoveLiquidity({
   otokenSymbol,
   otokenDecimals,
@@ -33,7 +29,7 @@ function RemoveLiquidity({
   poolETHBalance,
   liquidityTokenDecimals,
   liquidityTokenSupply,
-}) {
+}: RemoveLiquidityProps) {
   const SLIPPAGE_RATE = 2;
 
   const [amtLiquidityTokenToSell, setAmtLiquidityTokenToSell] = useState(new BigNumber(0));
@@ -109,16 +105,5 @@ function RemoveLiquidity({
     </Box>
   );
 }
-
-RemoveLiquidity.propTypes = {
-  otokenSymbol: PropTypes.string.isRequired,
-  otokenDecimals: PropTypes.number.isRequired,
-  userliquidityTokenBalance: PropTypes.instanceOf(BigNumber).isRequired,
-  uniswapExchange: PropTypes.string.isRequired,
-  poolTokenBalance: PropTypes.instanceOf(BigNumber).isRequired,
-  poolETHBalance: PropTypes.instanceOf(BigNumber).isRequired,
-  liquidityTokenDecimals: PropTypes.number.isRequired,
-  liquidityTokenSupply: PropTypes.instanceOf(BigNumber).isRequired,
-};
 
 export default RemoveLiquidity;

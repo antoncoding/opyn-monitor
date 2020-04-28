@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import PropTypes from 'prop-types';
+
 import {
   Box, DataView, IdentityBadge, TransactionBadge,
 } from '@aragon/ui';
@@ -57,12 +57,5 @@ function ExerciseHistory({
     </>
   );
 }
-
-ExerciseHistory.propTypes = {
-  owner: PropTypes.string.isRequired,
-  token: PropTypes.string.isRequired,
-  collateralDecimals: PropTypes.number.isRequired,
-  tokenDecimals: PropTypes.number.isRequired,
-};
 
 export default ExerciseHistory;

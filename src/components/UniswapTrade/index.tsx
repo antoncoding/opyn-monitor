@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import PropTypes from 'prop-types';
 import { useParams } from 'react-router-dom';
 import { Header } from '@aragon/ui';
 
@@ -12,13 +11,13 @@ import { toTokenUnitsBN } from '../../utils/number';
 import { allOptions } from '../../constants/options';
 
 import TradePageHeader from './Header';
-import OptionExchange from './OptionExchange';
+import UniswapBuySell from './UniswapBuySell';
 import AddLiquidity from './AddLiquidity';
 import RemoveLiquidity from './RemoveLiquidity';
 
 import tracker from '../../utils/tracker';
 
-function UniswapPool({ user }) {
+function UniswapPool({ user }: {user: string}) {
   const liquidityTokenDecimals = 18;
   const { token } = useParams();
 
@@ -29,7 +28,7 @@ function UniswapPool({ user }) {
   const option = allOptions.find((o) => o.addr === token);
   const {
     uniswapExchange, decimals, symbol, exchange, strikePriceInUSD,
-  } = option;
+  } = option!;
 
   const [poolTokenBalance, setPoolTokenBalance] = useState(new BigNumber(0));
   const [userTokenBalance, setUserTokenBalance] = useState(new BigNumber(0));
@@ -101,14 +100,13 @@ function UniswapPool({ user }) {
       <Header primary="Exchange" />
 
       <TradePageHeader
-        user={user}
         symbol={symbol}
         poolETHBalance={poolETHBalance}
         poolTokenBalance={poolTokenBalance}
         uniswapExchange={uniswapExchange}
       />
 
-      <OptionExchange
+      <UniswapBuySell
         strikePriceInUSD={strikePriceInUSD}
         symbol={symbol}
         tokenBalance={userTokenBalance}
@@ -120,12 +118,10 @@ function UniswapPool({ user }) {
       <Header primary="Provide Liquidity" />
 
       <AddLiquidity
-        user={user}
         otoken={token}
         otokenDecimals={decimals}
         otokenSymbol={symbol}
         userTokenBalance={userTokenBalance}
-        userliquidityTokenBalance={userliquidityTokenBalance}
         userETHBalance={userETHBalance}
         uniswapExchange={uniswapExchange}
         poolETHBalance={poolETHBalance}
@@ -138,7 +134,6 @@ function UniswapPool({ user }) {
         otokenDecimals={decimals}
         otokenSymbol={symbol}
         userliquidityTokenBalance={userliquidityTokenBalance}
-        userETHBalance={userETHBalance}
         uniswapExchange={uniswapExchange}
         poolETHBalance={poolETHBalance}
         poolTokenBalance={poolTokenBalance}
@@ -148,9 +143,5 @@ function UniswapPool({ user }) {
     </>
   );
 }
-
-UniswapPool.propTypes = {
-  user: PropTypes.string.isRequired,
-};
 
 export default UniswapPool;

@@ -1,7 +1,6 @@
 import React from 'react';
 import { Button } from '@aragon/ui';
 import { useHistory } from 'react-router-dom';
-import PropTypes from 'prop-types';
 import { openVault } from '../../utils/web3';
 
 
@@ -15,18 +14,13 @@ function ManageVaultButton({ oToken, owner }) {
   return <Button onClick={() => goToManagePage()} label="Manage" />;
 }
 
-ManageVaultButton.propTypes = {
-  oToken: PropTypes.string.isRequired,
-  owner: PropTypes.string.isRequired,
-};
-
 type openVaultButtonProps = {
   oToken: string,
   user: string,
-  goToMangePage? : boolean
+  goToMangePage?: boolean
 }
 
-function OpenVaultButton({ oToken, user, goToMangePage = true }:openVaultButtonProps) {
+function OpenVaultButton({ oToken, user, goToMangePage = true }: openVaultButtonProps) {
   const history = useHistory();
 
   const openAndGoToVault = async () => {

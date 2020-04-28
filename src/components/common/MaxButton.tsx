@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 
 import {
   ButtonBase,
@@ -14,9 +13,5 @@ function MaxButton({ onClick }:{ onClick: Function }) {
     </div>
   );
 }
-
-MaxButton.propTypes = {
-  onClick: PropTypes.func.isRequired,
-};
 
 export default MaxButton;

@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import PropTypes from 'prop-types';
+
 import {
   Header, Tabs, Box, Timer, Button,
 } from '@aragon/ui';
@@ -26,7 +26,7 @@ import { allOptions } from '../../constants/options';
 import * as types from '../../types'
 import tracker from '../../utils/tracker';
 
-function ManageVault({ user }) {
+function ManageVault({ user }: { user: string }) {
   const { token, owner } = useParams();
   useEffect(() => {
     tracker.pageview(`/manage/${token}`);
@@ -252,8 +252,6 @@ function ManageVault({ user }) {
     );
 }
 
-ManageVault.propTypes = {
-  user: PropTypes.string.isRequired,
-};
+
 
 export default ManageVault;

@@ -1,12 +1,11 @@
 import React, { useState } from 'react';
-import PropTypes from 'prop-types';
 import {
   Box, TextInput, Button, IconCirclePlus, IconCircleMinus,
 } from '@aragon/ui';
 import BigNumber from 'bignumber.js';
 import {
   WarningText, BalanceBlock, MaxButton, PriceSection,
-} from '../common/index.ts';
+} from '../common/index';
 import { buyOTokensFromExchange, sellOTokensFromExchange } from '../../utils/web3';
 
 import { getPremiumToPay, getPremiumReceived } from '../../utils/infura';
@@ -14,16 +13,18 @@ import { getPremiumToPay, getPremiumReceived } from '../../utils/infura';
 
 import { toBaseUnitBN, fromWei } from '../../utils/number';
 
-/**
- *
- * @param {{
- *  decimals: number
- *  tokenBalance: BigNumber
- * }} param0
- */
+type UniswapBuySellProps = {
+  symbol: string,
+  strikePriceInUSD: number | undefined,
+  tokenBalance: BigNumber,
+  token: string,
+  exchange: string,
+  decimals: number,
+};
+
 function OptionExchange({
   symbol, tokenBalance, token, exchange, decimals, strikePriceInUSD,
-}) {
+}: UniswapBuySellProps) {
   const [buyAmt, setBuyAmt] = useState(new BigNumber(0));
   const [sellAmt, setSellAmt] = useState(new BigNumber(0));
   const [premiumToPay, setPremiumToPay] = useState(new BigNumber(0));
@@ -149,18 +150,5 @@ function OptionExchange({
     </Box>
   );
 }
-
-OptionExchange.propTypes = {
-  symbol: PropTypes.string.isRequired,
-  strikePriceInUSD: PropTypes.number,
-  tokenBalance: PropTypes.instanceOf(BigNumber).isRequired,
-  token: PropTypes.string.isRequired,
-  exchange: PropTypes.string.isRequired,
-  decimals: PropTypes.number.isRequired,
-};
-
-OptionExchange.defaultProps = {
-  strikePriceInUSD: 0,
-};
 
 export default OptionExchange;

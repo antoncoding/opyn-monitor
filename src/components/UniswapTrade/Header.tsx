@@ -1,16 +1,18 @@
 import React from 'react';
 import BigNumber from 'bignumber.js';
-import PropTypes from 'prop-types';
 
-import { BalanceBlock, AddressBlock } from '../common/index.ts';
+import { BalanceBlock, AddressBlock } from '../common/index';
 
-/**
- *
- * @param {{ poolTokenBalance: BigNumber, poolETHBalance: BigNumber }}
- */
+type  TradePageHeaderProps = {
+  symbol: string,
+  poolETHBalance: BigNumber,
+  poolTokenBalance: BigNumber,
+  uniswapExchange: string,
+};
+
 const TradePageHeader = ({
   symbol, poolETHBalance, poolTokenBalance, uniswapExchange,
-}) => (
+}: TradePageHeaderProps) => (
   <div style={{ padding: '2%', display: 'flex', alignItems: 'center' }}>
     <div style={{ width: '30%' }}>
       <BalanceBlock asset="Total ETH Liquidity" balance={poolETHBalance} />
@@ -26,11 +28,5 @@ const TradePageHeader = ({
   </div>
 );
 
-TradePageHeader.propTypes = {
-  symbol: PropTypes.string.isRequired,
-  poolETHBalance: PropTypes.instanceOf(BigNumber).isRequired,
-  poolTokenBalance: PropTypes.instanceOf(BigNumber).isRequired,
-  uniswapExchange: PropTypes.string.isRequired,
-};
 
 export default TradePageHeader;
