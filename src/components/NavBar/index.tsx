@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import PropTypes from 'prop-types';
 import { useHistory } from 'react-router-dom';
 
 import {
@@ -7,11 +6,18 @@ import {
   Tag,
 } from '@aragon/ui';
 import ConnectButton from './ConnectButton';
-import ChangeModeButton from './SettingsButton';
+import ChangeModeButton from './SwitchTheme';
+
+type NavbarProps = {
+  theme:string,
+  updateTheme: Function,
+  user: string,
+  setUser: Function
+}
 
 function NavBar({
   theme, updateTheme, user, setUser,
-}) {
+}:NavbarProps) {
   const history = useHistory();
   const [isHome, updateIsHome] = useState(true);
 
@@ -83,14 +89,13 @@ function NavBar({
 }
 
 
-NavBar.propTypes = {
-  theme: PropTypes.string.isRequired,
-  updateTheme: PropTypes.func.isRequired,
-  user: PropTypes.string.isRequired,
-  setUser: PropTypes.func.isRequired,
-};
+type linkButtonProps = {
+  title:string,
+  onClick: Function,
+  isSelected?:boolean
+}
 
-function LinkButton({ title, onClick, isSelected = false }) {
+function LinkButton({ title, onClick, isSelected = false }:linkButtonProps) {
   return (
     <div style={{ paddingLeft: 40 }}>
       <LinkBase onClick={onClick}>
@@ -99,11 +104,5 @@ function LinkButton({ title, onClick, isSelected = false }) {
     </div>
   );
 }
-
-LinkButton.propTypes = {
-  title: PropTypes.string.isRequired,
-  onClick: PropTypes.func.isRequired,
-  isSelected: PropTypes.bool.isRequired,
-};
 
 export default NavBar;

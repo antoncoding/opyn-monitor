@@ -1,8 +1,12 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { Button, IconStarFilled, IconStar } from '@aragon/ui';
 
-function ChangeMode({ theme, updateTheme }) {
+type switchThemeProps = {
+  theme: string,
+  updateTheme: Function
+}
+
+function SwitchMode({ theme, updateTheme }: switchThemeProps) {
   const handleChangeTheme = () => {
     if (theme === 'light') updateTheme('dark');
     else updateTheme('light');
@@ -17,9 +21,5 @@ function ChangeMode({ theme, updateTheme }) {
   );
 }
 
-ChangeMode.propTypes = {
-  theme: PropTypes.string.isRequired,
-  updateTheme: PropTypes.func.isRequired,
-};
 
-export default ChangeMode;
+export default SwitchMode;

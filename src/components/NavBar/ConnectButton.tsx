@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import PropTypes from 'prop-types';
+
 import {
   Button, IdentityBadge, IconConnect, Box, IconPower, LinkBase,
 } from '@aragon/ui';
@@ -7,7 +7,12 @@ import {
 import { connect, disconnect } from '../../utils/web3';
 import { checkAddressAndAddToStorage } from '../../utils/storage';
 
-function ConnectButton({ user, setUser }) {
+type connectButtonProps = {
+  user: string,
+  setUser: Function
+}
+
+function ConnectButton({ user, setUser }: connectButtonProps) {
   const [isConnected, setIsConnected] = useState(false);
 
   const connectWeb3 = async () => {
@@ -43,9 +48,5 @@ function ConnectButton({ user, setUser }) {
   );
 }
 
-ConnectButton.propTypes = {
-  user: PropTypes.string.isRequired,
-  setUser: PropTypes.func.isRequired,
-};
 
 export default ConnectButton;
