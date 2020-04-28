@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import PropTypes from 'prop-types';
 import {
   Header,
   Button,
@@ -15,7 +14,6 @@ import {
   Tag,
 } from '@aragon/ui';
 
-import * as MyPTypes from '../types';
 import { RatioTag, Comment } from '../common';
 
 import {
@@ -27,27 +25,19 @@ import {
 import { getMaxLiquidatable } from '../../utils/infura';
 import { toTokenUnitsBN, toBaseUnitBN, formatDigits } from '../../utils/number';
 import { KETH, DAI, USDC } from '../../constants/contracts';
+import * as types from '../../types'
 
-/**
- *
- * @param {{
- * option:{
- * decimals:number,
- * exchange:string, collateral:{ addr:string, decimals: number, symbol:string}, symbol:string }
- * oTokensIssued: string,
- * collateralAmount: string,
- * exchange:string}} param0
- */
+type VaultModalProps = {
+  option: types.option,
+  vault: types.vaultWithRatio,
+  collateralIsETH: boolean
+}
+
 function VaultModal({
   option,
-  useCollateral,
-  owner,
-  collateral, // amount of collateral of this vault
-  oTokensIssued,
-  isSafe,
-  ratio,
-  collateralIsETH,
-}) {
+  vault,
+  collateralIsETH
+}: VaultModalProps) {
   const toast = useToast();
   const [opened, setOpened] = useState(false);
   const [addValue, setAddValue] = useState(0);
@@ -59,8 +49,8 @@ function VaultModal({
     let isCancelled = false;
     async function getData() {
       if (!opened) return;
-      if (!useCollateral) return;
-      const maxLiquidatable = await getMaxLiquidatable(option.addr, owner);
+      if (!vault.useCollateral) return;
+      const maxLiquidatable = await getMaxLiquidatable(option.addr, vault.owner);
       if (!isCancelled) {
         setLiquidateAmt(toTokenUnitsBN(maxLiquidatable, option.decimals).toNumber());
       }
@@ -70,7 +60,7 @@ function VaultModal({
     return () => {
       isCancelled = true;
     };
-  }, [option, opened, owner, useCollateral]);
+  }, [option, opened, vault.owner, vault.useCollateral]);
 
   return (
     <>
@@ -80,16 +70,14 @@ function VaultModal({
 
         <DataView
           fields={['Owner', 'Collateral', 'Issued', 'ratio', 'Status']}
-          entries={[{
-            collateral, isSafe, oTokensIssued, ratio, owner,
-          }]}
+          entries={[vault]}
           entriesPerPage={1}
-          renderEntry={(vault) => [
+          renderEntry={(vault: types.vaultWithRatio) => [
             <IdentityBadge entity={vault.owner} shorten />,
             formatDigits(toTokenUnitsBN(vault.collateral, option.collateral.decimals), 5),
             formatDigits(toTokenUnitsBN(vault.oTokensIssued, option.decimals), 5),
             formatDigits(vault.ratio, 4),
-            RatioTag({ isSafe: vault.isSafe, ratio, useCollateral }),
+            <RatioTag isSafe={vault.isSafe} ratio={vault.ratio} useCollateral={vault.useCollateral} />
           ]}
         />
 
@@ -114,12 +102,12 @@ function VaultModal({
                 wide
                 onClick={() => {
                   if (collateralIsETH) {
-                    addETHCollateral(option.addr, owner, addValue);
+                    addETHCollateral(option.addr, vault.owner, addValue);
                   } else {
                     addERC20Collateral(
                       option.collateral.addr,
                       option.addr,
-                      owner,
+                      vault.owner,
                       toBaseUnitBN(addValue, option.collateral.decimals).toString(),
                     );
                   }
@@ -129,7 +117,7 @@ function VaultModal({
           />
         </Box>
 
-        {useCollateral ? (
+        {vault.useCollateral ? (
           <Box heading="Liquidate">
             <Comment text={`Liquidate with your ${option.symbol}`} />
             <Split
@@ -149,10 +137,10 @@ function VaultModal({
                 <>
                   <Button
                     wide
-                    disabled={isSafe}
+                    disabled={vault.isSafe}
                     label="Liquidate"
                     onClick={() => {
-                      liquidate(option.addr, owner, toBaseUnitBN(liquidateAmt, option.decimals)).catch(
+                      liquidate(option.addr, vault.owner, toBaseUnitBN(liquidateAmt, option.decimals)).catch(
                         (error) => {
                           toast(error.toString());
                         },
@@ -177,9 +165,9 @@ function VaultModal({
               <Button
                 icon={<IconConnect />}
                 label="DAI"
-                disabled={isSafe}
+                disabled={vault.isSafe}
                 onClick={() => {
-                  kollateralLiquidate(option.addr, option.exchange, owner, DAI).catch((error) => {
+                  kollateralLiquidate(option.addr, option.exchange, vault.owner, DAI).catch((error) => {
                     toast(error.toString());
                   });
                 }}
@@ -189,9 +177,9 @@ function VaultModal({
               <Button
                 icon={<IconConnect />}
                 label="USDC"
-                disabled={isSafe}
+                disabled={vault.isSafe}
                 onClick={() => {
-                  kollateralLiquidate(option.addr, option.exchange, owner, USDC).catch((error) => {
+                  kollateralLiquidate(option.addr, option.exchange, vault.owner, USDC).catch((error) => {
                     toast(error.toString());
                   });
                 }}
@@ -200,9 +188,9 @@ function VaultModal({
               <Button
                 icon={<IconConnect />}
                 label="ETH"
-                disabled={isSafe}
+                disabled={vault.isSafe}
                 onClick={() => {
-                  kollateralLiquidate(option.addr, option.exchange, owner, KETH).catch((error) => {
+                  kollateralLiquidate(option.addr, option.exchange, vault.owner, KETH).catch((error) => {
                     toast(error.toString());
                   });
                 }}
@@ -218,15 +206,5 @@ function VaultModal({
   );
 }
 
-VaultModal.propTypes = {
-  option: MyPTypes.option.isRequired,
-  useCollateral: PropTypes.bool.isRequired,
-  owner: PropTypes.string.isRequired,
-  collateral: PropTypes.string.isRequired,
-  isSafe: PropTypes.bool.isRequired,
-  oTokensIssued: PropTypes.string.isRequired,
-  ratio: PropTypes.number.isRequired,
-  collateralIsETH: PropTypes.bool.isRequired,
-};
 
 export default VaultModal;

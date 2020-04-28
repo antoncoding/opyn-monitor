@@ -1,5 +1,5 @@
 import React, { useMemo, useState, useEffect } from 'react';
-import PropTypes from 'prop-types';
+
 import { useParams } from 'react-router-dom';
 import { Header } from '@aragon/ui';
 
@@ -15,8 +15,7 @@ import { allOptions } from '../../constants/options';
 
 import * as types from '../../types'
 
-
-function OptionPage({ user }) {
+function OptionPage({ user }: { user: string }) {
   const { token } = useParams();
   useEffect(() => {
     tracker.pageview(`/option/${token}`);
@@ -61,9 +60,5 @@ function OptionPage({ user }) {
     </>
   );
 }
-
-OptionPage.propTypes = {
-  user: PropTypes.string.isRequired,
-};
 
 export default OptionPage;

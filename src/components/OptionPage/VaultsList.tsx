@@ -96,29 +96,22 @@ function VaultOwnerList({
         fields={['Owner', 'collateral', 'Issued', 'RATIO', 'Status', '']}
         entries={vaultsWithDetail}
         entriesPerPage={5}
-        renderEntry={({
-          owner, collateral, oTokensIssued, ratio, isSafe, useCollateral,
-        }) => [
-          <IdentityBadge entity={owner} shorten />,
+        renderEntry={(vault: types.vaultWithRatio) => [
+          <IdentityBadge entity={vault.owner} shorten />,
           formatDigits(
-            toTokenUnitsBN(collateral, option.collateral.decimals).toNumber(),
+            toTokenUnitsBN(vault.collateral, option.collateral.decimals).toNumber(),
             6,
           ),
           formatDigits(
-            toTokenUnitsBN(oTokensIssued, option.decimals).toNumber(),
+            toTokenUnitsBN(vault.oTokensIssued, option.decimals).toNumber(),
             6,
           ),
-          formatDigits(ratio, 5),
-          RatioTag({ isSafe, ratio, useCollateral }),
+          formatDigits(vault.ratio, 5),
+          <RatioTag isSafe={vault.isSafe} ratio={vault.ratio} useCollateral={vault.useCollateral} />,
           <VaultModal
             option={option}
-            owner={owner}
-            collateral={collateral}
-            isSafe={isSafe}
-            useCollateral={useCollateral}
+            vault={vault}
             collateralIsETH={collateralIsETH}
-            oTokensIssued={oTokensIssued}
-            ratio={ratio}
           />,
         ]}
       />
