@@ -22,7 +22,7 @@ function AllContracts() {
   const [showExpired, setShowExpired] = useState(storedShowExpired === '1'); // whether to show expired options
 
   const history = useHistory();
-  const goToToken = (addr) => {
+  const goToToken = (addr:string) => {
     history.push(`/option/${addr}`);
   };
   return (
@@ -44,7 +44,7 @@ function AllContracts() {
       <Tabs
         items={['DeFi Insurance', 'ETH Options']}
         selected={tabSelected}
-        onChange={(choice) => {
+        onChange={(choice:number) => {
           setTabSelected(choice);
           storePreference('optionTab', choice.toString());
         }}
@@ -67,10 +67,10 @@ function AllContracts() {
           fields={['Name', 'Contract', 'Expiry', '']}
           entries={eth_options.filter((option) => showExpired || option.expiry * 1000 > Date.now())}
           entriesPerPage={6}
-          renderEntry={({ addr, title, expiry }) => [
+          renderEntry={({ addr, title, expiry }: {addr:string, title:string, expiry:number}) => [
             <>{title}</>,
             <IdentityBadge entity={addr} shorten={false} />,
-            new Date(parseInt(expiry * 1000, 10)).toDateString(),
+            new Date(expiry * 1000).toDateString(),
             <Button onClick={() => goToToken(addr)}> View Vaults </Button>,
           ]}
         />
