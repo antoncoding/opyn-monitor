@@ -10,7 +10,7 @@ import BigNumber from 'bignumber.js';
 import { BalanceBlock, MaxButton } from '../common/index.ts';
 import { liquidate } from '../../utils/web3';
 import { getMaxLiquidatable } from '../../utils/infura';
-import { getLiquidationHistory } from '../../utils/graph';
+import { getLiquidationHistory } from '../../utils/graph.ts';
 import {
   formatDigits, fromWei, toTokenUnitsBN, timeSince, toBaseUnitBN,
 } from '../../utils/number';

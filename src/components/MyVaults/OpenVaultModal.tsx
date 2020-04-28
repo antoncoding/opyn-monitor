@@ -1,5 +1,4 @@
-import React, { useState, useMemo, useEffect } from 'react';
-import PropTypes from 'prop-types';
+import React, { useState, useMemo, useEffect, ChangeEvent } from 'react';
 import { useHistory } from 'react-router-dom';
 
 import {
@@ -14,14 +13,19 @@ import {
 import BigNumber from 'bignumber.js';
 import {
   SectionTitle, OpenVaultButton, Comment, HelperText, WarningText,
-} from '../common/index.ts';
-import * as myType from '../types';
+} from '../common';
+import * as types from '../../types';
 
 import { openVaultAddCollateralAndMint } from '../../utils/web3';
 import { toBaseUnitBN } from '../../utils/number';
-import { calculateStrikeValueInCollateral, calculateRatio } from '../../utils/calculation.ts';
+import { calculateStrikeValueInCollateral, calculateRatio } from '../../utils/calculation';
 
-function OpenVaultModal({ user, option }) {
+type openVaultModalProps = {
+  user: string,
+  option: types.option
+}
+
+function OpenVaultModal({ user, option }: openVaultModalProps) {
   const toast = useToast();
   const history = useHistory();
 
@@ -121,7 +125,7 @@ function OpenVaultModal({ user, option }) {
             <TextInput
               type="number"
               value={collateralAmt.toNumber()}
-              onChange={(event) => onCollateralChange(event.target.value)}
+              onChange={(event: React.ChangeEvent<HTMLInputElement>) => onCollateralChange(event.target.value)}
               adornmentPosition="end"
               adornment={option.collateral.symbol}
             />
@@ -129,7 +133,7 @@ function OpenVaultModal({ user, option }) {
               <TextInput
                 type="number"
                 value={mintTokenAmt.toNumber()}
-                onChange={(event) => onMintTokenAmtChange(event.target.value)}
+                onChange={(event: React.ChangeEvent<HTMLInputElement>) => onMintTokenAmtChange(event.target.value)}
                 adornmentPosition="end"
                 adornment={option.symbol}
               />
@@ -149,10 +153,5 @@ function OpenVaultModal({ user, option }) {
     </>
   );
 }
-
-OpenVaultModal.propTypes = {
-  user: PropTypes.string.isRequired,
-  option: myType.option.isRequired,
-};
 
 export default OpenVaultModal;

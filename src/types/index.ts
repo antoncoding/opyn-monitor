@@ -22,6 +22,7 @@ export type option = {
   underlying: token,
   strike: token,
   strikePrice: number,
+  strikePriceInUSD?: number,
   minRatio: number,
   exchange: string,
   uniswapExchange: string,

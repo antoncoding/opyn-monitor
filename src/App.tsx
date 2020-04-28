@@ -15,16 +15,13 @@ import ManageVault from './components/ManageVault';
 import Uniswap from './components/UniswapTrade';
 import Footer from './components/Footer';
 
-// testing
-// import ZEROXTest from './components/OptionTrading/test';
-
 function App() {
   const storedTheme = getPreference('theme', 'light');
 
   const [user, setUser] = useState(''); // the current connected user
   const [theme, setTheme] = useState(storedTheme);
 
-  const updateTheme = (newTheme) => {
+  const updateTheme = (newTheme:string) => {
     setTheme(newTheme);
     updateModalMode(newTheme);
     storePreference('theme', newTheme);
@@ -54,7 +51,6 @@ function App() {
           <Route path="/trade/oeth-usdc/">
             <OptionTrading
               user={user}
-              theme={theme}
             />
           </Route>
           {/* <Route path="/trades/test/"><ZEROXTest /></Route> */}

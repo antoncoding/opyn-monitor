@@ -1,15 +1,14 @@
 import React, { useState } from 'react';
-import PropTypes from 'prop-types';
 import {
   TextInput, DataView, Button, LinkBase, EthIdenticon, useToast,
 } from '@aragon/ui';
 import { getPreference, checkAddressAndAddToStorage } from '../../utils/storage';
 
-import { Comment } from '../common/index.ts';
+import { Comment } from '../common/';
 import { isAddress } from '../../utils/number';
 import { resolveENS } from '../../utils/infura';
 
-function PleaseLogin({ setWatchAddress }) {
+function PleaseLogin({ setWatchAddress }: { setWatchAddress: Function }) {
   const toast = useToast();
   const [InAddress, setAddress] = useState('');
   const watch_addrs = getPreference('watch_addresses', '[]');
@@ -38,7 +37,7 @@ function PleaseLogin({ setWatchAddress }) {
                 entries={usedAddresses.reverse()}
                 fields={['used']}
                 entriesPerPage={5}
-                renderEntry={(address) => [
+                renderEntry={(address: string) => [
                   <LinkBase onClick={() => {
                     setWatchAddress(address);
                     checkAddressAndAddToStorage(address);
@@ -81,9 +80,5 @@ function PleaseLogin({ setWatchAddress }) {
   );
 }
 
-PleaseLogin.propTypes = {
-  // watchAddres: PropTypes.string.isRequired,
-  setWatchAddress: PropTypes.func.isRequired,
-};
 
 export default PleaseLogin;

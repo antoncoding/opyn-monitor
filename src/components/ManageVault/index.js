@@ -18,7 +18,7 @@ import { Comment } from '../common/index.ts';
 import { toTokenUnitsBN } from '../../utils/number';
 import { calculateRatio, calculateStrikeValueInCollateral } from '../../utils/calculation.ts';
 import { getTokenBalance, getBalance } from '../../utils/infura';
-import { getVault } from '../../utils/graph';
+import { getVault } from '../../utils/graph.ts';
 import { redeem } from '../../utils/web3';
 
 import { ETH_ADDRESS } from '../../constants/contracts';

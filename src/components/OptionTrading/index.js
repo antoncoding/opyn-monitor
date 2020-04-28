@@ -9,7 +9,7 @@ import TabBoard from './TabBoard';
 import BuyAndSell from './BuyAndSell';
 
 import { getTokenBalance } from '../../utils/infura';
-import { getOrderBook, isValid } from '../../utils/0x';
+import { getOrderBook, isValid } from '../../utils/0x.ts';
 // import { getVault } from '../../utils/graph';
 import { eth_puts, eth_calls } from '../../constants/options';
 
@@ -156,7 +156,6 @@ function OptionTrading({ user }) {
 
 OptionTrading.propTypes = {
   user: PropTypes.string.isRequired,
-  // theme: PropTypes.string.isRequired,
 };
 
 

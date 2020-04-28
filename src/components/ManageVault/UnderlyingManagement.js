@@ -5,7 +5,7 @@ import {
 } from '@aragon/ui';
 import { BalanceBlock } from '../common/index.ts';
 import { removeUnderlying } from '../../utils/web3';
-import { getRemoveUnderlyingHistory } from '../../utils/graph';
+import { getRemoveUnderlyingHistory } from '../../utils/graph.ts';
 import { formatDigits, toTokenUnitsBN, timeSince } from '../../utils/number';
 
 function RemoveUnderlying({

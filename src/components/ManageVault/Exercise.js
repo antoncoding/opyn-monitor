@@ -5,7 +5,7 @@ import {
 } from '@aragon/ui';
 
 
-import { getExerciseHistory } from '../../utils/graph';
+import { getExerciseHistory } from '../../utils/graph.ts';
 import { formatDigits, toTokenUnitsBN, timeSince } from '../../utils/number';
 
 function ExerciseHistory({

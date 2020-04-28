@@ -5,28 +5,43 @@ import {
   Header, DataView, IdentityBadge,
 } from '@aragon/ui';
 import NoWalletView from './NoWallet';
-
+import * as types from '../../types'
 import { allOptions } from '../../constants/options';
 import {
   SectionTitle, ManageVaultButton, Comment, CheckBox,
-} from '../common/index.ts';
+} from '../common/index';
 import {
   formatDigits, compareVaultRatio, toTokenUnitsBN,
 } from '../../utils/number';
 import { getAllVaultsForUser } from '../../utils/graph';
 import { getPreference, storePreference } from '../../utils/storage';
-import { calculateRatio, calculateStrikeValueInCollateral } from '../../utils/calculation.ts';
+import { calculateRatio, calculateStrikeValueInCollateral } from '../../utils/calculation';
 import tracker from '../../utils/tracker';
 import OpenVaultModal from './OpenVaultModal';
 
 const Promise = require('bluebird');
 
+export type vaultWithDetail = {
+  oToken:string,
+  collateral: string,
+  oTokenName:string
+  collateralDecimals: number
+  expiry:number
+  ratio: number
+}
+
+// export type notOpenedToken = {
+//   oToken: string,
+//   oTokenName: string
+// }
+
+
 function MyVaults({ user }) {
   useEffect(() => {
     tracker.pageview('/myvaults/');
   }, []);
-  const [opendVaults, setOpenedVaults] = useState([]);
-  const [tokensToOpen, setTokensToOpen] = useState([]);
+  const [opendVaults, setOpenedVaults] = useState<vaultWithDetail[]>([]);
+  const [tokensToOpen, setTokensToOpen] = useState<types.option[]>([]);
 
   const [isLoading, setIsLoading] = useState(true);
   // enable not logged in user to use this feature
@@ -46,12 +61,12 @@ function MyVaults({ user }) {
   useMemo(async () => {
     if (!hasAddressConnected) return;
     const userVaults = await getAllVaultsForUser(isWatchMode ? watchAddress : user);
-    const openedVaults = [];
-    const notOpenedTokens = [];
-    await Promise.map(allOptions, async (option) => {
+    const openedVaults: vaultWithDetail[] = [];
+    const notOpenedTokens: types.option[] = [];
+    await Promise.map(allOptions, async (option: types.option) => {
       const entry = userVaults.find((vault) => vault.optionsContract.address === option.addr);
-      const isOpened = entry !== undefined;
-      if (isOpened) {
+      
+      if (entry !== undefined) {
         const strikeValueInCollateral = await calculateStrikeValueInCollateral(
           option.collateral.addr,
           option.strike.addr,
@@ -74,10 +89,7 @@ function MyVaults({ user }) {
         });
       } else if (option.expiry > (Date.now() / 1000)) {
         // only put non-expired token to "can open" list
-        notOpenedTokens.push({
-          oToken: option.addr,
-          oTokenName: option.title,
-        });
+        notOpenedTokens.push(option);
       }
     });
     setIsLoading(false);
@@ -100,7 +112,7 @@ function MyVaults({ user }) {
                     <CheckBox
                       text="Expired"
                       checked={showExpired}
-                      onCheck={(checked) => {
+                      onCheck={(checked: boolean) => {
                         storePreference('showExpired', checked ? '1' : '0');
                         setShowExpired(checked);
                       }}
@@ -108,7 +120,7 @@ function MyVaults({ user }) {
                     <CheckBox
                       text="Empty"
                       checked={showEmpty}
-                      onCheck={(checked) => {
+                      onCheck={(checked: boolean) => {
                         storePreference('showEmpty', checked ? '1' : '0');
                         setShowEmpty(checked);
                       }}
@@ -143,11 +155,11 @@ function MyVaults({ user }) {
               <DataView
                 fields={['Token', 'contract', 'manage']}
                 entries={tokensToOpen}
-                renderEntry={({ oToken, oTokenName }) => {
-                  const option = allOptions.find((o) => o.addr === oToken);
+                
+                renderEntry={(option: types.option) => {
                   return [
-                    oTokenName,
-                    <IdentityBadge entity={oToken} shorten={false} />,
+                    option.title,
+                    <IdentityBadge entity={option.addr} shorten={false} />,
                     <OpenVaultModal user={user} option={option} />,
                   ];
                 }}
@@ -160,7 +172,7 @@ function MyVaults({ user }) {
       ) : (
         // Not connected to wallet
         <NoWalletView
-          watchAddress={watchAddress}
+          // watchAddress={watchAddress}
           setWatchAddress={setWatchAddress}
         />
       )}

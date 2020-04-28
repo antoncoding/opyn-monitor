@@ -2,9 +2,17 @@
 const opynGraphEndpoint = 'https://api.thegraph.com/subgraphs/name/aparnakr/opyn';
 
 /**
- * @return {Promise<Array<{colalteral: string, oTokensIssued: string, owner: string}>>}
+ * Get vaults for one option
  */
-export async function getAllVaultsForOption(optionAddress) {
+export async function getAllVaultsForOption(
+  optionAddress: string
+): Promise<
+  {
+    colalteral: string;
+    oTokensIssued: string;
+    owner: string;
+  }[]
+> {
   const query = `
   {
     vaults(where: {
@@ -20,7 +28,21 @@ export async function getAllVaultsForOption(optionAddress) {
   return vaults;
 }
 
-export async function getAllVaultsForUser(owner) {
+/**
+ * Get all vaults for a user
+ */
+export async function getAllVaultsForUser(
+  owner: string
+): Promise<
+  {
+    optionsContract: {
+      address: string;
+    };
+    oTokensIssued: string;
+    collateral: string;
+    underlying: string;
+  }[]
+> {
   const query = `{
     vaults (where: {owner: "${owner}"}) {
       optionsContract {
@@ -32,17 +54,16 @@ export async function getAllVaultsForUser(owner) {
     }
   }`;
   const response = await postQuery(query);
-  const actions = response.data.vaults;
-  return actions;
+  return response.data.vaults;
 }
 
 /**
  * Return target vault or null
- * @param {string} owner
- * @param {string} option
- * @return {Promise<{underlying:string, colalteral:string, oTokensIssued:string}>}
  */
-export async function getVault(owner, option) {
+export async function getVault(
+  owner: string,
+  option: string
+): Promise<{ underlying: string; colalteral: string; oTokensIssued: string }> {
   const query = `{
     vault(
      id: "${option.toLowerCase()}-${owner.toLowerCase()}"
@@ -56,43 +77,57 @@ export async function getVault(owner, option) {
   return response.data.vault;
 }
 
-export async function getLiquidationHistory(owner) {
-  const query = liquidationActionsQuery(owner);
+export async function getLiquidationHistory(
+  owner: string
+): Promise<
+  {
+    vault: {
+      owner: string;
+      optionContract: {
+        address: string;
+      };
+    };
+    liquidator: string;
+    collateralToPay: string;
+    timestamp: string;
+    transactionHash: string;
+  }[]
+> {
+  const query = `{
+    liquidateActions(where: {
+      vault_contains: "${owner}"
+    }) {
+      vault {
+        owner,
+        optionsContract {
+          address
+        }
+      },
+      liquidator,
+      collateralToPay,
+      timestamp
+      transactionHash
+    }
+  }`;
   const response = await postQuery(query);
   return response.data.liquidateActions;
 }
 
-const liquidationActionsQuery = (owner) => `{
-  liquidateActions(where: {
-    vault_contains: "${owner}"
-  }) {
-    vault {
-      owner,
-      optionsContract {
-        address
-      }
-    },
-    liquidator,
-    collateralToPay,
-    timestamp
-    transactionHash
-  }
-}
-
-`;
-
 /**
  * Get all exercise history for one user
- * @param {string} owner vault owner
- * @param {string} option contract address
- * @return {Promise<{
- * amtCollateralToPay: string,
- * exerciser:string,
- * oTokensToExercise:string,
- * timestamp:string,
- * transactionHash: string}[]>}
  */
-export async function getExerciseHistory(owner, option) {
+export async function getExerciseHistory(
+  owner: string,
+  option: string
+): Promise<
+  {
+    amtCollateralToPay: string;
+    exerciser: string;
+    oTokensToExercise: string;
+    timestamp: string;
+    transactionHash: string;
+  }[]
+> {
   const query = `{
     exerciseActions (where: {
       vault_contains: "${owner}"
@@ -112,13 +147,17 @@ export async function getExerciseHistory(owner, option) {
 
 /**
  * get RemoveUnderlying Event history
- * @param {string} owner
- * @param {string} option
- * @return {Promise<{
- * amount:string, timestamp:string, transactionHash:string
- * }[]>}
  */
-export async function getRemoveUnderlyingHistory(owner, option) {
+export async function getRemoveUnderlyingHistory(
+  owner: string,
+  option: string
+): Promise<
+  {
+    amount: string;
+    timestamp: string;
+    transactionHash: string;
+  }[]
+> {
   const query = `{
     removeUnderlyingActions(
       where: {
@@ -135,7 +174,7 @@ export async function getRemoveUnderlyingHistory(owner, option) {
   return response.data.removeUnderlyingActions;
 }
 
-const postQuery = async (query) => {
+const postQuery = async (query: string) => {
   const options = {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },

@@ -7,7 +7,7 @@ import ExerciseModal from './ExerciseModal';
 import VaultsList from './VaultsList';
 import OptionInfoBox from './OptionInfoBox';
 
-import { getAllVaultsForOption } from '../../utils/graph';
+import { getAllVaultsForOption } from '../../utils/graph.ts';
 import tracker from '../../utils/tracker';
 
 import { ETH_ADDRESS } from '../../constants/contracts';

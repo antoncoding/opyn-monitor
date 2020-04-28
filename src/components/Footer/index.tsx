@@ -1,28 +1,25 @@
 import React from 'react';
 import { useHistory } from 'react-router-dom';
 import { Link } from '@aragon/ui';
-import PropTypes from 'prop-types';
 
-function Footer({ theme }) {
+function Footer({ theme } : { theme:string }) {
   const history = useHistory();
-
-  const style = {
-    backgroundColor: theme === 'light' ? '#F8F8F8' : '#35425e',
-    textAlign: 'center',
-    padding: '17px',
-    position: 'fixed',
-    left: '0',
-    bottom: '0',
-    height: '50px',
-    width: '100%',
-    fontSize: '14px',
-  };
 
   return (
     history.location.pathname.includes('/trade/')
       ? <></>
       : (
-        <div style={style}>
+        <div style={{
+          backgroundColor: theme === 'light' ? '#F8F8F8' : '#35425e',
+          textAlign: 'center',
+          padding: '17px',
+          position: 'fixed',
+          left: '0',
+          bottom: '0',
+          height: '50px',
+          width: '100%',
+          fontSize: '14px'
+        }}>
           Powered By
           {' '}
           <Link external href="https://opyn.co/#/">
@@ -47,14 +44,9 @@ function Footer({ theme }) {
           <Link external href="https://github.com/antoncoding/opyn-liquidator">
             GitHub
           </Link>
-          {/* </div> */}
         </div>
       )
   );
 }
-
-Footer.propTypes = {
-  theme: PropTypes.string.isRequired,
-};
 
 export default Footer;
