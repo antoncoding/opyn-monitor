@@ -11,7 +11,7 @@ import { buyOTokensFromExchange, sellOTokensFromExchange } from '../../utils/web
 import { getPremiumToPay, getPremiumReceived } from '../../utils/infura';
 
 
-import { toBaseUnitBN, fromWei } from '../../utils/number';
+import { toBaseUnitBN, toTokenUnitsBN } from '../../utils/number';
 
 type UniswapBuySellProps = {
   symbol: string,
@@ -38,7 +38,7 @@ function OptionExchange({
     }
     const amount = toBaseUnitBN(butAmountBN, decimals).toString();
     const premium = await getPremiumToPay(exchange, token, amount);
-    setPremiumToPay(new BigNumber(fromWei(premium)));
+    setPremiumToPay(toTokenUnitsBN(premium, 16));
   };
 
   const updatePremiumReceived = async (amt) => {

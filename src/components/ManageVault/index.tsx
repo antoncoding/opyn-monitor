@@ -220,6 +220,7 @@ function ManageVault({ user }: { user: string }) {
                 isOwner={isOwner}
                 owner={owner}
                 token={token}
+                collateralDecimals={collateral.decimals}
                 tokenDecimals={decimals}
               />
             ) : (

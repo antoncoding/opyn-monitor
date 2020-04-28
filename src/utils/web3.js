@@ -7,7 +7,7 @@ import Onboard from 'bnc-onboard';
 
 import { notify } from './blockNative.ts';
 import { getAllowance, getPremiumToPay } from './infura';
-import { getPreference } from './storage';
+import { getPreference } from './storage.ts';
 import {
   ETH_ADDRESS,
   Kollateral_Liquidator,

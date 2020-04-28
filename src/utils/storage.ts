@@ -3,7 +3,7 @@
  * @param {string} key
  * @param {string} defaultValue
  */
-export function getPreference(key, defaultValue) {
+export function getPreference(key:string, defaultValue:string): string {
   return localStorage.getItem(key) || defaultValue;
 }
 
@@ -12,11 +12,11 @@ export function getPreference(key, defaultValue) {
  * @param {string} key
  * @param {string} value
  */
-export function storePreference(key, value) {
+export function storePreference(key:string, value:string):void {
   localStorage.setItem(key, value);
 }
 
-export function checkAddressAndAddToStorage(address) {
+export function checkAddressAndAddToStorage(address:string):void {
   const watch_addrs = getPreference('watch_addresses', '[]');
   const usedAddresses = JSON.parse(watch_addrs);
   if (!usedAddresses.includes(address.toLowerCase()) && !usedAddresses.includes(address)) {

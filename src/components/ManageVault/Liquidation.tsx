@@ -11,20 +11,20 @@ import { liquidate } from '../../utils/web3';
 import { getMaxLiquidatable } from '../../utils/infura';
 import { getLiquidationHistory } from '../../utils/graph';
 import {
-  formatDigits, fromWei, toTokenUnitsBN, timeSince, toBaseUnitBN,
+  formatDigits, toTokenUnitsBN, timeSince, toBaseUnitBN,
 } from '../../utils/number';
 
 type LiqActions = {
   vault: {
-    owner: string;
+    owner: string,
     optionsContract: {
-      address: string;
-    };
-  };
-  liquidator: string;
-  collateralToPay: string;
-  timestamp: string;
-  transactionHash: string;
+      address: string,
+    }
+  },
+  liquidator: string,
+  collateralToPay: string,
+  timestamp: string,
+  transactionHash: string,
 }
 
 type LiquidationHistoryProps = {
@@ -32,15 +32,12 @@ type LiquidationHistoryProps = {
   token: string,
   isOwner: Boolean,
   tokenDecimals: number,
+  collateralDecimals:number,
   userTokenBalance: BigNumber,
 };
 
-/**
- *
- * @param {{userTokenBalance: BigNumber}} param0
- */
 function LiquidationHistory({
-  owner, token, isOwner, tokenDecimals, userTokenBalance,
+  owner, token, isOwner, tokenDecimals, userTokenBalance, collateralDecimals
 }: LiquidationHistoryProps) {
   const [maxLiquidatable, setMaxLiquidatable] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
@@ -134,7 +131,7 @@ function LiquidationHistory({
             collateralToPay, liquidator, timestamp, transactionHash,
           }) => [
               <TransactionBadge transaction={transactionHash} />,
-              formatDigits(fromWei(collateralToPay), 5),
+              formatDigits(toTokenUnitsBN(collateralToPay, collateralDecimals), 5),
               <IdentityBadge entity={liquidator} />,
               timeSince(parseInt(timestamp, 10) * 1000),
             ]}
