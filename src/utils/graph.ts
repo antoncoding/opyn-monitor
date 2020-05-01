@@ -1,6 +1,8 @@
-// const prefix = 'https://cors-anywhere-anton.herokuapp.com/';
+import BigNumber from 'bignumber.js'
+
 const opynGraphEndpoint = 'https://api.thegraph.com/subgraphs/name/aparnakr/opyn';
 
+const bugETH200Put = '0xd79ab5a71fa2099ef30df0e8a81f8c200aac36f1'
 /**
  * Get vaults for one option
  */
@@ -25,6 +27,12 @@ export async function getAllVaultsForOption(
   }`;
   const response = await postQuery(query);
   const vaults = response.data.vaults;
+  if (optionAddress === bugETH200Put) {
+    for(let vault of vaults) {
+      vault.oTokensIssued = new BigNumber(vault.oTokensIssued).div(2).toString()
+      vault.collateral = new BigNumber(vault.collateral).div(2).toString()
+    }
+  }
   return vaults;
 }
 
@@ -54,7 +62,14 @@ export async function getAllVaultsForUser(
     }
   }`;
   const response = await postQuery(query);
-  return response.data.vaults;
+  const vaults = response.data.vaults;
+  for(let vault of vaults){
+    if(vault.optionsContract.address === bugETH200Put) {
+      vault.oTokensIssued = new BigNumber(vault.oTokensIssued).div(2).toString()
+      vault.collateral = new BigNumber(vault.collateral).div(2).toString()
+    }
+  }
+  return vaults
 }
 
 /**
@@ -75,8 +90,14 @@ export async function getVault(
     }
   }`;
   const response = await postQuery(query);
-  console.log(response.data.vault)
-  return response.data.vault;
+  const vault = response.data.vault;
+  
+  if(option === bugETH200Put) {
+    vault.oTokensIssued = new BigNumber(vault.oTokensIssued).div(2).toString()
+    vault.collateral = new BigNumber(vault.collateral).div(2).toString()
+  }
+  return vault
+  
 }
 
 export async function getLiquidationHistory(
