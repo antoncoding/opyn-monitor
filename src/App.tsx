@@ -13,6 +13,7 @@ import MyVaults from './components/MyVaults';
 import OptionPage from './components/OptionPage';
 import ManageVault from './components/ManageVault';
 import Uniswap from './components/UniswapTrade';
+import CreateOption from './components/CreateOption'
 import Footer from './components/Footer';
 
 function App() {
@@ -58,6 +59,7 @@ function App() {
           <Route path="/uniswap/">
             <Trade />
           </Route>
+          <Route path="/create/"><CreateOption/></Route>
           {/* HomePage */}
           <Route path="/"><HomePage /></Route>
         </Switch>

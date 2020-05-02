@@ -1,5 +1,7 @@
 /* eslint-disable camelcase */
 
+export const OptionFactory = '0xcc5d905b9c2c8c9329eb4e25dc086369d6c7777c';
+
 export const ETH_ADDRESS = '0x0000000000000000000000000000000000000000';
 export const ERC20_Liquidator = '0xF8cE4E70F52FdDBc72547Ce9616ed3E7d4525e8A';
 export const Kollateral_Liquidator = '0xfBaB30f79bbbC92C708E7e9b01E329e003d8Ce48';

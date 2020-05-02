@@ -9,6 +9,7 @@ import { notify } from './blockNative.ts';
 import { getAllowance, getPremiumToPay } from './infura';
 import { getPreference } from './storage.ts';
 import {
+  OptionFactory,
   ETH_ADDRESS,
   Kollateral_Liquidator,
   Kollateral_Invoker,
@@ -17,6 +18,7 @@ import {
   WETH,
 } from '../constants/contracts';
 
+const oTokenFactoryABI = require('../constants/abi/OptionFactory.json');
 const oTokenABI = require('../constants/abi/OptionContract.json');
 const exchangeABI = require('../constants/abi/OptionExchange.json');
 const uniswapExchangeABI = require('../constants/abi/UniswapExchange.json');
@@ -91,6 +93,77 @@ export const checkConnectedAndGetAddress = async () => {
     if (checked) return onboard.getState().address;
   }
 };
+
+/**
+ *  Option Factory
+ */
+
+/**
+ * Create Option
+ * @param {string} _collateralType collateral
+ * @param {number} _collateralExp
+ * @param {string} _underlyingType
+ * @param {number} _underlyingExp
+ * @param {number} _oTokenExchangeExp Units of underlying that 1 oToken protects
+ * @param {number} _strikePrice
+ * @param {number} _strikeExp
+ * @param {string} _strikeAsset
+ * @param {number} _expiry
+ * @param {number} _windowSize
+ * @param {string} _symbol
+ * @param {string} _name
+ * @param {Function} _callBack
+ */
+export const createOptionAndSetDetail = async (
+  _collateralType,
+  _collateralExp,
+  _underlyingType,
+  _underlyingExp,
+  _oTokenExchangeExp,
+  _strikePrice,
+  _strikeExp,
+  _strikeAsset,
+  _expiry,
+  _windowSize,
+  _symbol,
+  _name,
+  _callBack,
+) => {
+  const account = await checkConnectedAndGetAddress();
+  const factory = new web3.eth.Contract(oTokenFactoryABI, OptionFactory);
+
+  const tx = await factory.methods.createOptionsContract(
+    _collateralType,
+    _collateralExp,
+    _underlyingType,
+    _underlyingExp,
+    _oTokenExchangeExp,
+    _strikePrice,
+    _strikeExp,
+    _strikeAsset,
+    _expiry,
+    _windowSize,
+  ).send({ from: account })
+    .on('transactionHash', (hash) => {
+      notify.hash(hash);
+    });
+
+  // const addr = '0x7e30449da59e5489b8013744cc17c1dff3c2c670';
+  const addr = tx.events.OptionsContractCreated.returnValues.addr;
+  // fire callback when first tx succeed
+  if (typeof _callBack === 'function') _callBack();
+
+  const oToken = new web3.eth.Contract(oTokenABI, addr);
+  await oToken.methods.setDetails(_symbol, _name)
+    .send({ from: account })
+    .on('transactionHash', (hash) => {
+      notify.hash(hash);
+    });
+};
+
+/**
+ * Option Exchange
+ */
 
 export const liquidate = async (oTokenAddr, owner, liquidateAmt) => {
   const account = await checkConnectedAndGetAddress();
