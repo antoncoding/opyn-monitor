@@ -60,38 +60,44 @@ function ConfirmETHOption(
     }
     let newTokenAddr = ''
     setIsCreating(true)
-    if (type === 'Put') {
-      const oToken = await createOption(
-        USDC.symbol, // collateral
-        -1 * USDC.decimals,
-        OPYN_ETH.symbol, // underlying
-        -1 * OPYN_ETH.decimals,
-        -7, // decimals
-        new BigNumber(strikePrice).div(10).integerValue().toNumber(), //strike price
-        -6, // strikePrice exp
-        USDC.symbol,
-        expiry,
-        window
-      )
-
-      newTokenAddr = oToken
-    } else { // Create a eth call
-      const strikePriceNum = new BigNumber(10000000).div(strikePrice).integerValue().toNumber()
-      const oToken = await createOption(
-        OPYN_ETH.symbol, // collateral
-        -1 * OPYN_ETH.decimals,
-        USDC.symbol, // underlying
-        -1 * USDC.decimals,
-        -7, // decimals
-        strikePriceNum, //strike price
-        -14, // strikePrice exp
-        OPYN_ETH.symbol,
-        expiry,
-        window
-      )
-
-      newTokenAddr = oToken
+    try {
+      if (type === 'Put') {
+        const oToken = await createOption(
+          USDC.symbol, // collateral
+          -1 * USDC.decimals,
+          OPYN_ETH.symbol, // underlying
+          -1 * OPYN_ETH.decimals,
+          -7, // decimals
+          new BigNumber(strikePrice).div(10).integerValue().toNumber(), //strike price
+          -6, // strikePrice exp
+          USDC.symbol,
+          expiry,
+          window
+        )
+  
+        newTokenAddr = oToken
+      } else { // Create a eth call
+        const strikePriceNum = new BigNumber(10000000).div(strikePrice).integerValue().toNumber()
+        const oToken = await createOption(
+          OPYN_ETH.symbol, // collateral
+          -1 * OPYN_ETH.decimals,
+          USDC.symbol, // underlying
+          -1 * USDC.decimals,
+          -7, // decimals
+          strikePriceNum, //strike price
+          -14, // strikePrice exp
+          OPYN_ETH.symbol,
+          expiry,
+          window
+        )
+  
+        newTokenAddr = oToken
+      }
+    } catch(error) {
+      setIsCreating(false)
+      return
     }
+    
     const owner = await getOwner(newTokenAddr)
     const isOwner = owner === user
     setIsFactoryOwner(isOwner)
