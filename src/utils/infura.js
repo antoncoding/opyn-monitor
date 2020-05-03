@@ -52,6 +52,21 @@ export const getTotalSupply = async (erc20) => {
 
 // Option Contract
 
+
+/**
+ * Get owner of the oToken
+ * @param {string} oToken
+ * @return {Promise<string>}
+ */
+export const getOwner = async (oToken) => {
+  const oTokenContract = new web3.eth.Contract(optionContractABI, oToken);
+  const owner = await oTokenContract.methods
+    .owner()
+    .call();
+  return owner;
+};
+
+
 /**
  * Max liquidatable for given vault
  * @param {string} oToken

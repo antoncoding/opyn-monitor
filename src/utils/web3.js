@@ -6,7 +6,7 @@ import { signatureUtils } from '@0x/order-utils';
 import Onboard from 'bnc-onboard';
 
 import { notify } from './blockNative.ts';
-import { getAllowance, getPremiumToPay } from './infura';
+import { getAllowance, getPremiumToPay, getOwner } from './infura';
 import { getPreference } from './storage.ts';
 import {
   OptionFactory,
@@ -110,11 +110,8 @@ export const checkConnectedAndGetAddress = async () => {
  * @param {string} _strikeAsset
  * @param {number} _expiry
  * @param {number} _windowSize
- * @param {string} _symbol
- * @param {string} _name
- * @param {Function} _callBack
  */
-export const createOptionAndSetDetail = async (
+export const createOption = async (
   _collateralType,
   _collateralExp,
   _underlyingType,
@@ -125,13 +122,9 @@ export const createOptionAndSetDetail = async (
   _strikeAsset,
   _expiry,
   _windowSize,
-  _symbol,
-  _name,
-  _callBack,
 ) => {
   const account = await checkConnectedAndGetAddress();
   const factory = new web3.eth.Contract(oTokenFactoryABI, OptionFactory);
-
   const tx = await factory.methods.createOptionsContract(
     _collateralType,
     _collateralExp,
@@ -149,21 +142,30 @@ export const createOptionAndSetDetail = async (
     });
 
   // const addr = '0x7e30449da59e5489b8013744cc17c1dff3c2c670';
-  const addr = tx.events.OptionsContractCreated.returnValues.addr;
-  // fire callback when first tx succeed
-  if (typeof _callBack === 'function') _callBack();
-
-  const oToken = new web3.eth.Contract(oTokenABI, addr);
-  await oToken.methods.setDetails(_symbol, _name)
-    .send({ from: account })
-    .on('transactionHash', (hash) => {
-      notify.hash(hash);
-    });
+  const oToken = tx.events.OptionsContractCreated.returnValues.addr;
+  return { oToken, user: account };
 };
 
 /**
  * Option Exchange
  */
+
+/**
+ * Set token name ans symbol to newly created token
+ * @param {*} oTokenAdr
+ * @param {*} _symbol
+ * @param {*} _name
+ */
+export const setDetail = async (oTokenAdr, _symbol, _name) => {
+  const owner = await getOwner(oTokenAdr);
+  // const account = await checkConnectedAndGetAddress();
+  const oToken = new web3.eth.Contract(oTokenABI, oTokenAdr);
+  await oToken.methods.setDetails(_symbol, _name)
+    .send({ from: owner })
+    .on('transactionHash', (hash) => {
+      notify.hash(hash);
+    });
+};
 
 export const liquidate = async (oTokenAddr, owner, liquidateAmt) => {
   const account = await checkConnectedAndGetAddress();

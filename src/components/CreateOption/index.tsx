@@ -48,7 +48,10 @@ function CreateOption() {
     <>
       <Header primary="Create new option" />
       <Tabs
-        items={['ETH Option Series', 'Custom Option']}
+        items={[
+          'ETH Option Series',
+          // 'Custom Option'
+        ]}
         selected={selectedTab}
         onChange={setSelectedTab}
       />
@@ -69,7 +72,7 @@ function CreateOption() {
             title={'Option Type'}
             description="American or European?"
             child={
-              <div style={{ width: '60%' }} >
+              <div style={{ width: '100%' }} >
                 <GroupButtonWrapper>
                   {['American', 'European',].map((x, i) => (
                     <GroupButton theme={theme} key={x}
@@ -86,7 +89,7 @@ function CreateOption() {
             title={'Option Type'}
             description="Put or Call?"
             child={
-              <div style={{ width: '60%' }} >
+              <div style={{ width: '100%' }} >
                 <GroupButtonWrapper>
                   {['Put', 'Call',].map((x, i) => (
                     <GroupButton theme={theme} key={x}
@@ -103,7 +106,7 @@ function CreateOption() {
             title={'Strike Price'}
             description="Enter Strike Price"
             child={
-              <div style={{ width: '50%' }}>
+              <div style={{ width: '100%' }}>
                 <TextInput
                   adornmentPosition="end"
                   adornment="USDC"
@@ -136,6 +139,7 @@ function CreateOption() {
             strikePriceIsValid={strikePriceIsValid}
             expiration={expiration}
             />
+          
         </ItemsCarousel>
         <ProgressBar value={(activeItemIndex) / 5} />
       </div>
