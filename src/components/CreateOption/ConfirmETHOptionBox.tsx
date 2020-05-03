@@ -51,7 +51,7 @@ function ConfirmETHOption(
   // Create option -> Check user permission -> Set detail
   const onClickCreate = async () => {
     if (!user) {
-      toast("Please connect wallet first")
+      toast("Please connect wallet")
       return
     }
     if (!strikePriceIsValid) {
@@ -74,7 +74,7 @@ function ConfirmETHOption(
           expiry,
           window
         )
-  
+
         newTokenAddr = oToken
       } else { // Create a eth call
         const strikePriceNum = new BigNumber(10000000).div(strikePrice).integerValue().toNumber()
@@ -90,14 +90,14 @@ function ConfirmETHOption(
           expiry,
           window
         )
-  
+
         newTokenAddr = oToken
       }
-    } catch(error) {
+    } catch (error) {
       setIsCreating(false)
       return
     }
-    
+
     const owner = await getOwner(newTokenAddr)
     const isOwner = owner === user
     setIsFactoryOwner(isOwner)
@@ -126,7 +126,12 @@ function ConfirmETHOption(
           isCreating
             ? <ProcessingBox text="Creating Option..." />
             // Wait for confirm
-            : <ConfirmDiv americanOrEuropean={americanOrEuropean} name={name} symbol={symbol} putOrCall={putOrCall} onClickCreate={onClickCreate} />
+            : <ConfirmDiv
+              americanOrEuropean={americanOrEuropean}
+              name={name}
+              symbol={symbol}
+              onClickCreate={onClickCreate}
+            />
 
           // Already created
           : isFactoryOwner
@@ -146,33 +151,26 @@ export default ConfirmETHOption
 type ConfirmDivProps = {
   americanOrEuropean: 0 | 1,
   name: string,
-  symbol: string,
-  putOrCall: 0 | 1,
+  symbol: string
   onClickCreate: Function
 }
-function ConfirmDiv({ americanOrEuropean, name, symbol, putOrCall, onClickCreate }: ConfirmDivProps) {
+function ConfirmDiv({ americanOrEuropean, name, symbol, onClickCreate }: ConfirmDivProps) {
   const theme = useTheme()
   return (
     <div style={{ display: 'flex', height: 300 }}>
       <div style={{ width: '40%', paddingTop: 100, paddingLeft: 100 }}>
         <SectionTitle title="Almost done!" />
-        <div style={{ paddingLeft: 5 }}><Comment text="Confirm option detail" /></div>
+        <div style={{ paddingLeft: 5 }}><Comment text="Confirm Detail" /></div>
       </div>
-      <div style={{ width: '15%', paddingTop: 60, color: theme.info }}>
+      <div style={{ width: '15%', paddingTop: 100, color: theme.surfaceContentSecondary }}>
         <div>Type</div>
         <div>Name</div>
         <div>Symbol</div>
-        <br></br>
-        <div>Strike</div>
-        <div>Underlying</div>
       </div>
-      <div style={{ width: '30%', paddingTop: 60 }}>
-        <div>{americanOrEuropean ? 'European' : 'American'}</div>
+      <div style={{ width: '30%', paddingTop: 100 }}>
+        <div>{americanOrEuropean ? 'European Option' : 'American Option'}</div>
         <div>{name}</div>
         <div>{symbol}</div>
-        <br></br>
-        <div>{putOrCall === 0 ? USDC.symbol : OPYN_ETH.symbol}</div>
-        <div>{putOrCall === 0 ? OPYN_ETH.symbol : USDC.symbol}</div>
       </div>
       <div style={{ width: '10%', paddingTop: 130 }}>
         <Button label="Create" onClick={onClickCreate}></Button>
@@ -186,7 +184,7 @@ function ProcessingBox({ text }: { text: string }) {
     <div style={{ height: 300, paddingTop: 40 }}>
       <div style={{ width: '100%', display: 'flex', justifyContent: 'center', alignContent: 'center' }}>
         <Header primary={text} />
-        <div style={{padding: 25}}><LoadingRing mode="half-circle" /></div>
+        <div style={{ padding: 25 }}><LoadingRing mode="half-circle" /></div>
       </div>
     </div>
   )

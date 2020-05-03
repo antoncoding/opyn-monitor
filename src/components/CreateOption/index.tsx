@@ -124,7 +124,7 @@ function CreateOption({user}:{user: string}) {
           />
           <FieldCard
             title={'Expiration'}
-            description="Select Expiration"
+            description="Choose end date to expiration date"
             child={
               <div style={{ width: '80%' }}>
                 <DateRangePicker
