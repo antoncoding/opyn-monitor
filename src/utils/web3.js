@@ -6,7 +6,7 @@ import { signatureUtils } from '@0x/order-utils';
 import Onboard from 'bnc-onboard';
 
 import { notify } from './blockNative.ts';
-import { getAllowance, getPremiumToPay, getOwner } from './infura';
+import { getAllowance, getPremiumToPay } from './infura';
 import { getPreference } from './storage.ts';
 import {
   OptionFactory,
@@ -141,9 +141,8 @@ export const createOption = async (
       notify.hash(hash);
     });
 
-  // const addr = '0x7e30449da59e5489b8013744cc17c1dff3c2c670';
   const oToken = tx.events.OptionsContractCreated.returnValues.addr;
-  return { oToken, user: account };
+  return oToken;
 };
 
 /**
@@ -157,11 +156,11 @@ export const createOption = async (
  * @param {*} _name
  */
 export const setDetail = async (oTokenAdr, _symbol, _name) => {
-  const owner = await getOwner(oTokenAdr);
+  const account = await checkConnectedAndGetAddress();
   // const account = await checkConnectedAndGetAddress();
   const oToken = new web3.eth.Contract(oTokenABI, oTokenAdr);
   await oToken.methods.setDetails(_symbol, _name)
-    .send({ from: owner })
+    .send({ from: account })
     .on('transactionHash', (hash) => {
       notify.hash(hash);
     });

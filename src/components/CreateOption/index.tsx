@@ -21,7 +21,7 @@ const today = new Date(new Date().toDateString())
 const localOffset = today.getTimezoneOffset() * 60000; // in millisecond
 const tomorrow = new Date(today.getTime() + (24 * 60 * 60 * 1000) + localOffset);
 
-function CreateOption() {
+function CreateOption({user}:{user: string}) {
   const theme = useTheme()
 
   // create eth series or custom option
@@ -43,6 +43,7 @@ function CreateOption() {
   }
 
   const [activeItemIndex, setActiveItemIndex] = useState(0);
+  const [progress, setProgress] = useState(0)
 
   return (
     <>
@@ -133,15 +134,17 @@ function CreateOption() {
               </div>
             } />
           <ConfirmBox 
+            user={user}
             putOrCall={putOrCall} 
             americanOrEuropean={americanOrEuropean} 
             strikePrice={strikePriceForoETH}
             strikePriceIsValid={strikePriceIsValid}
             expiration={expiration}
+            setProgress={setProgress}
             />
           
         </ItemsCarousel>
-        <ProgressBar value={(activeItemIndex) / 5} />
+        <ProgressBar value={progress ? progress : activeItemIndex/5} />
       </div>
     </>
   )

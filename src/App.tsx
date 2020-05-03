@@ -59,7 +59,7 @@ function App() {
           <Route path="/uniswap/">
             <Trade />
           </Route>
-          <Route path="/create/"><CreateOption/></Route>
+          <Route path="/create/"><CreateOption user={user}/></Route>
           {/* HomePage */}
           <Route path="/"><HomePage /></Route>
         </Switch>
