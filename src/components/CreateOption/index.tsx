@@ -6,6 +6,7 @@ import {
 } from '@aragon/ui'
 
 import CreateETHOption from './CreateETHOption'
+import CreateCustomOption from './CreateCustomOption'
 
 const today = new Date(new Date().toDateString())
 const localOffset = today.getTimezoneOffset() * 60000; // in millisecond
@@ -27,7 +28,11 @@ function CreateOption({ user }: { user: string }) {
         selected={selectedTab}
         onChange={setSelectedTab}
       />
-      <CreateETHOption user={user} localOffset={localOffset} today={today} tomorrow={tomorrow} /> 
+      {selectedTab === 0
+        ? <CreateETHOption user={user} localOffset={localOffset} today={today} tomorrow={tomorrow} /> 
+        : <CreateCustomOption user={user} localOffset={localOffset} today={today} tomorrow={tomorrow} />
+      }
+      
     </>
   )
 }
