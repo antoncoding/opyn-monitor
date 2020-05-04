@@ -29,7 +29,7 @@ function CreateOption({ user }: { user: string }) {
         onChange={setSelectedTab}
       />
       {selectedTab === 0
-        ? <CreateETHOption user={user} localOffset={localOffset} today={today} tomorrow={tomorrow} /> 
+        ? <CreateETHOption user={user} /> 
         : <CreateCustomOption user={user} localOffset={localOffset} today={today} tomorrow={tomorrow} />
       }
       

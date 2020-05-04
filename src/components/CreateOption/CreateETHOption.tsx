@@ -3,26 +3,25 @@ import BigNumber from 'bignumber.js'
 import ItemsCarousel from 'react-items-carousel';
 import FieldCard from './FieldCard'
 import ConfirmBox from './ConfirmETHOptionBox'
+import DateTimePicker from 'react-widgets/lib/DateTimePicker'
+
 import {
   IconArrowRight,
   IconArrowLeft,
   Button,
   ProgressBar,
-  DateRangePicker,
   TextInput,
   useTheme
 } from '@aragon/ui'
 import { GroupButton, GroupButtonWrapper } from './GroupButton'
 
-
 type CreateOETHProps = {
-  user: string,
-  today: Date,
-  tomorrow: Date,
-  localOffset: number
+  user: string
 }
 
-function CreateOETH({ user, today, tomorrow, localOffset }: CreateOETHProps) {
+const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone
+
+function CreateOETH({ user }: CreateOETHProps) {
 
   const theme = useTheme()
   // put or call
@@ -32,16 +31,14 @@ function CreateOETH({ user, today, tomorrow, localOffset }: CreateOETHProps) {
   const [strikePriceForoETH, setStrikePriceForOETH] = useState<number>(200)
   const strikePriceIsValid = new BigNumber(strikePriceForoETH).mod(10).eq(0)
 
-  const [expiration, setExpiration] = useState<Date>(tomorrow)
+  const [expiration, setExpiration] = useState<Date>(new Date())
 
   // index of ItemsCarousel
-  const [step, setStep] = useState(0)
+  const [step, setStep] = useState(3)
   const [progress, setProgress] = useState(0)
 
-  const onChangeDatePicker = ({ end }: { end: Date }) => {
-    const endUTCs = end.getTime() + 1 + localOffset
-    const endUTC = new Date(endUTCs)
-    setExpiration(endUTC)
+  const onChangeDatePicker = (dateTime:Date) => {
+    setExpiration(dateTime)
   }
 
   return (
@@ -111,13 +108,12 @@ function CreateOETH({ user, today, tomorrow, localOffset }: CreateOETHProps) {
         />
         <FieldCard
           title={'Expiration'}
-          description="Choose end date to expiration date"
+          description={`Choose Expiration Time (${timezone})`}
           child={
             <div style={{ width: '80%' }}>
-              <DateRangePicker
+              <DateTimePicker
                 onChange={onChangeDatePicker}
-                startDate={today}
-                endDate={expiration} />
+                />
             </div>
           } />
         <ConfirmBox
