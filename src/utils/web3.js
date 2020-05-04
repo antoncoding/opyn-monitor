@@ -9,16 +9,18 @@ import { notify } from './blockNative.ts';
 import { getAllowance, getPremiumToPay } from './infura';
 import { getPreference } from './storage.ts';
 import {
-  OptionFactory,
   ETH_ADDRESS,
   Kollateral_Liquidator,
   Kollateral_Invoker,
   KETH,
   ZeroX_Exchange,
   WETH,
+  Oracle,
+  OptionExchange,
 } from '../constants/contracts';
 
-const oTokenFactoryABI = require('../constants/abi/OptionFactory.json');
+import oTokenBytecode from '../constants/bytecode/optionContract';
+
 const oTokenABI = require('../constants/abi/OptionContract.json');
 const exchangeABI = require('../constants/abi/OptionExchange.json');
 const uniswapExchangeABI = require('../constants/abi/UniswapExchange.json');
@@ -93,56 +95,48 @@ export const checkConnectedAndGetAddress = async () => {
     if (checked) return onboard.getState().address;
   }
 };
-
 /**
- *  Option Factory
- */
-
-/**
- * Create Option
- * @param {string} _collateralType collateral
- * @param {number} _collateralExp
- * @param {string} _underlyingType
- * @param {number} _underlyingExp
- * @param {number} _oTokenExchangeExp Units of underlying that 1 oToken protects
- * @param {number} _strikePrice
- * @param {number} _strikeExp
- * @param {string} _strikeAsset
+ * Deploy a new oToken contract
+ * @param {string} _collateral collateral address
+ * @param {number} _collExp - collateral decimals
+ * @param {string} _underlying underlying address
+ * @param {number} _underlyingExp - underlying decimals
+ * @param {number} _oTokenExchangeExp decimals
+ * @param {number} _strikePrice strikePrice
+ * @param {number} _strikeExp striekPrice exp
+ * @param {string} _strike strike asset address
  * @param {number} _expiry
  * @param {number} _windowSize
  */
-export const createOption = async (
-  _collateralType,
-  _collateralExp,
-  _underlyingType,
+export const deployOTokenContract = async (
+  _collateral,
+  _collExp,
+  _underlying,
   _underlyingExp,
   _oTokenExchangeExp,
   _strikePrice,
   _strikeExp,
-  _strikeAsset,
+  _strike,
   _expiry,
   _windowSize,
 ) => {
   const account = await checkConnectedAndGetAddress();
-  const factory = new web3.eth.Contract(oTokenFactoryABI, OptionFactory);
-  const tx = await factory.methods.createOptionsContract(
-    _collateralType,
-    _collateralExp,
-    _underlyingType,
-    _underlyingExp,
-    _oTokenExchangeExp,
-    _strikePrice,
-    _strikeExp,
-    _strikeAsset,
-    _expiry,
-    _windowSize,
-  ).send({ from: account })
+  const contract = new web3.eth.Contract(oTokenABI);
+  const oToken = await contract.deploy({
+    data: oTokenBytecode,
+    // eslint-disable-next-line max-len
+    arguments: [_collateral, _collExp, _underlying, _underlyingExp, _oTokenExchangeExp, _strikePrice, _strikeExp, _strike, _expiry,
+      OptionExchange, Oracle, _windowSize,
+    ],
+  })
+    .send({
+      from: account,
+    })
     .on('transactionHash', (hash) => {
       notify.hash(hash);
     });
 
-  const oToken = tx.events.OptionsContractCreated.returnValues.addr;
-  return oToken;
+  return oToken.options.address;
 };
 
 /**

@@ -2,6 +2,9 @@
 
 export const OptionFactory = '0xcc5d905b9c2c8c9329eb4e25dc086369d6c7777c';
 
+export const OptionExchange = '0x39246c4f3f6592c974ebc44f80ba6dc69b817c71';
+export const Oracle = '0x7054e08461e3eCb7718B63540adDB3c3A1746415';
+
 export const ETH_ADDRESS = '0x0000000000000000000000000000000000000000';
 export const ERC20_Liquidator = '0xF8cE4E70F52FdDBc72547Ce9616ed3E7d4525e8A';
 export const Kollateral_Liquidator = '0xfBaB30f79bbbC92C708E7e9b01E329e003d8Ce48';

@@ -5,10 +5,10 @@ import { Comment } from '../common'
 
 type CompleteCreate = {
   address: string,
-  isFactoryOwner: boolean,
+  setDetailComplete: boolean,
 }
 
-function ComplateCreate({ address, isFactoryOwner }: CompleteCreate) {
+function ComplateCreate({ address, setDetailComplete }: CompleteCreate) {
   return (
     <div style={{ height: 300, paddingTop: 40 }}>
       <div style={{ width: '100%', display: 'flex', justifyContent: 'center', alignContent: 'center' }}>
@@ -19,9 +19,9 @@ function ComplateCreate({ address, isFactoryOwner }: CompleteCreate) {
       <IdentityBadge entity={address} shorten={false} />
       </div>
       <br></br>
-      {!isFactoryOwner
+      {!setDetailComplete
         ? <div style={{ width: '100%', display: 'flex', justifyContent: 'center', alignContent: 'center' }}>
-        <Comment text="Please contact the opyn team to set detail information on your option" />
+        <Comment text="Remeber to set the token name and symbol!" />
         </div>
         : <></>}
     </div>

@@ -8,8 +8,7 @@ import CompleteCreate from './Complete'
 
 import { USDC, OPYN_ETH } from '../../constants/tokens'
 
-import { getOwner } from '../../utils/infura'
-import { createOption, setDetail } from '../../utils/web3'
+import { setDetail, deployOTokenContract } from '../../utils/web3'
 
 type ConfirmOptionProps = {
   user: string,
@@ -34,8 +33,8 @@ function ConfirmETHOption(
   const toast = useToast()
 
   const [isCreating, setIsCreating] = useState(false)
-  const [isFactoryOwner, setIsFactoryOwner] = useState(false)
   const [isSettingDetail, setIsSettingDetail] = useState(false)
+  const [allComplete , setAllComplete] = useState(false)
 
   const type = putOrCall === 0 ? 'Put' : 'Call'
   const expiry = new BigNumber(expiration.getTime()).div(1000).toNumber()
@@ -62,15 +61,15 @@ function ConfirmETHOption(
     setIsCreating(true)
     try {
       if (type === 'Put') {
-        const oToken = await createOption(
-          USDC.symbol, // collateral
+        const oToken = await deployOTokenContract(
+          USDC.addr, // collateral
           -1 * USDC.decimals,
-          OPYN_ETH.symbol, // underlying
+          OPYN_ETH.addr, // underlying
           -1 * OPYN_ETH.decimals,
           -7, // decimals
           new BigNumber(strikePrice).div(10).integerValue().toNumber(), //strike price
           -6, // strikePrice exp
-          USDC.symbol,
+          USDC.addr,
           expiry,
           window
         )
@@ -78,15 +77,15 @@ function ConfirmETHOption(
         newTokenAddr = oToken
       } else { // Create a eth call
         const strikePriceNum = new BigNumber(10000000).div(strikePrice).integerValue().toNumber()
-        const oToken = await createOption(
-          OPYN_ETH.symbol, // collateral
+        const oToken = await deployOTokenContract(
+          OPYN_ETH.addr, // collateral
           -1 * OPYN_ETH.decimals,
-          USDC.symbol, // underlying
+          USDC.addr, // underlying
           -1 * USDC.decimals,
           -7, // decimals
           strikePriceNum, //strike price
           -14, // strikePrice exp
-          OPYN_ETH.symbol,
+          OPYN_ETH.addr,
           expiry,
           window
         )
@@ -98,23 +97,20 @@ function ConfirmETHOption(
       return
     }
 
-    const owner = await getOwner(newTokenAddr)
-    const isOwner = owner === user
-    setIsFactoryOwner(isOwner)
     setIsCreating(false)
     setNewTokenAddr(newTokenAddr)
 
-    // is factory owner: proceed to detail setting tx.
-    if (isOwner) {
-      setIsSettingDetail(true)
-      setProgress(0.9)
-      try {
-        await setDetail(newTokenAddr, symbol, name)
-      } catch (error) {
-        setIsFactoryOwner(false)
-      }
-      setIsSettingDetail(false)
+    setIsSettingDetail(true)
+    setProgress(0.9)
+
+    try {
+      await setDetail(newTokenAddr, symbol, name)
+      setAllComplete(true)
+    } catch (error) {
+      console.log(error)
     }
+    
+    setIsSettingDetail(false)
     setProgress(1)
   }
 
@@ -133,13 +129,9 @@ function ConfirmETHOption(
               onClickCreate={onClickCreate}
             />
 
-          // Already created
-          : isFactoryOwner
-            ? isSettingDetail
-              ? <ProcessingBox text="Setting Detail..." />
-              : <CompleteCreate address={newTokenAddr} isFactoryOwner={true} />
-            : // option created, has no permission to set detail
-            <CompleteCreate address={newTokenAddr} isFactoryOwner={false} />
+          : isSettingDetail
+            ? <ProcessingBox text="Setting Detail..." />
+            : <CompleteCreate address={newTokenAddr} setDetailComplete={allComplete} />
       }
     </Box>
   )

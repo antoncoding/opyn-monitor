@@ -33,6 +33,7 @@ jobs:
         REACT_APP_INFURA_KEY: ${{ secrets.REACT_APP_INFURA_KEY }}
         REACT_APP_INFURA_KEY2: ${{ secrets.REACT_APP_INFURA_KEY2 }}
         REACT_APP_GA_PROJECT_ID: ${{ secrets.REACT_APP_GA_PROJECT_ID }}
+        REACT_APP_ETHERSCAN_KEY: ${{ secrets.REACT_APP_ETHERSCAN_KEY }}
 
     - name: Deploy
       uses: JamesIves/github-pages-deploy-action@releases/v3

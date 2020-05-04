@@ -6,8 +6,7 @@ import { SectionTitle, Comment } from '../common'
 
 import CompleteCreate from './Complete'
 
-import { getOwner } from '../../utils/infura'
-import { createOption, setDetail } from '../../utils/web3'
+import { deployOTokenContract, setDetail } from '../../utils/web3'
 
 import * as types from '../../types'
 
@@ -42,7 +41,7 @@ function ConfirmCustomOption(
   const toast = useToast()
 
   const [isCreating, setIsCreating] = useState(false)
-  const [isFactoryOwner, setIsFactoryOwner] = useState(false)
+  const [isAllComplete, setAllComplete] = useState(false)
   const [isSettingDetail, setIsSettingDetail] = useState(false)
 
   const expiry = new BigNumber(expiration.getTime()).div(1000).toNumber()
@@ -62,15 +61,15 @@ function ConfirmCustomOption(
     let newTokenAddr = ''
     setIsCreating(true)
     try {
-      const oToken = await createOption(
-        collateral.symbol, // collateral
+      const oToken = await deployOTokenContract(
+        collateral.addr, // collateral
         -1 * collateral.decimals,
-        underlying.symbol, // underlying
+        underlying.addr, // underlying
         -1 * underlying.decimals,
         -1 * decimals, // decimals
         strikePrice.c ? strikePrice.c[0] : 1, //strike price
         strikePrice.e ? -1 * strikePrice.e : -1, // strikePrice exp
-        strike.symbol,
+        strike.addr,
         expiry,
         window
       )
@@ -80,23 +79,17 @@ function ConfirmCustomOption(
       return
     }
 
-    const owner = await getOwner(newTokenAddr)
-    const isOwner = owner === user
-    setIsFactoryOwner(isOwner)
     setIsCreating(false)
-    setNewTokenAddr(newTokenAddr)
-
-    // is factory owner: proceed to detail setting tx.
-    if (isOwner) {
-      setIsSettingDetail(true)
-      setProgress(0.9)
-      try {
-        await setDetail(newTokenAddr, symbol, name)
-      } catch (error) {
-        setIsFactoryOwner(false)
-      }
-      setIsSettingDetail(false)
+    setNewTokenAddr(newTokenAddr)    
+    setIsSettingDetail(true)
+    setProgress(0.9)
+    try {
+      await setDetail(newTokenAddr, symbol, name)
+      setAllComplete(true)
+    } catch (error) {
+      console.log(error)
     }
+    setIsSettingDetail(false)
     setProgress(1)
   }
 
@@ -120,12 +113,9 @@ function ConfirmCustomOption(
             />
 
           // Already created
-          : isFactoryOwner
-            ? isSettingDetail
+          : isSettingDetail
               ? <ProcessingBox text="Setting Detail..." />
-              : <CompleteCreate address={newTokenAddr} isFactoryOwner={true} />
-            : // option created, has no permission to set detail
-            <CompleteCreate address={newTokenAddr} isFactoryOwner={false} />
+              : <CompleteCreate address={newTokenAddr} setDetailComplete={isAllComplete} />
       }
     </Box>
   )
