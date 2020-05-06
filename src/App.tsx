@@ -14,6 +14,7 @@ import OptionPage from './components/OptionPage';
 import ManageVault from './components/ManageVault';
 import Uniswap from './components/UniswapTrade';
 import CreateOption from './components/CreateOption'
+import PositionManagement from './components/PositionManagement'
 import Footer from './components/Footer';
 
 function App() {
@@ -53,6 +54,9 @@ function App() {
             <OptionTrading
               user={user}
             />
+          </Route>
+          <Route path="/positions/">
+           <PositionManagement user={user} />
           </Route>
           {/* <Route path="/trades/test/"><ZEROXTest /></Route> */}
           <Route path="/uniswap/:token/"><Uniswap user={user} /></Route>
