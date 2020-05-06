@@ -5,6 +5,7 @@ export const eth_calls: ETHOption[] = [
   {
     addr: '0xbcae1db14f1b366cd4611c75aab2031492b136e9',
     title: 'ETH Call $250 05/29/20',
+    type: 'call',
 
     // constants in contract
     symbol: 'oETH $250 Call',

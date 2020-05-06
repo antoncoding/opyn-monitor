@@ -6,6 +6,7 @@ export const eth_puts: ETHOption[] = [
   {
     addr: '0x48ab8a7d3bf2eb942e153e4275ae1a8988238dc7',
     title: 'ETH Put $100 04/03/20',
+    type: 'put',
 
     // constants in contract
     symbol: 'oETH $100 Put',
@@ -25,6 +26,7 @@ export const eth_puts: ETHOption[] = [
   {
     addr: '0x6c79f10543c7886c6946b8a996f824e474bac8f2',
     title: 'ETH Put $100 04/24/20',
+    type: 'put',
 
     // constants in contract
     symbol: 'oETH $100 Put',
@@ -44,6 +46,7 @@ export const eth_puts: ETHOption[] = [
   {
     addr: '0xaefc7b368f7b536c9e5e3f342bf534931ce58584',
     title: 'ETH Put $150 04/24/20',
+    type: 'put',
     // constants in contract
     symbol: 'oETH $150 Put',
     name: 'Opyn ETH Put $150 04/24/20',
@@ -62,6 +65,7 @@ export const eth_puts: ETHOption[] = [
   {
     addr: '0x461cd647add2159e85ad57141cb5371566fceed3',
     title: 'ETH Put $160 05/01/20',
+    type: 'put',
 
     // constants in contract
     symbol: 'oETH $160 Put',
@@ -81,6 +85,7 @@ export const eth_puts: ETHOption[] = [
   {
     addr: '0xc8f95e13eff0165e5e381ea1878c56d93562d7d7',
     title: 'ETH Put $160 05/08/20',
+    type: 'put',
 
     // constants in contract
     symbol: 'oETH $160 Put',
@@ -100,6 +105,8 @@ export const eth_puts: ETHOption[] = [
   {
     addr: '0xd79ab5a71fa2099ef30df0e8a81f8c200aac36f1',
     title: 'ETH Put $200 05/08/20',
+    type: 'put',
+
     symbol: 'oETH $200 Put',
     name: 'Opyn ETH Put $200 05/08/20',
     decimals: 7,
@@ -117,6 +124,8 @@ export const eth_puts: ETHOption[] = [
   {
     addr: '0x684a1d736e934a45f6f5d00c62ddf7a0b7d2064b',
     title: 'ETH Put $200 05/15/20',
+    type: 'put',
+
     symbol: 'oETH $200 Put',
     name: 'Opyn ETH Put $200 05/15/20',
     decimals: 7,
@@ -134,6 +143,7 @@ export const eth_puts: ETHOption[] = [
   {
     addr: '0xecf6f2fd8d2a8e17397066348d449566d5407174',
     title: 'ETH Put $150 05/29/20',
+    type: 'put',
 
     // constants in contract
     symbol: 'oETH $150 Put',
@@ -150,24 +160,4 @@ export const eth_puts: ETHOption[] = [
     uniswapExchange: '0x75B865EA22a2b6633038E15647357268C7F9Ac54',
     expiry: 1590739200,
   },
-  // {
-  //   addr: '0x09974afd06cc921a8389d03a06b1ab7bd5f39ffc',
-  //   title: 'ETH Put $180 07/29/20',
-
-  //   // constants in contract
-  //   symbol: 'oETH $180 Put',
-  //   name: 'Opyn ETH Put $180 07/29/20',
-  //   decimals: 7,
-  //   oracle: '0x7054e08461e3eCb7718B63540adDB3c3A1746415',
-  //   collateral: tokens.USDC,
-  //   underlying: tokens.OPYN_ETH,
-  //   strike: tokens.USDC,
-  //   strikePrice: 1.8e-5,
-  //   strikePriceInUSD: 180,
-  //   minRatio: 1,
-  //   exchange: '0x39246c4f3f6592c974ebc44f80ba6dc69b817c71',
-  //   uniswapExchange: '0x75B865EA22a2b6633038E15647357268C7F9Ac54',
-  //   expiry: 1596009600,
-  // },
-  
 ];
