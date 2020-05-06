@@ -39,16 +39,13 @@
     "predeploy": "npm run build",
     "deploy": "gh-pages -d build"
   },
-  "eslintConfig": {
-    "extends": "react-app"
-  },
   "husky": {
     "hooks": {
       "pre-commit": "lint-staged"
     }
   },
   "lint-staged": {
-    "./src/**": [
+    "./src/**.{js, jsx, ts, tsx}": [
       "eslint --fix"
     ]
   },
