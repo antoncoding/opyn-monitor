@@ -22,4 +22,7 @@ export type option = {
   expiry: number,
 };
 
-export type ETHOption = option & { strikePriceInUSD: number } 
+export type ETHOption = option & { 
+  type: 'call' | 'put'
+  strikePriceInUSD: number
+} 

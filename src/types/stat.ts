@@ -1,10 +1,11 @@
 import BigNumber from 'bignumber.js'
 
 export type greeks = {
-  Delta: BigNumber
-  Gamma: BigNumber
-  Vega: BigNumber
-  Theta: BigNumber
+  Delta: number,
+  Gamma: number,
+  Vega: number,
+  Theta: number,
+  Rho: number,
 }
 
 export type stats = {
