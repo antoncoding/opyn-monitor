@@ -4,7 +4,7 @@ import {
   Header, DataView, IdentityBadge, Button, Tabs,
 } from '@aragon/ui';
 
-import { insurances, eth_options } from '../../constants/options';
+import { insurances, eth_calls, eth_puts } from '../../constants/options';
 import { Comment, CheckBox } from '../common';
 import { getPreference, storePreference } from '../../utils/storage';
 
@@ -42,7 +42,7 @@ function AllContracts() {
         </div>
       </div>
       <Tabs
-        items={['DeFi Insurance', 'ETH Options']}
+        items={['DeFi Insurance', 'Put Options', 'Call Options']}
         selected={tabSelected}
         onChange={(choice:number) => {
           setTabSelected(choice);
@@ -61,11 +61,14 @@ function AllContracts() {
             <Button onClick={() => goToToken(addr)}> View Vaults </Button>,
           ]}
         />
-      ) : (
+      ) : tabSelected === 1 ? (
         <DataView
-          header="Options"
+          // header="Options"
           fields={['Name', 'Contract', 'Expiry', '']}
-          entries={eth_options.filter((option) => showExpired || option.expiry * 1000 > Date.now())}
+          entries={eth_puts
+            .filter((option) => showExpired || option.expiry * 1000 > Date.now())
+            .sort((oa, ob) =>  oa.expiry > ob.expiry ? 1 : -1 )
+          }
           entriesPerPage={6}
           renderEntry={({ addr, title, expiry }: {addr:string, title:string, expiry:number}) => [
             <>{title}</>,
@@ -74,7 +77,24 @@ function AllContracts() {
             <Button onClick={() => goToToken(addr)}> View Vaults </Button>,
           ]}
         />
-      )}
+      ) : ( // calls
+        <DataView
+          // header="Options"
+          fields={['Name', 'Contract', 'Expiry', '']}
+          entries={eth_calls
+            .filter((option) => showExpired || option.expiry * 1000 > Date.now())
+            .sort((oa, ob) =>  oa.expiry > ob.expiry ? 1 : -1 )
+          }
+          entriesPerPage={6}
+          renderEntry={({ addr, title, expiry }: {addr:string, title:string, expiry:number}) => [
+            <>{title}</>,
+            <IdentityBadge entity={addr} shorten={false} />,
+            new Date(expiry * 1000).toDateString(),
+            <Button onClick={() => goToToken(addr)}> View Vaults </Button>,
+          ]}
+        />
+      ) }
+      
     </>
   );
 }
