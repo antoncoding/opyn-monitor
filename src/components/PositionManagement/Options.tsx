@@ -8,6 +8,7 @@ import { SectionTitle } from '../common';
 import * as types from '../../types';
 
 import { eth_puts, eth_calls } from '../../constants/options';
+import BigNumber from 'bignumber.js';
 
 const optionsByDate = groupByDate(eth_puts, eth_calls);
 
@@ -15,9 +16,7 @@ const optionsByDate = groupByDate(eth_puts, eth_calls);
 type dataViewEntryType = {
   strikePrice: number,
   call?: types.ETHOption,
-  callDetail?: types.OptionRealTimeStat,
   put?: types.ETHOption,
-  putDetail?: types.OptionRealTimeStat
 }
 
 
@@ -34,13 +33,15 @@ type entriesForExpiry = {
 }
 
 type OptionBoardProps = {
-  baseAsset: types.token,
-  quoteAsset: types.token,
+  optionPrices: {
+    oToken: string,
+    price: BigNumber
+  }
+  spotPrice: BigNumber
+  ,
 };
 
-function Options({
-  quoteAsset
-}: OptionBoardProps) {
+function Options({ optionPrices ,spotPrice }: OptionBoardProps) {
   const [isLoading, setIsLoading] = useState(true);
   const [selectedExpiryIdx, setExpiryIdx] = useState(0);
   const [entriesToDisplay, setEntriesToDisplay] = useState<dataViewEntryType[]>([]);
@@ -57,7 +58,6 @@ function Options({
         const { call, put, strikePrice } = pair;
         const entry: dataViewEntryType = { strikePrice };
         if (call !== undefined) {
-          // has call option on this strikePrice
           entry.call = call;
         }
         if (put !== undefined) {
@@ -78,7 +78,7 @@ function Options({
       clearInterval(id);
       isCancelled = true;
     };
-  }, [selectedExpiryIdx, quoteAsset]);
+  }, [selectedExpiryIdx]);
 
 
   return (
