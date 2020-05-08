@@ -275,7 +275,10 @@ export default OptionBoard;
  */
 function groupByDate(puts: types.ETHOption[], calls: types.ETHOption[]): entriesForExpiry[] {
   const result: entriesForExpiry[] = [];
-  const allOptions = puts.concat(calls).filter((option) => option.expiry > Date.now() / 1000);
+  const allOptions = puts.concat(calls)
+    .filter((option) => option.expiry > Date.now() / 1000) // filter out expired options
+    .sort((oa, ob) =>  oa.expiry > ob.expiry ? 1 : -1 ); // short by date (so the dropdown is sorted)
+  
   const distinctExpirys = [...new Set(allOptions.map((option) => option.expiry))];
 
   for (const expiry of distinctExpirys) {
