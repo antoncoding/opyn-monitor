@@ -38,7 +38,7 @@ function OptionExchange({
     }
     const amount = toBaseUnitBN(butAmountBN, decimals).toString();
     const premium = await getPremiumToPay(exchange, token, amount);
-    setPremiumToPay(toTokenUnitsBN(premium, 16));
+    setPremiumToPay(toTokenUnitsBN(premium, 18));
   };
 
   const updatePremiumReceived = async (amt) => {
