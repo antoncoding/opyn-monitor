@@ -99,7 +99,7 @@ function LinkButton({ title, onClick, isSelected = false }:linkButtonProps) {
   return (
     <div style={{ paddingLeft: 40 }}>
       <LinkBase onClick={onClick}>
-        <div style={{ padding: '1%', opacity: isSelected ? 1 : 0.5, fontSize: 17 }}>{title}</div>
+        <div style={{ padding: '1%', opacity: isSelected ? 1 : 0.5, fontSize: 16 }}>{title}</div>
       </LinkBase>
     </div>
   );

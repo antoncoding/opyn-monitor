@@ -16,7 +16,6 @@ function SwitchMode({ theme, updateTheme }: switchThemeProps) {
     <Button
       icon={theme === 'dark' ? <IconStar /> : <IconStarFilled />}
       onClick={handleChangeTheme}
-      label="Theme"
     />
   );
 }
