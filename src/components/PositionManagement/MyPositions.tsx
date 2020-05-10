@@ -117,8 +117,8 @@ function MyPositions({ user, spotPrice, tokenPrices }: MyPositionsProps) {
       <DataView
         fields={['','Type','Price', 'Size', 'Delta', 'Gamma', 'Vega', 'Theta']}
         entries={positions}
-        entriesPerPage={5}
-        tableRowHeight={50}
+        entriesPerPage={8}
+        tableRowHeight={40}
         renderEntry={(p: position) => [
           <IdentityBadge
             entity={p.option.addr} label={p.option.title} /> ,

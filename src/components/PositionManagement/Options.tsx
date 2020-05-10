@@ -71,7 +71,7 @@ function Options({ optionPrices, spotPrice }: OptionBoardProps) {
         onChange={setSelectedType}
       />
       <DataView
-        tableRowHeight={50}
+        tableRowHeight={40}
         statusEmpty={<div> {`No ${selectedType === 0 ? 'Put' : 'Call'} for this expiration date`} </div>}
         mode="table"
         fields={[
