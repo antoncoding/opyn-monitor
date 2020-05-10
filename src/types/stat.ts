@@ -1,6 +1,7 @@
 import BigNumber from 'bignumber.js'
 
 export type greeks = {
+  iv: number,
   Delta: number,
   Gamma: number,
   Vega: number,

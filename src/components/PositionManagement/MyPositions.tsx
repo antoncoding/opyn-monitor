@@ -2,7 +2,7 @@ import React, { useState, useMemo, useEffect } from 'react';
 import { Header, DataView, IdentityBadge } from '@aragon/ui'
 import BigNumber from 'bignumber.js'
 import styled from 'styled-components'
-
+import { Comment } from '../common'
 import * as types from '../../types'
 import { getAllVaultsForUser } from '../../utils/graph'
 import { getTokenBalance } from '../../utils/infura'
@@ -113,11 +113,7 @@ function MyPositions({ user, spotPrice, tokenPrices }: MyPositionsProps) {
   return (
     <>
       <Header primary="My Positions" />
-      {/* <Accordion 
-      items={[
-        ['Row content', 'Expandable content'],
-        [<div>2</div>, <div>Detail</div>],
-      ]}/> */}
+      { user ?
       <DataView
         fields={['','Type','Price', 'Size', 'Delta', 'Gamma', 'Vega', 'Theta']}
         entries={positions}
@@ -134,8 +130,8 @@ function MyPositions({ user, spotPrice, tokenPrices }: MyPositionsProps) {
           p.Vega,
           p.Theta
         ]}
-      />
-
+      /> : <Comment text="Connect wallet to see your positions"></Comment>
+    }
     </>
   );
 }

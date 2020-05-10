@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
 
+import Options from './Options'
 import MyPositions from './MyPositions';
+
 import { getETHPrice } from '../../utils/etherscan'
 import { getPremiumToPay } from '../../utils/infura'
 import BigNumber from 'bignumber.js';
@@ -17,32 +19,32 @@ function PositionManagement({ user }: { user: string }) {
 
   const [spotPrice, setSpot] = useState<BigNumber>(new BigNumber(0))
 
-  const [tokenPrices, setTokenPrices] = useState<{oToken: string, price: BigNumber}[]>([])
+  const [tokenPrices, setTokenPrices] = useState<{ oToken: string, price: BigNumber }[]>([])
 
-  useEffect(()=>{
+  useEffect(() => {
     let canceled = false
-    async function getSpotPrice(){
+    async function getSpotPrice() {
 
       // spot price
       const spot = await getETHPrice()
 
-      
+
       const _tokenPrices = await Promise.map(allOptions, async option => {
         const priceUnit = await getPremiumToPay(
           option.exchange,
           option.addr,
           toBaseUnitBN(1, option.decimals).toString()
         )
-        const price = option.type === 'call' 
+        const price = option.type === 'call'
           ? toTokenUnitsBN(priceUnit, 18).times(new BigNumber(spot)).times(option.strikePriceInUSD) // 250 call tokens = 1 call option
           : toTokenUnitsBN(priceUnit, 18).times(new BigNumber(spot))
-       
+
         return {
           oToken: option.addr,
           price
         }
       })
-      
+
       if (!canceled) {
         setSpot(new BigNumber(spot))
         setTokenPrices(_tokenPrices)
@@ -59,6 +61,7 @@ function PositionManagement({ user }: { user: string }) {
 
   return (
     <>
+      <Options optionPrices={tokenPrices} spotPrice={spotPrice}/>
       <MyPositions
         spotPrice={spotPrice}
         tokenPrices={tokenPrices}
