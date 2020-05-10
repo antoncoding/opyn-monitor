@@ -25,7 +25,8 @@ export type vaultWithDetail = {
   oToken:string,
   collateral: string,
   oTokenName:string
-  collateralDecimals: number
+  collateralDecimals: number,
+  collateralSymbol,
   expiry:number
   ratio: number
 }
@@ -77,6 +78,7 @@ function MyVaults({ user }: {user: string}) {
           oToken: option.addr,
           oTokenName: option.title,
           collateral: entry.collateral,
+          collateralSymbol: option.collateral.symbol,
           collateralDecimals: option.collateral.decimals,
           expiry: option.expiry,
           ratio,
@@ -128,11 +130,11 @@ function MyVaults({ user }: {user: string}) {
                 entries={displayVaults}
                 entriesPerPage={6}
                 renderEntry={({
-                  oToken, oTokenName, collateral, collateralDecimals, ratio,
-                }) => [
+                  oToken, oTokenName, collateral, collateralDecimals, ratio, collateralSymbol
+                }:vaultWithDetail) => [
                   oTokenName,
                   <IdentityBadge entity={oToken} />,
-                  formatDigits(toTokenUnitsBN(collateral, collateralDecimals).toNumber(), 5),
+                  `${formatDigits(toTokenUnitsBN(collateral, collateralDecimals).toNumber(), 5)} ${collateralSymbol}`,
                   formatDigits(ratio, 4),
                   <ManageVaultButton oToken={oToken} owner={isWatchMode ? watchAddress : user} />,
                 ]}
