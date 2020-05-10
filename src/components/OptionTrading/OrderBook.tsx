@@ -69,10 +69,11 @@ function OrderBook({
         <div style={{ width: '50%' }}>
           <DataView
             statusEmpty={<div>No Sell Orders</div>}
-            entriesPerPage={4}
+            entriesPerPage={8}
             page={askPage}
             onPageChange={setAskPage}
             entries={asks}
+            tableRowHeight={40}
             onSelectEntries={onSelectAskEntry}
             // If other operation reset selected orders, should change selected accordingly
             selection={askSelectedIndexs}
@@ -89,10 +90,11 @@ function OrderBook({
         <div style={{ width: '50%' }}>
           <DataView
             statusEmpty={<div>No Buy Orders</div>}
-            entriesPerPage={4}
+            entriesPerPage={8}
             page={bidPage}
             onPageChange={setBidPage}
             entries={bids}
+            tableRowHeight={40}
             onSelectEntries={onSelectBidEntry}
             selection={bidSelectedIndexs}
             renderSelectionCount={(x) => `${x} Orders Selected`}

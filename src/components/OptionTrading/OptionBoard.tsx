@@ -148,6 +148,7 @@ function OptionBoard({
       {/* Calls */}
       <DataView
         mode="table"
+        tableRowHeight={50}
         status={isLoading ? 'loading' : 'default'}
         fields={[
           { label: 'last', align: 'start' },
