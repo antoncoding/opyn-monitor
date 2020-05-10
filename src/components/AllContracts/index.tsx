@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { useHistory } from 'react-router-dom';
 import {
-  Header, DataView, IdentityBadge, Button, Tabs,
+  Header, DataView, IdentityBadge, Button, Tabs, Timer
 } from '@aragon/ui';
 
 import { insurances, eth_calls, eth_puts } from '../../constants/options';
 import { Comment, CheckBox } from '../common';
 import { getPreference, storePreference } from '../../utils/storage';
+
+import * as types from '../../types'
 
 import tracker from '../../utils/tracker';
 
@@ -52,46 +54,27 @@ function AllContracts() {
 
       {tabSelected === 0 ? (
         <DataView
-          fields={['Name', 'Contract', '']}
+          fields={['Name', 'Contract', 'Expires in', '']}
           entries={insurances.filter((option) => showExpired || option.expiry * 1000 > Date.now())}
           entriesPerPage={6}
-          renderEntry={({ addr, title }) => [
+          renderEntry={({ addr, title, expiry }) => [
             <>{title}</>,
             <IdentityBadge entity={addr} shorten={false} />,
+            <Timer end={new Date(expiry * 1000)} format='Mdh' />,
             <Button onClick={() => goToToken(addr)}> View Vaults </Button>,
           ]}
         />
       ) : tabSelected === 1 ? (
-        <DataView
-          // header="Options"
-          fields={['Name', 'Contract', 'Expiry', '']}
-          entries={eth_puts
-            .filter((option) => showExpired || option.expiry * 1000 > Date.now())
-            .sort((oa, ob) =>  oa.expiry > ob.expiry ? 1 : -1 )
-          }
-          entriesPerPage={6}
-          renderEntry={({ addr, title, expiry }: {addr:string, title:string, expiry:number}) => [
-            <>{title}</>,
-            <IdentityBadge entity={addr} shorten={false} />,
-            new Date(expiry * 1000).toDateString(),
-            <Button onClick={() => goToToken(addr)}> View Vaults </Button>,
-          ]}
+        <OptionList 
+          entries={eth_puts}
+          showExpired={showExpired}
+          goToToken={goToToken}
         />
       ) : ( // calls
-        <DataView
-          // header="Options"
-          fields={['Name', 'Contract', 'Expiry', '']}
-          entries={eth_calls
-            .filter((option) => showExpired || option.expiry * 1000 > Date.now())
-            .sort((oa, ob) =>  oa.expiry > ob.expiry ? 1 : -1 )
-          }
-          entriesPerPage={6}
-          renderEntry={({ addr, title, expiry }: {addr:string, title:string, expiry:number}) => [
-            <>{title}</>,
-            <IdentityBadge entity={addr} shorten={false} />,
-            new Date(expiry * 1000).toDateString(),
-            <Button onClick={() => goToToken(addr)}> View Vaults </Button>,
-          ]}
+        <OptionList 
+          entries={eth_calls}
+          showExpired={showExpired}
+          goToToken={goToToken}
         />
       ) }
       
@@ -100,3 +83,21 @@ function AllContracts() {
 }
 
 export default AllContracts;
+
+function OptionList({ entries, showExpired, goToToken }:{entries: types.ETHOption[], showExpired: boolean, goToToken: Function}){
+  return (<DataView
+    fields={['Contract', 'Strike Price', 'Expiration', 'Expires in', '']}
+    entries={entries
+      .filter((option) => showExpired || option.expiry * 1000 > Date.now())
+      .sort((oa, ob) =>  oa.expiry > ob.expiry ? 1 : -1 )
+    }
+    entriesPerPage={6}
+    renderEntry={(option: types.ETHOption) => [
+      <IdentityBadge label={option.title} entity={option.addr} shorten={false} />,
+      <>{option.strikePriceInUSD + ' USD'}</>,
+      new Date(option.expiry * 1000).toLocaleDateString("en-US") ,
+      <Timer end={new Date(option.expiry * 1000)} format='dhm' />,
+      <Button onClick={() => goToToken(option.addr)}> View Vaults </Button>,
+    ]}
+  />)
+}
