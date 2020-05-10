@@ -6,7 +6,7 @@ const iv = require("implied-volatility");
 
 
 export function getGreeks (option: ETHOption, optionPrice: BigNumber, spotPrice: BigNumber): Greeks {
-  const type = option.name.toLowerCase().includes('call') ? 'call' : 'put'
+  const type = option.type
   // expiry in year
   const t = new BigNumber(option.expiry - (Date.now() / 1000)).div(86400).div(365).toNumber()
 
@@ -25,14 +25,3 @@ export function getGreeks (option: ETHOption, optionPrice: BigNumber, spotPrice:
     Rho: greek.getRho(s, k, t, v, r, type).toFixed(5),
   }
 }
-
-// export function getMarketStats (option: ETHOption, spotPrice: BigNumber): stats {
-//   return {
-//     Delta: spotPrice.times(0.00123),
-//     Gamma: new BigNumber(0),
-//     Vega: new BigNumber(option.strikePriceInUSD*0.0991),
-//     Theta: new BigNumber(option.decimals),
-//     OpenInterest: new BigNumber(0),
-//     IV: new BigNumber(0),
-//   }
-// }

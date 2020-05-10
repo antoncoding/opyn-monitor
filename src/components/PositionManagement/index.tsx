@@ -31,7 +31,7 @@ function PositionManagement({ user }: { user: string }) {
         const priceUnit = await getPremiumToPay(
           option.exchange,
           option.addr,
-          toBaseUnitBN(1, option.decimals)
+          toBaseUnitBN(1, option.decimals).toString()
         )
         const price = option.type === 'call' 
           ? toTokenUnitsBN(priceUnit, 18).times(new BigNumber(spot)).times(option.strikePriceInUSD) // 250 call tokens = 1 call option

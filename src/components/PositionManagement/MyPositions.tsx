@@ -1,6 +1,7 @@
 import React, { useState, useMemo, useEffect } from 'react';
-import { Header, DataView } from '@aragon/ui'
+import { Header, DataView, IdentityBadge } from '@aragon/ui'
 import BigNumber from 'bignumber.js'
+import styled from 'styled-components'
 
 import * as types from '../../types'
 import { getAllVaultsForUser } from '../../utils/graph'
@@ -10,7 +11,7 @@ import { eth_puts, eth_calls } from '../../constants/options';
 import { toTokenUnitsBN } from '../../utils/number';
 import { getGreeks } from './utils'
 
-const allOptions = eth_puts.concat(eth_calls).filter((o) => o.expiry > Date.now() / 1000)
+const allOptions = eth_puts.concat(eth_calls).filter((o) => o.expiry > Date.now() / 1000).sort((a,b)=> a.expiry > b.expiry ? 1 : -1)
 
 const Promise = require('bluebird')
 
@@ -76,11 +77,12 @@ function MyPositions({ user, spotPrice, tokenPrices }: MyPositionsProps) {
         let size = new BigNumber(0)
         let type: "Long" | "Short" = "Long"
         if (!vault && !rawBalance.isZero()) {
-          // has balance: short position
+          // has balance: Long Position
           size = toTokenUnitsBN(rawBalance, option.decimals)
-          type = 'Short'
+          type = 'Long'
         } else if (vault && rawBalance.isZero()) {
           size = toTokenUnitsBN(vault.oTokensIssued, option.decimals)
+          type = "Short"
         } else {
           const bought = toTokenUnitsBN(rawBalance, option.decimals)
           const sold = toTokenUnitsBN((vault as vault).oTokensIssued, option.decimals)
@@ -94,12 +96,11 @@ function MyPositions({ user, spotPrice, tokenPrices }: MyPositionsProps) {
         }
         if (!size.eq(0)) {
           userPositions.push({
-            name: option.title,
+            option: option,
             optionPrice: price,
-            expiration: option.expiry,
             type,
             PNL: new BigNumber(0),
-            size,
+            size: option.type === 'call' ? size.div(option.strikePriceInUSD) : size ,
             ...greeks
           })
         }
@@ -112,13 +113,20 @@ function MyPositions({ user, spotPrice, tokenPrices }: MyPositionsProps) {
   return (
     <>
       <Header primary="My Positions" />
+      {/* <Accordion 
+      items={[
+        ['Row content', 'Expandable content'],
+        [<div>2</div>, <div>Detail</div>],
+      ]}/> */}
       <DataView
         fields={['','Type','Price', 'Size', 'Delta', 'Gamma', 'Vega', 'Theta']}
         entries={positions}
         entriesPerPage={5}
+        tableRowHeight={50}
         renderEntry={(p: position) => [
-          p.name,
-          p.type,
+          <IdentityBadge
+            entity={p.option.addr} label={p.option.title} /> ,
+          <PositionType type={p.type}/>,
           `${p.optionPrice.toFixed(5)} USD`,
           p.size.toFixed(3),
           p.Delta,
@@ -134,10 +142,25 @@ function MyPositions({ user, spotPrice, tokenPrices }: MyPositionsProps) {
 
 export default MyPositions;
 
+function PositionType({type}:{type: 'Long'|'Short'}) {
+  return (
+    type === 'Long' ? <Green> {type} </Green> : <Red> {type} </Red> 
+  )
+}
+
+export const Green = styled.div`{
+  color: #7aae1a;
+}`;
+
+export const Red = styled.div`{
+  color: #da5750;
+}`;
+
 type position = {
-  name: string,
+  option: types.ETHOption,
+  // name: string,
   optionPrice: BigNumber,
-  expiration: number,
+  // expiration: number,
   type: 'Long' | 'Short',
   size: BigNumber,
   PNL: BigNumber
