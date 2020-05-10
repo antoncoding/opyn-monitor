@@ -177,6 +177,17 @@ export async function getRemoveUnderlyingHistory(
   return response.data.removeUnderlyingActions;
 }
 
+export const getTotalSupplys = async (): Promise<{address:string, totalSupply: string}[]> => {
+  const query = `{
+    optionsContracts {
+      address
+      totalSupply
+    }
+  }`
+  const response = await postQuery(query);
+  return response.data.optionsContracts;
+}
+
 const postQuery = async (query: string) => {
   const options = {
     method: 'POST',
