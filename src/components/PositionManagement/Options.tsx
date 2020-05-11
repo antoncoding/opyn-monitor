@@ -2,7 +2,7 @@ import React, { useState, useMemo } from 'react';
 import BigNumber from 'bignumber.js';
 
 import {
-  DataView, DropDown, Header, Tag, Tabs
+  DataView, DropDown, Header, Tabs
 } from '@aragon/ui';
 
 import { eth_puts, eth_calls } from '../../constants/options';
@@ -52,9 +52,6 @@ function Options({ optionPrices, spotPrice }: OptionBoardProps) {
     <div>
       <div style={{ display: 'flex' }}>
         <Header primary="Options Greeks" />
-        <div style={{ paddingTop: '24px' }}>
-          <Tag> alpha </Tag>
-        </div>
         <div style={{ paddingTop: '28px', paddingLeft: '36px' }}>
           <DropDown
             items={['All Dates']
