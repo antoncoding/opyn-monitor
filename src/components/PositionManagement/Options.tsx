@@ -78,7 +78,7 @@ function Options({ optionPrices, spotPrice }: OptionBoardProps) {
           { label: 'strike Price', align: 'start' },
           { label: 'expiry', align: 'start' },
           { label: 'price', align: 'start' },
-          { label: 'Open', align: 'start' },
+          { label: 'Open Interest', align: 'start' },
           { label: 'IV', align: 'start' },
           { label: 'Delta', align: 'start' },
           { label: 'Gamma', align: 'start' },
