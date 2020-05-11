@@ -51,7 +51,7 @@ function PositionManagement({ user }: { user: string }) {
       }
     }
     getSpotPrice()
-    const id = setInterval(getSpotPrice, 20000)
+    const id = setInterval(getSpotPrice, 10000)
     return () => {
       canceled = true
       clearInterval(id)

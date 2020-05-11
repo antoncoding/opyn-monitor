@@ -28,11 +28,11 @@ function Options({ optionPrices, spotPrice }: OptionBoardProps) {
   const [selectedExpiryIdx, setExpiryIdx] = useState(0);
   const [selectedType, setSelectedType] = useState(0)
 
-  const [openInterests, setOIs] = useState<{oToken: string, totalSupply: string}[]>([])
+  const [openInterests, setOIs] = useState<{ oToken: string, totalSupply: string }[]>([])
 
   // get Open Interest (totalSupply)
-  useMemo(async()=>{
-    const ivs = (await getTotalSupplys()).map(({address, totalSupply })=> {
+  useMemo(async () => {
+    const ivs = (await getTotalSupplys()).map(({ address, totalSupply }) => {
       return {
         oToken: address,
         totalSupply
@@ -43,15 +43,18 @@ function Options({ optionPrices, spotPrice }: OptionBoardProps) {
 
   const displayedOptions = allOptions
     .filter((option) => {
-      return selectedExpiryIdx === 0 ? true : option.expiry === distinctExpirys[selectedExpiryIdx-1]
+      return selectedExpiryIdx === 0 ? true : option.expiry === distinctExpirys[selectedExpiryIdx - 1]
     })
     .filter((option) => (option.type === 'call') === Boolean(selectedType))
-    .sort((a, b)=> a.strikePriceInUSD > b.strikePriceInUSD ? 1 : -1 )
+    .sort((a, b) => a.strikePriceInUSD > b.strikePriceInUSD ? 1 : -1)
 
   return (
     <div>
       <div style={{ display: 'flex' }}>
-        <Header primary="Options Greeks" />
+        <Header primary="ETH Options Greeks" />
+        <div style={{ paddingTop: '36px', paddingLeft: '36px' }}>
+          Spot Price: {spotPrice.toFixed(2)} USD
+        </div>
         <div style={{ paddingTop: '28px', paddingLeft: '36px' }}>
           <DropDown
             items={['All Dates']
@@ -62,7 +65,7 @@ function Options({ optionPrices, spotPrice }: OptionBoardProps) {
           />
         </div>
       </div>
-      <Tabs 
+      <Tabs
         items={['Puts', 'Calls']}
         selected={selectedType}
         onChange={setSelectedType}
@@ -84,7 +87,7 @@ function Options({ optionPrices, spotPrice }: OptionBoardProps) {
         ]}
         entries={displayedOptions}
         renderEntry={(option: ETHOption) => {
-          const priceInUSD = optionPrices.find(o=>o.oToken === option.addr)?.price || new BigNumber(0);
+          const priceInUSD = optionPrices.find(o => o.oToken === option.addr)?.price || new BigNumber(0);
           const greeks = getGreeks(option, priceInUSD, spotPrice)
 
           return [
@@ -95,7 +98,7 @@ function Options({ optionPrices, spotPrice }: OptionBoardProps) {
               .find(open => open.oToken === option.addr)?.totalSupply || 0, option.decimals)
               .div(option.type === 'call' ? option.strikePriceInUSD : 1)
               .toFixed(1),
-            `${(greeks.iv*100).toFixed(2)} %`,
+            `${(greeks.iv * 100).toFixed(2)} %`,
             greeks.Delta,
             greeks.Gamma,
             greeks.Vega,
