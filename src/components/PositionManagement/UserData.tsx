@@ -6,12 +6,10 @@ import Positions from './MyPositions'
 import Balances from './Balances'
 
 import { Comment } from '../common'
-import { getTokenBalance } from '../../utils/infura'
 
+import { getUserOptionBalances } from '../../utils/graph'
 import { eth_calls, eth_puts } from '../../constants/options'
-import * as types from '../../types'
 
-const Promise = require('bluebird')
 const allOptions = eth_puts.concat(eth_calls).filter((o) => o.expiry > Date.now() / 1000)
 
 type UserDataProps = {
@@ -31,10 +29,14 @@ function UserData({ user, spotPrice, tokenPrices }: UserDataProps) {
   // update token balances for all options
   useMemo(async () => {
     if (!user) return
-    const balances = await Promise.map(allOptions, async (option: types.option) => {
-      const tokenBalance = await getTokenBalance(option.addr, user)
-      return { oToken: option.addr, balance: new BigNumber(tokenBalance) }
-    });
+    const balances = (await getUserOptionBalances(user))
+      .filter(obj=> allOptions.find(option => option.addr === obj.oToken))
+      .map(obj=> {
+      return {
+        oToken: obj.oToken,
+        balance: new BigNumber(obj.balance)
+      }
+    })
 
     setBalances(balances)
   }, [user]);

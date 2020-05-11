@@ -188,6 +188,26 @@ export const getTotalSupplys = async (): Promise<{address:string, totalSupply: s
   return response.data.optionsContracts;
 }
 
+export const getUserOptionBalances = async(address: string) : Promise<{oToken: string, balance: string}[]> => {
+  const query= `{
+    accountBalances (where: {
+      account: "${address}"
+    }) {
+      token {
+        address
+      }
+      amount
+    }
+  }
+  `
+  const response = await postQuery(query);
+  return response.data.accountBalances.map((obj: {amount: string, token: {address: string}}) => {
+    return {
+      oToken: obj.token.address,
+      balance: obj.amount
+    }});
+}
+
 const postQuery = async (query: string) => {
   const options = {
     method: 'POST',
