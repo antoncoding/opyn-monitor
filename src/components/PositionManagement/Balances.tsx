@@ -54,7 +54,7 @@ function Balances({ tokenPrices, balances, allOptions }: MyPositionsProps) {
         fields={['Token', 'Price', 'Balance', 'Total']}
         entries={rows}
         entriesPerPage={8}
-        tableRowHeight={50}
+        tableRowHeight={45}
         renderEntry={({ option, price, amount, value }: optionBalance) => [
           <IdentityBadge label={option.title} entity={option.addr} />,
           price?.toFixed(2),

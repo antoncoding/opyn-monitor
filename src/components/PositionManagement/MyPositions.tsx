@@ -25,11 +25,13 @@ type MyPositionsProps = {
   }[]
 }
 
+const defaultPostitionGreeks = {Delta: 0, Gamma: 0, Theta: 0, Rho: 0, Vega:0, totalSize: 0}
+
 function MyPositions({ user, spotPrice, tokenPrices, balances }: MyPositionsProps) {
 
   const [vaults, setVaults] = useState<vault[]>([])
   const [positions, setPositions] = useState<position[]>([])
-
+  const [aggregatedPositionGreeks, setPositionGreeks] = useState<PositionGreekType>(defaultPostitionGreeks)
   // Get vaults
   useMemo(async () => {
     const userVaults = await getAllVaultsForUser(user);
@@ -50,8 +52,6 @@ function MyPositions({ user, spotPrice, tokenPrices, balances }: MyPositionsProp
 
     setVaults(openedVaults)
   }, [user]);
-
-  
 
   // Update positions when balance or vault change
   useEffect(() => {
@@ -101,24 +101,54 @@ function MyPositions({ user, spotPrice, tokenPrices, balances }: MyPositionsProp
     })
   }, [vaults, spotPrice, tokenPrices, balances])
 
+  // update aggregated position greeks
+  useEffect(() => {
+    const positionGreeks = positions.reduce((prev, current) => {
+      return {
+        Delta: (prev.Delta) + current.size.times(current.Delta).toNumber(),
+        Gamma: (prev.Gamma) + current.size.times(current.Gamma).toNumber(),
+        Vega: (prev.Vega) + current.size.times(current.Vega).toNumber(),
+        Theta: (prev.Theta) + current.size.times(current.Theta).toNumber(),
+        Rho: (prev.Rho) + current.size.times(current.Rho).toNumber(),
+        totalSize: (prev.totalSize) + current.size.toNumber()
+      }
+    }, defaultPostitionGreeks)
+    setPositionGreeks(positionGreeks)
+  }, [positions])
+
   return (
-    <DataView
-      fields={['', 'Type', 'Price', 'Size', 'Delta', 'Gamma', 'Vega', 'Theta']}
-      entries={positions}
-      entriesPerPage={8}
-      tableRowHeight={45}
-      renderEntry={(p: position) => [
-        <IdentityBadge
-          entity={p.option.addr} label={p.option.title} />,
-        <PositionType type={p.type} />,
-        `${p.optionPrice.toFixed(5)} USD`,
-        p.size.toFixed(3),
-        p.Delta,
-        p.Gamma,
-        p.Vega,
-        p.Theta
-      ]}
-    />
+    <>
+      <DataView 
+        fields={['Delta', 'Gamma', 'Vega', 'Theta', 'Rho']}
+        entries={[aggregatedPositionGreeks]}
+        entriesPerPage={8}
+        tableRowHeight={45}
+        renderEntry={(p: PositionGreekType) => [
+          (p.Delta / (p.totalSize)).toFixed(3),
+          (p.Gamma/ (p.totalSize)).toFixed(3),
+          (p.Vega/ (p.totalSize)).toFixed(3),
+          (p.Theta/ (p.totalSize)).toFixed(3),
+          (p.Rho/ (p.totalSize)).toFixed(3),
+        ]}
+      />
+      <DataView
+        fields={['', 'Type', 'Price', 'Size', 'Delta', 'Gamma', 'Vega', 'Theta']}
+        entries={positions}
+        entriesPerPage={8}
+        tableRowHeight={45}
+        renderEntry={(p: position) => [
+          <IdentityBadge
+            entity={p.option.addr} label={p.option.title} />,
+          <PositionType type={p.type} />,
+          `${p.optionPrice.toFixed(5)} USD`,
+          p.size.toFixed(3),
+          p.Delta,
+          p.Gamma,
+          p.Vega,
+          p.Theta
+        ]}
+      />
+    </>
   );
 }
 
@@ -155,4 +185,13 @@ type vault = {
   collateralDecimals: number,
   oTokensIssued: string,
   expiry: number
+}
+
+type PositionGreekType = {
+  Delta: number
+  Gamma: number,
+  Rho: number,
+  Vega: number,
+  Theta: number,
+  totalSize: number
 }
