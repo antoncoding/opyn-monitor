@@ -19,10 +19,10 @@ export function getGreeks (option: ETHOption, optionPrice: BigNumber, spotPrice:
   const v = iv.getImpliedVolatility(expectedCost, s, k, t, r, type); // 0.11406250000000001 (11.4%)
   return {
     iv: v,
-    Delta: greek.getDelta(s, k, t, v, r, type).toFixed(5),
-    Gamma: greek.getGamma(s, k, t, v, r).toFixed(5),
-    Vega: greek.getVega(s, k, t, v, r).toFixed(5),
-    Theta: greek.getTheta(s, k, t, v, r, type).toFixed(5),
-    Rho: greek.getRho(s, k, t, v, r, type).toFixed(5),
+    Delta: greek.getDelta(s, k, t, v, r, type).toFixed(3),
+    Gamma: greek.getGamma(s, k, t, v, r).toFixed(3),
+    Vega: greek.getVega(s, k, t, v, r).toFixed(3),
+    Theta: greek.getTheta(s, k, t, v, r, type).toFixed(3),
+    Rho: greek.getRho(s, k, t, v, r, type).toFixed(3),
   }
 }
