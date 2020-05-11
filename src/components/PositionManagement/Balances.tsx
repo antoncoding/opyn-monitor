@@ -34,6 +34,7 @@ function Balances({ tokenPrices, balances, allOptions }: MyPositionsProps) {
       .map(({balance, oToken}) => {
         const option = allOptions.find(option => option.addr === oToken) as types.ETHOption
         const amount = toTokenUnitsBN(balance, option.decimals)
+          .div(option.type === 'call' ? new BigNumber(option.strikePriceInUSD) : new BigNumber(1))
         const price = tokenPrices.find(priceInfo => priceInfo.oToken === oToken)?.price || new BigNumber(0)
         const value = price?.times(amount)
         return {
