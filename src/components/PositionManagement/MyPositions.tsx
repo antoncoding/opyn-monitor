@@ -1,33 +1,33 @@
 import React, { useState, useMemo, useEffect } from 'react';
-import { Header, DataView, IdentityBadge } from '@aragon/ui'
+import { DataView, IdentityBadge } from '@aragon/ui'
 import BigNumber from 'bignumber.js'
 import styled from 'styled-components'
-import { Comment } from '../common'
 import * as types from '../../types'
 import { getAllVaultsForUser } from '../../utils/graph'
-import { getTokenBalance } from '../../utils/infura'
+
 
 import { eth_puts, eth_calls } from '../../constants/options';
 import { toTokenUnitsBN } from '../../utils/number';
 import { getGreeks } from './utils'
 
-const allOptions = eth_puts.concat(eth_calls).filter((o) => o.expiry > Date.now() / 1000).sort((a,b)=> a.expiry > b.expiry ? 1 : -1)
-
-const Promise = require('bluebird')
+const allOptions = eth_puts.concat(eth_calls).filter((o) => o.expiry > Date.now() / 1000).sort((a, b) => a.expiry > b.expiry ? 1 : -1)
 
 type MyPositionsProps = {
-  user: string, 
-  spotPrice: BigNumber
+  user: string,
+  spotPrice: BigNumber,
+  balances: {
+    oToken: string,
+    balance: BigNumber
+  }[]
   tokenPrices: {
     oToken: string,
     price: BigNumber
   }[]
 }
 
-function MyPositions({ user, spotPrice, tokenPrices }: MyPositionsProps) {
+function MyPositions({ user, spotPrice, tokenPrices, balances }: MyPositionsProps) {
 
   const [vaults, setVaults] = useState<vault[]>([])
-  const [balances, setBalances] = useState<balance[]>([])
   const [positions, setPositions] = useState<position[]>([])
 
   // Get vaults
@@ -51,16 +51,7 @@ function MyPositions({ user, spotPrice, tokenPrices }: MyPositionsProps) {
     setVaults(openedVaults)
   }, [user]);
 
-  // update token balances for all options
-  useMemo(async () => {
-    if (!user) return
-    const balances = await Promise.map(allOptions, async (option: types.option) => {
-      const tokenBalance = await getTokenBalance(option.addr, user)
-      return { oToken: option.addr, balance: new BigNumber(tokenBalance) }
-    });
-
-    setBalances(balances)
-  }, [user]);
+  
 
   // Update positions when balance or vault change
   useEffect(() => {
@@ -89,7 +80,7 @@ function MyPositions({ user, spotPrice, tokenPrices }: MyPositionsProps) {
           if (bought.gt(sold)) {
             type = "Long"
             size = bought.minus(sold)
-          } else{
+          } else {
             type = "Short"
             size = sold.minus(bought)
           }
@@ -100,47 +91,42 @@ function MyPositions({ user, spotPrice, tokenPrices }: MyPositionsProps) {
             optionPrice: price,
             type,
             PNL: new BigNumber(0),
-            size: option.type === 'call' ? size.div(option.strikePriceInUSD) : size ,
+            size: option.type === 'call' ? size.div(option.strikePriceInUSD) : size,
             ...greeks
           })
         }
-        
+
       }
       setPositions(userPositions)
     })
-  }, [vaults, balances, spotPrice, tokenPrices])
+  }, [vaults, spotPrice, tokenPrices, balances])
 
   return (
-    <>
-      <Header primary="My Positions" />
-      { user ?
-      <DataView
-        fields={['','Type','Price', 'Size', 'Delta', 'Gamma', 'Vega', 'Theta']}
-        entries={positions}
-        entriesPerPage={8}
-        tableRowHeight={40}
-        renderEntry={(p: position) => [
-          <IdentityBadge
-            entity={p.option.addr} label={p.option.title} /> ,
-          <PositionType type={p.type}/>,
-          `${p.optionPrice.toFixed(5)} USD`,
-          p.size.toFixed(3),
-          p.Delta,
-          p.Gamma,
-          p.Vega,
-          p.Theta
-        ]}
-      /> : <Comment text="Connect wallet to see your positions"></Comment>
-    }
-    </>
+    <DataView
+      fields={['', 'Type', 'Price', 'Size', 'Delta', 'Gamma', 'Vega', 'Theta']}
+      entries={positions}
+      entriesPerPage={8}
+      tableRowHeight={45}
+      renderEntry={(p: position) => [
+        <IdentityBadge
+          entity={p.option.addr} label={p.option.title} />,
+        <PositionType type={p.type} />,
+        `${p.optionPrice.toFixed(5)} USD`,
+        p.size.toFixed(3),
+        p.Delta,
+        p.Gamma,
+        p.Vega,
+        p.Theta
+      ]}
+    />
   );
 }
 
 export default MyPositions;
 
-function PositionType({type}:{type: 'Long'|'Short'}) {
+function PositionType({ type }: { type: 'Long' | 'Short' }) {
   return (
-    type === 'Long' ? <Green> {type} </Green> : <Red> {type} </Red> 
+    type === 'Long' ? <Green> {type} </Green> : <Red> {type} </Red>
   )
 }
 
@@ -169,9 +155,4 @@ type vault = {
   collateralDecimals: number,
   oTokensIssued: string,
   expiry: number
-}
-
-type balance = {
-  oToken: string,
-  balance: BigNumber
 }

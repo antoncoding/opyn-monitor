@@ -1,13 +1,11 @@
 import React, { useEffect, useState } from 'react';
 
 import Options from './Options'
-import MyPositions from './MyPositions';
+import UserData from './UserData';
 
 import { getETHPrice } from '../../utils/etherscan'
 import { getPremiumToPay } from '../../utils/infura'
 import BigNumber from 'bignumber.js';
-
-
 
 import { eth_puts, eth_calls } from '../../constants/options';
 import { toTokenUnitsBN, toBaseUnitBN } from '../../utils/number';
@@ -20,7 +18,6 @@ function PositionManagement({ user }: { user: string }) {
   const [spotPrice, setSpot] = useState<BigNumber>(new BigNumber(0))
 
   const [tokenPrices, setTokenPrices] = useState<{ oToken: string, price: BigNumber }[]>([])
-
   useEffect(() => {
     let canceled = false
     async function getSpotPrice() {
@@ -62,7 +59,9 @@ function PositionManagement({ user }: { user: string }) {
   return (
     <>
       <Options optionPrices={tokenPrices} spotPrice={spotPrice}/>
-      <MyPositions
+      <br/>
+      <br/>
+      <UserData
         spotPrice={spotPrice}
         tokenPrices={tokenPrices}
         user={user}

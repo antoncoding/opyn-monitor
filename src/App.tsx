@@ -56,7 +56,7 @@ function App() {
             />
           </Route>
           <Route path="/positions/">
-           <PositionManagement user={user} />
+           <PositionManagement user="0x076c95c6cd2eb823acc6347fdf5b3dd9b83511e4" />
           </Route>
           {/* <Route path="/trades/test/"><ZEROXTest /></Route> */}
           <Route path="/uniswap/:token/"><Uniswap user={user} /></Route>
