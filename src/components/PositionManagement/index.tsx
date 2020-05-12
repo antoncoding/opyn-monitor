@@ -3,7 +3,6 @@ import React, { useEffect, useState } from 'react';
 import Options from './Options'
 import UserData from './UserData';
 
-import { getETHPrice } from '../../utils/etherscan'
 import { getPremiumToPay } from '../../utils/infura'
 import BigNumber from 'bignumber.js';
 
@@ -14,22 +13,16 @@ import tracker from '../../utils/tracker';
 const allOptions = eth_puts.concat(eth_calls).filter((o) => o.expiry > Date.now() / 1000)
 const Promise = require('bluebird')
 
-function PositionManagement({ user }: { user: string }) {
+function PositionManagement({ user, spotPrice }: { user: string, spotPrice: BigNumber }) {
 
   useEffect(() => {
     tracker.pageview(`/positions/`);
   }, []);
 
-  const [spotPrice, setSpot] = useState<BigNumber>(new BigNumber(0))
-
   const [tokenPrices, setTokenPrices] = useState<{ oToken: string, price: BigNumber }[]>([])
   useEffect(() => {
     let canceled = false
-    async function getSpotPrice() {
-
-      // spot price
-      const spot = await getETHPrice()
-
+    async function getTokenPrices() {
 
       const _tokenPrices = await Promise.map(allOptions, async option => {
         const priceUnit = await getPremiumToPay(
@@ -38,9 +31,8 @@ function PositionManagement({ user }: { user: string }) {
           toBaseUnitBN(1, option.decimals).toString()
         )
         const price = option.type === 'call'
-          ? toTokenUnitsBN(priceUnit, 18).times(new BigNumber(spot)).times(option.strikePriceInUSD) // 250 call tokens = 1 call option
-          : toTokenUnitsBN(priceUnit, 18).times(new BigNumber(spot))
-
+          ? toTokenUnitsBN(priceUnit, 18).times(spotPrice).times(option.strikePriceInUSD) // 250 call tokens = 1 call option
+          : toTokenUnitsBN(priceUnit, 18).times(spotPrice)
         return {
           oToken: option.addr,
           price
@@ -48,17 +40,16 @@ function PositionManagement({ user }: { user: string }) {
       })
 
       if (!canceled) {
-        setSpot(new BigNumber(spot))
         setTokenPrices(_tokenPrices)
       }
     }
-    getSpotPrice()
-    const id = setInterval(getSpotPrice, 10000)
+    getTokenPrices()
+    const id = setInterval(getTokenPrices, 5000)
     return () => {
       canceled = true
       clearInterval(id)
     }
-  }, [])
+  }, [spotPrice])
 
 
   return (

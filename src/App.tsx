@@ -1,4 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import BigNumber from 'bignumber.js'
+
+import { getETHPrice } from './utils/etherscan'
 
 import { HashRouter as Router, Switch, Route } from 'react-router-dom';
 import { Main } from '@aragon/ui';
@@ -29,6 +32,23 @@ function App() {
     storePreference('theme', newTheme);
   };
 
+  const [spotPrice, setSpot] = useState<BigNumber>(new BigNumber(0))
+
+  useEffect(() => {
+    let canceled = false
+    async function getSpotPrice() {
+      const spot = await getETHPrice()
+      if (!canceled) {
+        setSpot(new BigNumber(spot))
+      }
+    }
+    getSpotPrice()
+    const id = setInterval(getSpotPrice, 10000)
+    return () => {
+      clearInterval(id)
+    }
+  }, [])
+
   return (
     <Router>
       <Main assetsUrl={`${process.env.PUBLIC_URL}/aragon-ui/`} theme={theme}>
@@ -56,7 +76,7 @@ function App() {
             />
           </Route>
           <Route path="/positions/">
-           <PositionManagement user={user} />
+           <PositionManagement user={user} spotPrice={spotPrice} />
           </Route>
           {/* <Route path="/trades/test/"><ZEROXTest /></Route> */}
           <Route path="/uniswap/:token/"><Uniswap user={user} /></Route>
