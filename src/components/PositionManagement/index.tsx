@@ -9,11 +9,16 @@ import BigNumber from 'bignumber.js';
 
 import { eth_puts, eth_calls } from '../../constants/options';
 import { toTokenUnitsBN, toBaseUnitBN } from '../../utils/number';
+import tracker from '../../utils/tracker';
 
 const allOptions = eth_puts.concat(eth_calls).filter((o) => o.expiry > Date.now() / 1000)
 const Promise = require('bluebird')
 
 function PositionManagement({ user }: { user: string }) {
+
+  useEffect(() => {
+    tracker.pageview(`/positions/`);
+  }, []);
 
   const [spotPrice, setSpot] = useState<BigNumber>(new BigNumber(0))
 
