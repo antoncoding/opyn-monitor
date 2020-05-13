@@ -79,7 +79,7 @@ function App() {
            <PositionManagement user={user} spotPrice={spotPrice} />
           </Route>
           {/* <Route path="/trades/test/"><ZEROXTest /></Route> */}
-          <Route path="/uniswap/:token/"><Uniswap user={user} /></Route>
+          <Route path="/uniswap/:token/"><Uniswap user={user} spotPrice={spotPrice} /></Route>
           <Route path="/uniswap/">
             <Trade />
           </Route>

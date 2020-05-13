@@ -20,10 +20,11 @@ type UniswapBuySellProps = {
   token: string,
   exchange: string,
   decimals: number,
+  spotPrice: BigNumber
 };
 
-function OptionExchange({
-  symbol, tokenBalance, token, exchange, decimals, strikePriceInUSD,
+function UniswapBuySell({
+  symbol, tokenBalance, token, exchange, decimals, strikePriceInUSD, spotPrice
 }: UniswapBuySellProps) {
   const [buyAmt, setBuyAmt] = useState(new BigNumber(0));
   const [sellAmt, setSellAmt] = useState(new BigNumber(0));
@@ -96,7 +97,7 @@ function OptionExchange({
               />
             </div>
           </div>
-          <PriceSection label="Cost:" amt={premiumToPay} symbol="" />
+          <PriceSection label="Cost:" amt={premiumToPay} symbol="eth" ethPrice={spotPrice} />
         </div>
         <div style={{ width: '6%' }} />
         {/* Remove collateral */}
@@ -141,7 +142,7 @@ function OptionExchange({
               />
             </div>
           </div>
-          <PriceSection label="Premium" amt={premiumReceived} />
+          <PriceSection label="Premium" amt={premiumReceived} ethPrice={spotPrice} />
         </div>
       </div>
       { symbol.toLowerCase().includes('call')
@@ -151,4 +152,4 @@ function OptionExchange({
   );
 }
 
-export default OptionExchange;
+export default UniswapBuySell;

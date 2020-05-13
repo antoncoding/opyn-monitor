@@ -18,7 +18,7 @@ import RemoveLiquidity from './RemoveLiquidity';
 import tracker from '../../utils/tracker';
 import * as types from '../../types'
 
-function UniswapPool({ user }: {user: string}) {
+function UniswapPool({ user, spotPrice }: {user: string, spotPrice:BigNumber}) {
   const liquidityTokenDecimals = 18;
   const { token } = useParams();
 
@@ -108,6 +108,7 @@ function UniswapPool({ user }: {user: string}) {
       />
 
       <UniswapBuySell
+        spotPrice={spotPrice}
         strikePriceInUSD={(option as types.ETHOption).strikePriceInUSD}
         symbol={symbol}
         tokenBalance={userTokenBalance}
