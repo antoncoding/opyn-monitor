@@ -133,7 +133,7 @@ function MyPositions({ user, spotPrice, tokenPrices, balances }: MyPositionsProp
       />
       <DataView
         fields={['', 'Type', 'Price', 'Size', 'Delta', 'Gamma', 'Vega', 'Theta']}
-        entries={positions}
+        entries={positions.concat(positions)}
         entriesPerPage={8}
         tableRowHeight={45}
         renderEntry={(p: position) => [
