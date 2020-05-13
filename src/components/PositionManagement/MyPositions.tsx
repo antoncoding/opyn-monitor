@@ -121,7 +121,7 @@ function MyPositions({ user, spotPrice, tokenPrices, balances }: MyPositionsProp
       <DataView 
         fields={['Delta', 'Gamma', 'Vega', 'Theta', 'Rho']}
         entries={[aggregatedPositionGreeks]}
-        entriesPerPage={8}
+        entriesPerPage={5}
         tableRowHeight={45}
         renderEntry={(p: PositionGreekType) => [
           (p.Delta / (p.totalSize)).toFixed(3),

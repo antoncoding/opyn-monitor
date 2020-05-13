@@ -12,11 +12,11 @@ function Footer({ theme } : { theme:string }) {
         <div style={{
           backgroundColor: theme === 'light' ? '#F8F8F8' : '#35425e',
           textAlign: 'center',
-          padding: '17px',
+          padding: '12px',
           position: 'fixed',
           left: '0',
           bottom: '0',
-          height: '50px',
+          height: '40px',
           width: '100%',
           fontSize: '14px'
         }}>
