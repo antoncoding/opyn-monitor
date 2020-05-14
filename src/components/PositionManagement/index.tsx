@@ -59,7 +59,6 @@ function PositionManagement({ user, spotPrice }: { user: string, spotPrice: BigN
   // update token balances for all options
   const [balances, setBalances] = useState<balance[]>([])
   useEffect(() => {
-    console.log(`update balances`)
     let cancelled = false
     async function updateBalances() {
       if (!user) return
