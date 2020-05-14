@@ -95,7 +95,7 @@ function OptionList({ entries, showExpired, goToToken }:{entries: types.ETHOptio
     renderEntry={(option: types.ETHOption) => [
       <IdentityBadge label={option.title} entity={option.addr} shorten={false} />,
       <>{option.strikePriceInUSD + ' USD'}</>,
-      new Date(option.expiry * 1000).toLocaleDateString("en-US") ,
+      new Date(option.expiry * 1000).toLocaleDateString("en-US", { timeZone: "UTC" }) ,
       <Timer end={new Date(option.expiry * 1000)} format='dhm' />,
       <Button onClick={() => goToToken(option.addr)}> View Vaults </Button>,
     ]}
