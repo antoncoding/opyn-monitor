@@ -5,6 +5,7 @@ import {
   DataView, DropDown, Header, Tabs
 } from '@aragon/ui';
 
+import TradeModal from './TradeModal'
 import { eth_puts, eth_calls } from '../../constants/options';
 import { ETHOption } from '../../types';
 
@@ -20,15 +21,20 @@ type OptionBoardProps = {
     oToken: string,
     price: BigNumber
   }[]
-  spotPrice: BigNumber
+  spotPrice: BigNumber,
+  balances: {
+    oToken: string,
+    balance: BigNumber
+  }[]
   ,
 };
 
-function Options({ optionPrices, spotPrice }: OptionBoardProps) {
+function Options({ optionPrices, spotPrice, balances }: OptionBoardProps) {
   const [selectedExpiryIdx, setExpiryIdx] = useState(0);
   const [selectedType, setSelectedType] = useState(0)
 
   const [openInterests, setOIs] = useState<{ oToken: string, totalSupply: string }[]>([])
+  const [displayedOptions, setDisplayOptions] = useState<ETHOption[]>([])
 
   // get Open Interest (totalSupply)
   useMemo(async () => {
@@ -41,12 +47,16 @@ function Options({ optionPrices, spotPrice }: OptionBoardProps) {
     setOIs(ivs)
   }, [])
 
-  const displayedOptions = allOptions
-    .filter((option) => {
-      return selectedExpiryIdx === 0 ? true : option.expiry === distinctExpirys[selectedExpiryIdx - 1]
-    })
-    .filter((option) => (option.type === 'call') === Boolean(selectedType))
-    .sort((a, b) => a.strikePriceInUSD > b.strikePriceInUSD ? 1 : -1)
+  // Update displayed options
+  useMemo(()=>{
+    const displayOptions = allOptions
+      .filter((option) => {
+        return selectedExpiryIdx === 0 ? true : option.expiry === distinctExpirys[selectedExpiryIdx - 1]
+      })
+      .filter((option) => (option.type === 'call') === Boolean(selectedType))
+      .sort((a, b) => a.strikePriceInUSD > b.strikePriceInUSD ? 1 : -1)
+    setDisplayOptions(displayOptions)
+  },[selectedExpiryIdx, selectedType])
 
   return (
     <div>
@@ -58,7 +68,7 @@ function Options({ optionPrices, spotPrice }: OptionBoardProps) {
         <div style={{ paddingTop: '28px', paddingLeft: '36px' }}>
           <DropDown
             items={['All Dates']
-              .concat(distinctExpirys.map(timestamp => new Date(timestamp * 1000).toLocaleDateString("en-US")))
+              .concat(distinctExpirys.map(timestamp => new Date(timestamp * 1000).toLocaleDateString("en-US", { timeZone: "UTC" })))
             }
             selected={selectedExpiryIdx}
             onChange={setExpiryIdx}
@@ -83,26 +93,29 @@ function Options({ optionPrices, spotPrice }: OptionBoardProps) {
           { label: 'Delta', align: 'start' },
           { label: 'Gamma', align: 'start' },
           { label: 'Vega', align: 'start' },
-          { label: 'Theta', align: 'end' },
+          { label: 'Theta', align: 'start' },
+          { label: ' ', align: 'end' }
         ]}
         entries={displayedOptions}
         renderEntry={(option: ETHOption) => {
+          
           const priceInUSD = optionPrices.find(o => o.oToken === option.addr)?.price || new BigNumber(0);
           const greeks = getGreeks(option, priceInUSD, spotPrice)
-
+          const balance = balances.find(b=>b.oToken === option.addr)?.balance || new BigNumber(0)
           return [
             option.strikePriceInUSD,
-            new Date(option.expiry * 1000).toLocaleDateString("en-US"),
+            new Date(option.expiry * 1000).toLocaleDateString("en-US", { timeZone: "UTC" }),
             `${priceInUSD.toFixed(5)} USD`,
             toTokenUnitsBN(openInterests
               .find(open => open.oToken === option.addr)?.totalSupply || 0, option.decimals)
               .div(option.type === 'call' ? option.strikePriceInUSD : 1)
               .toFixed(1),
-            `${(greeks.iv * 100).toFixed(2)} %`,
-            greeks.Delta,
-            greeks.Gamma,
-            greeks.Vega,
-            greeks.Theta
+             `${(greeks.iv * 100).toFixed(2)} %`,
+             greeks.Delta,
+             greeks.Gamma,
+             greeks.Vega,
+             greeks.Theta,
+             <TradeModal oToken={option} spotPrice={spotPrice} balance={balance}/>
           ];
         }}
       />

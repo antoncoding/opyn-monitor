@@ -8,6 +8,7 @@ import BigNumber from 'bignumber.js';
 
 import { eth_puts, eth_calls } from '../../constants/options';
 import { toTokenUnitsBN, toBaseUnitBN } from '../../utils/number';
+import { getUserOptionBalances } from '../../utils/graph'
 import tracker from '../../utils/tracker';
 
 const allOptions = eth_puts.concat(eth_calls).filter((o) => o.expiry > Date.now() / 1000)
@@ -19,9 +20,11 @@ function PositionManagement({ user, spotPrice }: { user: string, spotPrice: BigN
     tracker.pageview(`/positions/`);
   }, []);
 
+  
+  // Update token price every 5 secs
   const [tokenPrices, setTokenPrices] = useState<{ oToken: string, price: BigNumber }[]>([])
   useEffect(() => {
-    let canceled = false
+    let cancelled = false
     async function getTokenPrices() {
 
       const _tokenPrices = await Promise.map(allOptions, async option => {
@@ -39,25 +42,59 @@ function PositionManagement({ user, spotPrice }: { user: string, spotPrice: BigN
         }
       })
 
-      if (!canceled) {
+      if (!cancelled) {
         setTokenPrices(_tokenPrices)
       }
     }
     getTokenPrices()
     const id = setInterval(getTokenPrices, 30000)
     return () => {
-      canceled = true
+      cancelled = true
       clearInterval(id)
     }
   }, [spotPrice])
 
+  
+
+  // update token balances for all options
+  const [balances, setBalances] = useState<balance[]>([])
+  useEffect(() => {
+    let cancelled = false
+    async function updateBalances() {
+      if (!user) return
+      const balances = (await getUserOptionBalances(user))
+        .filter(obj => allOptions.find(option => option.addr === obj.oToken))
+        .map(obj => {
+          return {
+            oToken: obj.oToken,
+            balance: new BigNumber(obj.balance)
+          }
+        })
+      if (!cancelled)
+        setBalances(balances)
+    }
+    
+    updateBalances()
+    const id = setInterval(updateBalances, 5000)
+    return () => {
+      cancelled = true
+      clearInterval(id)
+    }
+
+  }, [user]);
 
   return (
     <>
-      <Options optionPrices={tokenPrices} spotPrice={spotPrice}/>
-      <br/>
-      <br/>
+      <Options
+        // user={user} // for trading modal
+        optionPrices={tokenPrices}
+        spotPrice={spotPrice}
+        balances={balances}
+      />
+      <br />
+      <br />
       <UserData
+        balances={balances}
         spotPrice={spotPrice}
         tokenPrices={tokenPrices}
         user={user}
@@ -67,5 +104,9 @@ function PositionManagement({ user, spotPrice }: { user: string, spotPrice: BigN
   );
 }
 
-
 export default PositionManagement;
+
+type balance = {
+  oToken: string,
+  balance: BigNumber
+}

@@ -100,7 +100,7 @@ function UniswapBuySell({
           <PriceSection label="Cost:" amt={premiumToPay} symbol="eth" ethPrice={spotPrice} />
         </div>
         <div style={{ width: '6%' }} />
-        {/* Remove collateral */}
+        {/* Sell Token on Uniswap */}
         <div style={{ width: '32%', paddingTop: '2%' }}>
           <div style={{ display: 'flex' }}>
             <div style={{ width: '60%' }}>
