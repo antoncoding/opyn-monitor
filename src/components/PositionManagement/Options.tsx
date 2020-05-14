@@ -1,8 +1,9 @@
 import React, { useState, useMemo } from 'react';
 import BigNumber from 'bignumber.js';
 
+import { useHistory } from 'react-router-dom'
 import {
-  DataView, DropDown, Header, Tabs
+  DataView, DropDown, Header, Tabs, LinkBase
 } from '@aragon/ui';
 
 import TradeModal from './TradeModal'
@@ -30,6 +31,8 @@ type OptionBoardProps = {
 };
 
 function Options({ optionPrices, spotPrice, balances }: OptionBoardProps) {
+  const history = useHistory()
+
   const [selectedExpiryIdx, setExpiryIdx] = useState(0);
   const [selectedType, setSelectedType] = useState(0)
 
@@ -48,7 +51,7 @@ function Options({ optionPrices, spotPrice, balances }: OptionBoardProps) {
   }, [])
 
   // Update displayed options
-  useMemo(()=>{
+  useMemo(() => {
     const displayOptions = allOptions
       .filter((option) => {
         return selectedExpiryIdx === 0 ? true : option.expiry === distinctExpirys[selectedExpiryIdx - 1]
@@ -56,7 +59,7 @@ function Options({ optionPrices, spotPrice, balances }: OptionBoardProps) {
       .filter((option) => (option.type === 'call') === Boolean(selectedType))
       .sort((a, b) => a.strikePriceInUSD > b.strikePriceInUSD ? 1 : -1)
     setDisplayOptions(displayOptions)
-  },[selectedExpiryIdx, selectedType])
+  }, [selectedExpiryIdx, selectedType])
 
   return (
     <div>
@@ -73,6 +76,11 @@ function Options({ optionPrices, spotPrice, balances }: OptionBoardProps) {
             selected={selectedExpiryIdx}
             onChange={setExpiryIdx}
           />
+        </div>
+      </div>
+      <div style={{display: 'flex', alignContent: 'left'}}> 
+        <div style={{marginLeft: 'auto', opacity: 0.5, fontSize: 14}}>
+          Not satisfied with the price? Make your own order with <LinkBase onClick={()=>history.push('/trade/0x')} style={{color: 'white'}}> 0x Trade </LinkBase> 
         </div>
       </div>
       <Tabs
@@ -98,10 +106,10 @@ function Options({ optionPrices, spotPrice, balances }: OptionBoardProps) {
         ]}
         entries={displayedOptions}
         renderEntry={(option: ETHOption) => {
-          
+
           const priceInUSD = optionPrices.find(o => o.oToken === option.addr)?.price || new BigNumber(0);
           const greeks = getGreeks(option, priceInUSD, spotPrice)
-          const balance = balances.find(b=>b.oToken === option.addr)?.balance || new BigNumber(0)
+          const balance = balances.find(b => b.oToken === option.addr)?.balance || new BigNumber(0)
           return [
             option.strikePriceInUSD,
             new Date(option.expiry * 1000).toLocaleDateString("en-US", { timeZone: "UTC" }),
@@ -110,12 +118,12 @@ function Options({ optionPrices, spotPrice, balances }: OptionBoardProps) {
               .find(open => open.oToken === option.addr)?.totalSupply || 0, option.decimals)
               .div(option.type === 'call' ? option.strikePriceInUSD : 1)
               .toFixed(1),
-             `${(greeks.iv * 100).toFixed(2)} %`,
-             greeks.Delta,
-             greeks.Gamma,
-             greeks.Vega,
-             greeks.Theta,
-             <TradeModal oToken={option} spotPrice={spotPrice} balance={balance}/>
+            `${(greeks.iv * 100).toFixed(2)} %`,
+            greeks.Delta,
+            greeks.Gamma,
+            greeks.Vega,
+            greeks.Theta,
+            <TradeModal oToken={option} spotPrice={spotPrice} balance={balance} />
           ];
         }}
       />

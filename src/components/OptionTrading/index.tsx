@@ -165,8 +165,8 @@ const RightPart = styled.div`
 
 const WholeScreen = styled.div`
   textAlign: center;
-  padding-left: 5%;
-  padding-right: 5%;
+  padding-left: 10%;
+  padding-right: 10%;
   position:fixed;
   overflow-y:scroll;
   overflow-x:hidden;

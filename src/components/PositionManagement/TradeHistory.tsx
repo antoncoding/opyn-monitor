@@ -26,8 +26,6 @@ function TradeHistory({ user, allOptions }: MyPositionsProps) {
   
   const [rows, setRows] = useState<historyEntry[]>([])
 
-  
-
   useMemo(async()=>{
     if (!user) return
 

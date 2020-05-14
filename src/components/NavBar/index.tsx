@@ -3,7 +3,6 @@ import { useHistory } from 'react-router-dom';
 
 import {
   Bar, BackButton, LinkBase,
-  Tag,
 } from '@aragon/ui';
 import ConnectButton from './ConnectButton';
 import ChangeModeButton from './SwitchTheme';
@@ -61,20 +60,27 @@ function NavBar({
               isSelected={history.location.pathname === '/options/'}
             />
             <LinkButton
-              title="Uniswap"
+              title="Exchanges"
               onClick={() => {
                 history.push('/uniswap/');
               }}
               isSelected={history.location.pathname.includes('/uniswap/')}
             />
             <LinkButton
-              title="Trade"
+              title="Uniswap Trade"
               onClick={() => {
-                history.push('/trade/oeth-usdc');
+                history.push('/trade/uniswap');
               }}
-              isSelected={history.location.pathname.includes('/trade/')}
+              isSelected={history.location.pathname.includes('/trade/uniswap')}
             />
-            <Tag> beta </Tag>
+            
+            <LinkButton
+              title="0x Trade"
+              onClick={() => {
+                history.push('/trade/0x');
+              }}
+              isSelected={history.location.pathname.includes('/trade/0x')}
+            />
           </>
         )
       }

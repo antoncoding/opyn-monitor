@@ -15,7 +15,7 @@ import OptionTrading from './components/OptionTrading';
 import MyVaults from './components/MyVaults';
 import OptionPage from './components/OptionPage';
 import ManageVault from './components/ManageVault';
-import Uniswap from './components/UniswapTrade';
+import UniswapExchanges from './components/UniswapExchange';
 import CreateOption from './components/CreateOption'
 import PositionManagement from './components/PositionManagement'
 import Footer from './components/Footer';
@@ -70,16 +70,16 @@ function App() {
             <ManageVault user={user} />
           </Route>
           {/* Trading */}
-          <Route path="/trade/oeth-usdc/">
+          <Route path="/trade/0x/">
             <OptionTrading
               user={user}
             />
           </Route>
-          <Route path="/positions/">
+          <Route path="/trade/uniswap">
            <PositionManagement user={user} spotPrice={spotPrice} />
           </Route>
           {/* <Route path="/trades/test/"><ZEROXTest /></Route> */}
-          <Route path="/uniswap/:token/"><Uniswap user={user} spotPrice={spotPrice} /></Route>
+          <Route path="/uniswap/:token/"><UniswapExchanges user={user} spotPrice={spotPrice} /></Route>
           <Route path="/uniswap/">
             <Trade />
           </Route>

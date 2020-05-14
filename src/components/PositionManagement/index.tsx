@@ -5,7 +5,6 @@ import UserData from './UserData';
 
 import { getPremiumToPay } from '../../utils/infura'
 import BigNumber from 'bignumber.js';
-
 import { eth_puts, eth_calls } from '../../constants/options';
 import { toTokenUnitsBN, toBaseUnitBN } from '../../utils/number';
 import { getUserOptionBalances } from '../../utils/graph'

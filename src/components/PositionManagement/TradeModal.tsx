@@ -3,7 +3,7 @@ import BigNumber from 'bignumber.js'
 
 import { Modal, Button, Header } from '@aragon/ui'
 
-import UniswapBuySell from '../UniswapTrade/UniswapBuySell'
+import UniswapBuySell from '../UniswapExchange/UniswapBuySell'
 
 import * as types from '../../types'
 import { toTokenUnitsBN } from '../../utils/number'
