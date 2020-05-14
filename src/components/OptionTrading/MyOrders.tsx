@@ -47,19 +47,19 @@ function MyOrders({
       <DataView
         entriesPerPage={4}
         statusEmpty={(
-          <div>
+          <div style={{ fontSize: 15 }}>
             No Open Orders for
             {' '}
-            {option.title}
+            {option.symbol}
           </div>
-)}
+        )}
         page={myOrdersPage}
         onPageChange={setMyOrdersPage}
         onSelectEntries={setSelectedOrders}
         fields={['digest', 'type', 'price', 'amount', 'filled', 'expiration', '']}
         entries={userAsks.concat(userBids)
           .sort((a, b) => (a.order.expirationTimeSeconds > b.order.expirationTimeSeconds ? 1 : -1))}
-        renderEntry={function(order: types.order) {
+        renderEntry={function (order: types.order) {
           return [
             order.metaData.orderHash.slice(2, 8),
             order.type === 'Ask' ? <AskText>{order.type}</AskText> : <BidText>{order.type}</BidText>,
@@ -71,7 +71,7 @@ function MyOrders({
               : toTokenUnitsBN(order.order.takerAssetAmount, option.decimals).toFixed(3),
             `${zeroXUtil.getOrderFillRatio(order)}%`,
             <Timer end={new Date(parseInt(order.order.expirationTimeSeconds) * 1000)} />,
-  
+
             selectedOrders.length > 0
               ? (
                 <Button onClick={() => {
@@ -91,8 +91,8 @@ function MyOrders({
               ),
           ]
         }
-          
-          }
+
+        }
       />
     </>
   );

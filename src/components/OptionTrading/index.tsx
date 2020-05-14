@@ -74,11 +74,14 @@ function OptionTrading({ user }: { user: string }) {
   }, [baseAsset, user]);
 
   const [buttonLabel, setButtonLabel] = useState(`Make Order for ${baseAsset?.title}`)
+  const [sidePanelTitle, setSidePanelTitle] = useState('Make Order')
   useEffect(()=>{
     if (selectedOrders.length > 0) {
       setButtonLabel(`Fill Orders for ${baseAsset?.title}`)
+      setSidePanelTitle(`Fill Orders`)
     } else {
-      setButtonLabel(`Make Order for ${baseAsset?.title}`)
+      setButtonLabel(`Make Orders for ${baseAsset?.title}`)
+      setSidePanelTitle(`Make Orders`)
     }
   }, [selectedOrders, baseAsset])
 
@@ -102,7 +105,7 @@ function OptionTrading({ user }: { user: string }) {
 
   return (
     <>
-      <SidePanel opened={buySellActive} onClose={() => setBuySellActive(false)}>
+      <SidePanel title={sidePanelTitle} opened={buySellActive} onClose={() => setBuySellActive(false)}>
         <br />
         <br />
         <BuyAndSell
@@ -138,7 +141,7 @@ function OptionTrading({ user }: { user: string }) {
         setSelectedOrders={setSelectedOrders}
       />
       <br />
-      <div> <Button mode="strong" wide onClick={() => { setBuySellActive(true) }}>{buttonLabel}</Button> </div>
+      <Button mode="strong" wide onClick={() => { setBuySellActive(true) }}>{buttonLabel}</Button>
     </>
   );
 }

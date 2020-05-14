@@ -105,9 +105,11 @@ function OptionBoard({
     for (const { call, put } of optionsByDate[idx].pairs) {
       if (call !== undefined) {
         setBaseAsset(call);
+        setSelectedOrders([])
         return;
       } if (put !== undefined) {
         setBaseAsset(put);
+        setSelectedOrders([])
         return;
       }
     }
@@ -239,7 +241,10 @@ function OptionBoard({
             <div style={{ width: '30px' }}>
               <Radio
                 disabled={!call}
-                onChange={() => setBaseAsset(call)}
+                onChange={() => {
+                  setSelectedOrders([])
+                  setBaseAsset(call)
+                }}
                 checked={call && call.addr === baseAsset.addr}
               />
             </div>,
@@ -247,7 +252,10 @@ function OptionBoard({
             <div style={{ width: '30px' }}>
               <Radio
                 disabled={!put}
-                onChange={() => (setBaseAsset(put))}
+                onChange={() => {
+                  setSelectedOrders([])
+                  setBaseAsset(put)}
+                }
                 checked={put && put.addr === baseAsset.addr}
               />
             </div>,
@@ -297,7 +305,7 @@ function groupByDate(puts: types.ETHOption[], calls: types.ETHOption[]): entries
       });
     }
     pairs.sort((a, b) => (a.strikePrice > b.strikePrice ? 1 : -1));
-    const expiryText = new Date(expiry * 1000).toDateString();
+    const expiryText = new Date(expiry * 1000).toLocaleDateString("en-US", { timeZone: "UTC" });
     result.push({
       expiry,
       expiryText,

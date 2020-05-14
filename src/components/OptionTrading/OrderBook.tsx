@@ -21,7 +21,7 @@ type OrderbookProps = {
 
 function OrderBook({
   asks, bids, option, quoteAsset, setTradeType, setSelectedOrders, selectedOrders, tradeType,
-}:OrderbookProps) {
+}: OrderbookProps) {
   const [askPage, setAskPage] = useState(0);
   const [bidPage, setBidPage] = useState(0);
 
@@ -68,7 +68,7 @@ function OrderBook({
       <div style={{ display: 'flex' }}>
         <div style={{ width: '50%' }}>
           <DataView
-            statusEmpty={<div>No Sell Orders</div>}
+            statusEmpty={<div style={{ fontSize: 15 }} >No Sell Orders</div>}
             entriesPerPage={8}
             page={askPage}
             onPageChange={setAskPage}
@@ -89,7 +89,7 @@ function OrderBook({
         </div>
         <div style={{ width: '50%' }}>
           <DataView
-            statusEmpty={<div>No Buy Orders</div>}
+            statusEmpty={<div style={{ fontSize: 15 }} >No Buy Orders</div>}
             entriesPerPage={8}
             page={bidPage}
             onPageChange={setBidPage}
