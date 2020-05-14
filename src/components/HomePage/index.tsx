@@ -54,7 +54,7 @@ function HomePage() {
             description="Trade ETH Options on 0x"
             iconUrl="https://cdn.worldvectorlogo.com/logos/0x-virtual-money-.svg"
             onClick={() => {
-              history.push('/trade/oeth-usdc');
+              history.push('/trade/0x');
             }}
           />
         </div>
