@@ -6,6 +6,7 @@ import { Modal, Button, Header } from '@aragon/ui'
 import UniswapBuySell from '../UniswapTrade/UniswapBuySell'
 
 import * as types from '../../types'
+import { toTokenUnitsBN } from '../../utils/number'
 // import { SectionTitle } from '../common'
 
 type TradeModalProps = {
@@ -30,7 +31,7 @@ function TradeModal({ oToken, spotPrice, balance }: TradeModalProps) {
           spotPrice={spotPrice}
           strikePriceInUSD={oToken.strikePriceInUSD}
           symbol={oToken.symbol}
-          tokenBalance={balance}
+          tokenBalance={toTokenUnitsBN(balance, oToken.decimals)}
           token={oToken.addr}
           exchange={oToken.exchange}
           decimals={oToken.decimals}

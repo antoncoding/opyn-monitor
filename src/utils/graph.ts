@@ -209,19 +209,21 @@ export const getUserOptionBalances = async(address: string) : Promise<{oToken: s
 }
 
 export const getUserUniswapSells = async(address: string) : Promise<{ token : {address: string}, payoutTokensReceived: string, oTokensToSell: string,   payoutTokenAddress: string,   payoutTokenPrice: string,   usdcPrice: string,   timestamp: string,   transactionHash: string} []> => {
-  const query= `sellOTokensActions(where: {
-    transactionFrom: "${address}"
-  }) {
-    token {
-      address
+  const query= `{ 
+    sellOTokensActions(where: {
+      transactionFrom: "${address}"
+    }) {
+      token {
+        address
+      }
+      oTokensToSell
+      payoutTokenAddress
+      payoutTokenPrice
+      payoutTokensReceived
+      usdcPrice
+      timestamp
+      transactionHash
     }
-    oTokensToSell
-    payoutTokenAddress
-    payoutTokenPrice
-    payoutTokensReceived
-    usdcPrice
-    timestamp
-    transactionHash
   }
   `
   const response = await postQuery(query);

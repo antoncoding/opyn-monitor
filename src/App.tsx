@@ -76,7 +76,7 @@ function App() {
             />
           </Route>
           <Route path="/positions/">
-           <PositionManagement user={"0xeb919adce5908185a6f6c860ab42812e83ed355a"} spotPrice={spotPrice} />
+           <PositionManagement user={user} spotPrice={spotPrice} />
           </Route>
           {/* <Route path="/trades/test/"><ZEROXTest /></Route> */}
           <Route path="/uniswap/:token/"><Uniswap user={user} spotPrice={spotPrice} /></Route>
