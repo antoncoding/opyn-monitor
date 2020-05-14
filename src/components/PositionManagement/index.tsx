@@ -44,7 +44,7 @@ function PositionManagement({ user, spotPrice }: { user: string, spotPrice: BigN
       }
     }
     getTokenPrices()
-    const id = setInterval(getTokenPrices, 5000)
+    const id = setInterval(getTokenPrices, 30000)
     return () => {
       canceled = true
       clearInterval(id)
