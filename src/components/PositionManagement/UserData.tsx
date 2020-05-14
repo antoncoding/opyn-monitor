@@ -10,7 +10,7 @@ import History from './TradeHistory'
 import { Comment } from '../common'
 
 import { eth_calls, eth_puts } from '../../constants/options'
-
+import { getPreference, storePreference } from '../../utils/storage'
 const allOptions = eth_puts.concat(eth_calls).filter((o) => o.expiry > Date.now() / 1000)
 
 type UserDataProps = {
@@ -28,14 +28,17 @@ type UserDataProps = {
 
 function UserData({ user, spotPrice, tokenPrices, balances }: UserDataProps) {
 
-  const [selectedTab, setSelectedTab] = useState(2)
+  const [selectedTab, setSelectedTab] = useState(parseInt(getPreference('greekboardtab', '0')))
   
   return (
     <>
       <Tabs
         items={['Positions', 'Balances', 'History']}
         selected={selectedTab}
-        onChange={setSelectedTab}
+        onChange={(idx:number) => {
+          setSelectedTab(idx)
+          storePreference('greekboardtab', idx.toString())
+        }}
       />
       {
         user === ''

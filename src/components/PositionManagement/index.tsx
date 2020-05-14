@@ -19,7 +19,6 @@ function PositionManagement({ user, spotPrice }: { user: string, spotPrice: BigN
   useEffect(() => {
     tracker.pageview(`/positions/`);
   }, []);
-
   
   // Update token price every 5 secs
   const [tokenPrices, setTokenPrices] = useState<{ oToken: string, price: BigNumber }[]>([])
@@ -53,8 +52,6 @@ function PositionManagement({ user, spotPrice }: { user: string, spotPrice: BigN
       clearInterval(id)
     }
   }, [spotPrice])
-
-  
 
   // update token balances for all options
   const [balances, setBalances] = useState<balance[]>([])
