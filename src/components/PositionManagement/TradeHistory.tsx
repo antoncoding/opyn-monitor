@@ -25,6 +25,7 @@ type historyEntry = {
 function TradeHistory({ user, allOptions }: MyPositionsProps) {
   
   const [rows, setRows] = useState<historyEntry[]>([])
+  const [isLoading, setIsLoading] = useState(true)
 
   useMemo(async()=>{
     if (!user) return
@@ -37,11 +38,16 @@ function TradeHistory({ user, allOptions }: MyPositionsProps) {
     const buyEntries: historyEntry[]  = buys.map(buy => {
       const option = allOptions.find(o => o.addr === buy.token.address) as ETHOption
       const amount = toTokenUnitsBN(buy.oTokensToBuy, option.decimals)
+        .div(option.type === 'call' 
+        ? new BigNumber(option.strikePriceInUSD) 
+        : new BigNumber(1)
+      )
+      const price = (new BigNumber(buy.premiumPaid).div(new BigNumber(buy.usdcPrice))).div(amount)
       return {
         option,
         type: 'Buy',
         amount,
-        price: (new BigNumber(buy.premiumPaid).div(new BigNumber(buy.usdcPrice))).div(amount),
+        price,
         timestamp: parseInt(buy.timestamp),
         txHash: buy.transactionHash
       }
@@ -51,11 +57,16 @@ function TradeHistory({ user, allOptions }: MyPositionsProps) {
     const sellEntries: historyEntry[]  = sells.map(buy => {
       const option = allOptions.find(o => o.addr === buy.token.address) as ETHOption
       const amount = toTokenUnitsBN(buy.oTokensToSell, option.decimals)
+        .div(option.type === 'call' 
+          ? new BigNumber(option.strikePriceInUSD) 
+          : new BigNumber(1)
+        )
+      const price = (new BigNumber(buy.payoutTokensReceived).div(new BigNumber(buy.usdcPrice))).div(amount)
       return {
         option,
         type: 'Sell',
         amount,
-        price: (new BigNumber(buy.payoutTokensReceived).div(new BigNumber(buy.usdcPrice))).div(amount),
+        price,
         timestamp: parseInt(buy.timestamp),
         txHash: buy.transactionHash
       }
@@ -63,20 +74,22 @@ function TradeHistory({ user, allOptions }: MyPositionsProps) {
 
     const allEntris = sellEntries.concat(buyEntries).sort((a, b)=> a.timestamp > b.timestamp ? -1 : 1 )
     setRows(allEntris)
+    setIsLoading(false)
   }, [allOptions, user])
 
   return (
     <>
       <DataView
-        fields={['option', 'Type', 'Amount', 'Price', 'Time', 'tx']}
+        status={ isLoading ? "loading" : "default" }
+        fields={['option', 'Type', 'Size', 'Price', 'Time', 'tx']}
         entries={rows}
         entriesPerPage={8}
         tableRowHeight={45}
         renderEntry={({ type, price, amount, timestamp, txHash, option }:historyEntry) => [
           <IdentityBadge label={option.title} entity={option.addr} />,
           <TradeType type={type}/>,
-          amount?.toFixed(2),
-          price.toFixed(2),
+          (option.type === 'call' ? '*' : '') + amount?.toFixed(4),
+          price.toFixed(3) + ' USD',
           timeSince(timestamp*1000),
           <TransactionBadge transaction={txHash} />
         ]}

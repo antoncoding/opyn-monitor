@@ -59,7 +59,7 @@ function Balances({ tokenPrices, balances, allOptions }: MyPositionsProps) {
         renderEntry={({ option, price, amount, value }: optionBalance) => [
           <IdentityBadge label={option.title} entity={option.addr} />,
           price?.toFixed(2),
-          amount.toNumber(),
+          (option.type === 'call' ? '*' : '') + amount.toNumber(),
           value.toFixed(3) + ' USD'
         ]}
       />

@@ -80,7 +80,7 @@ function Options({ optionPrices, spotPrice, balances }: OptionBoardProps) {
       </div>
       <div style={{display: 'flex', alignContent: 'left'}}> 
         <div style={{marginLeft: 'auto', opacity: 0.5, fontSize: 14}}>
-          Not satisfied with the price? Make your own order with <LinkBase onClick={()=>history.push('/trade/0x')} style={{color: 'white'}}> 0x Trade </LinkBase> 
+          Not satisfied with the price? Create custom orders with <LinkBase onClick={()=>history.push('/trade/0x')} style={{color: 'white'}}> 0x Trade </LinkBase> 
         </div>
       </div>
       <Tabs

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import BigNumber from 'bignumber.js'
 
-import { Tabs } from '@aragon/ui'
+import { Tabs, Help } from '@aragon/ui'
 
 import Positions from './MyPositions'
 import Balances from './Balances'
@@ -32,6 +32,15 @@ function UserData({ user, spotPrice, tokenPrices, balances }: UserDataProps) {
   
   return (
     <>
+      <div style={{display: 'flex', alignContent: 'left'}}> 
+        <div style={{ display:'flex', marginLeft: 'auto', opacity: 0.5, fontSize: 14}}>
+          *Call option amounts already devided by strike price. <Help hint="why?">
+            With Opyn v1, call options have the same units as USDC: you need 250 oETH call tokens + 250 USDC to get back 1 ETH. 
+            To maker it clearer, all data on this page has been converted so that 1 call represent the right to buy 1 ETH.
+            But notice that the amount unit in trade modal has not been updated! 
+          </Help>
+        </div>
+      </div>
       <Tabs
         items={['Positions', 'Balances', 'History']}
         selected={selectedTab}
@@ -60,9 +69,3 @@ function UserData({ user, spotPrice, tokenPrices, balances }: UserDataProps) {
 }
 
 export default UserData;
-
-
-type balance = {
-  oToken: string,
-  balance: BigNumber
-}
