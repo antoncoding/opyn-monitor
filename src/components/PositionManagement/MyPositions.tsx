@@ -65,26 +65,10 @@ function MyPositions({ user, spotPrice, tokenPrices, balances }: MyPositionsProp
       const price = tokenPrices.find(entry => entry.oToken === option.addr)?.price || new BigNumber(0)
       const greeks = getGreeks(option, price, spotPrice)
       if (vault || rawBalance.gt(0)) {
-        let size = new BigNumber(0)
-        let type: "Long" | "Short" = "Long"
-        if (!vault && !rawBalance.isZero()) {
-          // has balance: Long Position
-          size = toTokenUnitsBN(rawBalance, option.decimals)
-          type = 'Long'
-        } else if (vault && rawBalance.isZero()) {
-          size = toTokenUnitsBN(vault.oTokensIssued, option.decimals)
-          type = "Short"
-        } else {
-          const bought = toTokenUnitsBN(rawBalance, option.decimals)
-          const sold = toTokenUnitsBN((vault as vault).oTokensIssued, option.decimals)
-          if (bought.gt(sold)) {
-            type = "Long"
-            size = bought.minus(sold)
-          } else {
-            type = "Short"
-            size = sold.minus(bought)
-          }
-        }
+        const bought = toTokenUnitsBN(rawBalance, option.decimals)
+        const sold = toTokenUnitsBN(vault ? vault.oTokensIssued : 0, option.decimals)
+        const type: "Long" | "Short" = bought.gt(sold) ? "Long" : "Short";
+        const size = bought.minus(sold).abs()
         if (!size.eq(0)) {
           userPositions.push({
             option: option,
