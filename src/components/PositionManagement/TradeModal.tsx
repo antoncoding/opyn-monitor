@@ -23,10 +23,12 @@ function TradeModal({ oToken, spotPrice, balance }: TradeModalProps) {
     <>
       <Button onClick={() => setOpened(true)} size="small">Trade</Button>
       <Modal 
-        width={(viewport)=>{Math.min(viewport.width, 600)}} 
+        padding={50}
+        width={(viewport)=>{Math.min(viewport.width, 800)}} 
         visible={opened} 
         onClose={() => setOpened(false)} >
-        <Header primary="Trade on Uniswap" />
+        <Header primary={`Buy / Sell ${oToken.title} `} />
+        <br/>
         <UniswapBuySell
           spotPrice={spotPrice}
           strikePriceInUSD={oToken.strikePriceInUSD}

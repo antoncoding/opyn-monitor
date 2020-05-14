@@ -64,7 +64,7 @@ function Options({ optionPrices, spotPrice, balances }: OptionBoardProps) {
   return (
     <div>
       <div style={{ display: 'flex' }}>
-        <Header primary="ETH Options Greeks" />
+        <Header primary="ETH Options" />
         <div style={{ paddingTop: '36px', paddingLeft: '36px' }}>
           Spot Price: {spotPrice.toFixed(2)} USD
         </div>

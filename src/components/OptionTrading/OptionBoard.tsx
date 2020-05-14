@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import {
-  DataView, DropDown, LinkBase, Radio, Header, Tag,
+  DataView, DropDown, LinkBase, Radio, Header,
 } from '@aragon/ui';
 import { AskText, BidText } from './styled';
 
@@ -119,9 +119,6 @@ function OptionBoard({
         {' '}
         <Header primary="Option Trading" />
         {' '}
-        <div style={{ paddingTop: '24px' }}>
-          <Tag> beta </Tag>
-        </div>
         <div style={{ paddingTop: '28px', paddingLeft: '36px' }}>
           <DropDown
             items={optionsByDate.map((item) => item.expiryText)}

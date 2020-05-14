@@ -1,15 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import BigNumber from 'bignumber.js';
-import styled from 'styled-components';
 
-import { Header } from '@aragon/ui';
+import {  SidePanel, Button } from '@aragon/ui';
 import OptionBoard from './OptionBoard';
 import TabBoard from './TabBoard';
 import BuyAndSell from './BuyAndSell';
 
 import { getTokenBalance } from '../../utils/infura';
 import { getOrderBook, isValid } from '../../utils/0x';
-// import { getVault } from '../../utils/graph';
 import { eth_puts, eth_calls } from '../../constants/options';
 import * as types from '../../types'
 import * as tokens from '../../constants/tokens';
@@ -19,6 +17,9 @@ import tracker from '../../utils/tracker';
 const quoteAsset = tokens.USDC;
 
 function OptionTrading({ user }: { user: string }) {
+
+  const [buySellActive, setBuySellActive] = useState(false)
+
   const [baseAsset, setBaseAsset] = useState<types.ETHOption | undefined>(
     eth_puts.concat(eth_calls).find((o) => o.expiry > Date.now() / 1000),
   );
@@ -34,12 +35,8 @@ function OptionTrading({ user }: { user: string }) {
   const [selectedOrders, setSelectedOrders] = useState([]);
 
   // user balance
-  // const [userETHBalance, setUserETHBalance] = useState(BigNumber(0)); // in eth
   const [baseAssetBalance, setBaseAssetBalance] = useState(new BigNumber(0));
   const [quoteAssetBalance, setQuoteAssetBalance] = useState(new BigNumber(0));
-
-  // const [vault, setVault] = useState({});
-
 
   // BaseAsset changeed: Update orderbook and base asset
   useEffect(() => {
@@ -62,11 +59,6 @@ function OptionTrading({ user }: { user: string }) {
       }
     };
 
-    // const updateVaultData = async () => {
-    //   if (user === '') return;
-    //   const userVault = await getVault(user, baseAsset.addr);
-    //   if (!isCancelled) setVault(userVault);
-    // };
     updateOrderBook();
     updateBaseBalance();
     // updateVaultData();
@@ -80,6 +72,15 @@ function OptionTrading({ user }: { user: string }) {
       // clearInterval(idUpdateVault);
     };
   }, [baseAsset, user]);
+
+  const [buttonLabel, setButtonLabel] = useState(`Make Order for ${baseAsset?.title}`)
+  useEffect(()=>{
+    if (selectedOrders.length > 0) {
+      setButtonLabel(`Fill Orders for ${baseAsset?.title}`)
+    } else {
+      setButtonLabel(`Make Order for ${baseAsset?.title}`)
+    }
+  }, [selectedOrders, baseAsset])
 
   // update quote asset
   useEffect(() => {
@@ -100,86 +101,74 @@ function OptionTrading({ user }: { user: string }) {
   }, [user]);
 
   return (
-    <WholeScreen>
-      <FlexWrapper>
-        <LeftPart>
-          <Header />
-          <br />
-          <br />
-          <BuyAndSell
-            user={user}
-            baseAsset={baseAsset!}
-            quoteAsset={quoteAsset}
+    <>
+      <SidePanel opened={buySellActive} onClose={() => setBuySellActive(false)}>
+        <br />
+        <br />
+        <BuyAndSell
+          user={user}
+          baseAsset={baseAsset!}
+          quoteAsset={quoteAsset}
+          baseAssetBalance={baseAssetBalance}
+          quoteAssetBalance={quoteAssetBalance}
+          tradeType={tradeType}
+          setTradeType={setTradeType}
 
-            baseAssetBalance={baseAssetBalance}
-            quoteAssetBalance={quoteAssetBalance}
-
-            // collateral={baseAsset!.collateral}
-            // vault={vault}
-
-            tradeType={tradeType}
-            setTradeType={setTradeType}
-
-            selectedOrders={selectedOrders}
-            setSelectedOrders={setSelectedOrders}
-          />
-        </LeftPart>
-        <RightPart>
-          {/* <Header primary="Trade ETH Options" /> */}
-          <OptionBoard
-            quoteAsset={quoteAsset}
-            baseAsset={baseAsset!}
-            setBaseAsset={setBaseAsset}
-            setTradeType={setTradeType}
-            setSelectedOrders={setSelectedOrders}
-          />
-          <br />
-          {/* <FixBottom> */}
-          <TabBoard
-            asks={asks}
-            bids={bids}
-            user={user}
-            option={baseAsset!}
-            quoteAsset={quoteAsset}
-            tradeType={tradeType}
-            selectedOrders={selectedOrders}
-            setTradeType={setTradeType}
-            setSelectedOrders={setSelectedOrders}
-          />
-          {/* </FixBottom> */}
-        </RightPart>
-      </FlexWrapper>
-    </WholeScreen>
+          selectedOrders={selectedOrders}
+          setSelectedOrders={setSelectedOrders}
+        />
+      </SidePanel>
+      <OptionBoard
+        quoteAsset={quoteAsset}
+        baseAsset={baseAsset!}
+        setBaseAsset={setBaseAsset}
+        setTradeType={setTradeType}
+        setSelectedOrders={setSelectedOrders}
+      />
+      <br />
+      <TabBoard
+        asks={asks}
+        bids={bids}
+        user={user}
+        option={baseAsset!}
+        quoteAsset={quoteAsset}
+        tradeType={tradeType}
+        selectedOrders={selectedOrders}
+        setTradeType={setTradeType}
+        setSelectedOrders={setSelectedOrders}
+      />
+      <br />
+      <div> <Button mode="strong" wide onClick={() => { setBuySellActive(true) }}>{buttonLabel}</Button> </div>
+    </>
   );
 }
 
+// const LeftPart = styled.div`
+//   width: 18%;
+//   padding-right: 1.5%;
+// `;
 
-const LeftPart = styled.div`
-  width: 20%;
-  padding-right: 1.5%;
-`;
+// const RightPart = styled.div`
+//   width: 80%;
+// `;
 
-const RightPart = styled.div`
-  width: 80%;
-`;
+// const WholeScreen = styled.div`
+//   textAlign: center;
+//   padding-left: 1%;
+//   padding-right: 10%;
+//   position:fixed;
+//   overflow-y:scroll;
+//   overflow-x:hidden;
+//   left: 0;
+//   bottom: 0;
+//   top: 6%;
+//   width: 100%;
+//   overflow: auto
+// `;
 
-const WholeScreen = styled.div`
-  textAlign: center;
-  padding-left: 10%;
-  padding-right: 10%;
-  position:fixed;
-  overflow-y:scroll;
-  overflow-x:hidden;
-  left: 0;
-  bottom: 0;
-  top: 6%;
-  width: 100%;
-  overflow: auto
-`;
-
-const FlexWrapper = styled.div`
-  display: flex;
-  height:87%
-`;
+// const FlexWrapper = styled.div`
+//   display: flex;
+//   height:87%
+// `;
 
 export default OptionTrading;

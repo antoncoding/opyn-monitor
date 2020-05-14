@@ -146,7 +146,10 @@ function UniswapBuySell({
         </div>
       </div>
       { symbol.toLowerCase().includes('call')
-        ? <WarningText text={`Buy ${strikePriceInUSD} ${symbol} to hedge 1 ETH`} />
+        ? <>
+            <WarningText text={`*The unit used here is not the same as the greek board.`} /> 
+            <WarningText text={`Buy ${strikePriceInUSD} ${symbol} to hedge 1 ETH.`} /> 
+          </>
         : <></> }
     </Box>
   );
