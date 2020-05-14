@@ -2,8 +2,10 @@ import React, { useState, useMemo } from 'react';
 import BigNumber from 'bignumber.js'
 
 import { Tabs } from '@aragon/ui'
+
 import Positions from './MyPositions'
 import Balances from './Balances'
+import History from './TradeHistory'
 
 import { Comment } from '../common'
 
@@ -23,7 +25,7 @@ type UserDataProps = {
 
 function UserData({ user, spotPrice, tokenPrices }: UserDataProps) {
 
-  const [selectedTab, setSelectedTab] = useState(0)
+  const [selectedTab, setSelectedTab] = useState(2)
   const [balances, setBalances] = useState<balance[]>([])
 
   // update token balances for all options
@@ -44,23 +46,23 @@ function UserData({ user, spotPrice, tokenPrices }: UserDataProps) {
   return (
     <>
       <Tabs
-        items={['Balances', 'Positions']}
+        items={['Positions', 'Balances', 'History']}
         selected={selectedTab}
         onChange={setSelectedTab}
       />
       {
         user === ''
           ? <Comment text="Connect wallet to see more detail"></Comment>
-          : (selectedTab === 1 ? <Positions
+          : (selectedTab === 0 ? <Positions
             user={user}
             spotPrice={spotPrice}
             tokenPrices={tokenPrices}
             balances={balances}
-          /> : <Balances 
+          /> : selectedTab === 1 ? <Balances 
             balances={balances}
             tokenPrices={tokenPrices}
             allOptions={allOptions}
-          /> 
+          /> : <History user={user} allOptions={allOptions} />
           )
 
       }

@@ -208,7 +208,7 @@ export const getUserOptionBalances = async(address: string) : Promise<{oToken: s
     }});
 }
 
-export const getUserUniswapSells = async(address: string) : Promise<{ token : {address: string}, oTokensToSell: string,   payoutTokenAddress: string,   payoutTokenPrice: string,   usdcPrice: string,   timestamp: string,   transactionHash: string} []> => {
+export const getUserUniswapSells = async(address: string) : Promise<{ token : {address: string}, payoutTokensReceived: string, oTokensToSell: string,   payoutTokenAddress: string,   payoutTokenPrice: string,   usdcPrice: string,   timestamp: string,   transactionHash: string} []> => {
   const query= `sellOTokensActions(where: {
     transactionFrom: "${address}"
   }) {
@@ -218,15 +218,17 @@ export const getUserUniswapSells = async(address: string) : Promise<{ token : {a
     oTokensToSell
     payoutTokenAddress
     payoutTokenPrice
+    payoutTokensReceived
     usdcPrice
     timestamp
     transactionHash
   }
   `
-  return postQuery(query);
+  const response = await postQuery(query);
+  return response.data.sellOTokensActions
 }
  
-export const getUserUniswapBuys = async(address: string) : Promise<{ token : {address: string }, oTokensToBuy: string, paymentTokenAddress: string, paymentTokenPrice: string, usdcPrice: string, timestamp: string, transactionHash: string } []> => {
+export const getUserUniswapBuys = async(address: string) : Promise<{ token : {address: string }, premiumPaid: string, oTokensToBuy: string, paymentTokenAddress: string, paymentTokenPrice: string, usdcPrice: string, timestamp: string, transactionHash: string } []> => {
   const query= `{
     buyOTokensActions(where: {
       buyer: "${address}"
@@ -238,12 +240,14 @@ export const getUserUniswapBuys = async(address: string) : Promise<{ token : {ad
       paymentTokenAddress
       paymentTokenPrice
       usdcPrice
+      premiumPaid
       timestamp
       transactionHash
     }
   }
   `
-  return postQuery(query);
+  const response = await postQuery(query);
+  return response.data.buyOTokensActions
 }
 
 
