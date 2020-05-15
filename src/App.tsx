@@ -9,15 +9,21 @@ import { updateModalMode } from './utils/web3';
 import { storePreference, getPreference } from './utils/storage';
 import NavBar from './components/NavBar';
 import HomePage from './components/HomePage';
-import AllOptoins from './components/AllContracts';
-import Trade from './components/Trade/index';
-import OptionTrading from './components/OptionTrading';
+
+import OptionLists from './components/AllContracts';
+import OptionDetail from './components/OptionPage';
+
 import MyVaults from './components/MyVaults';
-import OptionPage from './components/OptionPage';
 import ManageVault from './components/ManageVault';
+
+// List of Uniswap exchanges
+import ExchangeList from './components/ExchangeList/index';
 import UniswapExchanges from './components/UniswapExchange';
+
+import TradeOnUniswap from './components/TradeUniswap'
+import TradeOn0x from './components/Trade0x';
 import CreateOption from './components/CreateOption'
-import PositionManagement from './components/PositionManagement'
+
 import Footer from './components/Footer';
 
 function App() {
@@ -57,10 +63,10 @@ function App() {
         <Switch>
           {/* All Options */}
           <Route path="/option/:token">
-            <OptionPage user={user} />
+            <OptionDetail user={user} />
           </Route>
           <Route path="/options/">
-            <AllOptoins />
+            <OptionLists />
           </Route>
           {/* My Vaults */}
           <Route path="/myvaults">
@@ -71,17 +77,17 @@ function App() {
           </Route>
           {/* Trading */}
           <Route path="/trade/0x/">
-            <OptionTrading
+            <TradeOn0x
               user={user}
             />
           </Route>
           <Route path="/trade/uniswap">
-           <PositionManagement user={user} spotPrice={spotPrice} />
+           <TradeOnUniswap user={user} spotPrice={spotPrice} />
           </Route>
           {/* <Route path="/trades/test/"><ZEROXTest /></Route> */}
           <Route path="/uniswap/:token/"><UniswapExchanges user={user} spotPrice={spotPrice} /></Route>
           <Route path="/uniswap/">
-            <Trade />
+            <ExchangeList />
           </Route>
           <Route path="/create/"><CreateOption user={user}/></Route>
           {/* HomePage */}
