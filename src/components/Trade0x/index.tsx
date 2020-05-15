@@ -25,7 +25,7 @@ function OptionTrading({ user }: { user: string }) {
   );
 
   useEffect(() => {
-    tracker.pageview('/trade/');
+    tracker.pageview('/trade/0x');
   }, []);
 
   const [asks, setAsks] = useState<types.order[]>([]);

@@ -17,7 +17,7 @@ const Promise = require('bluebird')
 function PositionManagement({ user, spotPrice }: { user: string, spotPrice: BigNumber }) {
 
   useEffect(() => {
-    tracker.pageview(`/positions/`);
+    tracker.pageview(`/trade/uniswap/`);
   }, []);
   
   // Update token price every 5 secs
