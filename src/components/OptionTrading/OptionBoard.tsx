@@ -120,7 +120,7 @@ function OptionBoard({
       <div style={{ display: 'flex' }}>
         {' '}
         <Header primary="Option Trading" />
-        {' '}
+        <img alt="icon" style={{ paddingTop: 24, height: 64 }} src={'https://cdn.worldvectorlogo.com/logos/0x-virtual-money-.svg'} />
         <div style={{ paddingTop: '28px', paddingLeft: '36px' }}>
           <DropDown
             items={optionsByDate.map((item) => item.expiryText)}

@@ -64,10 +64,8 @@ function Options({ optionPrices, spotPrice, balances }: OptionBoardProps) {
   return (
     <div>
       <div style={{ display: 'flex' }}>
-        <Header primary="ETH Options" />
-        <div style={{ paddingTop: '36px', paddingLeft: '36px' }}>
-          Spot Price: {spotPrice.toFixed(2)} USD
-        </div>
+        <Header primary="Option Trading" />
+        <img alt="icon" style={{ paddingTop: 24, paddingLeft: 10, height: 64, width: 50 }} src={'https://i.imgur.com/4eX8GlY.png'} />
         <div style={{ paddingTop: '28px', paddingLeft: '36px' }}>
           <DropDown
             items={['All Dates']
@@ -77,6 +75,10 @@ function Options({ optionPrices, spotPrice, balances }: OptionBoardProps) {
             onChange={setExpiryIdx}
           />
         </div>
+        <div style={{ paddingTop: '36px', paddingLeft: '36px' }}>
+          Spot Price: {spotPrice.toFixed(2)} USD
+        </div>
+        
       </div>
       <div style={{display: 'flex', alignContent: 'left'}}> 
         <div style={{marginLeft: 'auto', opacity: 0.5, fontSize: 14}}>

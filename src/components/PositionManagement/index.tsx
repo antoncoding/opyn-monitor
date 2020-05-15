@@ -89,7 +89,6 @@ function PositionManagement({ user, spotPrice }: { user: string, spotPrice: BigN
   return (
     <>
       <Options
-        // user={user} // for trading modal
         optionPrices={tokenPrices}
         spotPrice={spotPrice}
         balances={balances}
