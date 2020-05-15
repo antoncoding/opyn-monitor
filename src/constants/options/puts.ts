@@ -196,4 +196,22 @@ export const eth_puts: ETHOption[] = [
     uniswapExchange: '0x1D8D9FF60C8C2a579215CA4a8b44a72D01F15B3e',
     expiry: 1590134400,
   },
+  {
+    addr: '0x7cac16770dd5f2a59859a395a492224f05a846b6',
+    title: 'ETH Put $200 05/29/20',
+    type: 'put',
+    symbol: 'oETH $200 Put',
+    name: 'Opyn ETH Put $200 05/29/20',
+    decimals: 7,
+    oracle: '0x7054e08461e3eCb7718B63540adDB3c3A1746415',
+    collateral: tokens.USDC,
+    underlying: tokens.OPYN_ETH,
+    strike: tokens.USDC,
+    strikePrice: 2e-5,
+    strikePriceInUSD: 200,
+    minRatio: 1,
+    exchange: '0x39246c4f3f6592c974ebc44f80ba6dc69b817c71',
+    uniswapExchange: '0xD3760EDFFB3289fA817D9aE6ceEc126902BA2905',
+    expiry: 1590739200,
+  }
 ];
