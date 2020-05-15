@@ -65,7 +65,7 @@ function Options({ optionPrices, spotPrice, balances }: OptionBoardProps) {
     <div>
       <div style={{ display: 'flex' }}>
         <Header primary="Option Trading" />
-        <img alt="icon" style={{ paddingTop: 24, paddingLeft: 10, height: 64, width: 50 }} src={'https://i.imgur.com/4eX8GlY.png'} />
+        <img alt="icon" style={{ paddingTop: 24, paddingLeft: 14, height: 64, width: 54 }} src={'https://i.imgur.com/4eX8GlY.png'} />
         <div style={{ paddingTop: '28px', paddingLeft: '36px' }}>
           <DropDown
             items={['All Dates']
