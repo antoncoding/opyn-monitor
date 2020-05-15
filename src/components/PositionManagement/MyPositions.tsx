@@ -125,7 +125,7 @@ function MyPositions({ user, spotPrice, tokenPrices, balances }: MyPositionsProp
             entity={p.option.addr} label={p.option.title} />,
           <PositionType type={p.type} />,
           `${p.optionPrice.toFixed(5)} USD`,
-          p.size.toFixed(3),
+          p.size.toFixed(3) + (p.option.type === 'call' ? '*' : ''),
           p.Delta,
           p.Gamma,
           p.Vega,

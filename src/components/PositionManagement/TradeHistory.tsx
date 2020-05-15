@@ -17,6 +17,7 @@ type historyEntry = {
   option: ETHOption
   type: 'Buy' | 'Sell'
   amount: BigNumber,
+  premium: BigNumber,
   price: BigNumber,
   timestamp: number,
   txHash: string
@@ -48,27 +49,29 @@ function TradeHistory({ user, allOptions }: MyPositionsProps) {
         type: 'Buy',
         amount,
         price,
+        premium: toTokenUnitsBN(buy.premiumPaid, 18),
         timestamp: parseInt(buy.timestamp),
         txHash: buy.transactionHash
       }
     })
     
     const sells = (await getUserUniswapSells(user)).filter(filterOptionsOnly)
-    const sellEntries: historyEntry[]  = sells.map(buy => {
-      const option = allOptions.find(o => o.addr === buy.token.address) as ETHOption
-      const amount = toTokenUnitsBN(buy.oTokensToSell, option.decimals)
+    const sellEntries: historyEntry[]  = sells.map(sell => {
+      const option = allOptions.find(o => o.addr === sell.token.address) as ETHOption
+      const amount = toTokenUnitsBN(sell.oTokensToSell, option.decimals)
         .div(option.type === 'call' 
           ? new BigNumber(option.strikePriceInUSD) 
           : new BigNumber(1)
         )
-      const price = (new BigNumber(buy.payoutTokensReceived).div(new BigNumber(buy.usdcPrice))).div(amount)
+      const price = (new BigNumber(sell.payoutTokensReceived).div(new BigNumber(sell.usdcPrice))).div(amount)
       return {
         option,
         type: 'Sell',
         amount,
+        premium: toTokenUnitsBN(sell.payoutTokensReceived, 18),
         price,
-        timestamp: parseInt(buy.timestamp),
-        txHash: buy.transactionHash
+        timestamp: parseInt(sell.timestamp),
+        txHash: sell.transactionHash
       }
     })
 
@@ -81,15 +84,16 @@ function TradeHistory({ user, allOptions }: MyPositionsProps) {
     <>
       <DataView
         status={ isLoading ? "loading" : "default" }
-        fields={['option', 'Type', 'Size', 'Price', 'Time', 'tx']}
+        fields={['option', 'Type', 'Size', 'Price', 'total Premium','Time', 'tx']}
         entries={rows}
         entriesPerPage={8}
         tableRowHeight={45}
-        renderEntry={({ type, price, amount, timestamp, txHash, option }:historyEntry) => [
+        renderEntry={({ type, price, amount, timestamp, txHash, option, premium }:historyEntry) => [
           <IdentityBadge label={option.title} entity={option.addr} />,
           <TradeType type={type}/>,
-          (option.type === 'call' ? '*' : '') + amount?.toFixed(4),
+          amount?.toFixed(3) + (option.type === 'call' ? '*' : ''),
           price.toFixed(3) + ' USD',
+          premium.toFixed(3) + ' ETH',
           timeSince(timestamp*1000),
           <TransactionBadge transaction={txHash} />
         ]}

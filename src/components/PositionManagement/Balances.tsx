@@ -52,14 +52,14 @@ function Balances({ tokenPrices, balances, allOptions }: MyPositionsProps) {
     <>
       <Box heading="Total USD Value" > {totalValueUSD.toFixed(2)} USD </Box>
       <DataView
-        fields={['Token', 'Price', 'Balance', 'Total']}
+        fields={['Token', 'Balance','Price', 'Total value']}
         entries={rows}
         entriesPerPage={8}
         tableRowHeight={45}
-        renderEntry={({ option, price, amount, value }: optionBalance) => [
+        renderEntry={({ option, amount, price, value }: optionBalance) => [
           <IdentityBadge label={option.title} entity={option.addr} />,
+          amount.toFixed(3) + (option.type === 'call' ? '*' : ''),
           price?.toFixed(2),
-          (option.type === 'call' ? '*' : '') + amount.toNumber(),
           value.toFixed(3) + ' USD'
         ]}
       />
