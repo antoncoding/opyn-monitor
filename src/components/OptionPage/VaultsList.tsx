@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import BigNumber from 'bignumber.js';
 
-import { DataView, IdentityBadge } from '@aragon/ui';
+import { DataView, IdentityBadge, RadioGroup, Radio, Header } from '@aragon/ui';
 import VaultModal from './VaultModal';
-import { SectionTitle, RatioTag } from '../common';
+import { RatioTag } from '../common';
 
 import {
   formatDigits, compareVaultRatio, compareVaultIssued, toTokenUnitsBN,
@@ -12,6 +12,7 @@ import {
 import { calculateRatio, calculateStrikeValueInCollateral } from '../../utils/calculation';
 import { getExerciseForOption } from '../../utils/graph'
 import * as types from '../../types'
+import { vaultWithRatio } from '../../types';
 
 type VaultOwnerListProps = {
   user: string,
@@ -27,6 +28,10 @@ function VaultOwnerList({
 
   const [isLoading, setIsLoading] = useState(true);
   const [vaultsWithDetail, setVaultDetail] = useState<types.vaultWithRatio[]>([]);
+
+  const [checkedSorted, setChecked] = useState(0)
+
+  const SORTED_BY = ['Collateral', 'Issued', 'Exercised', 'Ratio']
 
   const [page, setPage] = useState(0);
 
@@ -102,16 +107,27 @@ function VaultOwnerList({
 
   return (
     <>
-      <SectionTitle title="All Vaults" />
+      <Header primary="All Vaults" secondary={
+        <RadioGroup onChange={setChecked} selected={checkedSorted}>
+          {SORTED_BY.map((label, i) => {
+            return (
+              <label key={i} style={{ opacity: 0.8 }}>
+                <Radio id={i} />
+                {label}
+              </label>
+            )
+          })}
+        </RadioGroup>
+      } />
+
       <DataView
         page={page}
         onPageChange={setPage}
         status={isLoading ? 'loading' : 'default'}
         fields={['Owner', 'collateral', 'Issued', 'Exercised', 'RATIO', 'Status', '']}
-        entries={vaultsWithDetail}
+        entries={vaultsWithDetail.sort(selectSortFunction(checkedSorted))}
         entriesPerPage={5}
         renderEntry={(vault: types.vaultWithRatio) => {
-
           return [
             <IdentityBadge entity={vault.owner} shorten />,
             toTokenUnitsBN(vault.collateral, option.collateral.decimals).toFixed(3),
@@ -135,10 +151,21 @@ function VaultOwnerList({
 
 export default VaultOwnerList;
 
-type exerciseEntry = {
-  amtCollateralToPay: string
-  exerciser: string
-  vault: {
-    owner: string
-  }
+const selectSortFunction = (idx: number): (a, b) => 1 | -1 => {
+  if (idx === 0) return sortByCollateral
+  else if (idx === 1) return sortByIssued
+  else if (idx === 2) return sortByExercised
+  else return sortByRatio
 }
+
+const sortByCollateral = (a: vaultWithRatio, b: vaultWithRatio) =>
+  new BigNumber(a.collateral).gt(new BigNumber(b.collateral)) ? -1 : 1
+
+const sortByIssued = (a: vaultWithRatio, b: vaultWithRatio) =>
+  new BigNumber(a.oTokensIssued).gt(new BigNumber(b.oTokensIssued)) ? -1 : 1
+
+const sortByExercised = (a: vaultWithRatio, b: vaultWithRatio) =>
+  a.exercised.gt(b.exercised) ? -1 : 1
+
+const sortByRatio = (a: vaultWithRatio, b: vaultWithRatio) =>
+  new BigNumber(a.ratio).lt(new BigNumber(b.ratio)) ? -1 : 1
