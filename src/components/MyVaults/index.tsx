@@ -26,7 +26,7 @@ export type vaultWithDetail = {
   collateral: string,
   oTokenName:string
   collateralDecimals: number,
-  collateralSymbol,
+  collateralSymbol: string,
   expiry:number
   ratio: number
 }

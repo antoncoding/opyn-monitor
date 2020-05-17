@@ -116,6 +116,42 @@ export async function getLiquidationHistory(
   return response.data.liquidateActions;
 }
 
+export async function getTotalExercised (oToken: string) : Promise<string> {
+  const query = `{
+    optionsContract(id: "${oToken}") {
+      totalExercised
+    }
+  }`
+  const response = await postQuery(query);
+  return response.data.optionsContract.totalExercised
+}
+
+/**
+ * Get all exercise actions for 1 oToken
+ */
+export async function getExerciseForOption (oToken: string): Promise<{
+    amtCollateralToPay: string
+    exerciser: string
+    vault: {
+      owner: string
+    }
+  }[]
+>{
+  const query = `{
+    exerciseActions (where: {
+     optionsContract_contains :"${oToken}"
+   }) {
+     exerciser
+     vault {
+       owner
+     }
+     amtCollateralToPay
+   }
+ }`
+ const response = await postQuery(query);
+ return response.data.exerciseActions
+}
+
 /**
  * Get all exercise history for one user
  */
