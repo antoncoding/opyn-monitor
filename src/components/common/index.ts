@@ -10,11 +10,13 @@ import Comment from './Comment';
 import { ManageVaultButton, OpenVaultButton } from './VaultButton';
 import Wrapper from './Wrapper';
 import CheckBox from './CheckBox';
+import CustomIdentityBadge from './CustomIdentityBadge'
 
 export {
   AddressBlock,
   BalanceBlock,
   CheckBox,
+  CustomIdentityBadge,
   RatioTag,
   SectionTitle,
   MaxButton,

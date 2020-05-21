@@ -1,12 +1,12 @@
 import React, { useState, useMemo, useEffect } from 'react';
 
 import {
-  Box, DataView, IdentityBadge, TransactionBadge, TextInput, Button,
+  Box, DataView, TransactionBadge, TextInput, Button,
 } from '@aragon/ui';
 
 import BigNumber from 'bignumber.js';
 
-import { BalanceBlock, MaxButton } from '../common/index';
+import { BalanceBlock, MaxButton, CustomIdentityBadge } from '../common/index';
 import { liquidate } from '../../utils/web3';
 import { getMaxLiquidatable } from '../../utils/infura';
 import { getLiquidationHistory } from '../../utils/graph';
@@ -132,7 +132,7 @@ function LiquidationHistory({
           }) => [
               <TransactionBadge transaction={transactionHash} />,
               formatDigits(toTokenUnitsBN(collateralToPay, collateralDecimals), 5),
-              <IdentityBadge entity={liquidator} />,
+              <CustomIdentityBadge entity={liquidator} />,
               timeSince(parseInt(timestamp, 10) * 1000),
             ]}
         />

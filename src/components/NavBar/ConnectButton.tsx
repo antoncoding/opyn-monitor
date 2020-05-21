@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
 
 import {
-  Button, IdentityBadge, IconConnect, Box, IconPower, LinkBase,
+  Button, IconConnect, Box, IconPower, LinkBase,
 } from '@aragon/ui';
+
+import { CustomIdentityBadge } from '../common'
 
 import { connect, disconnect } from '../../utils/web3';
 import { checkAddressAndAddToStorage } from '../../utils/storage';
@@ -39,7 +41,7 @@ function ConnectButton({ user, setUser }: connectButtonProps) {
         </LinkBase>
       </div>
       <Box padding={6}>
-        <IdentityBadge entity={user} />
+        <CustomIdentityBadge entity={user} shorten={true} />
       </Box>
 
     </>

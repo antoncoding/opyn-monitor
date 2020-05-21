@@ -7,13 +7,12 @@ import {
   Box,
   Split,
   TextInput,
-  IdentityBadge,
   DataView,
 } from '@aragon/ui';
 import BigNumber from 'bignumber.js';
 
 import { exercise } from '../../utils/web3';
-import { PriceSection } from '../common/index';
+import { PriceSection, CustomIdentityBadge } from '../common';
 import { getUnderlyingRequiredToExercise, getBalance, getTokenBalance } from '../../utils/infura';
 import {
   toTokenUnitsBN, toBaseUnitBN, formatDigits, compareVaultIssued,
@@ -32,8 +31,8 @@ function ExerciseModal({
   user,
   vaults,
   option
-}:ExerciseModalProps) {
-  
+}: ExerciseModalProps) {
+
   const underlyingIsETH = option.underlying.addr === ETH_ADDRESS;
   const [userUnderlyingBalance, setUserUnderlyingBalance] = useState(new BigNumber(0));
   const [userOTokenBalance, setUserOTokenBalance] = useState(new BigNumber(0));
@@ -83,7 +82,7 @@ function ExerciseModal({
    */
   const checkHasEnoughToken = (entries) => {
     const sumIssued = entries.reduce(
-      (accumulator:BigNumber, current: types.vaultWithoutUnderlying) => accumulator.plus(new BigNumber(current.oTokensIssued)), new BigNumber(0),
+      (accumulator: BigNumber, current: types.vaultWithoutUnderlying) => accumulator.plus(new BigNumber(current.oTokensIssued)), new BigNumber(0),
     );
     if (sumIssued.gt(new BigNumber(0)) && sumIssued.gte(toBaseUnitBN(exerciseAmount, option.decimals))) {
       setHasEnoughCollateral(true);
@@ -167,7 +166,7 @@ function ExerciseModal({
           selection={selectedIndexes}
           onSelectEntries={onSelectEntries}
           renderEntry={({ owner, collateral, oTokensIssued }) => [
-            <IdentityBadge entity={owner} />,
+            <CustomIdentityBadge entity={owner} />,
             formatDigits(toTokenUnitsBN(oTokensIssued, option.decimals).toNumber(), 5),
             formatDigits(toTokenUnitsBN(collateral, option.collateral.decimals).toNumber(), 5),
           ]}
