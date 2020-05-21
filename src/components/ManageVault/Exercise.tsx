@@ -1,9 +1,10 @@
 import React, { useState, useMemo } from 'react';
 
 import {
-  Box, DataView, IdentityBadge, TransactionBadge,
+  Box, DataView, TransactionBadge,
 } from '@aragon/ui';
 
+import { CustomIdentityBadge } from '../common'
 
 import { getExerciseHistory } from '../../utils/graph';
 import { formatDigits, toTokenUnitsBN, timeSince } from '../../utils/number';
@@ -49,7 +50,7 @@ function ExerciseHistory({
               toTokenUnitsBN(oTokensToExercise, tokenDecimals).toNumber(),
               5,
             ),
-            <IdentityBadge entity={exerciser} />,
+            <CustomIdentityBadge entity={exerciser} />,
             timeSince(parseInt(timestamp, 10) * 1000),
           ]}
         />

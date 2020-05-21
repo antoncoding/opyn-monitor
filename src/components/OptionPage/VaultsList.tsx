@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import BigNumber from 'bignumber.js';
 
-import { DataView, IdentityBadge, RadioGroup, Radio, Header } from '@aragon/ui';
+import { DataView, RadioGroup, Radio, Header } from '@aragon/ui';
 import VaultModal from './VaultModal';
-import { RatioTag } from '../common';
+import { RatioTag, CustomIdentityBadge } from '../common';
 
 import {
   formatDigits, compareVaultRatio, compareVaultIssued, toTokenUnitsBN,
@@ -129,7 +129,7 @@ function VaultOwnerList({
         entriesPerPage={5}
         renderEntry={(vault: types.vaultWithRatio) => {
           return [
-            <IdentityBadge entity={vault.owner} shorten />,
+            <CustomIdentityBadge entity={vault.owner} shorten />,
             toTokenUnitsBN(vault.collateral, option.collateral.decimals).toFixed(3),
             toTokenUnitsBN(vault.oTokensIssued, option.decimals).toFixed(3),
             toTokenUnitsBN(vault.exercised, option.collateral.decimals).toFixed(3),

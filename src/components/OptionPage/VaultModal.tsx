@@ -6,7 +6,6 @@ import {
   Box,
   Split,
   TextInput,
-  IdentityBadge,
   IconEthereum,
   IconConnect,
   DataView,
@@ -14,7 +13,7 @@ import {
   Tag,
 } from '@aragon/ui';
 
-import { RatioTag, Comment } from '../common';
+import { RatioTag, Comment, CustomIdentityBadge } from '../common';
 
 import {
   liquidate,
@@ -73,7 +72,7 @@ function VaultModal({
           entries={[vault]}
           entriesPerPage={1}
           renderEntry={(vault: types.vaultWithRatio) => [
-            <IdentityBadge entity={vault.owner} shorten />,
+            <CustomIdentityBadge entity={vault.owner} shorten />,
             formatDigits(toTokenUnitsBN(vault.collateral, option.collateral.decimals), 5),
             formatDigits(toTokenUnitsBN(vault.oTokensIssued, option.decimals), 5),
             formatDigits(vault.ratio, 4),
