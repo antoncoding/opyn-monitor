@@ -24,6 +24,8 @@ import TradeOnUniswap from './components/TradeUniswap'
 import TradeOn0x from './components/Trade0x';
 import CreateOption from './components/CreateOption'
 
+import Balancer from './components/Balancer'
+
 import Footer from './components/Footer';
 
 function App() {
@@ -89,6 +91,8 @@ function App() {
           <Route path="/uniswap/">
             <ExchangeList />
           </Route>
+          
+          <Route path="/balancer/"> <Balancer ethPrice={spotPrice}/> </Route>
           <Route path="/create/"><CreateOption user={user}/></Route>
           {/* HomePage */}
           <Route path="/"><HomePage /></Route>
