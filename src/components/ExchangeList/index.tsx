@@ -16,7 +16,7 @@ function TradeLanding() {
     tracker.pageview('/uniswap/');
   }, []);
 
-  const goToTrade = (addr:string) => {
+  const goToTrade = (addr: string) => {
     history.push(`/uniswap/${addr}`);
   };
 
@@ -24,7 +24,7 @@ function TradeLanding() {
 
   return (
     <>
-      <Header primary="Trade on Uniswap" />
+      <Header primary="Uniswap Exchanges" />
       <div style={{ display: 'flex' }}>
         <Comment text="Buy or Sell DeFi Insurance" />
         <div style={{ marginLeft: 'auto' }}>
@@ -73,7 +73,7 @@ function TradeLanding() {
 
 
 
-function GoToUniswapFunction({ token }:{token:string}) {
+function GoToUniswapFunction({ token }: { token: string }) {
   return (
     <Button onClick={() => {
       tracker.event({
@@ -81,10 +81,11 @@ function GoToUniswapFunction({ token }:{token:string}) {
         action: 'uniswap',
       })
       window.open(
-      `https://uniswap.exchange/swap?inputCurrency=${token}`,
-      '_blank',
-    )}
-  }
+        `https://uniswap.exchange/swap?inputCurrency=${token}`,
+        '_blank',
+      )
+    }
+    }
     >
       <img alt="uniswap" src="https://i.imgur.com/4eX8GlY.png" style={{ padding: 2, height: 25, width: 23 }} />
     </Button>

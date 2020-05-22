@@ -33,21 +33,31 @@ function HomePage() {
             }}
           />
         </div>
-
         <div style={{ width: '30%', marginLeft: '3%' }}>
           <MainButton
-            title="Exchange"
-            description="Buy, Sell Options on Uniswap."
+            title="Exchanges"
+            description="View all open markets for opyn options"
             iconUrl="https://i.imgur.com/4eX8GlY.png"
             onClick={() => {
-              history.push('/trade/uniswap/');
+              history.push('/uniswap/');
             }}
           />
         </div>
 
       </div>
       <div style={{ padding: '1%', display: 'flex', alignItems: 'center' }}>
-        <div style={{ width: '30%' }}>
+        <div style={{ width: '30%', marginRight: '3%' }}>
+          <MainButton
+            title="Trade"
+            tag="new"
+            description="Trade Options on Uniswap."
+            iconUrl="https://i.imgur.com/4eX8GlY.png"
+            onClick={() => {
+              history.push('/trade/uniswap/');
+            }}
+          />
+        </div>
+        <div style={{ width: '30%', marginRight: '3%' }}>
           <MainButton
             title="Trade"
             tag="new"
@@ -69,12 +79,12 @@ type MainButtonPropx = {
   description: string,
   iconUrl: string,
   onClick: Function,
-  tag?:string
+  tag?: string
 }
 
 function MainButton({
   title, description, iconUrl, onClick, tag,
-}:MainButtonPropx) {
+}: MainButtonPropx) {
   return (
     <LinkBase onClick={onClick} style={{ width: '100%' }}>
       <Box>
