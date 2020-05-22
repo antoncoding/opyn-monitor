@@ -64,7 +64,7 @@ function NavBar({
               onClick={() => {
                 history.push('/uniswap/');
               }}
-              isSelected={history.location.pathname.includes('/uniswap/')}
+              isSelected={history.location.pathname.includes('/uniswap/') && !history.location.pathname.includes('/trade/')}
             />
             <LinkButton
               title="Uniswap Trade"
