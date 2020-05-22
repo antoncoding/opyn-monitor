@@ -81,7 +81,7 @@ function GoToUniswapFunction({ token }: { token: string }) {
         action: 'uniswap',
       })
       window.open(
-        `https://uniswap.exchange/swap?inputCurrency=${token}`,
+        `https://v1.uniswap.exchange/swap?inputCurrency=${token}`,
         '_blank',
       )
     }
