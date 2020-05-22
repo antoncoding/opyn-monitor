@@ -37,10 +37,10 @@ function HomePage() {
         <div style={{ width: '30%', marginLeft: '3%' }}>
           <MainButton
             title="Exchange"
-            description="Buy, Sell or Provided Liquidity."
+            description="Buy, Sell Options on Uniswap."
             iconUrl="https://i.imgur.com/4eX8GlY.png"
             onClick={() => {
-              history.push('/uniswap/');
+              history.push('/trade/uniswap/');
             }}
           />
         </div>
