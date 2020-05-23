@@ -56,7 +56,10 @@ function AllContracts() {
       {tabSelected === 0 ? (
         <DataView
           fields={['Name', 'Contract', 'Expires in', '']}
-          entries={insurances.filter((option) => showExpired || option.expiry * 1000 > Date.now())}
+          entries={insurances
+            .filter((option) => showExpired || option.expiry * 1000 > Date.now())
+            .sort((oa, ob) => oa.expiry > ob.expiry ? -1 : 1)
+          }
           entriesPerPage={6}
           renderEntry={({ addr, title, expiry }) => [
             <>{title}</>,

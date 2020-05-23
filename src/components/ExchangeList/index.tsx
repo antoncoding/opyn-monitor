@@ -20,6 +20,9 @@ function TradeLanding() {
     history.push(`/uniswap/${addr}`);
   };
 
+  const [insurancePage, setIPages] = useState(0)
+  const [optionPage, setOptionPage] = useState(0)
+
   const [showExpired, setShowExpired] = useState(getPreference('showExpired', '0') === '1');
 
   return (
@@ -42,6 +45,8 @@ function TradeLanding() {
         fields={['Name', 'Contract', '']}
         entries={insurances.filter((option) => showExpired || option.expiry * 1000 > Date.now())}
         entriesPerPage={6}
+        page={insurancePage}
+        onPageChange={setIPages}
         renderEntry={({ addr, title }) => [
           <>{title}</>,
           <IdentityBadge entity={addr} shorten={false} />,
@@ -55,6 +60,8 @@ function TradeLanding() {
       <Comment text="Trade Options" />
       <DataView
         fields={['Name', 'Contract', '']}
+        page={optionPage}
+        onPageChange={setOptionPage}
         entries={eth_options.filter((option) => showExpired || option.expiry * 1000 > Date.now())}
         entriesPerPage={6}
         renderEntry={({ addr, title }) => [
