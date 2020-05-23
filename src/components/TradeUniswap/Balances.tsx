@@ -27,7 +27,7 @@ function Balances({ tokenPrices, balances, allOptions }: MyPositionsProps) {
   
   const [rows, setRows] = useState<optionBalance[]>([])
   const [totalValueUSD, setTotalValue] = useState(new BigNumber(0))
-
+  const [page, setPage] = useState(0)
   useEffect(()=>{
     const entries = balances
       .filter(balanceObj => balanceObj.balance.gt(0))
@@ -55,6 +55,8 @@ function Balances({ tokenPrices, balances, allOptions }: MyPositionsProps) {
         fields={['Token', 'Balance','Price', 'Total value']}
         entries={rows}
         entriesPerPage={8}
+        page={page}
+        onChangePage={setPage}
         tableRowHeight={45}
         renderEntry={({ option, amount, price, value }: optionBalance) => [
           <IdentityBadge label={option.title} entity={option.addr} />,

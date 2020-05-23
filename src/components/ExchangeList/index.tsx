@@ -16,15 +16,18 @@ function TradeLanding() {
     tracker.pageview('/uniswap/');
   }, []);
 
-  const goToTrade = (addr:string) => {
+  const goToTrade = (addr: string) => {
     history.push(`/uniswap/${addr}`);
   };
+
+  const [insurancePage, setIPages] = useState(0)
+  const [optionPage, setOptionPage] = useState(0)
 
   const [showExpired, setShowExpired] = useState(getPreference('showExpired', '0') === '1');
 
   return (
     <>
-      <Header primary="Trade on Uniswap" />
+      <Header primary="Uniswap Exchanges" />
       <div style={{ display: 'flex' }}>
         <Comment text="Buy or Sell DeFi Insurance" />
         <div style={{ marginLeft: 'auto' }}>
@@ -42,6 +45,8 @@ function TradeLanding() {
         fields={['Name', 'Contract', '']}
         entries={insurances.filter((option) => showExpired || option.expiry * 1000 > Date.now())}
         entriesPerPage={6}
+        page={insurancePage}
+        onPageChange={setIPages}
         renderEntry={({ addr, title }) => [
           <>{title}</>,
           <IdentityBadge entity={addr} shorten={false} />,
@@ -55,6 +60,8 @@ function TradeLanding() {
       <Comment text="Trade Options" />
       <DataView
         fields={['Name', 'Contract', '']}
+        page={optionPage}
+        onPageChange={setOptionPage}
         entries={eth_options.filter((option) => showExpired || option.expiry * 1000 > Date.now())}
         entriesPerPage={6}
         renderEntry={({ addr, title }) => [
@@ -73,7 +80,7 @@ function TradeLanding() {
 
 
 
-function GoToUniswapFunction({ token }:{token:string}) {
+function GoToUniswapFunction({ token }: { token: string }) {
   return (
     <Button onClick={() => {
       tracker.event({
@@ -81,10 +88,11 @@ function GoToUniswapFunction({ token }:{token:string}) {
         action: 'uniswap',
       })
       window.open(
-      `https://uniswap.exchange/swap?inputCurrency=${token}`,
-      '_blank',
-    )}
-  }
+        `https://v1.uniswap.exchange/swap?inputCurrency=${token}`,
+        '_blank',
+      )
+    }
+    }
     >
       <img alt="uniswap" src="https://i.imgur.com/4eX8GlY.png" style={{ padding: 2, height: 25, width: 23 }} />
     </Button>

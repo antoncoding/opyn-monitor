@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   TextInput, DataView, Button, LinkBase, EthIdenticon, useToast,
 } from '@aragon/ui';
@@ -11,8 +11,13 @@ import { resolveENS } from '../../utils/infura';
 function PleaseLogin({ setWatchAddress }: { setWatchAddress: Function }) {
   const toast = useToast();
   const [InAddress, setAddress] = useState('');
-  const watch_addrs = getPreference('watch_addresses', '[]');
-  const usedAddresses = JSON.parse(watch_addrs);
+  const [addrs, setAddrLisrt] = useState([])
+
+  useEffect(()=>{
+    const watch_addrs = getPreference('watch_addresses', '[]');
+    const usedAddresses = JSON.parse(watch_addrs);
+    setAddrLisrt(usedAddresses)
+  },[])
 
   return (
     <>
@@ -31,10 +36,10 @@ function PleaseLogin({ setWatchAddress }: { setWatchAddress: Function }) {
             wide
           />
 
-          {usedAddresses.length > 0 ? (
+          {addrs.length > 0 ? (
             <div style={{ paddingTop: '3%' }}>
               <DataView
-                entries={usedAddresses.reverse()}
+                entries={addrs.reverse()}
                 fields={['used']}
                 entriesPerPage={5}
                 renderEntry={(address: string) => [

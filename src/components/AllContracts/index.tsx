@@ -24,9 +24,10 @@ function AllContracts() {
   const [showExpired, setShowExpired] = useState(storedShowExpired === '1'); // whether to show expired options
 
   const history = useHistory();
-  const goToToken = (addr:string) => {
+  const goToToken = (addr: string) => {
     history.push(`/option/${addr}`);
   };
+
   return (
     <>
       <Header primary="All Contracts" />
@@ -46,7 +47,7 @@ function AllContracts() {
       <Tabs
         items={['DeFi Insurance', 'Put Options', 'Call Options']}
         selected={tabSelected}
-        onChange={(choice:number) => {
+        onChange={(choice: number) => {
           setTabSelected(choice);
           storePreference('optionTab', choice.toString());
         }}
@@ -55,7 +56,10 @@ function AllContracts() {
       {tabSelected === 0 ? (
         <DataView
           fields={['Name', 'Contract', 'Expires in', '']}
-          entries={insurances.filter((option) => showExpired || option.expiry * 1000 > Date.now())}
+          entries={insurances
+            .filter((option) => showExpired || option.expiry * 1000 > Date.now())
+            .sort((oa, ob) => oa.expiry > ob.expiry ? -1 : 1)
+          }
           entriesPerPage={6}
           renderEntry={({ addr, title, expiry }) => [
             <>{title}</>,
@@ -65,39 +69,44 @@ function AllContracts() {
           ]}
         />
       ) : tabSelected === 1 ? (
-        <OptionList 
+        <OptionList
           entries={eth_puts}
           showExpired={showExpired}
           goToToken={goToToken}
         />
       ) : ( // calls
-        <OptionList 
-          entries={eth_calls}
-          showExpired={showExpired}
-          goToToken={goToToken}
-        />
-      ) }
-      
+            <OptionList
+              entries={eth_calls}
+              showExpired={showExpired}
+              goToToken={goToToken}
+            />
+          )}
+
     </>
   );
 }
 
 export default AllContracts;
 
-function OptionList({ entries, showExpired, goToToken }:{entries: types.ETHOption[], showExpired: boolean, goToToken: Function}){
-  return (<DataView
-    fields={['Contract', 'Strike Price', 'Expiration', 'Expires in', '']}
-    entries={entries
-      .filter((option) => showExpired || option.expiry * 1000 > Date.now())
-      .sort((oa, ob) =>  oa.expiry > ob.expiry ? 1 : -1 )
-    }
-    entriesPerPage={6}
-    renderEntry={(option: types.ETHOption) => [
-      <IdentityBadge label={option.title} entity={option.addr} shorten={false} />,
-      <>{option.strikePriceInUSD + ' USD'}</>,
-      new Date(option.expiry * 1000).toLocaleDateString("en-US", { timeZone: "UTC" }) ,
-      <Timer end={new Date(option.expiry * 1000)} format='dhm' />,
-      <Button onClick={() => goToToken(option.addr)}> View Vaults </Button>,
-    ]}
-  />)
+function OptionList({ entries, showExpired, goToToken }: { entries: types.ETHOption[], showExpired: boolean, goToToken: Function }) {
+  const [page, setPage] = useState(0)
+  return (
+    <DataView
+      fields={['Contract', 'Strike Price', 'Expiration', 'Expires in', '']}
+      entries={entries
+        .filter((option) => showExpired || option.expiry * 1000 > Date.now())
+        .sort((oa, ob) => oa.expiry > ob.expiry ? -1 : 1)
+      }
+      page={page}
+      onPageChange={setPage}
+      entriesPerPage={6}
+      renderEntry={(option: types.ETHOption) => [
+        <IdentityBadge label={option.title} entity={option.addr} shorten={false} />,
+        <>{option.strikePriceInUSD + ' USD'}</>,
+        new Date(option.expiry * 1000).toLocaleDateString("en-US", { timeZone: "UTC" }),
+        <Timer end={new Date(option.expiry * 1000)} format='dhm' />,
+        <Button onClick={() => goToToken(option.addr)}> View Vaults </Button>,
+      ]}
+    />
+  )
 }

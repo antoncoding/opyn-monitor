@@ -25,7 +25,7 @@ function RemoveUnderlying({
 }: RemoveUnderlyingProps) {
   const [isLoading, setIsLoading] = useState(true);
   const [entries, setEntries] = useState<RemoveUnderlyingHistoryEntry[]>([]);
-
+  const [page, setPage]= useState(0)
   useMemo(async () => {
     const actions = await getRemoveUnderlyingHistory(owner, token);
     setEntries(actions);
@@ -34,7 +34,6 @@ function RemoveUnderlying({
 
   return (
     <>
-
       <Box heading="Underlying">
         <div style={{ display: 'flex' }}>
           {/* balance */}
@@ -57,16 +56,18 @@ function RemoveUnderlying({
           fields={['Tx', 'Amount', 'Timestamp']}
           entries={entries}
           entriesPerPage={4}
+          page={page}
+          onPageChange={setPage}
           renderEntry={({
             transactionHash, amount, timestamp,
           }: RemoveUnderlyingHistoryEntry) => [
-            <TransactionBadge shorten={false} transaction={transactionHash} />,
-            formatDigits(
-              toTokenUnitsBN(amount, underlyingDecimals).toNumber(),
-              5,
-            ),
-            timeSince(parseInt(timestamp, 10)* 1000),
-          ]}
+              <TransactionBadge shorten={false} transaction={transactionHash} />,
+              formatDigits(
+                toTokenUnitsBN(amount, underlyingDecimals).toNumber(),
+                5,
+              ),
+              timeSince(parseInt(timestamp, 10) * 1000),
+            ]}
         />
       </Box>
     </>
