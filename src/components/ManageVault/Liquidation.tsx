@@ -32,7 +32,7 @@ type LiquidationHistoryProps = {
   token: string,
   isOwner: Boolean,
   tokenDecimals: number,
-  collateralDecimals:number,
+  collateralDecimals: number,
   userTokenBalance: BigNumber,
 };
 
@@ -44,6 +44,8 @@ function LiquidationHistory({
   const [entries, setEntries] = useState<LiqActions[]>([]);
 
   const [amountToLiquidate, setAmtToLiquidate] = useState(0);
+
+  const [tablePage, setTablePage] = useState(0)
 
   useEffect(() => {
     async function updateLiquidatable() {
@@ -127,6 +129,8 @@ function LiquidationHistory({
           fields={['Tx', 'Amount', 'Liquidator', 'Date']}
           entries={entries}
           entriesPerPage={4}
+          page={tablePage}
+          onPageChange={setTablePage}
           renderEntry={({
             collateralToPay, liquidator, timestamp, transactionHash,
           }) => [

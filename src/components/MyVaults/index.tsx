@@ -22,16 +22,16 @@ import OpenVaultModal from './OpenVaultModal';
 const Promise = require('bluebird');
 
 export type vaultWithDetail = {
-  oToken:string,
+  oToken: string,
   collateral: string,
-  oTokenName:string
+  oTokenName: string
   collateralDecimals: number,
   collateralSymbol: string,
-  expiry:number
+  expiry: number
   ratio: number
 }
 
-function MyVaults({ user }: {user: string}) {
+function MyVaults({ user }: { user: string }) {
   useEffect(() => {
     tracker.pageview('/myvaults/');
   }, []);
@@ -60,7 +60,7 @@ function MyVaults({ user }: {user: string}) {
     const notOpenedTokens: types.option[] = [];
     await Promise.map(allOptions, async (option: types.option) => {
       const entry = userVaults.find((vault) => vault.optionsContract.address === option.addr);
-      
+
       if (entry !== undefined) {
         const strikeValueInCollateral = await calculateStrikeValueInCollateral(
           option.collateral.addr,
@@ -92,6 +92,9 @@ function MyVaults({ user }: {user: string}) {
     setOpenedVaults(openedVaults.sort(compareVaultRatio));
     setTokensToOpen(notOpenedTokens);
   }, [user, watchAddress, hasAddressConnected, isWatchMode]);
+
+  const [vaultListPage, setVPage] = useState(0)
+  const [openVaultPage, setOPage] = useState(0)
 
   return (
     <>
@@ -129,29 +132,32 @@ function MyVaults({ user }: {user: string}) {
                 fields={['Token', 'contract', 'collateral', 'Ratio', '']}
                 entries={displayVaults}
                 entriesPerPage={6}
+                page={vaultListPage}
+                onPageChange={setVPage}
                 renderEntry={({
                   oToken, oTokenName, collateral, collateralDecimals, ratio, collateralSymbol
-                }:vaultWithDetail) => [
-                  oTokenName,
-                  <IdentityBadge entity={oToken} />,
-                  `${formatDigits(toTokenUnitsBN(collateral, collateralDecimals).toNumber(), 5)} ${collateralSymbol}`,
-                  formatDigits(ratio, 4),
-                  <ManageVaultButton oToken={oToken} owner={isWatchMode ? watchAddress : user} />,
-                ]}
+                }: vaultWithDetail) => [
+                    oTokenName,
+                    <IdentityBadge entity={oToken} />,
+                    `${formatDigits(toTokenUnitsBN(collateral, collateralDecimals).toNumber(), 5)} ${collateralSymbol}`,
+                    formatDigits(ratio, 4),
+                    <ManageVaultButton oToken={oToken} owner={isWatchMode ? watchAddress : user} />,
+                  ]}
               />
             </div>
           ) : isLoading ? (
             <Comment text="Loading" />
           ) : (
-            <Comment text="No Opened Vaults" />
-          )}
+                <Comment text="No Opened Vaults" />
+              )}
           {tokensToOpen.length > 0 && !isWatchMode ? (
             <div>
               <SectionTitle title="Open new vaults" />
               <DataView
                 fields={['Token', 'contract', 'manage']}
                 entries={tokensToOpen}
-                
+                page={openVaultPage}
+                onPageChange={setOPage}
                 renderEntry={(option: types.option) => {
                   return [
                     option.title,
@@ -162,16 +168,15 @@ function MyVaults({ user }: {user: string}) {
               />
             </div>
           ) : (
-            <></>
-          )}
+              <></>
+            )}
         </>
       ) : (
-        // Not connected to wallet
-        <NoWalletView
-          // watchAddress={watchAddress}
-          setWatchAddress={setWatchAddress}
-        />
-      )}
+          // Not connected to wallet
+          <NoWalletView
+            setWatchAddress={setWatchAddress}
+          />
+        )}
     </>
   );
 }

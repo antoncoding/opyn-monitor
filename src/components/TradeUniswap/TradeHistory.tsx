@@ -26,29 +26,29 @@ type historyEntry = {
   price: BigNumber,
   timestamp: number,
   txHash: string,
-  paymentTokenSymbol:string,
-} 
+  paymentTokenSymbol: string,
+}
 
 function TradeHistory({ user, allOptions }: MyPositionsProps) {
-  
+
   const [rows, setRows] = useState<historyEntry[]>([])
   const [isLoading, setIsLoading] = useState(true)
 
-  useMemo(async()=>{
+  useMemo(async () => {
     if (!user) return
 
-    function filterOptionsOnly (entry: {token: {address: string}}) {
+    function filterOptionsOnly(entry: { token: { address: string } }) {
       return allOptions.map(o => o.addr).includes(entry.token.address)
-    } 
+    }
 
     const buys = (await getUserUniswapBuys(user)).filter(filterOptionsOnly)
     const buyEntries: historyEntry[] = await Promise.map(buys, async buy => {
       const option = allOptions.find(o => o.addr === buy.token.address) as ETHOption
       const amount = toTokenUnitsBN(buy.oTokensToBuy, option.decimals)
-        .div(option.type === 'call' 
-        ? new BigNumber(option.strikePriceInUSD) 
-        : new BigNumber(1)
-      )
+        .div(option.type === 'call'
+          ? new BigNumber(option.strikePriceInUSD)
+          : new BigNumber(1)
+        )
       let paymentToken = paymentTokens.find(t => t.addr === buy.paymentTokenAddress)
       if (paymentToken === undefined) {
         const decimals = await getDecimals(buy.paymentTokenAddress)
@@ -76,7 +76,7 @@ function TradeHistory({ user, allOptions }: MyPositionsProps) {
         txHash: buy.transactionHash
       }
     })
-    
+
     const sells = (await getUserUniswapSells(user)).filter(filterOptionsOnly)
     const sellEntries: historyEntry[] = await Promise.map(sells, async sell => {
       const option = allOptions.find(o => o.addr === sell.token.address) as ETHOption
@@ -92,10 +92,10 @@ function TradeHistory({ user, allOptions }: MyPositionsProps) {
         paymentTokens.push(payoutToken)
       }
 
-      
+
       const amount = toTokenUnitsBN(sell.oTokensToSell, option.decimals)
-        .div(option.type === 'call' 
-          ? new BigNumber(option.strikePriceInUSD) 
+        .div(option.type === 'call'
+          ? new BigNumber(option.strikePriceInUSD)
           : new BigNumber(1)
         )
       const price = new BigNumber(sell.payoutTokensReceived)
@@ -109,36 +109,38 @@ function TradeHistory({ user, allOptions }: MyPositionsProps) {
         type: 'Sell',
         amount,
         premium: toTokenUnitsBN(sell.payoutTokensReceived, payoutToken.decimals),
-        price: toTokenUnitsBN(price, payoutToken.decimals ),
+        price: toTokenUnitsBN(price, payoutToken.decimals),
         timestamp: parseInt(sell.timestamp),
         txHash: sell.transactionHash
       }
     })
 
-    const allEntris = sellEntries.concat(buyEntries).sort((a, b)=> a.timestamp > b.timestamp ? -1 : 1 )
+    const allEntris = sellEntries.concat(buyEntries).sort((a, b) => a.timestamp > b.timestamp ? -1 : 1)
     setRows(allEntris)
     setIsLoading(false)
   }, [allOptions, user])
 
+  const [page, setPage] = useState(0)
+
   return (
-    <>
-      <DataView
-        status={ isLoading ? "loading" : "default" }
-        fields={['option', 'Type', 'Size', 'Price', 'total Premium','Time', 'tx']}
-        entries={rows}
-        entriesPerPage={8}
-        tableRowHeight={45}
-        renderEntry={({ type, price, amount, timestamp, txHash, option, premium, paymentTokenSymbol }:historyEntry) => [
-          <IdentityBadge label={option.title} entity={option.addr} />,
-          <TradeType type={type}/>,
-          amount?.toFixed(3) + (option.type === 'call' ? '*' : ''),
-          price.toFixed(3) + ' USD',
-          `${premium.toFixed(3)} ${paymentTokenSymbol}`,
-          timeSince(timestamp*1000),
-          <TransactionBadge transaction={txHash} />
-        ]}
-      />
-    </>
+    <DataView
+      status={isLoading ? "loading" : "default"}
+      fields={['option', 'Type', 'Size', 'Price', 'total Premium', 'Time', 'tx']}
+      entries={rows}
+      entriesPerPage={8}
+      page={page}
+      onPageChange={setPage}
+      tableRowHeight={45}
+      renderEntry={({ type, price, amount, timestamp, txHash, option, premium, paymentTokenSymbol }: historyEntry) => [
+        <IdentityBadge label={option.title} entity={option.addr} />,
+        <TradeType type={type} />,
+        amount?.toFixed(3) + (option.type === 'call' ? '*' : ''),
+        price.toFixed(3) + ' USD',
+        `${premium.toFixed(3)} ${paymentTokenSymbol}`,
+        timeSince(timestamp * 1000),
+        <TransactionBadge transaction={txHash} />
+      ]}
+    />
   );
 }
 

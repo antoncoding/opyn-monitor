@@ -32,6 +32,7 @@ function MyPositions({ user, spotPrice, tokenPrices, balances }: MyPositionsProp
   const [vaults, setVaults] = useState<vault[]>([])
   const [positions, setPositions] = useState<position[]>([])
   const [aggregatedPositionGreeks, setPositionGreeks] = useState<PositionGreekType>(defaultPostitionGreeks)
+  const [positionsPage, setPPage] = useState(0)
   // Get vaults
   useMemo(async () => {
     const userVaults = await getAllVaultsForUser(user);
@@ -120,6 +121,8 @@ function MyPositions({ user, spotPrice, tokenPrices, balances }: MyPositionsProp
         entries={positions}
         entriesPerPage={8}
         tableRowHeight={45}
+        page={positionsPage}
+        onPageChange={setPPage}
         renderEntry={(p: position) => [
           <IdentityBadge
             entity={p.option.addr} label={p.option.title} />,
