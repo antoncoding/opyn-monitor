@@ -6,11 +6,11 @@ import { BalanceBlock } from '../common'
 import BigNumber from 'bignumber.js'
 
 import {
-  getApprxATMIV,
+  // getApprxATMIV,
   // getIVCorrandoMiller, 
-  getApprxIV,
-  getApprxATMPrice, 
-  // getApprxATMPrice2,
+  getApprxIV2,
+  // getApprxATMPrice, 
+  getApprxATMPrice2,
   updateWight, 
   calculateOutGivenIn,
 } from './utils'
@@ -45,7 +45,7 @@ function BalancerDemo({ ethPrice }: { ethPrice: BigNumber }) {
   // Mock smart contract calls
   const preAction = () => {
     // adjust price (weight) with new spot price, timestamp and OLD IV
-    const newprice = getApprxATMPrice(ethPrice, lastIV, today, expiration)
+    const newprice = getApprxATMPrice2(new BigNumber(strikePrice), ethPrice, lastIV, today, expiration)
     // const newprice = getApprxATMPrice2(new BigNumber(strikePrice), ethPrice, lastIV, today, expiration)
 
     if (poolUSDCAmount.gt(0) && poolOTokenAmount.gt(0)) {
@@ -64,13 +64,13 @@ function BalancerDemo({ ethPrice }: { ethPrice: BigNumber }) {
     // calculate iv from current spot price
     console.log(`[post] weight ${usdcWeight.toNumber()} - ${tokenWeight.toNumber()}`)
     const spotPrice = (poolUSDCAmount.div(usdcWeight)).div(poolOTokenAmount.div(tokenWeight))
-    const iv = getApprxATMIV(
-      spotPrice,
-      ethPrice,
-      today,
-      expiration
-    ).toNumber()
-    const iv2 = getApprxIV(
+    // const iv = getApprxATMIV(
+    //   spotPrice,
+    //   ethPrice,
+    //   today,
+    //   expiration
+    // ).toNumber()
+    const iv2 = getApprxIV2(
       spotPrice,
       ethPrice,
       new BigNumber(strikePrice),
@@ -79,7 +79,7 @@ function BalancerDemo({ ethPrice }: { ethPrice: BigNumber }) {
     ).toNumber()
     // const iv2 = getIVCorrandoMiller(spotPrice, new BigNumber(strikePrice), ethPrice, today, expiration)
     console.log(`iv2`, iv2)
-    setLastIV(iv)
+    setLastIV(iv2)
 
   }
 

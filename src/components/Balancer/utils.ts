@@ -25,23 +25,24 @@ export function getApprxATMPrice(ethPrice: BigNumber, volatility: number, now: D
 }
 
 export function getApprxATMPrice2(strikePrice: BigNumber, ethPrice: BigNumber, volatility: number, now: Date, expiry: Date) {
+  console.log(`t in s ${new BigNumber(expiry.getTime() - now.getTime()).div(1000).toNumber()}`)
   const timeInYear = new BigNumber(expiry.getTime() - now.getTime()).div(1000).div(86400).div(365);
   const avg = (ethPrice.plus(strikePrice)).div(2)
   const intrisic = (ethPrice.minus(strikePrice)).div(2)
   return avg.times(0.4).times(volatility).times(timeInYear.sqrt()).plus(intrisic) ;
 }
 
-export function getApprxATMIV(
-  optionPrice: BigNumber,
-  ethPrice: BigNumber,
-  now: Date,
-  expiry: Date
-) {
-  const timeInYear = new BigNumber(expiry.getTime() - now.getTime()).div(1000).div(86400).div(365);
-  return optionPrice.div(0.4).div(timeInYear.sqrt()).div(ethPrice);
-}
+// export function getApprxATMIV(
+//   optionPrice: BigNumber,
+//   ethPrice: BigNumber,
+//   now: Date,
+//   expiry: Date
+// ) {
+//   const timeInYear = new BigNumber(expiry.getTime() - now.getTime()).div(1000).div(86400).div(365);
+//   return optionPrice.div(0.4).div(timeInYear.sqrt()).div(ethPrice);
+// }
 
-export function getApprxIV(
+export function getApprxIV2(
   optionPrice: BigNumber,
   ethPrice: BigNumber,
   strikePrice: BigNumber,
@@ -50,9 +51,12 @@ export function getApprxIV(
 ) {
   const intrisic = (ethPrice.minus(strikePrice)).div(2)
   const timeInYear = new BigNumber(expiry.getTime() - now.getTime()).div(1000).div(86400).div(365);
-  return PI.times(2).div(timeInYear).sqrt().times(optionPrice.minus(intrisic)).div(ethPrice.minus(intrisic))
-  
+  // return PI.times(2).div(timeInYear).sqrt().times(optionPrice.minus(intrisic)).div(ethPrice.minus(intrisic))
+  const divider = timeInYear.sqrt().times(new BigNumber(0.4))
+    .times(ethPrice.minus(intrisic));
+  return optionPrice.minus(intrisic).div(divider)
 }
+
 
 export function getIVCorrandoMiller(
   optionPrice: BigNumber,
