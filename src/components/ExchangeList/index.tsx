@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useHistory } from 'react-router-dom';
+import MesaLogo from '../../imgs/gnosis.png'
+import UniswapLogo from '../../imgs/uniswap.png'
 import {
   Header, DataView, IdentityBadge, Button,
 } from '@aragon/ui';
@@ -27,7 +29,7 @@ function TradeLanding() {
 
   return (
     <>
-      <Header primary="Uniswap Exchanges" />
+      <Header primary="Exchanges" />
       <div style={{ display: 'flex' }}>
         <Comment text="Buy or Sell DeFi Insurance" />
         <div style={{ marginLeft: 'auto' }}>
@@ -53,6 +55,7 @@ function TradeLanding() {
           <div style={{ display: 'flex' }}>
             <Button onClick={() => goToTrade(addr)}> Start Trading </Button>
             <GoToUniswapFunction token={addr} />
+            <GoToMesa token={addr} />
           </div>,
         ]}
       />
@@ -70,6 +73,7 @@ function TradeLanding() {
           <div style={{ display: 'flex' }}>
             <Button onClick={() => goToTrade(addr)}> Start Trading </Button>
             <GoToUniswapFunction token={addr} />
+            <GoToMesa token={addr} />
           </div>,
 
         ]}
@@ -94,10 +98,31 @@ function GoToUniswapFunction({ token }: { token: string }) {
     }
     }
     >
-      <img alt="uniswap" src="https://i.imgur.com/4eX8GlY.png" style={{ padding: 2, height: 25, width: 23 }} />
+      <img alt="uniswap" src={UniswapLogo} style={{ padding: 2, height: 32, width: 29 }} />
     </Button>
   );
 }
+
+function GoToMesa({ token }: { token: string }) {
+  return (
+    <Button onClick={() => {
+      tracker.event({
+        category: 'link',
+        action: 'mesa',
+      })
+      window.open(
+        `https://mesadev.eth.link/#/trade/DAI-${token}`,
+        '_blank',
+      )
+    }
+    }
+    >
+      <img alt="mesa" src={MesaLogo} style={{ padding: 2, height: 32, width: 32 }} />
+    </Button>
+  );
+}
+
+
 
 
 export default TradeLanding;
