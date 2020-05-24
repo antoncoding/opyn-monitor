@@ -1,194 +1,145 @@
-import React, { useState } from 'react'
-
-import { TextInput, Header, Box, Button } from '@aragon/ui'
-import DateTimePicker from 'react-widgets/lib/DateTimePicker'
+import React, { useState, useMemo } from 'react'
+import { TextInput, Header, Box, Button, Timer, IdentityBadge } from '@aragon/ui'
 import { BalanceBlock } from '../common'
 import BigNumber from 'bignumber.js'
+import * as infura from './infura';
+import * as web3 from './web3'
 
-import {
-  // getApprxATMIV,
-  // getIVCorrandoMiller, 
-  getApprxIV2,
-  // getApprxATMPrice, 
-  getApprxATMPrice2,
-  updateWight, 
-  calculateOutGivenIn,
-} from './utils'
+import { toTokenUnitsBN, toBaseUnitBN } from '../../utils/number'
 
-function BalancerDemo({ ethPrice }: { ethPrice: BigNumber }) {
+const usdcDecimals = 6;
+const oTokenDecimals = 7;
 
-  const [smartContractCalls, setSmartContactCalled] = useState(0)
+const oToken = '0x6d2e52cac19d85fa1f8002c2b054502d962305e8';
+const usdc = '0x6de3919ad3e78a848a169c282d959de9a20267db';
 
-  const [today, setToday] = useState(new Date())
-  const [expiration, setExpiration] = useState(new Date(today.getTime() + (120 * 60 * 60 * 1000)))
+const poolAddr = '0x126679b2b632f643d00773b205e5a6b0559be282';
 
-  // option info
-  const [strikePrice, setStrikePrice] = useState(200)
+const expiration = new Date(1591344000000)
 
+function BalancerDemo() {
 
-  // const [isLocked, setIsLocked] = useState(false)
+  const [spotPrice, setSpotPrice] = useState(new BigNumber(0));
+
+  const [iv, setIV] = useState(0.5);
 
   const [poolOTokenAmount, setPoolOTokenAmt] = useState(new BigNumber(0))
-  const [poolUSDCAmount, setPoolETHAmt] = useState(new BigNumber(0))
+  const [poolUSDCAmount, setPoolUSDCAmt] = useState(new BigNumber(0))
 
-  const [poolOtokenWeight, setOTokenWeight] = useState(new BigNumber(0.5))
-  const [poolUSDCWeight, setUSDCWeight] = useState(new BigNumber(0.5))
+  const [poolOtokenWeight, setOTokenWeight] = useState(new BigNumber(50))
+  const [poolUSDCWeight, setUSDCWeight] = useState(new BigNumber(50))
 
-  // Input values
-  const [addOTokenAmount, setAddOTokenAmount] = useState(new BigNumber(0))
-  const [addUSDCAmount, setAddUSDCAmount] = useState(new BigNumber(0))
+  const [ethPrice, setEthPrice] = useState(new BigNumber(0))
+
+  useMemo(async () => {
+    const usdcWeight = await infura.getWeight(usdc)
+    const _usdcWeight = toTokenUnitsBN(usdcWeight, 17)
+    const _tokenWeight = new BigNumber(100).minus(_usdcWeight)
+    setOTokenWeight(_tokenWeight)
+    setUSDCWeight(_usdcWeight)
+
+    const iv = await infura.getIV()
+    const _iv = toTokenUnitsBN(iv, 10);
+    setIV(_iv.toNumber())
+
+    const poolUSDC = await infura.getTokenBalance(usdc, poolAddr)
+    const poolOToken = await infura.getTokenBalance(oToken, poolAddr)
+    setPoolOTokenAmt(toTokenUnitsBN(poolOToken, oTokenDecimals))
+    setPoolUSDCAmt(toTokenUnitsBN(poolUSDC, usdcDecimals))
+
+    const spotPrice = await infura.getSpotPRice();
+    setSpotPrice(toTokenUnitsBN(spotPrice, 18 - oTokenDecimals + usdcDecimals)) // 18 - 7 + 6
+
+    const usdcPrice = await infura.getUSDC()
+    setEthPrice(new BigNumber(10).exponentiatedBy(18).div(usdcPrice))
+
+  }, [])
 
   const [inputUSDCAmount, setInputUSDCAmount] = useState(new BigNumber(0))
+  const [inputOTokenAmount, setInputOTokenAmount] = useState(new BigNumber(0))
 
-  const spotPrice = (poolUSDCAmount.div(poolUSDCWeight)).div(poolOTokenAmount.div(poolOtokenWeight))
-
-  // Mock smart contract calls
-  const preAction = () => {
-    // adjust price (weight) with new spot price, timestamp and OLD IV
-    const newprice = getApprxATMPrice2(new BigNumber(strikePrice), ethPrice, lastIV, today, expiration)
-    // const newprice = getApprxATMPrice2(new BigNumber(strikePrice), ethPrice, lastIV, today, expiration)
-
-    if (poolUSDCAmount.gt(0) && poolOTokenAmount.gt(0)) {
-      // const priceInETH = newprice.div(ethPrice)
-      const newWeights = updateWight(newprice, poolUSDCAmount, poolOTokenAmount)
-      setUSDCWeight(newWeights.w1)
-      setOTokenWeight(newWeights.w2)
-      console.log(`[pre] weight ${newWeights.w1.toNumber()} - ${newWeights.w2.toNumber()}`)
-      return newWeights
-    }
-    return { w1: poolUSDCWeight, w2: poolOtokenWeight }
-
+  const onClickBuy = async () => {
+    await web3.swapInUSDC(toBaseUnitBN(inputUSDCAmount, usdcDecimals).toString());
   }
 
-  const postAction = (poolUSDCAmount: BigNumber, poolOTokenAmount: BigNumber, usdcWeight, tokenWeight) => {
-    // calculate iv from current spot price
-    console.log(`[post] weight ${usdcWeight.toNumber()} - ${tokenWeight.toNumber()}`)
-    const spotPrice = (poolUSDCAmount.div(usdcWeight)).div(poolOTokenAmount.div(tokenWeight))
-    // const iv = getApprxATMIV(
-    //   spotPrice,
-    //   ethPrice,
-    //   today,
-    //   expiration
-    // ).toNumber()
-    const iv2 = getApprxIV2(
-      spotPrice,
-      ethPrice,
-      new BigNumber(strikePrice),
-      today,
-      expiration
-    ).toNumber()
-    // const iv2 = getIVCorrandoMiller(spotPrice, new BigNumber(strikePrice), ethPrice, today, expiration)
-    console.log(`iv2`, iv2)
-    setLastIV(iv2)
-
+  const onClickSell = async () => {
+    await web3.swapInOETH(toBaseUnitBN(inputOTokenAmount, oTokenDecimals).toString());
   }
-
-  const onClickAddLiquidity = () => {
-    const weights = preAction()
-
-    setPoolOTokenAmt(poolOTokenAmount.plus(addOTokenAmount))
-    setPoolETHAmt(poolUSDCAmount.plus(addUSDCAmount))
-
-    setAddUSDCAmount(new BigNumber(0))
-    setAddOTokenAmount(new BigNumber(0))
-    setSmartContactCalled(smartContractCalls + 1)
-
-    postAction(poolUSDCAmount.plus(addUSDCAmount), poolOTokenAmount.plus(addOTokenAmount), weights.w1, weights.w2)
-  }
-
-  const onClickInputUSDC = () => {
-    const weights = preAction()
-
-    const outAmount = calculateOutGivenIn(inputUSDCAmount, poolUSDCAmount, poolOTokenAmount, poolUSDCWeight, poolOtokenWeight)
-    setPoolOTokenAmt(poolOTokenAmount.minus(outAmount))
-    setPoolETHAmt(poolUSDCAmount.plus(inputUSDCAmount))
-
-    postAction(poolUSDCAmount.plus(inputUSDCAmount), poolOTokenAmount.minus(outAmount), weights.w1, weights.w2)
-
-  }
-
-  const [lastIV, setLastIV] = useState(0.5)
 
   return (
     <>
-      <Header primary="Balancer" secondary={'ETH price: ' + ethPrice.toFixed(2) + ' USD'} />
-      <Box heading="Option">
-        Today | Expiration
-        <div style={{ display: 'flex' }}>
-
-          <DateTimePicker
-            defaultValue={today}
-            onChange={setToday}
-          />
-          <DateTimePicker
-            defaultValue={expiration}
-            onChange={setExpiration}
-          />
-        </div>
-        <br />
-        Strike Price
-        <TextInput
-          value={strikePrice}
-          onChange={(e) => setStrikePrice(e.target.value)} />
-      </Box>
+      <Header primary="Balancer (Kovan)" secondary={'ETH price: ' + ethPrice.toFixed(2) + ' USD'} />
       <Box heading="Controller">
-        <div>
-          Last IV:  {lastIV ? lastIV.toFixed(5) : '-'}
+        <div style={{ display: 'flex' }}>
+          <div style={{ width: '50%' }}>
+            <Box heading="Implied Volatility">
+              <BalanceBlock asset="" balance={iv * 100} />
+            </Box>
+          </div>
+          <div style={{ width: '50%' }}>
+            <Box heading="Expiration" padding={36}>
+              <Timer end={expiration} />
+            </Box>
+          </div>
         </div>
-        <Box heading="Add Asset">
-          <TextInput
-            // disabled={isLocked}
-            value={addUSDCAmount.toNumber()}
-            onChange={(e) => setAddUSDCAmount(new BigNumber(e.target.value))}
-            adornment="USDC"
-            adornmentPosition="end"
-          />
-          <TextInput
-            // disabled={isLocked}
-            value={addOTokenAmount.toNumber()}
-            onChange={(e) => setAddOTokenAmount(new BigNumber(e.target.value))}
-            adornment="oToken"
-            adornmentPosition="end"
-          />
-          <Button label="Add Liquidity" onClick={onClickAddLiquidity} />
-        </Box>
-        <Box heading="Buy">
-          <TextInput
-            // disabled={isLocked}
-            value={inputUSDCAmount.toNumber()}
-            onChange={(e) => setInputUSDCAmount(new BigNumber(e.target.value))}
-            adornment="USDC"
-            adornmentPosition="end"
-          />
-          <Button label="Buy oToken" onClick={onClickInputUSDC} />
-          {/* <TextInput
-            // disabled={isLocked}
-            value={addOTokenAmount.toNumber()}
-            onChange={(e) => setAddOTokenAmount(new BigNumber(e.target.value))}
-            adornment="oToken"
-            adornmentPosition="end"
-          /> */}
 
-        </Box>
+        <div style={{ display: 'flex' }}>
+          <div style={{ width: '50%' }}>
+            <Box heading="Buy">
+              <TextInput
+                // disabled={isLocked}
+                value={inputUSDCAmount.toNumber()}
+                onChange={(e) => setInputUSDCAmount(new BigNumber(e.target.value))}
+                adornment="USDC"
+                adornmentPosition="end"
+              />
+              <Button label="Buy oToken" onClick={onClickBuy} />
+            </Box>
+          </div>
+          <div style={{ width: '50%' }}>
+            <Box heading="Sell">
+              <TextInput
+                // disabled={isLocked}
+                value={inputOTokenAmount.toNumber()}
+                onChange={(e) => setInputOTokenAmount(new BigNumber(e.target.value))}
+                adornment="oETH"
+                adornmentPosition="end"
+              />
+              <Button label="Sell oToken" onClick={onClickSell} />
+            </Box>
+          </div>
+        </div>
+
       </Box>
       <Box heading="Pool">
-        <div>
-          Spot Price {spotPrice ? spotPrice.toFixed(5) : '-'} ({spotPrice.toFixed(2)} USDC)
+        <div style={{ display: 'flex' }}>
+          <div style={{ width: '50%' }}>
+            <Box heading="Spot Price">
+              <BalanceBlock asset="USDC" balance={spotPrice} />
+            </Box>
+          </div>
+          <div style={{ width: '50%' }}>
+            <Box heading="Pool Addresses" padding={46}>
+              <IdentityBadge entity={poolAddr} label="Balancer Pool" shorten={true} /> {' '}
+              <IdentityBadge entity={oToken} label="oETH" shorten={false} /> {' '}
+              <IdentityBadge entity={usdc} label="USDC" shorten={false} />
+            </Box>
+          </div>
         </div>
         <br /><br />
         <div style={{ display: 'flex' }}>
           <div style={{ width: '20%' }}>
-            <BalanceBlock asset="oToken" balance={poolOTokenAmount} ></BalanceBlock>
+            <BalanceBlock asset="oETH" balance={poolOTokenAmount} ></BalanceBlock>
           </div>
           <div style={{ width: '20%' }}>
-            <BalanceBlock asset="oToken Weight" balance={poolOtokenWeight.toFixed(4)} ></BalanceBlock>
+            <BalanceBlock asset="oETH Weight" balance={poolOtokenWeight.toFixed(4)} ></BalanceBlock>
           </div>
           <div style={{ width: '20%' }}></div>
           <div style={{ width: '20%' }}>
             <BalanceBlock asset="USDC" balance={poolUSDCAmount} ></BalanceBlock>
           </div>
           <div style={{ width: '20%' }}>
-            <BalanceBlock asset="ETH Weight" balance={poolUSDCWeight.toFixed(4)} ></BalanceBlock>
+            <BalanceBlock asset="USDC Weight" balance={poolUSDCWeight.toFixed(4)} ></BalanceBlock>
           </div>
         </div>
       </Box>

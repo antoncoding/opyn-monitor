@@ -25,11 +25,16 @@ export function getApprxATMPrice(ethPrice: BigNumber, volatility: number, now: D
 }
 
 export function getApprxATMPrice2(strikePrice: BigNumber, ethPrice: BigNumber, volatility: number, now: Date, expiry: Date) {
-  console.log(`t in s ${new BigNumber(expiry.getTime() - now.getTime()).div(1000).toNumber()}`)
-  const timeInYear = new BigNumber(expiry.getTime() - now.getTime()).div(1000).div(86400).div(365);
+  const t = new BigNumber(expiry.getTime() - now.getTime()).div(1000)
+  console.log(`t in s ${t.toNumber()}`)
+  // const timeInYear = new BigNumber(expiry.getTime() - now.getTime()).div(1000).div(86400).div(365);
+  const d = (ethPrice.minus(strikePrice)).div(2)
   const avg = (ethPrice.plus(strikePrice)).div(2)
-  const intrisic = (ethPrice.minus(strikePrice)).div(2)
-  return avg.times(0.4).times(volatility).times(timeInYear.sqrt()).plus(intrisic) ;
+  
+  return avg.times(volatility)
+    .times(t.sqrt())
+    .div(14040)
+    .plus(d) ;
 }
 
 // export function getApprxATMIV(
@@ -56,7 +61,6 @@ export function getApprxIV2(
     .times(ethPrice.minus(intrisic));
   return optionPrice.minus(intrisic).div(divider)
 }
-
 
 export function getIVCorrandoMiller(
   optionPrice: BigNumber,

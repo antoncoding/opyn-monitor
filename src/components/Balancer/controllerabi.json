@@ -1,0 +1,148 @@
+[
+  {
+    "inputs": [],
+    "name": "USDC",
+    "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "uint256", "name": "p", "type": "uint256" },
+      { "internalType": "uint256", "name": "x", "type": "uint256" },
+      { "internalType": "uint256", "name": "spot", "type": "uint256" },
+      { "internalType": "uint256", "name": "t", "type": "uint256" }
+    ],
+    "name": "_approximatePutIV",
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "uint256", "name": "x", "type": "uint256" },
+      { "internalType": "uint256", "name": "spot", "type": "uint256" },
+      { "internalType": "uint256", "name": "t", "type": "uint256" },
+      { "internalType": "uint256", "name": "v", "type": "uint256" }
+    ],
+    "name": "_approximatePutPrice",
+    "outputs": [{ "internalType": "uint256", "name": "price", "type": "uint256" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "_calculateImpliedVolatility",
+    "outputs": [{ "internalType": "uint256", "name": "_iv", "type": "uint256" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "_calculateOptionPrice",
+    "outputs": [{ "internalType": "uint256", "name": "optionPrice", "type": "uint256" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "ethDecimals",
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "expiry",
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "contract IBPool", "name": "_pool", "type": "address" },
+      { "internalType": "contract ICompoundOracle", "name": "_oracle", "type": "address" },
+      { "internalType": "uint256", "name": "_strikePrice", "type": "uint256" },
+      { "internalType": "uint256", "name": "_expiry", "type": "uint256" },
+      { "internalType": "address", "name": "_usdc_address", "type": "address" },
+      { "internalType": "address", "name": "_oToken", "type": "address" },
+      { "internalType": "uint256", "name": "_tokenDecimals", "type": "uint256" }
+    ],
+    "name": "init",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "iv",
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "ivDecimals",
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "oToken",
+    "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "oracle",
+    "outputs": [{ "internalType": "contract ICompoundOracle", "name": "", "type": "address" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "pool",
+    "outputs": [{ "internalType": "contract IBPool", "name": "", "type": "address" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "strikePrice",
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "address", "name": "tokenIn", "type": "address" },
+      { "internalType": "uint256", "name": "tokenAmountIn", "type": "uint256" },
+      { "internalType": "address", "name": "tokenOut", "type": "address" },
+      { "internalType": "uint256", "name": "minAmountOut", "type": "uint256" },
+      { "internalType": "uint256", "name": "maxPrice", "type": "uint256" }
+    ],
+    "name": "swapExactAmountIn",
+    "outputs": [
+      { "internalType": "uint256", "name": "tokenAmountOut", "type": "uint256" },
+      { "internalType": "uint256", "name": "spotPriceAfter", "type": "uint256" }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "tokenDecimals",
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "usdcDecimals",
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "stateMutability": "view",
+    "type": "function"
+  }
+]
