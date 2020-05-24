@@ -1,5 +1,9 @@
 import React from 'react';
 import { useHistory } from 'react-router-dom';
+
+import MesaLogo from '../../imgs/gnosis.png'
+import UniswapLogo from '../../imgs/uniswap.png'
+
 import {
   Header, Box, LinkBase, Tag,
 } from '@aragon/ui';
@@ -37,7 +41,8 @@ function HomePage() {
           <MainButton
             title="Exchanges"
             description="View all open markets for opyn options"
-            iconUrl="https://i.imgur.com/4eX8GlY.png"
+            iconUrl={UniswapLogo}
+            secondImg={MesaLogo}
             onClick={() => {
               history.push('/uniswap/');
             }}
@@ -50,8 +55,8 @@ function HomePage() {
           <MainButton
             title="Trade"
             tag="new"
-            description="Trade Options on Uniswap."
-            iconUrl="https://i.imgur.com/4eX8GlY.png"
+            description="Trade ETH Options on Uniswap."
+            iconUrl={UniswapLogo}
             onClick={() => {
               history.push('/trade/uniswap/');
             }}
@@ -77,13 +82,14 @@ function HomePage() {
 type MainButtonPropx = {
   title: string,
   description: string,
-  iconUrl: string,
+  iconUrl: any,
+  secondImg?: any,
   onClick: Function,
   tag?: string
 }
 
 function MainButton({
-  title, description, iconUrl, onClick, tag,
+  title, description, iconUrl, secondImg, onClick, tag,
 }: MainButtonPropx) {
   return (
     <LinkBase onClick={onClick} style={{ width: '100%' }}>
@@ -93,6 +99,7 @@ function MainButton({
           {tag ? <Tag>{tag}</Tag> : <></>}
         </div>
         <img alt="icon" style={{ padding: 10, height: 64 }} src={iconUrl} />
+        { secondImg && <img alt="icon" style={{ padding: 10, height: 64 }} src={secondImg} /> } 
         <div style={{ paddingTop: 5, opacity: 0.5 }}>
           {' '}
           {description}
