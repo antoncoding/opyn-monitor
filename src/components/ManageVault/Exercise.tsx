@@ -8,6 +8,7 @@ import { CustomIdentityBadge } from '../common'
 
 import { getExerciseHistory } from '../../utils/graph';
 import { formatDigits, toTokenUnitsBN, timeSince } from '../../utils/number';
+import { option } from '../../types';
 
 type exerciseEntry = {
   amtCollateralToPay: string;
@@ -17,19 +18,24 @@ type exerciseEntry = {
   transactionHash: string;
 }
 
+type ExerciseHistoryProps = {
+  owner: string
+  option: option
+}
+
 function ExerciseHistory({
-  owner, token, collateralDecimals, tokenDecimals,
-}) {
+  owner, option,
+}:ExerciseHistoryProps) {
   const [isLoading, setIsLoading] = useState(true);
   const [entries, setEntries] = useState<exerciseEntry[]>([]);
 
   const [page, setPage] = useState(0)
 
   useMemo(async () => {
-    const actions = await getExerciseHistory(owner, token);
+    const actions = await getExerciseHistory(owner, option.addr);
     setEntries(actions);
     setIsLoading(false);
-  }, [owner, token]);
+  }, [owner, option.addr]);
 
   return (
     <>
@@ -47,11 +53,11 @@ function ExerciseHistory({
           }: exerciseEntry) => [
               <TransactionBadge transaction={transactionHash} />,
               formatDigits(
-                toTokenUnitsBN(amtCollateralToPay, collateralDecimals).toNumber(),
+                toTokenUnitsBN(amtCollateralToPay, option.collateral.decimals).toNumber(),
                 5,
               ),
               formatDigits(
-                toTokenUnitsBN(oTokensToExercise, tokenDecimals).toNumber(),
+                toTokenUnitsBN(oTokensToExercise, option.decimals).toNumber(),
                 5,
               ),
               <CustomIdentityBadge entity={exerciser} />,

@@ -13,34 +13,22 @@ import * as types from '../../types';
 
 
 type IssueTokenProps = {
+  option: types.option
   isOwner: boolean,
   vault: types.vault,
   tokenBalance: BigNumber,
-  token: string,
   strikeValue: BigNumber,
-  strikePrice: number,
-  minRatio: number,
-  decimals: number,
-  symbol: string,
   setNewRatio: Function,
-  strikePriceInUSD: number | undefined,
-  collateralSymbol: string
 }
 
 function IssuedTokenManagement({
+  option,
   isOwner,
   vault,
   tokenBalance,
-  token,
   strikeValue,
-  strikePrice,
-  minRatio,
-  decimals,
-  symbol,
   setNewRatio,
-  strikePriceInUSD,
-  collateralSymbol,
-}:IssueTokenProps) {
+}: IssueTokenProps) {
   const [issueAmt, setIssueAmt] = useState(new BigNumber(0));
   const [burnAmt, setBurnAmt] = useState(new BigNumber(0));
 
@@ -50,7 +38,7 @@ function IssuedTokenManagement({
    */
   const updateNewRatio = (newAmt) => {
     if (newAmt.lte(new BigNumber(0))) return;
-    const newRatio = calculateRatio(vault.collateral, newAmt, strikePrice, strikeValue);
+    const newRatio = calculateRatio(vault.collateral, newAmt, option.strikePrice, strikeValue);
     setNewRatio(newRatio);
   };
 
@@ -61,13 +49,13 @@ function IssuedTokenManagement({
     }
     const amountBN = new BigNumber(intputAmt);
     setIssueAmt(amountBN);
-    updateNewRatio(new BigNumber(vault.oTokensIssued).plus(toBaseUnitBN(amountBN, decimals)));
+    updateNewRatio(new BigNumber(vault.oTokensIssued).plus(toBaseUnitBN(amountBN, option.decimals)));
   };
 
   const onClickIssueToken = () => {
     issueOToken(
-      token,
-      toBaseUnitBN(issueAmt, decimals).toString(),
+      option.addr,
+      toBaseUnitBN(issueAmt, option.decimals).toString(),
     );
   };
 
@@ -77,14 +65,14 @@ function IssuedTokenManagement({
       return;
     }
     const amountBN = new BigNumber(intputAmt);
-    updateNewRatio(new BigNumber(vault.oTokensIssued).minus(toBaseUnitBN(amountBN, decimals)));
+    updateNewRatio(new BigNumber(vault.oTokensIssued).minus(toBaseUnitBN(amountBN, option.decimals)));
     setBurnAmt(amountBN);
   };
 
   const onClickBurnToken = () => {
     burnOToken(
-      token,
-      toBaseUnitBN(burnAmt, decimals).toString(),
+      option.addr,
+      toBaseUnitBN(burnAmt, option.decimals).toString(),
     );
   };
 
@@ -94,7 +82,7 @@ function IssuedTokenManagement({
         {/* total Issued */}
         <div style={{ width: '30%' }}>
           <BalanceBlock
-            asset={`Owner ${symbol} Balance `}
+            asset={`Owner ${option.symbol} Balance `}
             balance={tokenBalance.toString()}
           />
         </div>
@@ -111,14 +99,16 @@ function IssuedTokenManagement({
                 />
                 <MaxButton
                   onClick={() => {
-                    if (strikePrice <= 0) return;
+                    if (option.strikePrice <= 0) return;
                     const maxTotal = new BigNumber(vault.collateral).div(
-                      new BigNumber(minRatio).times(new BigNumber(strikePrice)).times(strikeValue),
+                      new BigNumber(option.minRatio)
+                        .times(new BigNumber(option.strikePrice))
+                        .times(strikeValue),
                     );
                     const maxToIssueRaw = maxTotal.minus(new BigNumber(vault.oTokensIssued));
-                    const maxToIssue = toTokenUnitsBN(maxToIssueRaw, decimals);
+                    const maxToIssue = toTokenUnitsBN(maxToIssueRaw, option.decimals);
                     setIssueAmt(maxToIssue);
-                    setNewRatio(minRatio);
+                    setNewRatio(option.minRatio);
                   }}
                 />
               </>
@@ -148,7 +138,7 @@ function IssuedTokenManagement({
                 />
                 <MaxButton
                   onClick={() => {
-                    const issued = toTokenUnitsBN(vault.oTokensIssued, decimals);
+                    const issued = toTokenUnitsBN(vault.oTokensIssued, option.decimals);
                     const maxToBurn = tokenBalance.lt(issued) ? tokenBalance : issued; // min (issued, tokenBalance)
                     setBurnAmt(maxToBurn);
                     updateNewRatio(issued.minus(maxToBurn));
@@ -168,9 +158,9 @@ function IssuedTokenManagement({
           </div>
         </div>
       </div>
-      { symbol.toLowerCase().includes('call')
-        ? <WarningText text={`1 ${collateralSymbol} can create ${strikePriceInUSD} ${symbol}`} />
-        : <></>}
+      {option.type === 'call' &&
+        <WarningText text={`1 ${option.collateral.symbol} can create ${(option as types.ETHOption).strikePriceInUSD} ${option.symbol}`} />
+      }
     </Box>
   );
 }
