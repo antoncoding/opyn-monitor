@@ -6,6 +6,7 @@ import { BalanceBlock } from '../common/index';
 import { removeUnderlying } from '../../utils/web3';
 import { getRemoveUnderlyingHistory } from '../../utils/graph';
 import { formatDigits, toTokenUnitsBN, timeSince } from '../../utils/number';
+import { option } from '../../types';
 
 type RemoveUnderlyingHistoryEntry = {
   amount: string;
@@ -15,22 +16,21 @@ type RemoveUnderlyingHistoryEntry = {
 
 type RemoveUnderlyingProps = {
   owner: string,
-  token: string,
-  underlyingDecimals: number,
+  option: option
   underlyingAmount: string,
 }
 
 function RemoveUnderlying({
-  owner, token, underlyingDecimals, underlyingAmount,
+  owner, option, underlyingAmount
 }: RemoveUnderlyingProps) {
   const [isLoading, setIsLoading] = useState(true);
   const [entries, setEntries] = useState<RemoveUnderlyingHistoryEntry[]>([]);
   const [page, setPage]= useState(0)
   useMemo(async () => {
-    const actions = await getRemoveUnderlyingHistory(owner, token);
+    const actions = await getRemoveUnderlyingHistory(owner, option.addr);
     setEntries(actions);
     setIsLoading(false);
-  }, [owner, token]);
+  }, [owner, option]);
 
   return (
     <>
@@ -40,13 +40,13 @@ function RemoveUnderlying({
           <div style={{ width: '30%' }}>
             {BalanceBlock({
               asset: 'Redeemable',
-              balance: formatDigits(toTokenUnitsBN(underlyingAmount, underlyingDecimals), 6),
+              balance: formatDigits(toTokenUnitsBN(underlyingAmount, option.underlying.decimals), 6),
             })}
           </div>
           <div style={{ width: '70%', padding: '2%' }}>
             <Button
               label="Redeem Underlying"
-              onClick={() => { removeUnderlying(token); }}
+              onClick={() => { removeUnderlying(option.addr); }}
             />
           </div>
         </div>
@@ -63,7 +63,7 @@ function RemoveUnderlying({
           }: RemoveUnderlyingHistoryEntry) => [
               <TransactionBadge shorten={false} transaction={transactionHash} />,
               formatDigits(
-                toTokenUnitsBN(amount, underlyingDecimals).toNumber(),
+                toTokenUnitsBN(amount, option.underlying.decimals).toNumber(),
                 5,
               ),
               timeSince(parseInt(timestamp, 10) * 1000),

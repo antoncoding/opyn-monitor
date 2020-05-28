@@ -32,12 +32,11 @@ function ManageVault({ user }: { user: string }) {
     tracker.pageview(`/manage/${token}`);
   }, [token]);
 
-  const option = allOptions.find((o) => o.addr === token);
-  
+  const option = allOptions.find((o) => o.addr === token);  
 
   const {
     decimals, symbol, oracle, strike, strikePrice, minRatio,
-    collateral, expiry, underlying
+    collateral, expiry
   } = option!;
 
   const [isLoading, setIsLoading] = useState(true);
@@ -158,16 +157,11 @@ function ManageVault({ user }: { user: string }) {
           />
 
           <HeaderDashboard
-            // user={user}
+            option={option as types.option}
             ratio={ratio}
-            minRatio={minRatio}
             vault={vault}
-            decimals={decimals}
-            symbol={symbol}
             newRatio={newRatio}
             useCollateral={vaultUsesCollateral}
-            // collateralIsETH={collateralIsETH}
-            collateralDecimals={collateral.decimals}
           />
 
           <Tabs
@@ -178,6 +172,7 @@ function ManageVault({ user }: { user: string }) {
 
           {tabSelected === 0 ? (
             <CollateralManagement
+              // option={option}
               isOwner={isOwner}
               vault={vault}
               collateralAssetBalance={userCollateralAssetBalance}
@@ -244,8 +239,7 @@ function ManageVault({ user }: { user: string }) {
           {tabSelected === 4 ? (
             <UnderlyingManagement
               owner={owner}
-              token={token}
-              underlyingDecimals={underlying.decimals}
+              option={option as types.option}
               underlyingAmount={vault.underlying}
             />
           ) : <> </>}

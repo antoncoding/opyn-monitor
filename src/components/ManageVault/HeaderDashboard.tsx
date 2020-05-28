@@ -4,32 +4,30 @@ import { BalanceBlock, RatioTag, HelperText } from '../common/index';
 import { formatDigits, toTokenUnitsBN } from '../../utils/number';
 import * as types from '../../types';
 
-type HeaderDashboardProps= {
+type HeaderDashboardProps = {
+  option: types.option
   ratio: number,
-  minRatio: number,
-  symbol: string,
+  // minRatio: number,
+  // symbol: string,
   vault: types.vault,
-  decimals: number,
+  // decimals: number,
   newRatio: number,
-  collateralDecimals: number,
+  // collateralDecimals: number,
   useCollateral: boolean,
 };
 
 const HeaderDashboard = ({
+  option,
   ratio,
-  minRatio,
-  symbol,
   vault,
-  decimals,
   newRatio,
-  collateralDecimals,
   useCollateral,
-}:HeaderDashboardProps) => {
+}: HeaderDashboardProps) => {
   const tokenInUnit = vault.oTokensIssued
-    ? toTokenUnitsBN(vault.oTokensIssued, decimals).toNumber()
+    ? toTokenUnitsBN(vault.oTokensIssued, option.decimals).toNumber()
     : '0';
   const collateralBalance = vault.collateral
-    ? toTokenUnitsBN(vault.collateral, collateralDecimals).toString()
+    ? toTokenUnitsBN(vault.collateral, option.collateral.decimals).toString()
     : '0';
 
   return (
@@ -38,7 +36,7 @@ const HeaderDashboard = ({
         <BalanceBlock asset="Total Collateral" balance={formatDigits(collateralBalance, 6)} />
       </div>
       <div style={{ width: '50%' }}>
-        <BalanceBlock asset={`${symbol} Issued`} balance={tokenInUnit.toString()} />
+        <BalanceBlock asset={`${option.symbol} Issued`} balance={tokenInUnit.toString()} />
       </div>
       <div style={{ width: '20%' }}>
         <>
@@ -46,10 +44,14 @@ const HeaderDashboard = ({
             Current Ratio
             {' '}
             {ratio > 0 ? (
-              <RatioTag isSafe={ratio >= minRatio} ratio={ratio} useCollateral={useCollateral} />
+              <RatioTag
+                isSafe={ratio >= option.minRatio}
+                ratio={ratio}
+                useCollateral={useCollateral}
+              />
             ) : (
-              <></>
-            )}
+                <></>
+              )}
           </div>
           <div style={{ fontSize: 24, padding: 3 }}>
             <span style={{ fontSize: 24 }}>{formatDigits(ratio, 5).split('.')[0]}</span>
@@ -58,24 +60,21 @@ const HeaderDashboard = ({
               {formatDigits(ratio, 5).split('.')[1]}
               {' '}
             </span>
-            {minRatio > 0 ? (
+            {option.minRatio > 0 &&
               <span style={{ fontSize: 16 }}>
                 {' '}
                 /
                 {' '}
-                {minRatio}
+                {option.minRatio}
                 {' '}
               </span>
-            ) : ''}
+            }
           </div>
           <>
             {' '}
-            {newRatio === ratio ? (
-              ''
-            ) : (
+            {newRatio !== ratio &&
               <HelperText label="New Ratio" amt={newRatio.toString()} />
-            )}
-            {' '}
+            }
           </>
         </>
       </div>
