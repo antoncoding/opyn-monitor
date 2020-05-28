@@ -7,11 +7,10 @@ import { addLiquidity } from '../../utils/web3';
 
 import { BalanceBlock, MaxButton, PriceSection } from '../common/index';
 import { toBaseUnitBN } from '../../utils/number';
+import { option } from '../../types'
 
 type AddliquidityProps = {
-  otoken: string,
-  otokenSymbol: string,
-  otokenDecimals: number,
+  oToken: option
   poolTokenBalance: BigNumber,
   poolETHBalance:BigNumber,
   liquidityTokenSupply: BigNumber,
@@ -22,9 +21,7 @@ type AddliquidityProps = {
 }
 
 function AddLiquidity({
-  otoken,
-  otokenSymbol,
-  otokenDecimals,
+  oToken,
   userTokenBalance,
   userETHBalance,
   uniswapExchange,
@@ -82,7 +79,7 @@ function AddLiquidity({
               <>
                 <TextInput
                   adornmentPosition="end"
-                  adornment={otokenSymbol}
+                  adornment={oToken.symbol}
                   type="number"
                   wide
                   value={amtTokenToAdd.toNumber()}
@@ -116,11 +113,11 @@ function AddLiquidity({
                 icon={<IconCirclePlus />}
                 label="Add Liquidity"
                 onClick={() => {
-                  const maxToken = toBaseUnitBN(amtTokenToAdd, otokenDecimals).toString();
+                  const maxToken = toBaseUnitBN(amtTokenToAdd, oToken.decimals).toString();
                   const minLiquidity = toBaseUnitBN(liquidityMintedMin, liquidityTokenDecimals).toString();
                   const ethWei = toBaseUnitBN(amtETHToAdd, 18).toString();
                   addLiquidity(
-                    otoken,
+                    oToken.addr,
                     uniswapExchange,
                     maxToken,
                     minLiquidity,

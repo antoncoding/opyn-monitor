@@ -16,7 +16,7 @@ import AddLiquidity from './AddLiquidity';
 import RemoveLiquidity from './RemoveLiquidity';
 
 import tracker from '../../utils/tracker';
-import * as types from '../../types'
+import * as types from '../../types';
 
 function UniswapPool({ user, spotPrice }: {user: string, spotPrice:BigNumber}) {
   const liquidityTokenDecimals = 18;
@@ -28,7 +28,7 @@ function UniswapPool({ user, spotPrice }: {user: string, spotPrice:BigNumber}) {
 
   const option = allOptions.find((o) => o.addr === token);
   const {
-    uniswapExchange, decimals, symbol, exchange,
+    uniswapExchange, decimals,
   } = option!;
 
   const [poolTokenBalance, setPoolTokenBalance] = useState(new BigNumber(0));
@@ -101,7 +101,7 @@ function UniswapPool({ user, spotPrice }: {user: string, spotPrice:BigNumber}) {
       <Header primary="Exchange" />
 
       <TradePageHeader
-        symbol={symbol}
+        option={option as types.option}
         poolETHBalance={poolETHBalance}
         poolTokenBalance={poolTokenBalance}
         uniswapExchange={uniswapExchange}
@@ -109,20 +109,14 @@ function UniswapPool({ user, spotPrice }: {user: string, spotPrice:BigNumber}) {
 
       <UniswapBuySell
         spotPrice={spotPrice}
-        strikePriceInUSD={(option as types.ETHOption).strikePriceInUSD}
-        symbol={symbol}
+        option={option as types.option}
         tokenBalance={userTokenBalance}
-        token={token}
-        exchange={exchange}
-        decimals={decimals}
       />
 
       <Header primary="Provide Liquidity" />
 
       <AddLiquidity
-        otoken={token}
-        otokenDecimals={decimals}
-        otokenSymbol={symbol}
+        oToken={option as types.option}
         userTokenBalance={userTokenBalance}
         userETHBalance={userETHBalance}
         uniswapExchange={uniswapExchange}
@@ -133,8 +127,7 @@ function UniswapPool({ user, spotPrice }: {user: string, spotPrice:BigNumber}) {
       />
 
       <RemoveLiquidity
-        otokenDecimals={decimals}
-        otokenSymbol={symbol}
+        oToken={option as types.option}
         userliquidityTokenBalance={userliquidityTokenBalance}
         uniswapExchange={uniswapExchange}
         poolETHBalance={poolETHBalance}

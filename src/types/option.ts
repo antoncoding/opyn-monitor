@@ -10,6 +10,7 @@ export type option = {
   title: string,
   symbol: string,
   name: string,
+  type: 'insurance' | 'call' | 'put'
   decimals: number,
   oracle: string,
   collateral: token,

@@ -12,19 +12,16 @@ import { getPremiumToPay, getPremiumReceived } from '../../utils/infura';
 
 
 import { toBaseUnitBN, toTokenUnitsBN } from '../../utils/number';
+import { option, ETHOption } from '../../types';
 
 type UniswapBuySellProps = {
-  symbol: string,
-  strikePriceInUSD: number | undefined,
+  option: option
   tokenBalance: BigNumber,
-  token: string,
-  exchange: string,
-  decimals: number,
   spotPrice: BigNumber
 };
 
 function UniswapBuySell({
-  symbol, tokenBalance, token, exchange, decimals, strikePriceInUSD, spotPrice
+  tokenBalance, option, spotPrice
 }: UniswapBuySellProps) {
   const [buyAmt, setBuyAmt] = useState(new BigNumber(0));
   const [sellAmt, setSellAmt] = useState(new BigNumber(0));
@@ -32,13 +29,13 @@ function UniswapBuySell({
   const [premiumReceived, setPremiumReceived] = useState(new BigNumber(0));
 
   const updatePremiumToPay = async (amt) => {
-    const butAmountBN = new BigNumber(amt);
-    if (butAmountBN.lte(new BigNumber(0))) {
+    const buyAmountBN = new BigNumber(amt);
+    if (buyAmountBN.lte(new BigNumber(0))) {
       setPremiumToPay(new BigNumber(0));
       return;
     }
-    const amount = toBaseUnitBN(butAmountBN, decimals).toString();
-    const premium = await getPremiumToPay(exchange, token, amount);
+    const amount = toBaseUnitBN(buyAmountBN, option.decimals).toString();
+    const premium = await getPremiumToPay(option.exchange, option.addr, amount);
     setPremiumToPay(toTokenUnitsBN(premium, 18));
   };
 
@@ -48,8 +45,8 @@ function UniswapBuySell({
       setPremiumReceived(new BigNumber(0));
       return;
     }
-    const amount = toBaseUnitBN(sellAmountBN, decimals).toString();
-    const premium = await getPremiumReceived(exchange, token, amount);
+    const amount = toBaseUnitBN(sellAmountBN, option.decimals).toString();
+    const premium = await getPremiumReceived(option.exchange, option.addr, amount);
     setPremiumReceived(new BigNumber(premium));
   };
 
@@ -58,7 +55,7 @@ function UniswapBuySell({
       <div style={{ display: 'flex' }}>
         {/* total Issued */}
         <div style={{ width: '30%' }}>
-          <BalanceBlock asset={`${symbol} Balance`} balance={tokenBalance} />
+          <BalanceBlock asset={`${option.symbol} Balance`} balance={tokenBalance} />
         </div>
         {/* Buy Token from Uniswap */}
         <div style={{ width: '32%', paddingTop: '2%' }}>
@@ -88,9 +85,9 @@ function UniswapBuySell({
                 label="Buy"
                 onClick={() => {
                   buyOTokensFromExchange(
-                    token,
-                    exchange,
-                    toBaseUnitBN(buyAmt, decimals).toString(),
+                    option.addr,
+                    option.exchange,
+                    toBaseUnitBN(buyAmt, option.decimals).toString(),
                     toBaseUnitBN(premiumToPay, 18).toString(),
                   );
                 }}
@@ -134,9 +131,9 @@ function UniswapBuySell({
                 label="Sell"
                 onClick={() => {
                   sellOTokensFromExchange(
-                    token,
-                    exchange,
-                    toBaseUnitBN(sellAmt, decimals).toString(),
+                    option.addr,
+                    option.exchange,
+                    toBaseUnitBN(sellAmt, option.decimals).toString(),
                   );
                 }}
               />
@@ -145,10 +142,10 @@ function UniswapBuySell({
           <PriceSection label="Premium" amt={premiumReceived} ethPrice={spotPrice} />
         </div>
       </div>
-      { symbol.toLowerCase().includes('call')
+      { option.type === 'call'
         ? <>
             <WarningText text={`*The unit used here is not the same as the greek board.`} /> 
-            <WarningText text={`Buy ${strikePriceInUSD} ${symbol} to hedge 1 ETH.`} /> 
+            <WarningText text={`Buy ${(option as ETHOption).strikePriceInUSD} ${option.symbol} to hedge 1 ETH.`} /> 
           </>
         : <></> }
     </Box>

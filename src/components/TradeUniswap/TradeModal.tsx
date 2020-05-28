@@ -30,13 +30,14 @@ function TradeModal({ oToken, spotPrice, balance }: TradeModalProps) {
         <Header primary={`Buy / Sell ${oToken.title} `} />
         <br/>
         <UniswapBuySell
+          option={oToken}
           spotPrice={spotPrice}
-          strikePriceInUSD={oToken.strikePriceInUSD}
-          symbol={oToken.symbol}
+          // strikePriceInUSD={oToken.strikePriceInUSD}
+          // symbol={oToken.symbol}
           tokenBalance={toTokenUnitsBN(balance, oToken.decimals)}
-          token={oToken.addr}
-          exchange={oToken.exchange}
-          decimals={oToken.decimals}
+          // token={oToken.addr}
+          // exchange={oToken.exchange}
+          // decimals={oToken.decimals}
         />
       </Modal>
     </>
