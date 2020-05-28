@@ -32,7 +32,7 @@ function ManageVault({ user }: { user: string }) {
     tracker.pageview(`/manage/${token}`);
   }, [token]);
 
-  const option = allOptions.find((o) => o.addr === token);  
+  const option = allOptions.find((o) => o.addr === token) as types.option;  
 
   const {
     decimals, symbol, oracle, strike, strikePrice, minRatio,
@@ -157,7 +157,7 @@ function ManageVault({ user }: { user: string }) {
           />
 
           <HeaderDashboard
-            option={option as types.option}
+            option={option}
             ratio={ratio}
             vault={vault}
             newRatio={newRatio}
@@ -172,16 +172,12 @@ function ManageVault({ user }: { user: string }) {
 
           {tabSelected === 0 ? (
             <CollateralManagement
-              // option={option}
+              option={option}
               isOwner={isOwner}
               vault={vault}
               collateralAssetBalance={userCollateralAssetBalance}
-              collateral={collateral}
-              token={token}
               owner={owner}
               strikeValue={strikeValueInCollateral}
-              strikePrice={strikePrice}
-              minRatio={minRatio}
               setNewRatio={setNewRatio}
             />
           ) : (
