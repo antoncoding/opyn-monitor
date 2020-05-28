@@ -28,8 +28,10 @@ function UniswapBuySell({
   const [premiumToPay, setPremiumToPay] = useState(new BigNumber(0));
   const [premiumReceived, setPremiumReceived] = useState(new BigNumber(0));
 
+  const multiplier = option.type === 'call' ? new BigNumber((option as ETHOption).strikePriceInUSD) : new BigNumber(1)
+
   const updatePremiumToPay = async (amt) => {
-    const buyAmountBN = new BigNumber(amt);
+    const buyAmountBN = new BigNumber(amt).times(multiplier);
     if (buyAmountBN.lte(new BigNumber(0))) {
       setPremiumToPay(new BigNumber(0));
       return;
@@ -40,7 +42,7 @@ function UniswapBuySell({
   };
 
   const updatePremiumReceived = async (amt) => {
-    const sellAmountBN = new BigNumber(amt);
+    const sellAmountBN = new BigNumber(amt).times(multiplier);
     if (sellAmountBN.lte(new BigNumber(0))) {
       setPremiumReceived(new BigNumber(0));
       return;
@@ -55,7 +57,7 @@ function UniswapBuySell({
       <div style={{ display: 'flex' }}>
         {/* total Issued */}
         <div style={{ width: '30%' }}>
-          <BalanceBlock asset={`${option.symbol} Balance`} balance={tokenBalance} />
+          <BalanceBlock asset={`${option.symbol} Balance`} balance={tokenBalance.div(multiplier)} />
         </div>
         {/* Buy Token from Uniswap */}
         <div style={{ width: '32%', paddingTop: '2%' }}>
@@ -87,7 +89,7 @@ function UniswapBuySell({
                   buyOTokensFromExchange(
                     option.addr,
                     option.exchange,
-                    toBaseUnitBN(buyAmt, option.decimals).toString(),
+                    toBaseUnitBN(buyAmt, option.decimals).times(multiplier).toString(),
                     toBaseUnitBN(premiumToPay, 18).toString(),
                   );
                 }}
@@ -118,8 +120,8 @@ function UniswapBuySell({
                 />
                 <MaxButton
                   onClick={() => {
-                    setSellAmt(tokenBalance);
-                    updatePremiumReceived(tokenBalance);
+                    setSellAmt(tokenBalance.div(multiplier));
+                    updatePremiumReceived(tokenBalance.div(multiplier));
                   }}
                 />
               </>
@@ -133,7 +135,7 @@ function UniswapBuySell({
                   sellOTokensFromExchange(
                     option.addr,
                     option.exchange,
-                    toBaseUnitBN(sellAmt, option.decimals).toString(),
+                    toBaseUnitBN(sellAmt, option.decimals).times(multiplier).toString(),
                   );
                 }}
               />
