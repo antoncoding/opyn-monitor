@@ -16,13 +16,9 @@ type CollateralManagementProps = {
   isOwner: boolean,
   vault: types.vault,
   option: types.option
-  // collateral: types.token,
   collateralAssetBalance: BigNumber,
-  // token: string,
   owner: string,
   strikeValue: BigNumber,
-  // strikePrice: number,
-  // minRatio: number,
   setNewRatio: Function,
 
 }
@@ -31,13 +27,9 @@ function CollateralManagement({
   isOwner,
   vault,
   option,
-  // collateral,
-  collateralAssetBalance, // Bignumber, / token unit
-  // token,
+  collateralAssetBalance,
   owner,
   strikeValue,
-  // strikePrice,
-  // minRatio,
   setNewRatio,
 }: CollateralManagementProps) {
   const [addCollateralAmt, setAddCollateralAmt] = useState(0); // in token unit

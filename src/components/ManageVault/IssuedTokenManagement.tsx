@@ -15,6 +15,7 @@ import * as types from '../../types';
 type IssueTokenProps = {
   option: types.option
   isOwner: boolean,
+  multiplier: BigNumber,
   vault: types.vault,
   tokenBalance: BigNumber,
   strikeValue: BigNumber,
@@ -24,6 +25,7 @@ type IssueTokenProps = {
 function IssuedTokenManagement({
   option,
   isOwner,
+  multiplier,
   vault,
   tokenBalance,
   strikeValue,
@@ -49,13 +51,16 @@ function IssuedTokenManagement({
     }
     const amountBN = new BigNumber(intputAmt);
     setIssueAmt(amountBN);
-    updateNewRatio(new BigNumber(vault.oTokensIssued).plus(toBaseUnitBN(amountBN, option.decimals)));
+    updateNewRatio(new BigNumber(vault.oTokensIssued)
+      .plus(toBaseUnitBN(amountBN, option.decimals).times(multiplier))
+    );
   };
 
   const onClickIssueToken = () => {
     issueOToken(
       option.addr,
-      toBaseUnitBN(issueAmt, option.decimals).toString(),
+      toBaseUnitBN(issueAmt, option.decimals)
+        .toString(),
     );
   };
 

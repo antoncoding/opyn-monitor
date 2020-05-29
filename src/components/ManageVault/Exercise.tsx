@@ -9,6 +9,7 @@ import { CustomIdentityBadge } from '../common'
 import { getExerciseHistory } from '../../utils/graph';
 import { formatDigits, toTokenUnitsBN, timeSince } from '../../utils/number';
 import { option } from '../../types';
+import BigNumber from 'bignumber.js';
 
 type exerciseEntry = {
   amtCollateralToPay: string;
@@ -21,10 +22,11 @@ type exerciseEntry = {
 type ExerciseHistoryProps = {
   owner: string
   option: option
+  multiplier: BigNumber
 }
 
 function ExerciseHistory({
-  owner, option,
+  owner, option, multiplier
 }:ExerciseHistoryProps) {
   const [isLoading, setIsLoading] = useState(true);
   const [entries, setEntries] = useState<exerciseEntry[]>([]);
@@ -57,7 +59,9 @@ function ExerciseHistory({
                 5,
               ),
               formatDigits(
-                toTokenUnitsBN(oTokensToExercise, option.decimals).toNumber(),
+                toTokenUnitsBN(oTokensToExercise, option.decimals)
+                  .div(multiplier)
+                  .toNumber(),
                 5,
               ),
               <CustomIdentityBadge entity={exerciser} />,

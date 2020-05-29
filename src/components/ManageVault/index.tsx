@@ -34,6 +34,8 @@ function ManageVault({ user }: { user: string }) {
 
   const option = allOptions.find((o) => o.addr === token) as types.option;
 
+  const multiplier = option.type === 'call' ? new BigNumber((option as types.ETHOption).strikePriceInUSD) : new BigNumber(1)
+
   const {
     decimals, oracle, strike, strikePrice,
     collateral, expiry
@@ -162,6 +164,7 @@ function ManageVault({ user }: { user: string }) {
           vault={vault}
           newRatio={newRatio}
           useCollateral={vaultUsesCollateral}
+          multiplier={multiplier}
         />
 
         <Tabs
@@ -186,6 +189,7 @@ function ManageVault({ user }: { user: string }) {
           <IssuedTokenManagement
             option={option}
             isOwner={isOwner}
+            multiplier={multiplier}
             vault={vault}
             tokenBalance={ownerTokenBalance}
             strikeValue={strikeValueInCollateral}
@@ -209,6 +213,7 @@ function ManageVault({ user }: { user: string }) {
         {tabSelected === 3 &&
           <ExerciseHistory
             owner={owner}
+            multiplier={multiplier}
             option={option}
           />
         }

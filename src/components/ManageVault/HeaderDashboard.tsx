@@ -1,4 +1,5 @@
 import React from 'react';
+import BigNumber from 'bignumber.js'
 
 import { BalanceBlock, RatioTag, HelperText } from '../common/index';
 import { formatDigits, toTokenUnitsBN } from '../../utils/number';
@@ -7,13 +8,10 @@ import * as types from '../../types';
 type HeaderDashboardProps = {
   option: types.option
   ratio: number,
-  // minRatio: number,
-  // symbol: string,
   vault: types.vault,
-  // decimals: number,
   newRatio: number,
-  // collateralDecimals: number,
   useCollateral: boolean,
+  multiplier: BigNumber
 };
 
 const HeaderDashboard = ({
@@ -22,9 +20,13 @@ const HeaderDashboard = ({
   vault,
   newRatio,
   useCollateral,
+  multiplier
 }: HeaderDashboardProps) => {
+
   const tokenInUnit = vault.oTokensIssued
-    ? toTokenUnitsBN(vault.oTokensIssued, option.decimals).toNumber()
+    ? toTokenUnitsBN(vault.oTokensIssued, option.decimals)
+      .div(multiplier)
+      .toString()
     : '0';
   const collateralBalance = vault.collateral
     ? toTokenUnitsBN(vault.collateral, option.collateral.decimals).toString()
