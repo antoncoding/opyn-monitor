@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import BigNumber from 'bignumber.js'
+import 'bootstrap/dist/css/bootstrap.min.css';
 
 import { getETHPrice } from './utils/etherscan'
 

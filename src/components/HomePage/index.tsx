@@ -1,6 +1,10 @@
 import React from 'react';
 import { useHistory } from 'react-router-dom';
 
+import Container from 'react-bootstrap/Container'
+import Row from 'react-bootstrap/Row'
+import Col from 'react-bootstrap/Col'
+
 import MesaLogo from '../../imgs/gnosis.png'
 import UniswapLogo from '../../imgs/uniswap.png'
 
@@ -15,66 +19,71 @@ function HomePage() {
     <>
       <Header primary="Welcome to Opyn Monitor" />
       <div style={{ padding: 5, opacity: 0.5 }}> Tools for DeFi Risk Management. </div>
-      <div style={{ padding: '1%', display: 'flex', alignItems: 'center' }}>
-        <div style={{ width: '30%', marginRight: '3%' }}>
-          <MainButton
-            title="My Vaults"
-            description="Manage collateral, Mint/Burn oTokens"
-            iconUrl="https://opyn.co/static/media/1.68813886.svg"
-            onClick={() => {
-              history.push('/myvaults');
-            }}
-          />
-        </div>
+      <Container fluid='md'>
+        <Row>
+          <Col md={6} lg={4}>
+            <MainButton
+              title="My Vaults"
+              description="Manage collateral, Mint/Burn oTokens"
+              iconUrl="https://opyn.co/static/media/1.68813886.svg"
+              onClick={() => {
+                history.push('/myvaults');
+              }}
+            />
+          </Col>
 
-        <div style={{ width: '30%' }}>
-          <MainButton
-            title="All Contracts"
-            description=" Monitor and liquidate vaults."
-            iconUrl="https://opyn.co/static/media/2.18d22be0.svg"
-            onClick={() => {
-              history.push('/options/');
-            }}
-          />
-        </div>
-        <div style={{ width: '30%', marginLeft: '3%' }}>
-          <MainButton
-            title="Exchanges"
-            description="View all open markets for opyn options"
-            iconUrl={UniswapLogo}
-            secondImg={MesaLogo}
-            onClick={() => {
-              history.push('/uniswap/');
-            }}
-          />
-        </div>
+          <Col md={6} lg={4}>
+            <MainButton
+              title="All Contracts"
+              description=" Monitor and liquidate vaults."
+              iconUrl="https://opyn.co/static/media/2.18d22be0.svg"
+              onClick={() => {
+                history.push('/options/');
+              }}
+            />
+          </Col>
+          <Col md={6} lg={4}>
+            <div>
+            </div>
+            <MainButton
+              title="Exchanges"
+              description="View all open markets"
+              iconUrl={UniswapLogo}
+              secondImg={MesaLogo}
+              onClick={() => {
+                history.push('/uniswap/');
+              }}
+            />
+          </Col>
+        </Row>
 
-      </div>
-      <div style={{ padding: '1%', display: 'flex', alignItems: 'center' }}>
-        <div style={{ width: '30%', marginRight: '3%' }}>
-          <MainButton
-            title="Trade"
-            tag="new"
-            description="Trade ETH Options on Uniswap."
-            iconUrl={UniswapLogo}
-            onClick={() => {
-              history.push('/trade/uniswap/');
-            }}
-          />
-        </div>
-        <div style={{ width: '30%', marginRight: '3%' }}>
-          <MainButton
-            title="Trade"
-            tag="new"
-            description="Trade ETH Options on 0x"
-            iconUrl="https://cdn.worldvectorlogo.com/logos/0x-virtual-money-.svg"
-            onClick={() => {
-              history.push('/trade/0x');
-            }}
-          />
-        </div>
-      </div>
+        <Row>
+          <Col md={6} lg={4}>
+            <MainButton
+              title="Trade"
+              tag="new"
+              description="Trade ETH Options on Uniswap."
+              iconUrl={UniswapLogo}
+              onClick={() => {
+                history.push('/trade/uniswap/');
+              }}
+            />
+          </Col>
+          <Col md={6} lg={4}>
+            <MainButton
+              title="Trade"
+              tag="new"
+              description="Trade ETH Options on 0x"
+              iconUrl="https://cdn.worldvectorlogo.com/logos/0x-virtual-money-.svg"
+              onClick={() => {
+                history.push('/trade/0x');
+              }}
+            />
+          </Col>
 
+
+        </Row>
+      </Container>
     </>
   );
 }
@@ -92,14 +101,14 @@ function MainButton({
   title, description, iconUrl, secondImg, onClick, tag,
 }: MainButtonPropx) {
   return (
-    <LinkBase onClick={onClick} style={{ width: '100%' }}>
+    <LinkBase onClick={onClick} style={{ width: '100%', paddingBottom: 20 }}>
       <Box>
         <div style={{ padding: 10, fontSize: 18 }}>
           {title}
           {tag ? <Tag>{tag}</Tag> : <></>}
         </div>
         <img alt="icon" style={{ padding: 10, height: 64 }} src={iconUrl} />
-        { secondImg && <img alt="icon" style={{ padding: 10, height: 64 }} src={secondImg} /> } 
+        {secondImg && <img alt="icon" style={{ padding: 10, height: 64 }} src={secondImg} />}
         <div style={{ paddingTop: 5, opacity: 0.5 }}>
           {' '}
           {description}
