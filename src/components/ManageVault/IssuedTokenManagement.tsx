@@ -34,50 +34,49 @@ function IssuedTokenManagement({
   const [issueAmt, setIssueAmt] = useState(new BigNumber(0));
   const [burnAmt, setBurnAmt] = useState(new BigNumber(0));
 
-  /**
-   *
-   * @param {BigNumber} newAmt in raw amt
-   */
-  const updateNewRatio = (newAmt) => {
+  const updateNewRatio = (newAmt: BigNumber) => {
     if (newAmt.lte(new BigNumber(0))) return;
     const newRatio = calculateRatio(vault.collateral, newAmt, option.strikePrice, strikeValue);
     setNewRatio(newRatio);
   };
 
-  const onChangeIssueAmt = (intputAmt) => {
+  const onChangeIssueAmt = (intputAmt: number) => {
     if (!intputAmt) {
       setIssueAmt(new BigNumber(0));
       return;
     }
     const amountBN = new BigNumber(intputAmt);
     setIssueAmt(amountBN);
-    updateNewRatio(new BigNumber(vault.oTokensIssued)
-      .plus(toBaseUnitBN(amountBN, option.decimals).times(multiplier))
+    updateNewRatio(
+      new BigNumber(vault.oTokensIssued).plus(
+        toBaseUnitBN(amountBN, option.decimals).times(multiplier)
+      )
     );
   };
 
   const onClickIssueToken = () => {
     issueOToken(
       option.addr,
-      toBaseUnitBN(issueAmt, option.decimals)
-        .toString(),
+      toBaseUnitBN(issueAmt, option.decimals).times(multiplier).toString(),
     );
   };
 
-  const onChangeBurnAmt = (intputAmt) => {
+  const onChangeBurnAmt = (intputAmt: number) => {
     if (!intputAmt) {
       setBurnAmt(new BigNumber(0));
       return;
     }
     const amountBN = new BigNumber(intputAmt);
-    updateNewRatio(new BigNumber(vault.oTokensIssued).minus(toBaseUnitBN(amountBN, option.decimals)));
+    updateNewRatio(new BigNumber(vault.oTokensIssued).minus(
+      toBaseUnitBN(amountBN, option.decimals).times(multiplier)
+    ));
     setBurnAmt(amountBN);
   };
 
   const onClickBurnToken = () => {
     burnOToken(
       option.addr,
-      toBaseUnitBN(burnAmt, option.decimals).toString(),
+      toBaseUnitBN(burnAmt, option.decimals).times(multiplier).toString(),
     );
   };
 
@@ -88,7 +87,7 @@ function IssuedTokenManagement({
         <div style={{ width: '30%' }}>
           <BalanceBlock
             asset={`Owner ${option.symbol} Balance `}
-            balance={tokenBalance.toString()}
+            balance={tokenBalance.div(multiplier).toString()}
           />
         </div>
         {/* Issue More Token */}
@@ -111,7 +110,8 @@ function IssuedTokenManagement({
                         .times(strikeValue),
                     );
                     const maxToIssueRaw = maxTotal.minus(new BigNumber(vault.oTokensIssued));
-                    const maxToIssue = toTokenUnitsBN(maxToIssueRaw, option.decimals);
+                    const maxToIssue = toTokenUnitsBN(maxToIssueRaw, option.decimals)
+                      .div(multiplier); // convert 250 soETH Call => 1 oETH 
                     setIssueAmt(maxToIssue);
                     setNewRatio(option.minRatio);
                   }}
@@ -130,7 +130,8 @@ function IssuedTokenManagement({
           </div>
         </div>
         <div style={{ width: '6%' }} />
-        {/* Remove collateral */}
+        
+        {/* Burn Tokens */}
         <div style={{ width: '32%', paddingTop: '2%' }}>
           <div style={{ display: 'flex' }}>
             <div style={{ width: '60%' }}>
@@ -144,8 +145,8 @@ function IssuedTokenManagement({
                 <MaxButton
                   onClick={() => {
                     const issued = toTokenUnitsBN(vault.oTokensIssued, option.decimals);
-                    const maxToBurn = tokenBalance.lt(issued) ? tokenBalance : issued; // min (issued, tokenBalance)
-                    setBurnAmt(maxToBurn);
+                    const maxToBurn = tokenBalance.lt(issued) ? tokenBalance : issued; // in base token unit
+                    setBurnAmt(maxToBurn.div(multiplier));
                     updateNewRatio(issued.minus(maxToBurn));
                   }}
                 />
@@ -164,7 +165,8 @@ function IssuedTokenManagement({
         </div>
       </div>
       {option.type === 'call' &&
-        <WarningText text={`1 ${option.collateral.symbol} can create ${(option as types.ETHOption).strikePriceInUSD} ${option.symbol}`} />
+        <WarningText 
+          text={`1 ${option.symbol} gives you the right to buy 1 ${option.collateral.symbol} with ${(option as types.ETHOption).strikePriceInUSD} ${option.underlying.symbol}`} />
       }
     </Box>
   );
