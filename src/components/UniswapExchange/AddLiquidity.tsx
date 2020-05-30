@@ -11,6 +11,7 @@ import { option } from '../../types'
 
 type AddliquidityProps = {
   oToken: option
+  multiplier: BigNumber,
   poolTokenBalance: BigNumber,
   poolETHBalance:BigNumber,
   liquidityTokenSupply: BigNumber,
@@ -22,6 +23,7 @@ type AddliquidityProps = {
 
 function AddLiquidity({
   oToken,
+  multiplier,
   userTokenBalance,
   userETHBalance,
   uniswapExchange,
@@ -48,7 +50,7 @@ function AddLiquidity({
       return;
     }
 
-    const newTokenAmt = (new BigNumber(ethAmt).times(tokenToEthRatio));
+    const newTokenAmt = (new BigNumber(ethAmt).times(tokenToEthRatio)).div(multiplier);
     setAmtETHToAdd(new BigNumber(ethAmt));
     setAmtTokenToAdd(newTokenAmt);
   };
@@ -60,7 +62,7 @@ function AddLiquidity({
       return;
     }
 
-    const newEthAmt = new BigNumber(tokenAmt).times(ethToTokenRatio);
+    const newEthAmt = new BigNumber(tokenAmt).times(multiplier).times(ethToTokenRatio);
     setAmtETHToAdd(newEthAmt);
     setAmtTokenToAdd(new BigNumber(tokenAmt));
   };

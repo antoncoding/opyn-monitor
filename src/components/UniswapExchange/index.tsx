@@ -26,10 +26,14 @@ function UniswapPool({ user, spotPrice }: {user: string, spotPrice:BigNumber}) {
     tracker.pageview(`/uniswap/${token}`);
   }, [token]);
 
-  const option = allOptions.find((o) => o.addr === token);
+  const option = allOptions.find((o) => o.addr === token) as types.option;
   const {
     uniswapExchange, decimals,
   } = option!;
+
+  const multiplier = option.type === 'call' 
+    ? new BigNumber((option as types.ETHOption).strikePriceInUSD) 
+    : new BigNumber(1)
 
   const [poolTokenBalance, setPoolTokenBalance] = useState(new BigNumber(0));
   const [userTokenBalance, setUserTokenBalance] = useState(new BigNumber(0));
@@ -101,22 +105,24 @@ function UniswapPool({ user, spotPrice }: {user: string, spotPrice:BigNumber}) {
       <Header primary="Exchange" />
 
       <TradePageHeader
-        option={option as types.option}
+        option={option}
         poolETHBalance={poolETHBalance}
         poolTokenBalance={poolTokenBalance}
         uniswapExchange={uniswapExchange}
       />
 
       <UniswapBuySell
+        multiplier={multiplier}
         spotPrice={spotPrice}
-        option={option as types.option}
+        option={option}
         tokenBalance={userTokenBalance}
       />
 
       <Header primary="Provide Liquidity" />
 
       <AddLiquidity
-        oToken={option as types.option}
+        oToken={option}
+        multiplier={multiplier}
         userTokenBalance={userTokenBalance}
         userETHBalance={userETHBalance}
         uniswapExchange={uniswapExchange}
@@ -127,7 +133,8 @@ function UniswapPool({ user, spotPrice }: {user: string, spotPrice:BigNumber}) {
       />
 
       <RemoveLiquidity
-        oToken={option as types.option}
+        oToken={option}
+        multiplier={multiplier}
         userliquidityTokenBalance={userliquidityTokenBalance}
         uniswapExchange={uniswapExchange}
         poolETHBalance={poolETHBalance}

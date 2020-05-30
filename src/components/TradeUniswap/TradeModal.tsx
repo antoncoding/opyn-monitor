@@ -7,7 +7,6 @@ import UniswapBuySell from '../UniswapExchange/UniswapBuySell'
 
 import * as types from '../../types'
 import { toTokenUnitsBN } from '../../utils/number'
-// import { SectionTitle } from '../common'
 
 type TradeModalProps = {
   spotPrice: BigNumber
@@ -18,6 +17,9 @@ type TradeModalProps = {
 function TradeModal({ oToken, spotPrice, balance }: TradeModalProps) {
 
   const [opened, setOpened] = useState(false)
+  const multiplier = oToken.type === 'call' 
+    ? new BigNumber(oToken.strikePriceInUSD) 
+    : new BigNumber(1)
 
   return (
     <>
@@ -31,13 +33,9 @@ function TradeModal({ oToken, spotPrice, balance }: TradeModalProps) {
         <br/>
         <UniswapBuySell
           option={oToken}
+          multiplier={multiplier}
           spotPrice={spotPrice}
-          // strikePriceInUSD={oToken.strikePriceInUSD}
-          // symbol={oToken.symbol}
           tokenBalance={toTokenUnitsBN(balance, oToken.decimals)}
-          // token={oToken.addr}
-          // exchange={oToken.exchange}
-          // decimals={oToken.decimals}
         />
       </Modal>
     </>

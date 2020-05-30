@@ -11,6 +11,7 @@ import { option } from '../../types'
 
 type RemoveLiquidityProps = {
   oToken: option
+  multiplier: BigNumber
   uniswapExchange: string
   userliquidityTokenBalance: BigNumber
   poolTokenBalance: BigNumber
@@ -22,6 +23,7 @@ type RemoveLiquidityProps = {
 
 function RemoveLiquidity({
   oToken,
+  multiplier,
   userliquidityTokenBalance,
   uniswapExchange,
   poolTokenBalance,
@@ -76,7 +78,7 @@ function RemoveLiquidity({
             <div style={{ width: '35%', marginRight: '5%' }}>
               <>
                 <PriceSection label="You get" amt={estETHRecieved} symbol="ETH" />
-                <PriceSection label="+" amt={estOTokenReceived} symbol={oToken.symbol} />
+                <PriceSection label="+" amt={estOTokenReceived.div(multiplier)} symbol={oToken.symbol} />
               </>
             </div>
             <div style={{ width: '30%' }}>

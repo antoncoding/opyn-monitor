@@ -12,23 +12,22 @@ import { getPremiumToPay, getPremiumReceived } from '../../utils/infura';
 
 
 import { toBaseUnitBN, toTokenUnitsBN } from '../../utils/number';
-import { option, ETHOption } from '../../types';
+import { option } from '../../types';
 
 type UniswapBuySellProps = {
   option: option
   tokenBalance: BigNumber,
-  spotPrice: BigNumber
+  spotPrice: BigNumber,
+  multiplier: BigNumber
 };
 
 function UniswapBuySell({
-  tokenBalance, option, spotPrice
+  tokenBalance, option, spotPrice, multiplier
 }: UniswapBuySellProps) {
   const [buyAmt, setBuyAmt] = useState(new BigNumber(0));
   const [sellAmt, setSellAmt] = useState(new BigNumber(0));
   const [premiumToPay, setPremiumToPay] = useState(new BigNumber(0));
   const [premiumReceived, setPremiumReceived] = useState(new BigNumber(0));
-
-  const multiplier = option.type === 'call' ? new BigNumber((option as ETHOption).strikePriceInUSD) : new BigNumber(1)
 
   const updatePremiumToPay = async (amt) => {
     const buyAmountBN = new BigNumber(amt).times(multiplier);
@@ -145,11 +144,9 @@ function UniswapBuySell({
         </div>
       </div>
       { option.type === 'call'
-        ? <>
-            <WarningText text={`*The unit used here is not the same as the greek board.`} /> 
-            <WarningText text={`Buy ${(option as ETHOption).strikePriceInUSD} ${option.symbol} to hedge 1 ETH.`} /> 
-          </>
-        : <></> }
+        && 
+        <WarningText text={`Buy 1 ${option.symbol} to hedge 1 ETH.`} /> 
+      }
     </Box>
   );
 }
