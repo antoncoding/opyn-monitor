@@ -109,14 +109,19 @@ function VaultOwnerList({
     <>
       <Header primary="All Vaults" secondary={
         <RadioGroup onChange={setChecked} selected={checkedSorted}>
-          {SORTED_BY.map((label, i) => {
-            return (
-              <label key={i} style={{ opacity: 0.8 }}>
-                <Radio id={i} />
-                {label}
-              </label>
-            )
-          })}
+          <div style={{ display: 'flex' }}>
+            {SORTED_BY.map((label, i) => {
+              return (
+                <label key={i} style={{ opacity: 0.8 }}>
+                  <div style={{ display: 'flex' }}>
+                    <Radio id={i} />
+                    <div>{label} </div>
+                  </div>
+                </label>
+              )
+            })}
+          </div>
+
         </RadioGroup>
       } />
 
