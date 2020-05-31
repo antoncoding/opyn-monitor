@@ -63,42 +63,63 @@ function App() {
         <NavBar user={user} setUser={setUser} theme={theme} updateTheme={updateTheme} />
 
         <Switch>
-          {/* Out side of Aragon UI default Layout */}
+
+          {/* All Options */}
+          <Route path="/option/:token">
+            <Layout>
+              <OptionDetail user={user} />
+            </Layout>
+          </Route>
+          
+          <Route path="/options/">
+            <Layout>
+              <OptionLists />
+            </Layout>
+          </Route>
+          
+          {/* My Vaults */}
+          <Route path="/myvaults">
+            <Layout>
+              <MyVaults user={user} />
+            </Layout>
+          </Route>
+          
+          <Route path="/manage/:token/:owner">
+            <Layout>
+              <ManageVault user={user} />
+            </Layout>
+          </Route>
+
+          {/* Not Using Layout */}
           <Route path="/trade/0x/">
             <TradeOn0x
               user={user}
             />
           </Route>
-          <Layout>
-            {/* All Options */}
-            <Route path="/option/:token">
-              <OptionDetail user={user} />
-            </Route>
-            <Route path="/options/">
-              <OptionLists />
-            </Route>
-            {/* My Vaults */}
-            <Route path="/myvaults">
-              <MyVaults user={user} />
-            </Route>
-            <Route path="/manage/:token/:owner">
-              <ManageVault user={user} />
-            </Route>
 
-            <Route path="/trade/uniswap">
+          <Route path="/trade/uniswap">
+            <Layout>
               <TradeOnUniswap user={user} spotPrice={spotPrice} />
-            </Route>
-            {/* <Route path="/trades/test/"><ZEROXTest /></Route> */}
-            <Route path="/uniswap/:token/"><UniswapExchanges user={user} spotPrice={spotPrice} /></Route>
-            <Route path="/uniswap/">
-              <ExchangeList />
-            </Route>
+            </Layout>
+          </Route>
+          {/* <Route path="/trades/test/"><ZEROXTest /></Route> */}
+          <Route path="/uniswap/:token/">
+            <Layout>
+              <UniswapExchanges user={user} spotPrice={spotPrice} />
+            </Layout>
+          </Route>
 
-            <Route path="/balancer/"> <BalancerDemo /> </Route>
-            <Route path="/create/"><CreateOption user={user} /></Route>
-            {/* HomePage */}
-            <Route path="/"><HomePage /></Route>
-          </Layout>
+          <Route path="/uniswap/">
+            <Layout>
+            <ExchangeList />
+            </Layout>
+          </Route>
+
+          <Route path="/balancer/"><Layout><BalancerDemo /></Layout></Route>
+          <Route path="/create/"><Layout><CreateOption user={user} /></Layout></Route>
+          {/* HomePage */}
+          <Route path="/"><Layout><HomePage /></Layout></Route>
+          {/* </Layout> */}
 
         </Switch>
 
