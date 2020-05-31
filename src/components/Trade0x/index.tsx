@@ -5,7 +5,7 @@ import styled from 'styled-components'
 import Col from 'react-bootstrap/Col'
 import Row from 'react-bootstrap/Row'
 
-import { Header } from '@aragon/ui';
+import { Header, DropDown, Layout } from '@aragon/ui';
 import OptionBoard from './OptionBoard';
 import TabBoard from './TabBoard';
 import BuyAndSell from './BuyAndSell';
@@ -17,12 +17,15 @@ import * as types from '../../types'
 import * as tokens from '../../constants/tokens';
 
 import tracker from '../../utils/tracker';
+import { groupByDate } from './utils'
 
 const quoteAsset = tokens.USDC;
 
+const optionsByDate = groupByDate(eth_puts, eth_calls);
+
 function OptionTrading({ user }: { user: string }) {
 
-  // const [buySellActive, setBuySellActive] = useState(false)
+  const [selectedExpiryIdx, setExpiryIdx] = useState(0);
 
   const [baseAsset, setBaseAsset] = useState<types.ETHOption | undefined>(
     eth_puts.concat(eth_calls).find((o) => o.expiry > Date.now() / 1000),
@@ -77,18 +80,6 @@ function OptionTrading({ user }: { user: string }) {
     };
   }, [baseAsset, user]);
 
-  // const [buttonLabel, setButtonLabel] = useState(`Make Order for ${baseAsset?.title}`)
-  // const [sidePanelTitle, setSidePanelTitle] = useState('Make Order')
-  // useEffect(() => {
-  //   if (selectedOrders.length > 0) {
-  //     setButtonLabel(`Fill Orders for ${baseAsset?.title}`)
-  //     setSidePanelTitle(`Fill Orders`)
-  //   } else {
-  //     setButtonLabel(`Make Orders for ${baseAsset?.title}`)
-  //     setSidePanelTitle(`Make Orders`)
-  //   }
-  // }, [selectedOrders, baseAsset])
-
   // update quote asset
   useEffect(() => {
     let isCancelled = false;
@@ -107,12 +98,44 @@ function OptionTrading({ user }: { user: string }) {
     };
   }, [user]);
 
+  // when selection change: update selected order to the first option of the expiry
+  const onExpiryChange = (idx) => {
+    setExpiryIdx(idx);
+    for (const { call, put } of optionsByDate[idx].pairs) {
+      if (call !== undefined) {
+        setBaseAsset(call);
+        setSelectedOrders([])
+        return;
+      } if (put !== undefined) {
+        setBaseAsset(put);
+        setSelectedOrders([])
+        return;
+      }
+    }
+  };
+
   return (
     <MyContainer>
+      <Layout>
+        <div style={{ display: 'flex' }}>
+            {' '}
+            <Header primary="Option Trading" />
+            <img alt="icon" style={{ paddingTop: 24, paddingLeft:5, height: 64 }} src={'https://cdn.worldvectorlogo.com/logos/0x-virtual-money-.svg'} />
+            <div style={{ paddingTop: '28px', paddingLeft: '15px' }}>
+              <DropDown
+                items={optionsByDate.map((item) => item.expiryText)}
+                selected={selectedExpiryIdx}
+                onChange={onExpiryChange}
+              />
+            </div>
+          </div>
+
+
+      </Layout>
+
       <Row>
         <Col xl={2} lg={3} md={4} sm={12} xs={12}>
-          {/* <SidePanel title={sidePanelTitle} opened={buySellActive} onClose={() => setBuySellActive(false)}> */}
-          <Header />
+          <br />
           <br />
           <BuyAndSell
             user={user}
@@ -130,6 +153,8 @@ function OptionTrading({ user }: { user: string }) {
         </Col>
         <Col xl={10} lg={9} md={8} sm={12} xs={12}>
           <OptionBoard
+            selectedExpiryIdx={selectedExpiryIdx}
+            optionsByDate={optionsByDate}
             quoteAsset={quoteAsset}
             baseAsset={baseAsset!}
             setBaseAsset={setBaseAsset}

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import {
-  DataView, DropDown, LinkBase, Radio, Header,
+  DataView, LinkBase, Radio,
 } from '@aragon/ui';
 import { AskText, BidText } from './styled';
 
@@ -9,31 +9,18 @@ import { SectionTitle } from '../common';
 import { getBasePairAskAndBids } from '../../utils/0x';
 import * as types from '../../types';
 
-import { eth_puts, eth_calls } from '../../constants/options';
+// import { eth_puts, eth_calls } from '../../constants/options';
 
-const optionsByDate = groupByDate(eth_puts, eth_calls);
-
+import { entriesForExpiry } from './utils'
 
 type dataViewEntryType = {
   strikePrice: number,
   call?: types.ETHOption,
   callDetail?: types.OptionRealTimeStat,
   put?: types.ETHOption,
-  putDetail?: types.OptionRealTimeStat
+  putDetail?: types.OptionRealTimeStat,
 }
 
-
-type strikePricePair = {
-  strikePrice: number,
-  call: types.ETHOption | undefined,
-  put: types.ETHOption | undefined
-}
-
-type entriesForExpiry = { 
-  expiry: number, 
-  expiryText: string, 
-  pairs: strikePricePair[]
-}
 
 type OptionBoardProps = {
   baseAsset: types.token,
@@ -41,13 +28,19 @@ type OptionBoardProps = {
   setBaseAsset: Function,
   setTradeType: Function,
   setSelectedOrders: Function,
+
+  selectedExpiryIdx: number
+
+  optionsByDate: entriesForExpiry[]
 };
 
 function OptionBoard({
   baseAsset, quoteAsset, setBaseAsset, setTradeType, setSelectedOrders,
-}:OptionBoardProps) {
+  selectedExpiryIdx,
+  optionsByDate
+}: OptionBoardProps) {
   const [isLoading, setIsLoading] = useState(true);
-  const [selectedExpiryIdx, setExpiryIdx] = useState(0);
+
   const [entriesToDisplay, setEntriesToDisplay] = useState<dataViewEntryType[]>([]);
 
   // on expiry change: start the call and put update function on the options of that day
@@ -65,7 +58,7 @@ function OptionBoard({
         .map((pair) => pair.put);
 
       const [callData, putData] = await Promise.all([
-        getBasePairAskAndBids(callsOfExpiry as types.ETHOption[] , quoteAsset),
+        getBasePairAskAndBids(callsOfExpiry as types.ETHOption[], quoteAsset),
         getBasePairAskAndBids(putsOfExpiry as types.ETHOption[], quoteAsset),
       ]);
 
@@ -97,42 +90,10 @@ function OptionBoard({
       clearInterval(id);
       isCancelled = true;
     };
-  }, [selectedExpiryIdx, quoteAsset]);
-
-  // when selection change: update selected order to the first option of the expiry
-  const onExpiryChange = (idx) => {
-    setExpiryIdx(idx);
-    for (const { call, put } of optionsByDate[idx].pairs) {
-      if (call !== undefined) {
-        setBaseAsset(call);
-        setSelectedOrders([])
-        return;
-      } if (put !== undefined) {
-        setBaseAsset(put);
-        setSelectedOrders([])
-        return;
-      }
-    }
-  };
+  }, [selectedExpiryIdx, quoteAsset, optionsByDate]);
 
   return (
     <div>
-      <div style={{ display: 'flex' }}>
-        {' '}
-        <Header primary="Option Trading" />
-        <img alt="icon" style={{ paddingTop: 24, paddingLeft:5, height: 64 }} src={'https://cdn.worldvectorlogo.com/logos/0x-virtual-money-.svg'} />
-        <div style={{ paddingTop: '28px', paddingLeft: '15px' }}>
-          <DropDown
-            items={optionsByDate.map((item) => item.expiryText)}
-            selected={selectedExpiryIdx}
-            onChange={onExpiryChange}
-          />
-        </div>
-      </div>
-
-      {/* <div style={{ display: 'flex' }}> */}
-
-      {/* </div> */}
       <div style={{ display: 'flex', padding: '0px' }}>
         <SectionTitle title="Calls" />
         <div
@@ -254,7 +215,8 @@ function OptionBoard({
                 disabled={!put}
                 onChange={() => {
                   setSelectedOrders([])
-                  setBaseAsset(put)}
+                  setBaseAsset(put)
+                }
                 }
                 checked={put && put.addr === baseAsset.addr}
               />
@@ -276,44 +238,6 @@ function OptionBoard({
 
 export default OptionBoard;
 
-/**
- *
- */
-function groupByDate(puts: types.ETHOption[], calls: types.ETHOption[]): entriesForExpiry[] {
-  const result: entriesForExpiry[] = [];
-  const allOptions = puts.concat(calls)
-    .filter((option) => option.expiry > Date.now() / 1000) // filter out expired options
-    .sort((oa, ob) =>  oa.expiry > ob.expiry ? 1 : -1 ); // short by date (so the dropdown is sorted)
-  
-  const distinctExpirys = [...new Set(allOptions.map((option) => option.expiry))];
-
-  for (const expiry of distinctExpirys) {
-    const optionsExpiresThisDay = allOptions.filter((o) => o.expiry === expiry);
-    const strikePrices = [
-      ...new Set(optionsExpiresThisDay.map((option) => option.strikePriceInUSD)),
-    ];
-
-    // const allStrikesForThisDay = {};
-    const pairs: strikePricePair[] = [];
-    for (const strikePrice of strikePrices) {
-      const put = puts.find((o) => o.strikePriceInUSD === strikePrice && o.expiry === expiry);
-      const call = calls.find((o) => o.strikePriceInUSD === strikePrice && o.expiry === expiry);
-      pairs.push({
-        strikePrice,
-        call,
-        put,
-      });
-    }
-    pairs.sort((a, b) => (a.strikePrice > b.strikePrice ? 1 : -1));
-    const expiryText = new Date(expiry * 1000).toLocaleDateString("en-US", { timeZone: "UTC" });
-    result.push({
-      expiry,
-      expiryText,
-      pairs,
-    });
-  }
-  return result;
-}
 
 type CellProps = {
   onClick: Function,
@@ -323,7 +247,7 @@ type CellProps = {
 
 function Cell({
   onClick, text, type,
-}:CellProps) {
+}: CellProps) {
   return (
     <LinkBase onClick={onClick}>
       <div style={{ width: '60px', textAlign: 'center' }}>
