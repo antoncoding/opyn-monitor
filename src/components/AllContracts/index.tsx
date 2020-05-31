@@ -53,34 +53,36 @@ function AllContracts() {
         }}
       />
 
-      {tabSelected === 0 ? (
+      {tabSelected === 0 &&
         <DataView
-          fields={['Name', 'Contract', 'Expires in', '']}
+          fields={['Contract', 'Underlying', 'Strike', 'Collateral', 'Expires in', '']}
           entries={insurances
             .filter((option) => showExpired || option.expiry * 1000 > Date.now())
             .sort((oa, ob) => oa.expiry > ob.expiry ? -1 : 1)
           }
           entriesPerPage={6}
-          renderEntry={({ addr, title, expiry }) => [
-            <>{title}</>,
-            <IdentityBadge entity={addr} shorten={false} />,
-            <Timer end={new Date(expiry * 1000)} format='Mdh' />,
-            <Button onClick={() => goToToken(addr)}> View Vaults </Button>,
+          renderEntry={(option: types.option) => [
+            <IdentityBadge label={option.title} entity={option.addr}/>,
+            <IdentityBadge label={option.underlying.symbol} entity={option.underlying.addr} />,
+            <IdentityBadge label={option.strike.symbol} entity={option.strike.addr} />,
+            <IdentityBadge label={option.collateral.symbol} entity={option.collateral.addr} />,
+            <Timer end={new Date(option.expiry * 1000)} format='Mdh' />,
+            <Button onClick={() => goToToken(option.addr)}> View Vaults </Button>,
           ]}
-        />
-      ) : tabSelected === 1 ? (
+        />}
+      {tabSelected === 1 &&
         <OptionList
           entries={eth_puts}
           showExpired={showExpired}
           goToToken={goToToken}
+        />}
+      {tabSelected === 2 &&
+        <OptionList
+          entries={eth_calls}
+          showExpired={showExpired}
+          goToToken={goToToken}
         />
-      ) : ( // calls
-            <OptionList
-              entries={eth_calls}
-              showExpired={showExpired}
-              goToToken={goToToken}
-            />
-          )}
+      }
 
     </>
   );
