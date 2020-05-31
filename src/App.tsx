@@ -61,8 +61,15 @@ function App() {
     <Router>
       <Main assetsUrl={`${process.env.PUBLIC_URL}/aragon-ui/`} theme={theme} layout={false}>
         <NavBar user={user} setUser={setUser} theme={theme} updateTheme={updateTheme} />
-        <Layout>
-          <Switch>
+
+        <Switch>
+          {/* Out side of Aragon UI default Layout */}
+          <Route path="/trade/0x/">
+            <TradeOn0x
+              user={user}
+            />
+          </Route>
+          <Layout>
             {/* All Options */}
             <Route path="/option/:token">
               <OptionDetail user={user} />
@@ -77,12 +84,7 @@ function App() {
             <Route path="/manage/:token/:owner">
               <ManageVault user={user} />
             </Route>
-            {/* Trading */}
-            <Route path="/trade/0x/">
-              <TradeOn0x
-                user={user}
-              />
-            </Route>
+
             <Route path="/trade/uniswap">
               <TradeOnUniswap user={user} spotPrice={spotPrice} />
             </Route>
@@ -96,8 +98,10 @@ function App() {
             <Route path="/create/"><CreateOption user={user} /></Route>
             {/* HomePage */}
             <Route path="/"><HomePage /></Route>
-          </Switch>
-        </Layout>
+          </Layout>
+
+        </Switch>
+
         <Footer theme={theme} />
       </Main>
     </Router>

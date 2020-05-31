@@ -1,7 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import BigNumber from 'bignumber.js';
+import styled from 'styled-components'
 
-import {  SidePanel, Button } from '@aragon/ui';
+import Col from 'react-bootstrap/Col'
+import Row from 'react-bootstrap/Row'
+
+import { Header } from '@aragon/ui';
 import OptionBoard from './OptionBoard';
 import TabBoard from './TabBoard';
 import BuyAndSell from './BuyAndSell';
@@ -18,7 +22,7 @@ const quoteAsset = tokens.USDC;
 
 function OptionTrading({ user }: { user: string }) {
 
-  const [buySellActive, setBuySellActive] = useState(false)
+  // const [buySellActive, setBuySellActive] = useState(false)
 
   const [baseAsset, setBaseAsset] = useState<types.ETHOption | undefined>(
     eth_puts.concat(eth_calls).find((o) => o.expiry > Date.now() / 1000),
@@ -73,17 +77,17 @@ function OptionTrading({ user }: { user: string }) {
     };
   }, [baseAsset, user]);
 
-  const [buttonLabel, setButtonLabel] = useState(`Make Order for ${baseAsset?.title}`)
-  const [sidePanelTitle, setSidePanelTitle] = useState('Make Order')
-  useEffect(()=>{
-    if (selectedOrders.length > 0) {
-      setButtonLabel(`Fill Orders for ${baseAsset?.title}`)
-      setSidePanelTitle(`Fill Orders`)
-    } else {
-      setButtonLabel(`Make Orders for ${baseAsset?.title}`)
-      setSidePanelTitle(`Make Orders`)
-    }
-  }, [selectedOrders, baseAsset])
+  // const [buttonLabel, setButtonLabel] = useState(`Make Order for ${baseAsset?.title}`)
+  // const [sidePanelTitle, setSidePanelTitle] = useState('Make Order')
+  // useEffect(() => {
+  //   if (selectedOrders.length > 0) {
+  //     setButtonLabel(`Fill Orders for ${baseAsset?.title}`)
+  //     setSidePanelTitle(`Fill Orders`)
+  //   } else {
+  //     setButtonLabel(`Make Orders for ${baseAsset?.title}`)
+  //     setSidePanelTitle(`Make Orders`)
+  //   }
+  // }, [selectedOrders, baseAsset])
 
   // update quote asset
   useEffect(() => {
@@ -104,47 +108,59 @@ function OptionTrading({ user }: { user: string }) {
   }, [user]);
 
   return (
-    <>
-      <SidePanel title={sidePanelTitle} opened={buySellActive} onClose={() => setBuySellActive(false)}>
-        <br />
-        <br />
-        <BuyAndSell
-          user={user}
-          baseAsset={baseAsset!}
-          quoteAsset={quoteAsset}
-          baseAssetBalance={baseAssetBalance}
-          quoteAssetBalance={quoteAssetBalance}
-          tradeType={tradeType}
-          setTradeType={setTradeType}
+    <MyContainer>
+      <Row>
+        <Col xl={2} lg={3} md={4} sm={12} xs={12}>
+          {/* <SidePanel title={sidePanelTitle} opened={buySellActive} onClose={() => setBuySellActive(false)}> */}
+          <Header />
+          <br />
+          <BuyAndSell
+            user={user}
+            baseAsset={baseAsset!}
+            quoteAsset={quoteAsset}
+            baseAssetBalance={baseAssetBalance}
+            quoteAssetBalance={quoteAssetBalance}
+            tradeType={tradeType}
+            setTradeType={setTradeType}
 
-          selectedOrders={selectedOrders}
-          setSelectedOrders={setSelectedOrders}
-        />
-      </SidePanel>
-      <OptionBoard
-        quoteAsset={quoteAsset}
-        baseAsset={baseAsset!}
-        setBaseAsset={setBaseAsset}
-        setTradeType={setTradeType}
-        setSelectedOrders={setSelectedOrders}
-      />
-      <br />
-      <TabBoard
-        asks={asks}
-        bids={bids}
-        user={user}
-        option={baseAsset!}
-        quoteAsset={quoteAsset}
-        tradeType={tradeType}
-        selectedOrders={selectedOrders}
-        setTradeType={setTradeType}
-        setSelectedOrders={setSelectedOrders}
-      />
-      <br />
-      <Button mode="strong" wide onClick={() => { setBuySellActive(true) }}>{buttonLabel}</Button>
-    </>
+            selectedOrders={selectedOrders}
+            setSelectedOrders={setSelectedOrders}
+          />
+          {/* </SidePanel> */}
+        </Col>
+        <Col xl={10} lg={9} md={8} sm={12} xs={12}>
+          <OptionBoard
+            quoteAsset={quoteAsset}
+            baseAsset={baseAsset!}
+            setBaseAsset={setBaseAsset}
+            setTradeType={setTradeType}
+            setSelectedOrders={setSelectedOrders}
+          />
+          <br />
+          <TabBoard
+            asks={asks}
+            bids={bids}
+            user={user}
+            option={baseAsset!}
+            quoteAsset={quoteAsset}
+            tradeType={tradeType}
+            selectedOrders={selectedOrders}
+            setTradeType={setTradeType}
+            setSelectedOrders={setSelectedOrders}
+          />
+          {/* <br /> */}
+
+          {/* <Button mode="strong" wide onClick={() => { setBuySellActive(true) }}>{buttonLabel}</Button> */}
+        </Col>
+      </Row>
+    </MyContainer>
   );
 }
+
+const MyContainer = styled.div`
+  padding-left: 4%;
+  padding-right: 4%
+`
 
 // const LeftPart = styled.div`
 //   width: 18%;

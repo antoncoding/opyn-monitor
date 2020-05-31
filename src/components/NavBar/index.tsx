@@ -44,7 +44,6 @@ function MyBar({
               }}
               isSelected={history.location.pathname === '/'}
             />
-
             <LinkButton
               title="My Vaults"
               onClick={() => {
@@ -52,7 +51,6 @@ function MyBar({
               }}
               isSelected={history.location.pathname === '/myvaults/'}
             />
-
             <LinkButton
               title="All Contracts"
               onClick={() => {
@@ -60,7 +58,6 @@ function MyBar({
               }}
               isSelected={history.location.pathname === '/options/'}
             />
-
             <LinkButton
               title="Exchanges"
               onClick={() => {
@@ -68,7 +65,6 @@ function MyBar({
               }}
               isSelected={history.location.pathname.includes('/uniswap/') && !history.location.pathname.includes('/trade/')}
             />
-
             <LinkButton
               title="Uniswap Trade"
               onClick={() => {

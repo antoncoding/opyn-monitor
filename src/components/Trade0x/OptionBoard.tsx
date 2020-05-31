@@ -150,7 +150,7 @@ function OptionBoard({
         tableRowHeight={50}
         status={isLoading ? 'loading' : 'default'}
         fields={[
-          { label: 'last', align: 'start' },
+          // { label: 'last', align: 'start' },
           { label: 'bid', align: 'start' },
           { label: 'amt', align: 'start' },
           { label: 'ask', align: 'start' },
@@ -158,7 +158,7 @@ function OptionBoard({
           { label: ' ', align: 'start' },
           { label: 'strike', align: 'start' },
           { label: ' ', align: 'start' },
-          { label: 'last', align: 'start' },
+          // { label: 'last', align: 'start' },
           { label: 'bid', align: 'start' },
           { label: 'amt', align: 'start' },
           { label: 'ask', align: 'start' },
@@ -173,21 +173,21 @@ function OptionBoard({
           callDetail,
           strikePrice,
         }) => {
-          const lastCallPrice = '-';
+          // const lastCallPrice = '-';
           let callAsk = '-';
           let callBid = '-';
           let callBidAmt = '-';
           let callAskAmt = '-';
-          let callOnclick = () => { };
+          // let callOnclick = () => { };
           let callBidOnclick = () => { };
           let callAskOnclick = () => { };
 
-          const lastPutPrice = '-';
+          // const lastPutPrice = '-';
           let putAsk = '-';
           let putBid = '-';
           let putBidAmt = '-';
           let putAskAmt = '-';
-          let putOnclick = () => { };
+          // let putOnclick = () => { };
           let putBidOnclick = () => { };
           let putAskOnclick = () => { };
 
@@ -197,7 +197,7 @@ function OptionBoard({
             callBid = callDetail.bestBidPrice.toFixed(4);
             callAskAmt = callDetail.totalAskAmt.toFixed(2);
             callBidAmt = callDetail.totalBidAmt.toFixed(2);
-            callOnclick = () => { setBaseAsset(call); };
+            // callOnclick = () => { setBaseAsset(call); };
 
             callBidOnclick = () => {
               setTradeType('sell');
@@ -217,7 +217,7 @@ function OptionBoard({
             putAskAmt = putDetail.totalAskAmt.toFixed(2);
             putBidAmt = putDetail.totalBidAmt.toFixed(2);
 
-            putOnclick = () => { setBaseAsset(put); };
+            // putOnclick = () => { setBaseAsset(put); };
 
             putBidOnclick = () => {
               setBaseAsset(put);
@@ -232,7 +232,7 @@ function OptionBoard({
           }
 
           return [
-            <Cell onClick={callOnclick} text={lastCallPrice} type="normal" />,
+            // <Cell onClick={callOnclick} text={lastCallPrice} type="normal" />,
             <Cell onClick={callBidOnclick} text={callBid} type="bid" />,
             <Cell onClick={callBidOnclick} text={callBidAmt} type="normal" />,
 
@@ -259,7 +259,7 @@ function OptionBoard({
                 checked={put && put.addr === baseAsset.addr}
               />
             </div>,
-            <Cell onClick={putOnclick} text={lastPutPrice} type="normal" />,
+            // <Cell onClick={putOnclick} text={lastPutPrice} type="normal" />,
             <Cell onClick={putBidOnclick} text={putBid} type="bid" />,
             <Cell onClick={putBidOnclick} text={putBidAmt} type="normal" />,
             <Cell onClick={putAskOnclick} text={putAsk} type="ask" />,
