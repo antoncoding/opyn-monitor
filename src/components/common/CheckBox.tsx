@@ -16,7 +16,7 @@ function MyCheckBox({ text, checked, onCheck }: checkBoxProps) {
         checked={checked}
         onChange={onCheck}
       />
-      <span style={{ paddingBottom: '5px' }}>
+      <span style={{ margin: '4px' }}>
         {text}
       </span>
       <br />
@@ -27,7 +27,7 @@ function MyCheckBox({ text, checked, onCheck }: checkBoxProps) {
 export default MyCheckBox;
 
 const CheckBoxWrapper = styled.div`{
-  padding: 5px;
+  display: flex;
   font-size: 14px;
   color: ${(props) => props.theme.surfaceContentSecondary}
 }`;
