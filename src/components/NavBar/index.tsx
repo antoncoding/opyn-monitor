@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import styled from 'styled-components'
 import { useHistory } from 'react-router-dom';
 
 import {
@@ -8,15 +9,15 @@ import ConnectButton from './ConnectButton';
 import ChangeModeButton from './SwitchTheme';
 
 type NavbarProps = {
-  theme:string,
+  theme: string,
   updateTheme: Function,
   user: string,
   setUser: Function
 }
 
-function NavBar({
+function MyBar({
   theme, updateTheme, user, setUser,
-}:NavbarProps) {
+}: NavbarProps) {
   const history = useHistory();
   const [isHome, updateIsHome] = useState(true);
 
@@ -27,17 +28,15 @@ function NavBar({
   return (
     <Bar
       primary={
-        isHome ? (
-          <></>
-        ) : (
+        !isHome &&
           <>
-            <div style={{ height: '100%' }}>
+            <MaxHeightDiv>
               <BackButton
                 onClick={() => {
                   history.goBack();
                 }}
               />
-            </div>
+            </MaxHeightDiv>
             <LinkButton
               title="Home"
               onClick={() => {
@@ -45,6 +44,7 @@ function NavBar({
               }}
               isSelected={history.location.pathname === '/'}
             />
+
             <LinkButton
               title="My Vaults"
               onClick={() => {
@@ -52,6 +52,7 @@ function NavBar({
               }}
               isSelected={history.location.pathname === '/myvaults/'}
             />
+
             <LinkButton
               title="All Contracts"
               onClick={() => {
@@ -59,6 +60,7 @@ function NavBar({
               }}
               isSelected={history.location.pathname === '/options/'}
             />
+
             <LinkButton
               title="Exchanges"
               onClick={() => {
@@ -66,6 +68,7 @@ function NavBar({
               }}
               isSelected={history.location.pathname.includes('/uniswap/') && !history.location.pathname.includes('/trade/')}
             />
+
             <LinkButton
               title="Uniswap Trade"
               onClick={() => {
@@ -82,33 +85,44 @@ function NavBar({
               isSelected={history.location.pathname.includes('/trade/0x')}
             />
           </>
-        )
+        
       }
-      secondary={(
+      secondary={
         <>
           <ConnectButton user={user} setUser={setUser} />
           <ChangeModeButton theme={theme} updateTheme={updateTheme} />
         </>
-      )}
+      }
     />
+
   );
 }
 
 
 type linkButtonProps = {
-  title:string,
+  title: string,
   onClick: Function,
-  isSelected?:boolean
+  isSelected?: boolean
 }
 
-function LinkButton({ title, onClick, isSelected = false }:linkButtonProps) {
+function LinkButton({ title, onClick, isSelected = false }: linkButtonProps) {
   return (
     <div style={{ paddingLeft: 40 }}>
       <LinkBase onClick={onClick}>
-        <div style={{ padding: '1%', opacity: isSelected ? 1 : 0.5, fontSize: 16 }}>{title}</div>
+        <Link isSelected={isSelected}> {title} </Link>
       </LinkBase>
     </div>
   );
 }
 
-export default NavBar;
+const MaxHeightDiv = styled.div`
+  height: 100%;
+`
+
+const Link = styled.div`
+  padding: '1%';
+  opacity: ${ props => props.isSelected ? 1 : 0.5 };
+  font-size: 16px;
+`
+
+export default MyBar;

@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import 'react-widgets/dist/css/react-widgets.css';
-import 'bootstrap/dist/css/bootstrap.min.css';
+import 'bootstrap/dist/css/bootstrap-grid.css';
 import App from './App';
 import * as serviceWorker from './serviceWorker';
 

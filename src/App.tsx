@@ -1,11 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import BigNumber from 'bignumber.js'
-import 'bootstrap/dist/css/bootstrap.min.css';
 
 import { getETHPrice } from './utils/etherscan'
 
 import { HashRouter as Router, Switch, Route } from 'react-router-dom';
-import { Main } from '@aragon/ui';
+import { Main, Layout } from '@aragon/ui';
 import { updateModalMode } from './utils/web3';
 import { storePreference, getPreference } from './utils/storage';
 import NavBar from './components/NavBar';
@@ -35,7 +34,7 @@ function App() {
   const [user, setUser] = useState(''); // the current connected user
   const [theme, setTheme] = useState(storedTheme);
 
-  const updateTheme = (newTheme:string) => {
+  const updateTheme = (newTheme: string) => {
     setTheme(newTheme);
     updateModalMode(newTheme);
     storePreference('theme', newTheme);
@@ -60,44 +59,45 @@ function App() {
 
   return (
     <Router>
-      <Main assetsUrl={`${process.env.PUBLIC_URL}/aragon-ui/`} theme={theme}>
+      <Main assetsUrl={`${process.env.PUBLIC_URL}/aragon-ui/`} theme={theme} layout={false}>
         <NavBar user={user} setUser={setUser} theme={theme} updateTheme={updateTheme} />
+        <Layout>
+          <Switch>
+            {/* All Options */}
+            <Route path="/option/:token">
+              <OptionDetail user={user} />
+            </Route>
+            <Route path="/options/">
+              <OptionLists />
+            </Route>
+            {/* My Vaults */}
+            <Route path="/myvaults">
+              <MyVaults user={user} />
+            </Route>
+            <Route path="/manage/:token/:owner">
+              <ManageVault user={user} />
+            </Route>
+            {/* Trading */}
+            <Route path="/trade/0x/">
+              <TradeOn0x
+                user={user}
+              />
+            </Route>
+            <Route path="/trade/uniswap">
+              <TradeOnUniswap user={user} spotPrice={spotPrice} />
+            </Route>
+            {/* <Route path="/trades/test/"><ZEROXTest /></Route> */}
+            <Route path="/uniswap/:token/"><UniswapExchanges user={user} spotPrice={spotPrice} /></Route>
+            <Route path="/uniswap/">
+              <ExchangeList />
+            </Route>
 
-        <Switch>
-          {/* All Options */}
-          <Route path="/option/:token">
-            <OptionDetail user={user} />
-          </Route>
-          <Route path="/options/">
-            <OptionLists />
-          </Route>
-          {/* My Vaults */}
-          <Route path="/myvaults">
-            <MyVaults user={user} />
-          </Route>
-          <Route path="/manage/:token/:owner">
-            <ManageVault user={user} />
-          </Route>
-          {/* Trading */}
-          <Route path="/trade/0x/">
-            <TradeOn0x
-              user={user}
-            />
-          </Route>
-          <Route path="/trade/uniswap">
-           <TradeOnUniswap user={user} spotPrice={spotPrice} />
-          </Route>
-          {/* <Route path="/trades/test/"><ZEROXTest /></Route> */}
-          <Route path="/uniswap/:token/"><UniswapExchanges user={user} spotPrice={spotPrice} /></Route>
-          <Route path="/uniswap/">
-            <ExchangeList />
-          </Route>
-          
-          <Route path="/balancer/"> <BalancerDemo/> </Route>
-          <Route path="/create/"><CreateOption user={user}/></Route>
-          {/* HomePage */}
-          <Route path="/"><HomePage /></Route>
-        </Switch>
+            <Route path="/balancer/"> <BalancerDemo /> </Route>
+            <Route path="/create/"><CreateOption user={user} /></Route>
+            {/* HomePage */}
+            <Route path="/"><HomePage /></Route>
+          </Switch>
+        </Layout>
         <Footer theme={theme} />
       </Main>
     </Router>

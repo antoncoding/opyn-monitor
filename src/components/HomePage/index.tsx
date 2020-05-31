@@ -17,9 +17,10 @@ function HomePage() {
 
   return (
     <>
+      <Container fluid='md'>
       <Header primary="Welcome to Opyn Monitor" />
       <div style={{ padding: 5, opacity: 0.5 }}> Tools for DeFi Risk Management. </div>
-      <Container fluid='md'>
+      
         <Row>
           <Col md={6} lg={4}>
             <MainButton
