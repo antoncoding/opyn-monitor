@@ -13,12 +13,13 @@ import * as types from '../../types'
 import tracker from '../../utils/tracker';
 
 type AllContractsProps = {
+  isInitializing: boolean
   insurances: types.optionWithStat[],
   calls: types.ETHOption[],
   puts: types.ETHOption[],
 }
 
-function AllContracts({insurances, calls, puts}:AllContractsProps) {
+function AllContracts({isInitializing, insurances, calls, puts}:AllContractsProps) {
   useEffect(() => {
     tracker.pageview('/options/');
   }, []);
@@ -61,6 +62,7 @@ function AllContracts({insurances, calls, puts}:AllContractsProps) {
 
       {tabSelected === 0 &&
         <DataView
+          status={isInitializing ? 'loading' : 'default'}
           fields={['Contract', 'Underlying', 'Strike', 'Collateral', 'Expires in', '']}
           entries={insurances
             .filter((option) => showExpired || option.expiry * 1000 > Date.now())

@@ -11,21 +11,30 @@ import { getAllVaultsForOption } from '../../utils/graph';
 import tracker from '../../utils/tracker';
 
 import { ETH_ADDRESS } from '../../constants/contracts';
-import { allOptions } from '../../constants/options';
+import { defaultOption } from '../../constants/options';
 
 import * as types from '../../types'
 
-function OptionPage({ user }: { user: string }) {
+function OptionPage({ user, options, isInitializing }: { 
+  user: string, 
+  options: types.optionWithStat[] 
+  isInitializing: boolean
+}) {
   const { token } = useParams();
   useEffect(() => {
     tracker.pageview(`/option/${token}`);
   }, [token]);
 
-  const option = allOptions.find((o) => o.addr === token);
+  const [option, setOption] = useState<types.optionWithStat>(defaultOption)
 
   const [vaults, setVaults] = useState<types.vaultWithoutUnderlying[]>([]);
 
   const collateralIsETH = option!.collateral.addr === ETH_ADDRESS;
+
+  useEffect(()=>{
+    const option = options.find((o) => o.addr === token);
+    if (option) setOption(option)
+  }, [options, token])
 
   useMemo(async () => {
     // Get All vaults once
@@ -36,11 +45,11 @@ function OptionPage({ user }: { user: string }) {
   return (
     <>
       <Header
-        primary={option!.name}
+        primary={option && option!.name}
         secondary={(
           <ExerciseModal
             user={user}
-            option={option!}
+            option={option}
             vaults={vaults}
           />
         )}
@@ -48,10 +57,10 @@ function OptionPage({ user }: { user: string }) {
       {/* Basic Info Header */}
       <OptionInfoBox
         option={option!}
-        collateralIsETH={collateralIsETH}
       />
       {/* List of Vaults */}
       <VaultsList
+        isInitializing={isInitializing}
         option={option!}
         user={user}
         vaults={vaults}

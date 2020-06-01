@@ -15,6 +15,7 @@ import * as types from '../../types'
 import { vaultWithRatio } from '../../types';
 
 type VaultOwnerListProps = {
+  isInitializing: boolean
   user: string,
   option: types.option,
   vaults: types.vaultWithoutUnderlying[],
@@ -22,8 +23,9 @@ type VaultOwnerListProps = {
 }
 
 function VaultOwnerList({
-  user, option, vaults, collateralIsETH,
+  isInitializing, user, option, vaults, collateralIsETH,
 }: VaultOwnerListProps) {
+
   const vaultUsesCollateral = option.collateral.addr !== option.strike.addr;
 
   const [isLoading, setIsLoading] = useState(true);
@@ -37,9 +39,13 @@ function VaultOwnerList({
 
   // calculate ratio
   useEffect(() => {
+    if(option.addr === '') return 
     let isCancelled = false;
     const updateInfo = async () => {
-      if (vaults.length === 0) return;
+      if (vaults.length === 0) {
+        setIsLoading(false)
+        return
+      };
       const {
         strike, minRatio, strikePrice, oracle, collateral,
       } = option;
@@ -128,7 +134,7 @@ function VaultOwnerList({
       <DataView
         page={page}
         onPageChange={setPage}
-        status={isLoading ? 'loading' : 'default'}
+        status={isLoading || isInitializing ? 'loading' : 'default'}
         fields={['Owner', 'collateral', 'Issued', 'Exercised', 'RATIO', 'Status', '']}
         entries={vaultsWithDetail.sort(selectSortFunction(checkedSorted))}
         entriesPerPage={5}

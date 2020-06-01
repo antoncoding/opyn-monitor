@@ -29,9 +29,12 @@ import { optionWithStat, ethOptionWithStat } from './types'
 function App() {
   const storedTheme = getPreference('theme', 'light');
 
+  const [isInitializing, setInitialized] = useState(true)
+
   const [user, setUser] = useState(''); // the current connected user
   const [theme, setTheme] = useState(storedTheme);
 
+  const [options, setOptions] = useState<optionWithStat[]>([])
   const [insurances, setInsurances] = useState<optionWithStat[]>([])
   const [puts, setPuts] = useState<ethOptionWithStat[]>([])
   const [calls, setCalls] = useState<ethOptionWithStat[]>([])
@@ -62,9 +65,11 @@ function App() {
   // Get all options
   useMemo(async()=>{
     const options = await initOptions()
+    setOptions(options.insurances.concat(options.calls).concat(options.puts))
     setInsurances(options.insurances)
     setCalls(options.calls)
     setPuts(options.puts)
+    setInitialized(true)
   }, [])
 
   return (
@@ -77,13 +82,13 @@ function App() {
           {/* All Options */}
           <Route path="/option/:token">
             <Layout>
-              <OptionDetail user={user} />
+              <OptionDetail isInitializing={isInitializing} user={user} options={options}/>
             </Layout>
           </Route>
           
           <Route path="/options/">
             <Layout>
-              <OptionLists insurances={insurances} puts={puts} calls={calls} />
+              <OptionLists isInitializing={isInitializing} insurances={insurances} puts={puts} calls={calls} />
             </Layout>
           </Route>
           
