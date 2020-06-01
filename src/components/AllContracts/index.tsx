@@ -4,7 +4,6 @@ import {
   Header, DataView, IdentityBadge, Button, Tabs, Timer
 } from '@aragon/ui';
 
-// import { eth_calls, eth_puts } from '../../constants/options';
 import { Comment, CheckBox } from '../common';
 import { getPreference, storePreference } from '../../utils/storage';
 

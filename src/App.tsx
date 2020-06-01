@@ -101,7 +101,7 @@ function App() {
           
           <Route path="/manage/:token/:owner">
             <Layout>
-              <ManageVault user={user} />
+              <ManageVault options={options} user={user} />
             </Layout>
           </Route>
 

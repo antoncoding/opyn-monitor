@@ -22,19 +22,25 @@ import { getVault } from '../../utils/graph';
 import { redeem } from '../../utils/web3';
 
 import { ETH_ADDRESS } from '../../constants/contracts';
-import { allOptions } from '../../constants/options';
+import { defaultOption } from '../../constants/options';
 import * as types from '../../types'
 import tracker from '../../utils/tracker';
+// import { optionWithStat } from '../../types';
 
-function ManageVault({ user }: { user: string }) {
+function ManageVault({ user, options }: { user: string, options: types.option[] }) {
   const { token, owner } = useParams();
   useEffect(() => {
     tracker.pageview(`/manage/${token}`);
   }, [token]);
-
-  const option = allOptions.find((o) => o.addr === token) as types.option;
+  
+  const [option, setOption] = useState<types.option>(defaultOption)
 
   const multiplier = option.type === 'call' ? new BigNumber((option as types.ETHOption).strikePriceInUSD) : new BigNumber(1)
+
+  useEffect(()=>{
+    const option = options.find((o) => o.addr === token);
+    if (option) setOption(option)
+  }, [options, token])
 
   const {
     decimals, oracle, strike, strikePrice,
@@ -68,7 +74,9 @@ function ManageVault({ user }: { user: string }) {
 
   useMemo(() => {
     let isCancelled = false;
+
     async function updateInfo() {
+      if (option.addr === '') return 
       const vaultToManage = await getVault(owner, token);
       if (vaultToManage === null) {
         setIsLoading(false);
@@ -135,6 +143,7 @@ function ManageVault({ user }: { user: string }) {
     strikePrice,
     token,
     user,
+    option.addr
   ]);
 
   const isOwner = user === owner;
