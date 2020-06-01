@@ -29,7 +29,7 @@ import { optionWithStat, ethOptionWithStat } from './types'
 function App() {
   const storedTheme = getPreference('theme', 'light');
 
-  const [isInitializing, setInitialized] = useState(true)
+  const [isInitializing, setInitializing] = useState(true)
 
   const [user, setUser] = useState(''); // the current connected user
   const [theme, setTheme] = useState(storedTheme);
@@ -69,7 +69,7 @@ function App() {
     setInsurances(options.insurances)
     setCalls(options.calls)
     setPuts(options.puts)
-    setInitialized(true)
+    setInitializing(false)
   }, [])
 
   return (
@@ -95,7 +95,7 @@ function App() {
           {/* My Vaults */}
           <Route path="/myvaults">
             <Layout>
-              <MyVaults user={user} />
+              <MyVaults isInitializing={isInitializing} user={user} options={options} />
             </Layout>
           </Route>
           
