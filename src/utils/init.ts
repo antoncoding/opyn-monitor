@@ -6,8 +6,6 @@ import { getUniswapExchangeAddress, getERC20Symbol, getERC20Name } from './infur
 import { USDC, OPYN_ETH, cDAI, cUSDC, CurveFi, WETH, DAI, yDAI } from '../constants/tokens';
 import { EMPTY_EXCHANGE } from '../constants/contracts'
 import Promise from 'bluebird';
-// import { optionWithStat, optionWithStat } from '../types';
-import { insurances } from '../constants/options';
 
 const tokens = [USDC, OPYN_ETH, cDAI, cUSDC, CurveFi, WETH, DAI, yDAI];
 
