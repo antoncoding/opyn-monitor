@@ -12,24 +12,36 @@ import BuyAndSell from './BuyAndSell';
 
 import { getTokenBalance } from '../../utils/infura';
 import { getOrderBook, isValid } from '../../utils/0x';
-import { eth_puts, eth_calls } from '../../constants/options';
+import { defaultOption } from '../../constants/options';
 import * as types from '../../types'
 import * as tokens from '../../constants/tokens';
 
 import tracker from '../../utils/tracker';
-import { groupByDate } from './utils'
+import { groupByDate, entriesForExpiry } from './utils'
 
 const quoteAsset = tokens.USDC;
 
-const optionsByDate = groupByDate(eth_puts, eth_calls);
+type TradingProps = {
+  user: string,
+  puts: types.ETHOption[],
+  calls: types.ETHOption[]
+}
 
-function OptionTrading({ user }: { user: string }) {
+function OptionTrading({ user, puts, calls }:TradingProps) {
 
   const [selectedExpiryIdx, setExpiryIdx] = useState(0);
+  const [optionsByDate, setOptionsByDate] = useState<entriesForExpiry[]>([])
 
-  const [baseAsset, setBaseAsset] = useState<types.ETHOption | undefined>(
-    eth_puts.concat(eth_calls).find((o) => o.expiry > Date.now() / 1000),
-  );
+  const [baseAsset, setBaseAsset] = useState<types.ETHOption>((defaultOption as types.option) as types.ETHOption);
+
+  useEffect(()=>{
+    const optionsByDate = groupByDate(puts, calls);
+    setOptionsByDate(optionsByDate)
+    const defaultBaseAsset = puts.concat(calls).find((o) => o.expiry > Date.now() / 1000)
+    if (defaultBaseAsset) {
+      setBaseAsset(defaultBaseAsset)
+    }
+  },[puts, calls])
 
   useEffect(() => {
     tracker.pageview('/trade/0x');
@@ -47,10 +59,12 @@ function OptionTrading({ user }: { user: string }) {
 
   // BaseAsset changeed: Update orderbook and base asset
   useEffect(() => {
+    if (baseAsset.addr === '') return
     let isCancelled = false;
 
     // update orderbook
     const updateOrderBook = async () => {
+      if(!baseAsset.addr) return 
       const res = await getOrderBook(baseAsset!.addr, quoteAsset.addr);
       if (!isCancelled) {
         setAsks(res.asks.records.filter((record) => isValid(record)));
@@ -60,6 +74,7 @@ function OptionTrading({ user }: { user: string }) {
 
     // update baseAsset Balance
     const updateBaseBalance = async () => {
+      if(!baseAsset.addr) return 
       const baseBalance = await getTokenBalance(baseAsset!.addr, user);
       if (!isCancelled) {
         setBaseAssetBalance(new BigNumber(baseBalance));

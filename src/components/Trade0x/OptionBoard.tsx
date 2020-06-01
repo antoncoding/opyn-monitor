@@ -47,6 +47,7 @@ function OptionBoard({
     let isCancelled = false;
 
     const updateBoardStats = async () => {
+      if(!optionsByDate[selectedExpiryIdx]) return
       const callsOfExpiry = optionsByDate[selectedExpiryIdx].pairs
         .filter((pair) => pair.call !== undefined)
         .map((pair) => pair.call);

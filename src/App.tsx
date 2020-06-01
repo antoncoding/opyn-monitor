@@ -108,6 +108,8 @@ function App() {
           {/* Not Using Layout */}
           <Route path="/trade/0x/">
             <TradeOn0x
+              puts={puts}
+              calls={calls}
               user={user}
             />
           </Route>
