@@ -116,19 +116,32 @@ function App() {
 
           <Route path="/trade/uniswap">
             <Layout>
-              <TradeOnUniswap user={user} spotPrice={spotPrice} />
+              <TradeOnUniswap 
+                puts={puts}
+                calls={calls}
+                user={user}
+                spotPrice={spotPrice}
+              />
             </Layout>
           </Route>
           {/* <Route path="/trades/test/"><ZEROXTest /></Route> */}
           <Route path="/uniswap/:token/">
             <Layout>
-              <UniswapExchanges user={user} spotPrice={spotPrice} />
+              <UniswapExchanges 
+                allOptions={options}
+                user={user} 
+                spotPrice={spotPrice}
+              />
             </Layout>
           </Route>
 
           <Route path="/uniswap/">
             <Layout>
-            <ExchangeList />
+            <ExchangeList 
+              isInitializing={isInitializing}
+              insurances={insurances}
+              eth_options={calls.concat(puts)}  
+            />
             </Layout>
           </Route>
 

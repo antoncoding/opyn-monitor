@@ -188,9 +188,7 @@ function OptionTrading({ user, puts, calls }:TradingProps) {
             setTradeType={setTradeType}
             setSelectedOrders={setSelectedOrders}
           />
-          {/* <br /> */}
 
-          {/* <Button mode="strong" wide onClick={() => { setBuySellActive(true) }}>{buttonLabel}</Button> */}
         </Col>
       </Row>
     </MyContainer>
@@ -201,33 +199,5 @@ const MyContainer = styled.div`
   padding-left: 4%;
   padding-right: 4%
 `
-
-// const LeftPart = styled.div`
-//   width: 18%;
-//   padding-right: 1.5%;
-// `;
-
-// const RightPart = styled.div`
-//   width: 80%;
-// `;
-
-// const WholeScreen = styled.div`
-//   textAlign: center;
-//   padding-left: 1%;
-//   padding-right: 10%;
-//   position:fixed;
-//   overflow-y:scroll;
-//   overflow-x:hidden;
-//   left: 0;
-//   bottom: 0;
-//   top: 6%;
-//   width: 100%;
-//   overflow: auto
-// `;
-
-// const FlexWrapper = styled.div`
-//   display: flex;
-//   height:87%
-// `;
 
 export default OptionTrading;

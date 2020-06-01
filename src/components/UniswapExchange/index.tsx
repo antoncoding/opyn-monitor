@@ -8,7 +8,7 @@ import {
 } from '../../utils/infura';
 import { toTokenUnitsBN } from '../../utils/number';
 
-import { allOptions } from '../../constants/options';
+import { defaultOption } from '../../constants/options';
 
 import TradePageHeader from './Header';
 import UniswapBuySell from './UniswapBuySell';
@@ -18,7 +18,7 @@ import RemoveLiquidity from './RemoveLiquidity';
 import tracker from '../../utils/tracker';
 import * as types from '../../types';
 
-function UniswapPool({ user, spotPrice }: {user: string, spotPrice:BigNumber}) {
+function UniswapPool({ user, spotPrice, allOptions }: {user: string, spotPrice:BigNumber, allOptions: types.option[]}) {
   const liquidityTokenDecimals = 18;
   const { token } = useParams();
 
@@ -26,7 +26,12 @@ function UniswapPool({ user, spotPrice }: {user: string, spotPrice:BigNumber}) {
     tracker.pageview(`/uniswap/${token}`);
   }, [token]);
 
-  const option = allOptions.find((o) => o.addr === token) as types.option;
+  const [option, setOption] = useState<types.option>(defaultOption)
+  useEffect(()=>{
+    const _option = allOptions.find((o) => o.addr === token) as types.option;
+    setOption(_option)
+  }, [allOptions, token])
+  
   const {
     uniswapExchange, decimals,
   } = option!;

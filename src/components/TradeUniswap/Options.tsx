@@ -7,17 +7,13 @@ import {
 } from '@aragon/ui';
 
 import TradeModal from './TradeModal'
-import { eth_puts, eth_calls } from '../../constants/options';
-import { ETHOption } from '../../types';
+import { ETHOption, ethOptionWithStat } from '../../types';
 
 import { getGreeks } from './utils'
-import { getTotalSupplys } from '../../utils/graph'
 import { toTokenUnitsBN } from '../../utils/number';
 
-const allOptions = eth_puts.concat(eth_calls).filter((option) => option.expiry > Date.now() / 1000).sort((a, b) => a > b ? 1 : -1);
-const distinctExpirys = [...new Set(allOptions.map((option) => option.expiry))].sort((a, b) => a > b ? 1 : -1);
-
 type OptionBoardProps = {
+  allOptions: ethOptionWithStat[]
   optionPrices: {
     oToken: string,
     price: BigNumber
@@ -30,25 +26,22 @@ type OptionBoardProps = {
   ,
 };
 
-function Options({ optionPrices, spotPrice, balances }: OptionBoardProps) {
+function Options({ optionPrices, spotPrice, balances, allOptions }: OptionBoardProps) {
   const history = useHistory()
 
   const [selectedExpiryIdx, setExpiryIdx] = useState(0);
   const [selectedType, setSelectedType] = useState(0)
 
-  const [openInterests, setOIs] = useState<{ oToken: string, totalSupply: string }[]>([])
+  // const [openInterests, setOIs] = useState<{ oToken: string, totalSupply: string }[]>([])
   const [displayedOptions, setDisplayOptions] = useState<ETHOption[]>([])
 
-  // get Open Interest (totalSupply)
-  useMemo(async () => {
-    const ivs = (await getTotalSupplys()).map(({ address, totalSupply }) => {
-      return {
-        oToken: address,
-        totalSupply
-      }
-    });
-    setOIs(ivs)
-  }, [])
+  const [distinctExpirys, setDistinctExpirys] = useState<number[]>([])
+
+  useMemo(()=>{
+    const distinctExpirys = [...new Set(allOptions.map((option) => option.expiry))].sort((a, b) => a > b ? 1 : -1);
+    setDistinctExpirys(distinctExpirys)
+  }, [allOptions])
+
 
   // Update displayed options
   useMemo(() => {
@@ -59,7 +52,7 @@ function Options({ optionPrices, spotPrice, balances }: OptionBoardProps) {
       .filter((option) => (option.type === 'call') === Boolean(selectedType))
       .sort((a, b) => a.strikePriceInUSD > b.strikePriceInUSD ? 1 : -1)
     setDisplayOptions(displayOptions)
-  }, [selectedExpiryIdx, selectedType])
+  }, [selectedExpiryIdx, selectedType, allOptions, distinctExpirys])
 
   return (
     <div>
@@ -107,7 +100,7 @@ function Options({ optionPrices, spotPrice, balances }: OptionBoardProps) {
           { label: ' ', align: 'end' }
         ]}
         entries={displayedOptions}
-        renderEntry={(option: ETHOption) => {
+        renderEntry={(option: ethOptionWithStat) => {
 
           const priceInUSD = optionPrices.find(o => o.oToken === option.addr)?.price || new BigNumber(0);
           const greeks = getGreeks(option, priceInUSD, spotPrice)
@@ -116,8 +109,7 @@ function Options({ optionPrices, spotPrice, balances }: OptionBoardProps) {
             option.strikePriceInUSD,
             new Date(option.expiry * 1000).toLocaleDateString("en-US", { timeZone: "UTC" }),
             `${priceInUSD.toFixed(5)} USD`,
-            toTokenUnitsBN(openInterests
-              .find(open => open.oToken === option.addr)?.totalSupply || 0, option.decimals)
+            toTokenUnitsBN(option.totalSupply, option.decimals)
               .div(option.type === 'call' ? option.strikePriceInUSD : 1)
               .toFixed(1),
             `${(greeks.iv * 100).toFixed(2)} %`,
