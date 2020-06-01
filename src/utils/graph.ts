@@ -331,10 +331,10 @@ export type optionTheGraph = {
   minCollateralizationRatioValue: string;
   minCollateralizationRatioExp: string;
   oTokenExchangeRateExp: string;
-  
+
   strikePriceExp: string;
   strikePriceValue: string;
-  
+
   expiry: string;
   totalCollateral: string;
   totalExercised: string;
