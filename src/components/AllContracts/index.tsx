@@ -28,6 +28,7 @@ function AllContracts({isInitializing, insurances, calls, puts}:AllContractsProp
 
   const [tabSelected, setTabSelected] = useState(parseInt(storedOptionTab, 10));
   const [showExpired, setShowExpired] = useState(storedShowExpired === '1'); // whether to show expired options
+  const [insurancePage, setInsurancePage] = useState(0)
 
   const history = useHistory();
   const goToToken = (addr: string) => {
@@ -63,6 +64,8 @@ function AllContracts({isInitializing, insurances, calls, puts}:AllContractsProp
         <DataView
           status={isInitializing ? 'loading' : 'default'}
           fields={['Contract', 'Underlying', 'Strike', 'Collateral', 'Expires in', '']}
+          page={insurancePage}
+          onPageChange={setInsurancePage}
           entries={insurances
             .filter((option) => showExpired || option.expiry * 1000 > Date.now())
             .sort((oa, ob) => oa.expiry > ob.expiry ? -1 : 1)
