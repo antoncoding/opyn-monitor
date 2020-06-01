@@ -6,9 +6,9 @@ import {
 } from '@aragon/ui';
 import NoWalletView from './NoWallet';
 import * as types from '../../types'
-import { allOptions } from '../../constants/options';
+
 import {
-  SectionTitle, ManageVaultButton, Comment, CheckBox,
+  SectionTitle, ManageVaultButton, CheckBox,
 } from '../common/index';
 import {
   formatDigits, compareVaultRatio, toTokenUnitsBN,
@@ -31,7 +31,7 @@ export type vaultWithDetail = {
   ratio: number
 }
 
-function MyVaults({ user }: { user: string }) {
+function MyVaults({ user, isInitializing, options }: { user: string, isInitializing: boolean, options: types.option[] }) {
   useEffect(() => {
     tracker.pageview('/myvaults/');
   }, []);
@@ -58,7 +58,7 @@ function MyVaults({ user }: { user: string }) {
     const userVaults = await getAllVaultsForUser(isWatchMode ? watchAddress : user);
     const openedVaults: vaultWithDetail[] = [];
     const notOpenedTokens: types.option[] = [];
-    await Promise.map(allOptions, async (option: types.option) => {
+    await Promise.map(options, async (option: types.option) => {
       const entry = userVaults.find((vault) => vault.optionsContract.address === option.addr);
 
       if (entry !== undefined) {
@@ -91,7 +91,7 @@ function MyVaults({ user }: { user: string }) {
     setIsLoading(false);
     setOpenedVaults(openedVaults.sort(compareVaultRatio));
     setTokensToOpen(notOpenedTokens);
-  }, [user, watchAddress, hasAddressConnected, isWatchMode]);
+  }, [user, watchAddress, hasAddressConnected, isWatchMode, options]);
 
   const [vaultListPage, setVPage] = useState(0)
   const [openVaultPage, setOPage] = useState(0)
@@ -101,55 +101,50 @@ function MyVaults({ user }: { user: string }) {
       <Header primary="My Vaults" />
       {hasAddressConnected ? (
         <>
-          {opendVaults.length > 0 ? (
-            <div style={{ paddingBottom: '3%' }}>
-
-              <div style={{ display: 'flex' }}>
-                <SectionTitle title="Existing Vaults" />
-                <div style={{ marginLeft: 'auto' }}>
-                  <div style={{ display: 'flex' }}>
-                    <CheckBox
-                      text="Expired"
-                      checked={showExpired}
-                      onCheck={(checked: boolean) => {
-                        storePreference('showExpired', checked ? '1' : '0');
-                        setShowExpired(checked);
-                      }}
-                    />
-                    <CheckBox
-                      text="Empty"
-                      checked={showEmpty}
-                      onCheck={(checked: boolean) => {
-                        storePreference('showEmpty', checked ? '1' : '0');
-                        setShowEmpty(checked);
-                      }}
-                    />
-                  </div>
+          <div style={{ paddingBottom: '3%' }}>
+            <div style={{ display: 'flex' }}>
+              <SectionTitle title="Existing Vaults" />
+              <div style={{ marginLeft: 'auto' }}>
+                <div style={{ display: 'flex' }}>
+                  <CheckBox
+                    text="Expired"
+                    checked={showExpired}
+                    onCheck={(checked: boolean) => {
+                      storePreference('showExpired', checked ? '1' : '0');
+                      setShowExpired(checked);
+                    }}
+                  />
+                  <CheckBox
+                    text="Empty"
+                    checked={showEmpty}
+                    onCheck={(checked: boolean) => {
+                      storePreference('showEmpty', checked ? '1' : '0');
+                      setShowEmpty(checked);
+                    }}
+                  />
                 </div>
               </div>
-
-              <DataView
-                fields={['Token', 'contract', 'collateral', 'Ratio', '']}
-                entries={displayVaults}
-                entriesPerPage={6}
-                page={vaultListPage}
-                onPageChange={setVPage}
-                renderEntry={({
-                  oToken, oTokenName, collateral, collateralDecimals, ratio, collateralSymbol
-                }: vaultWithDetail) => [
-                    oTokenName,
-                    <IdentityBadge entity={oToken} />,
-                    `${formatDigits(toTokenUnitsBN(collateral, collateralDecimals).toNumber(), 5)} ${collateralSymbol}`,
-                    formatDigits(ratio, 4),
-                    <ManageVaultButton oToken={oToken} owner={isWatchMode ? watchAddress : user} />,
-                  ]}
-              />
             </div>
-          ) : isLoading ? (
-            <Comment text="Loading" />
-          ) : (
-                <Comment text="No Opened Vaults" />
-              )}
+
+            <DataView
+              status={isInitializing || isLoading ? 'loading' : 'default'}
+              fields={['Token', 'contract', 'collateral', 'Ratio', '']}
+              entries={displayVaults}
+              entriesPerPage={6}
+              page={vaultListPage}
+              onPageChange={setVPage}
+              renderEntry={({
+                oToken, oTokenName, collateral, collateralDecimals, ratio, collateralSymbol
+              }: vaultWithDetail) => [
+                  oTokenName,
+                  <IdentityBadge entity={oToken} />,
+                  `${formatDigits(toTokenUnitsBN(collateral, collateralDecimals).toNumber(), 5)} ${collateralSymbol}`,
+                  formatDigits(ratio, 4),
+                  <ManageVaultButton oToken={oToken} owner={isWatchMode ? watchAddress : user} />,
+                ]}
+            />
+          </div>
+          
           {tokensToOpen.length > 0 && !isWatchMode ? (
             <div>
               <SectionTitle title="Open new vaults" />
@@ -172,7 +167,6 @@ function MyVaults({ user }: { user: string }) {
             )}
         </>
       ) : (
-          // Not connected to wallet
           <NoWalletView
             setWatchAddress={setWatchAddress}
           />

@@ -9,12 +9,12 @@ import History from './TradeHistory'
 
 import { Comment } from '../common'
 
-import { eth_calls, eth_puts } from '../../constants/options'
+import * as types from '../../types'
 import { getPreference, storePreference } from '../../utils/storage'
-const allOptions = eth_puts.concat(eth_calls).filter((o) => o.expiry > Date.now() / 1000)
 
 type UserDataProps = {
   user: string,
+  allOptions: types.ethOptionWithStat[]
   spotPrice: BigNumber
   tokenPrices: {
     oToken: string,
@@ -26,7 +26,7 @@ type UserDataProps = {
   }[]
 }
 
-function UserData({ user, spotPrice, tokenPrices, balances }: UserDataProps) {
+function UserData({ user, spotPrice, tokenPrices, balances, allOptions }: UserDataProps) {
 
   const [selectedTab, setSelectedTab] = useState(parseInt(getPreference('greekboardtab', '0')))
   
@@ -54,6 +54,7 @@ function UserData({ user, spotPrice, tokenPrices, balances }: UserDataProps) {
           ? <Comment text="Connect wallet to see more detail"></Comment>
           : (selectedTab === 0 ? <Positions
             user={user}
+            allOptions={allOptions}
             spotPrice={spotPrice}
             tokenPrices={tokenPrices}
             balances={balances}

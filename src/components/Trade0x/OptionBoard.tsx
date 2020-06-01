@@ -9,8 +9,6 @@ import { SectionTitle } from '../common';
 import { getBasePairAskAndBids } from '../../utils/0x';
 import * as types from '../../types';
 
-// import { eth_puts, eth_calls } from '../../constants/options';
-
 import { entriesForExpiry } from './utils'
 
 type dataViewEntryType = {
@@ -49,6 +47,7 @@ function OptionBoard({
     let isCancelled = false;
 
     const updateBoardStats = async () => {
+      if(!optionsByDate[selectedExpiryIdx]) return
       const callsOfExpiry = optionsByDate[selectedExpiryIdx].pairs
         .filter((pair) => pair.call !== undefined)
         .map((pair) => pair.call);

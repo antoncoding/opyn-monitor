@@ -5,16 +5,22 @@ import UserData from './UserData';
 
 import { getPremiumToPay } from '../../utils/infura'
 import BigNumber from 'bignumber.js';
-import { eth_puts, eth_calls } from '../../constants/options';
+
 import { toTokenUnitsBN, toBaseUnitBN } from '../../utils/number';
 import { getUserOptionBalances } from '../../utils/graph'
 import tracker from '../../utils/tracker';
-import { ETHOption } from '../../types';
+import * as types from '../../types';
 
-const allOptions = eth_puts.concat(eth_calls).filter((o) => o.expiry > Date.now() / 1000)
 const Promise = require('bluebird')
 
-function PositionManagement({ user, spotPrice }: { user: string, spotPrice: BigNumber }) {
+type TradeUniswapProps = {
+  user: string,
+  spotPrice: BigNumber,
+  calls: types.ethOptionWithStat[]
+  puts: types.ethOptionWithStat[]
+}
+
+function TradeUniswap({ user, spotPrice, calls, puts }: TradeUniswapProps) {
 
   useEffect(() => {
     tracker.pageview(`/trade/uniswap/`);
@@ -22,11 +28,19 @@ function PositionManagement({ user, spotPrice }: { user: string, spotPrice: BigN
   
   // Update token price every 5 secs
   const [tokenPrices, setTokenPrices] = useState<{ oToken: string, price: BigNumber }[]>([])
+
+  const [allEthOptions, setAllEthOptions] = useState<types.ethOptionWithStat[]>([])
+
+  useEffect(()=>{
+    const allOptions = puts.concat(calls).filter((o) => o.expiry > Date.now() / 1000)
+    setAllEthOptions(allOptions)
+  }, [puts, calls])
+
   useEffect(() => {
     let cancelled = false
     async function getTokenPrices() {
 
-      const _tokenPrices = await Promise.map(allOptions, async (option:ETHOption) => {
+      const _tokenPrices = await Promise.map(allEthOptions, async (option:types.ETHOption) => {
         if (option.uniswapExchange === '0x0000000000000000000000000000000000000000') {
           return {
             oToken: option.addr,
@@ -57,7 +71,7 @@ function PositionManagement({ user, spotPrice }: { user: string, spotPrice: BigN
       cancelled = true
       clearInterval(id)
     }
-  }, [spotPrice])
+  }, [spotPrice, allEthOptions])
 
   // update token balances for all options
   const [balances, setBalances] = useState<balance[]>([])
@@ -66,7 +80,7 @@ function PositionManagement({ user, spotPrice }: { user: string, spotPrice: BigN
     async function updateBalances() {
       if (!user) return
       const balances = (await getUserOptionBalances(user))
-        .filter(obj => allOptions.find(option => option.addr === obj.oToken))
+        .filter(obj => allEthOptions.find(option => option.addr === obj.oToken))
         .map(obj => {
           return {
             oToken: obj.oToken,
@@ -84,12 +98,13 @@ function PositionManagement({ user, spotPrice }: { user: string, spotPrice: BigN
       clearInterval(id)
     }
 
-  }, [user]);
+  }, [user, allEthOptions]);
 
   return (
     <>
       <Options
         optionPrices={tokenPrices}
+        allOptions={allEthOptions}
         spotPrice={spotPrice}
         balances={balances}
       />
@@ -97,6 +112,7 @@ function PositionManagement({ user, spotPrice }: { user: string, spotPrice: BigN
       <br />
       <UserData
         balances={balances}
+        allOptions={allEthOptions}
         spotPrice={spotPrice}
         tokenPrices={tokenPrices}
         user={user}
@@ -106,7 +122,7 @@ function PositionManagement({ user, spotPrice }: { user: string, spotPrice: BigN
   );
 }
 
-export default PositionManagement;
+export default TradeUniswap;
 
 type balance = {
   oToken: string,

@@ -355,7 +355,7 @@ function BuyAndSell({
         <Wrapper>
           <BuySellTopPart theme={theme}>
             <FlexWrapper>
-              <div>{baseAsset.symbol}</div>
+              <div>{(baseAsset.symbol.split(' ').slice(0, -1).join(' '))}</div>
               <BuySellTopPartText>{toTokenUnitsBN(baseAssetBalance, baseAsset.decimals).toFormat(4)}</BuySellTopPartText>
             </FlexWrapper>
             <FlexWrapper>
@@ -413,7 +413,7 @@ function BuyAndSell({
               onChange={(e) => onChangeBaseAmount(e.target.value)}
               value={baseAmountToCreate.plus(baseAmountToFill).toNumber()}
               adornmentPosition="end"
-              adornment={baseAsset.symbol}
+              adornment={baseAsset.symbol.split(' ').slice(0, -1).join(' ')}
             />
 
             <Label>Price Per Token</Label>

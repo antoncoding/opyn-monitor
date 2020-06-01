@@ -5,12 +5,8 @@ import styled from 'styled-components'
 import * as types from '../../types'
 import { getAllVaultsForUser } from '../../utils/graph'
 
-
-import { eth_puts, eth_calls } from '../../constants/options';
 import { toTokenUnitsBN } from '../../utils/number';
 import { getGreeks } from './utils'
-
-const allOptions = eth_puts.concat(eth_calls).filter((o) => o.expiry > Date.now() / 1000).sort((a, b) => a.expiry > b.expiry ? 1 : -1)
 
 type MyPositionsProps = {
   user: string,
@@ -23,11 +19,12 @@ type MyPositionsProps = {
     oToken: string,
     price: BigNumber
   }[]
+  allOptions: types.ETHOption[]
 }
 
 const defaultPostitionGreeks = {Delta: 0, Gamma: 0, Theta: 0, Rho: 0, Vega:0, totalSize: 0}
 
-function MyPositions({ user, spotPrice, tokenPrices, balances }: MyPositionsProps) {
+function MyPositions({ user, spotPrice, tokenPrices, balances, allOptions }: MyPositionsProps) {
 
   const [vaults, setVaults] = useState<vault[]>([])
   const [positions, setPositions] = useState<position[]>([])
@@ -52,7 +49,7 @@ function MyPositions({ user, spotPrice, tokenPrices, balances }: MyPositionsProp
     });
 
     setVaults(openedVaults)
-  }, [user]);
+  }, [user, allOptions]);
 
   // Update positions when balance or vault change
   useEffect(() => {
@@ -84,7 +81,7 @@ function MyPositions({ user, spotPrice, tokenPrices, balances }: MyPositionsProp
       }
       setPositions(userPositions)
     })
-  }, [vaults, spotPrice, tokenPrices, balances])
+  }, [vaults, spotPrice, tokenPrices, balances, allOptions])
 
   // update aggregated position greeks
   useEffect(() => {

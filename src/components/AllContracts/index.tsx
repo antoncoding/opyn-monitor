@@ -4,7 +4,6 @@ import {
   Header, DataView, IdentityBadge, Button, Tabs, Timer
 } from '@aragon/ui';
 
-import { insurances, eth_calls, eth_puts } from '../../constants/options';
 import { Comment, CheckBox } from '../common';
 import { getPreference, storePreference } from '../../utils/storage';
 
@@ -12,7 +11,14 @@ import * as types from '../../types'
 
 import tracker from '../../utils/tracker';
 
-function AllContracts() {
+type AllContractsProps = {
+  isInitializing: boolean
+  insurances: types.optionWithStat[],
+  calls: types.ETHOption[],
+  puts: types.ETHOption[],
+}
+
+function AllContracts({isInitializing, insurances, calls, puts}:AllContractsProps) {
   useEffect(() => {
     tracker.pageview('/options/');
   }, []);
@@ -22,6 +28,7 @@ function AllContracts() {
 
   const [tabSelected, setTabSelected] = useState(parseInt(storedOptionTab, 10));
   const [showExpired, setShowExpired] = useState(storedShowExpired === '1'); // whether to show expired options
+  const [insurancePage, setInsurancePage] = useState(0)
 
   const history = useHistory();
   const goToToken = (addr: string) => {
@@ -55,7 +62,10 @@ function AllContracts() {
 
       {tabSelected === 0 &&
         <DataView
+          status={isInitializing ? 'loading' : 'default'}
           fields={['Contract', 'Underlying', 'Strike', 'Collateral', 'Expires in', '']}
+          page={insurancePage}
+          onPageChange={setInsurancePage}
           entries={insurances
             .filter((option) => showExpired || option.expiry * 1000 > Date.now())
             .sort((oa, ob) => oa.expiry > ob.expiry ? -1 : 1)
@@ -72,13 +82,15 @@ function AllContracts() {
         />}
       {tabSelected === 1 &&
         <OptionList
-          entries={eth_puts}
+          typeText="Put Options"
+          entries={puts}
           showExpired={showExpired}
           goToToken={goToToken}
         />}
       {tabSelected === 2 &&
         <OptionList
-          entries={eth_calls}
+          typeText="Call Options"
+          entries={calls}
           showExpired={showExpired}
           goToToken={goToToken}
         />
@@ -90,10 +102,11 @@ function AllContracts() {
 
 export default AllContracts;
 
-function OptionList({ entries, showExpired, goToToken }: { entries: types.ETHOption[], showExpired: boolean, goToToken: Function }) {
+function OptionList({ entries, showExpired, goToToken, typeText }: { typeText: string, entries: types.ETHOption[], showExpired: boolean, goToToken: Function }) {
   const [page, setPage] = useState(0)
   return (
     <DataView
+      statusEmpty={<div>No {typeText} Available</div>}
       fields={['Contract', 'Strike Price', 'Expiration', 'Expires in', '']}
       entries={entries
         .filter((option) => showExpired || option.expiry * 1000 > Date.now())
