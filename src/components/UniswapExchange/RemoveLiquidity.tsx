@@ -7,10 +7,11 @@ import { removeLiquidity } from '../../utils/web3';
 
 import { BalanceBlock, MaxButton, PriceSection } from '../common/index';
 import { toBaseUnitBN } from '../../utils/number';
+import { option } from '../../types'
 
 type RemoveLiquidityProps = {
-  otokenDecimals: number,
-  otokenSymbol: string,
+  oToken: option
+  multiplier: BigNumber
   uniswapExchange: string
   userliquidityTokenBalance: BigNumber
   poolTokenBalance: BigNumber
@@ -21,8 +22,8 @@ type RemoveLiquidityProps = {
 
 
 function RemoveLiquidity({
-  otokenSymbol,
-  otokenDecimals,
+  oToken,
+  multiplier,
   userliquidityTokenBalance,
   uniswapExchange,
   poolTokenBalance,
@@ -77,7 +78,7 @@ function RemoveLiquidity({
             <div style={{ width: '35%', marginRight: '5%' }}>
               <>
                 <PriceSection label="You get" amt={estETHRecieved} symbol="ETH" />
-                <PriceSection label="+" amt={estOTokenReceived} symbol={otokenSymbol} />
+                <PriceSection label="+" amt={estOTokenReceived.div(multiplier)} symbol={oToken.symbol} />
               </>
             </div>
             <div style={{ width: '30%' }}>
@@ -88,7 +89,7 @@ function RemoveLiquidity({
                 onClick={() => {
                   const amt = toBaseUnitBN(amtLiquidityTokenToSell, liquidityTokenDecimals).toString();
                   const min_eth = toBaseUnitBN(minETHReceived, 18).toString();
-                  const min_token = toBaseUnitBN(minTokenReceived, otokenDecimals).toString();
+                  const min_token = toBaseUnitBN(minTokenReceived, oToken.decimals).toString();
 
                   removeLiquidity(
                     uniswapExchange,

@@ -15,13 +15,10 @@ import * as types from '../../types';
 type CollateralManagementProps = {
   isOwner: boolean,
   vault: types.vault,
-  collateral: types.token,
+  option: types.option
   collateralAssetBalance: BigNumber,
-  token: string,
   owner: string,
   strikeValue: BigNumber,
-  strikePrice: number,
-  minRatio: number,
   setNewRatio: Function,
 
 }
@@ -29,19 +26,16 @@ type CollateralManagementProps = {
 function CollateralManagement({
   isOwner,
   vault,
-  collateral,
-  collateralAssetBalance, // Bignumber, / token unit
-  token,
+  option,
+  collateralAssetBalance,
   owner,
   strikeValue,
-  strikePrice,
-  minRatio,
   setNewRatio,
 }: CollateralManagementProps) {
   const [addCollateralAmt, setAddCollateralAmt] = useState(0); // in token unit
   const [removeCollateralAmt, setRemoveCollateralAmt] = useState(0); // in token unit
 
-  const collateralIsETH = collateral.addr === ETH_ADDRESS;
+  const collateralIsETH = option.collateral.addr === ETH_ADDRESS;
 
   /**
    * @param {number} newCollateral in wei
@@ -50,7 +44,7 @@ function CollateralManagement({
   const updateNewRatio = (newCollateral) => {
     if (!newCollateral || newCollateral <= 0) return 0;
     const str = newCollateral.toString();
-    const newRatio = calculateRatio(str, vault.oTokensIssued, strikePrice, strikeValue);
+    const newRatio = calculateRatio(str, vault.oTokensIssued, option.strikePrice, strikeValue);
     setNewRatio(formatDigits(newRatio, 5));
   };
 
@@ -60,7 +54,7 @@ function CollateralManagement({
         {/* balance */}
         <div style={{ width: '30%' }}>
           {BalanceBlock({
-            asset: `Your ${collateral.symbol} Balance`,
+            asset: `Your ${option.collateral.symbol} Balance`,
             balance: formatDigits(collateralAssetBalance.toString(), 6),
           })}
         </div>
@@ -80,7 +74,7 @@ function CollateralManagement({
                       return;
                     }
                     setAddCollateralAmt(amt);
-                    const amtRaw = toBaseUnitBN(amt, collateral.decimals);
+                    const amtRaw = toBaseUnitBN(amt, option.collateral.decimals);
                     const newCollateralInWei = new BigNumber(vault.collateral).plus(amtRaw).toNumber();
                     updateNewRatio(newCollateralInWei);
                   }}
@@ -88,7 +82,7 @@ function CollateralManagement({
                 <MaxButton
                   onClick={() => {
                     setAddCollateralAmt(collateralAssetBalance.toNumber());
-                    const collateralBalanceRaw = toBaseUnitBN(collateralAssetBalance, collateral.decimals);
+                    const collateralBalanceRaw = toBaseUnitBN(collateralAssetBalance, option.collateral.decimals);
                     const newCollateral = new BigNumber(vault.collateral).plus(collateralBalanceRaw).toNumber();
                     updateNewRatio(newCollateral);
                   }}
@@ -102,13 +96,13 @@ function CollateralManagement({
                 label="Add"
                 onClick={() => {
                   if (collateralIsETH) {
-                    addETHCollateral(token, owner, addCollateralAmt);
+                    addETHCollateral(option.addr, owner, addCollateralAmt);
                   } else {
                     addERC20Collateral(
-                      collateral.addr,
-                      token,
+                      option.collateral.addr,
+                      option.addr,
                       owner,
-                      toBaseUnitBN(addCollateralAmt, collateral.decimals),
+                      toBaseUnitBN(addCollateralAmt, option.collateral.decimals),
                     );
                   }
                 }}
@@ -133,7 +127,7 @@ function CollateralManagement({
                       return;
                     }
                     setRemoveCollateralAmt(amt);
-                    const amtRaw = toBaseUnitBN(amt, collateral.decimals);
+                    const amtRaw = toBaseUnitBN(amt, option.collateral.decimals);
                     const newCollateralWei = new BigNumber(vault.collateral).minus(amtRaw).toNumber();
                     updateNewRatio(newCollateralWei);
                   }}
@@ -141,16 +135,16 @@ function CollateralManagement({
                 <MaxButton
                   onClick={() => {
                     if (strikeValue.toNumber() <= 0) return;
-                    const strikePriceBN = new BigNumber(strikePrice);
+                    const strikePriceBN = new BigNumber(option.strikePrice);
                     const tokenIssuedBN = new BigNumber(vault.oTokensIssued);
-                    const minRatioBN = new BigNumber(minRatio);
+                    const minRatioBN = new BigNumber(option.minRatio);
                     const minCollateral = strikePriceBN.times(tokenIssuedBN).times(minRatioBN).times(strikeValue);
                     // const minValueInStrike = strikePrice * vault.oTokensIssued * minRatio;
                     // const minCollateral = minValueInStrike * strikeValue;
                     const maxToRemove = new BigNumber(vault.collateral).minus(minCollateral).toString();
-                    const maxToRemoveInTokenUnit = toTokenUnitsBN(maxToRemove, collateral.decimals).toNumber();
+                    const maxToRemoveInTokenUnit = toTokenUnitsBN(maxToRemove, option.collateral.decimals).toNumber();
                     setRemoveCollateralAmt(maxToRemoveInTokenUnit);
-                    setNewRatio(minRatio);
+                    setNewRatio(option.minRatio);
                   }}
                 />
               </>
@@ -163,9 +157,9 @@ function CollateralManagement({
                 label="Remove"
                 onClick={() => {
                   removeCollateral(
-                    collateral.addr,
-                    token,
-                    toBaseUnitBN(removeCollateralAmt, collateral.decimals).toString(),
+                    option.collateral.addr,
+                    option.addr,
+                    toBaseUnitBN(removeCollateralAmt, option.collateral.decimals).toString(),
                   );
                 }}
               />

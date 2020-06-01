@@ -20,10 +20,10 @@ export type ethOptionWithStat = ETHOption & {
 
 export type option = {
   addr: string,
-  type: 'call' | 'put' | 'insurance',
   title: string,
   symbol: string,
   name: string,
+  type: 'insurance' | 'call' | 'put'
   decimals: number,
   oracle: string,
   collateral: token,

@@ -32,12 +32,13 @@ function ManageVault({ user }: { user: string }) {
     tracker.pageview(`/manage/${token}`);
   }, [token]);
 
-  const option = allOptions.find((o) => o.addr === token);
-  
+  const option = allOptions.find((o) => o.addr === token) as types.option;
+
+  const multiplier = option.type === 'call' ? new BigNumber((option as types.ETHOption).strikePriceInUSD) : new BigNumber(1)
 
   const {
-    decimals, symbol, oracle, strike, strikePrice, minRatio,
-    collateral, expiry, underlying
+    decimals, oracle, strike, strikePrice,
+    collateral, expiry
   } = option!;
 
   const [isLoading, setIsLoading] = useState(true);
@@ -145,111 +146,86 @@ function ManageVault({ user }: { user: string }) {
       : (
         <Comment text="No Vault Found for this user under this contract" />
       ) : (
-        <>
-          <Header
-            primary={isOwner ? 'Manage My Vault' : 'Vault Detail'}
-            secondary={
-          expiry * 1000 > Date.now() ? (
-            <Timer end={new Date(expiry * 1000)} />
-          ) : (
-            <Button onClick={() => redeem(token)} label="Redeem" />
-          )
-        }
-          />
-
-          <HeaderDashboard
-            // user={user}
-            ratio={ratio}
-            minRatio={minRatio}
-            vault={vault}
-            decimals={decimals}
-            symbol={symbol}
-            newRatio={newRatio}
-            useCollateral={vaultUsesCollateral}
-            // collateralIsETH={collateralIsETH}
-            collateralDecimals={collateral.decimals}
-          />
-
-          <Tabs
-            items={['Collateral Management', 'Token Issuance', 'Liquidation', 'Exercise', 'Underlying Redemption']}
-            selected={tabSelected}
-            onChange={setTabSelected}
-          />
-
-          {tabSelected === 0 ? (
-            <CollateralManagement
-              isOwner={isOwner}
-              vault={vault}
-              collateralAssetBalance={userCollateralAssetBalance}
-              collateral={collateral}
-              token={token}
-              owner={owner}
-              strikeValue={strikeValueInCollateral}
-              strikePrice={strikePrice}
-              minRatio={minRatio}
-              setNewRatio={setNewRatio}
-            />
-          ) : (
-            <></>
-          )}
-
-          {tabSelected === 1 ? (
-            <IssuedTokenManagement
-              isOwner={isOwner}
-              vault={vault}
-              tokenBalance={ownerTokenBalance}
-              token={token}
-              strikeValue={strikeValueInCollateral}
-              strikePrice={strikePrice}
-              minRatio={minRatio}
-              decimals={decimals}
-              symbol={symbol}
-              setNewRatio={setNewRatio}
-              // for call heler text
-              strikePriceInUSD={(option as types.ETHOption).strikePriceInUSD}
-              collateralSymbol={collateral.symbol}
-            />
-          ) : (
-            <></>
-          )}
-
-          {tabSelected === 2 ? (
-            vaultUsesCollateral ? (
-              <LiquidationHistory
-                userTokenBalance={userTokenBalance}
-                isOwner={isOwner}
-                owner={owner}
-                token={token}
-                collateralDecimals={collateral.decimals}
-                tokenDecimals={decimals}
-              />
+      <>
+        <Header
+          primary={isOwner ? 'Manage My Vault' : 'Vault Detail'}
+          secondary={
+            expiry * 1000 > Date.now() ? (
+              <Timer end={new Date(expiry * 1000)} />
             ) : (
+                <Button onClick={() => redeem(token)} label="Redeem" />
+              )
+          }
+        />
+
+        <HeaderDashboard
+          option={option}
+          ratio={ratio}
+          vault={vault}
+          newRatio={newRatio}
+          useCollateral={vaultUsesCollateral}
+          multiplier={multiplier}
+        />
+
+        <Tabs
+          items={['Collateral Management', 'Token Issuance', 'Liquidation', 'Exercise', 'Underlying Redemption']}
+          selected={tabSelected}
+          onChange={setTabSelected}
+        />
+
+        {tabSelected === 0 &&
+          <CollateralManagement
+            option={option}
+            isOwner={isOwner}
+            vault={vault}
+            collateralAssetBalance={userCollateralAssetBalance}
+            owner={owner}
+            strikeValue={strikeValueInCollateral}
+            setNewRatio={setNewRatio}
+          />
+        }
+
+        {tabSelected === 1 &&
+          <IssuedTokenManagement
+            option={option}
+            isOwner={isOwner}
+            multiplier={multiplier}
+            vault={vault}
+            tokenBalance={ownerTokenBalance}
+            strikeValue={strikeValueInCollateral}
+            setNewRatio={setNewRatio}
+          />
+        }
+
+        {tabSelected === 2 &&
+          (vaultUsesCollateral ? (
+            <LiquidationHistory
+              userTokenBalance={userTokenBalance}
+              isOwner={isOwner}
+              owner={owner}
+              option={option}
+            />
+          ) : (
               <Box> This vault cannot be liquidated </Box>
-            )
-          ) : (
-            <></>
-          )}
+            ))
+        }
 
-          {tabSelected === 3 ? (
-            <ExerciseHistory
-              owner={owner}
-              token={token}
-              tokenDecimals={decimals}
-              collateralDecimals={collateral.decimals}
-            />
-          ) : (
-            <></>
-          )}
+        {tabSelected === 3 &&
+          <ExerciseHistory
+            owner={owner}
+            multiplier={multiplier}
+            option={option}
+          />
+        }
 
-          {tabSelected === 4 ? (
-            <UnderlyingManagement
-              owner={owner}
-              token={token}
-              underlyingDecimals={underlying.decimals}
-              underlyingAmount={vault.underlying}
-            />
-          ) : <> </>}
-        </>
+        {tabSelected === 4 &&
+          <UnderlyingManagement
+            owner={owner}
+            option={option as types.option}
+            underlyingAmount={vault.underlying}
+          />
+        }
+      </>
     );
 }
 

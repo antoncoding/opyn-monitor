@@ -13,6 +13,7 @@ import { getLiquidationHistory } from '../../utils/graph';
 import {
   formatDigits, toTokenUnitsBN, timeSince, toBaseUnitBN,
 } from '../../utils/number';
+import { option } from '../../types';
 
 type LiqActions = {
   vault: {
@@ -28,16 +29,14 @@ type LiqActions = {
 }
 
 type LiquidationHistoryProps = {
-  owner: string,
-  token: string,
-  isOwner: Boolean,
-  tokenDecimals: number,
-  collateralDecimals: number,
-  userTokenBalance: BigNumber,
+  owner: string
+  option: option
+  isOwner: Boolean
+  userTokenBalance: BigNumber
 };
 
 function LiquidationHistory({
-  owner, token, isOwner, tokenDecimals, userTokenBalance, collateralDecimals
+  owner, option, isOwner, userTokenBalance,
 }: LiquidationHistoryProps) {
   const [maxLiquidatable, setMaxLiquidatable] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
@@ -49,17 +48,18 @@ function LiquidationHistory({
 
   useEffect(() => {
     async function updateLiquidatable() {
-      const maxToLiquidate = await getMaxLiquidatable(token, owner);
-      setMaxLiquidatable(toTokenUnitsBN(maxToLiquidate, tokenDecimals).toNumber());
+      const maxToLiquidate = await getMaxLiquidatable(option.addr, owner);
+      setMaxLiquidatable(toTokenUnitsBN(maxToLiquidate, option.decimals).toNumber());
     }
     updateLiquidatable();
-  }, [owner, token, tokenDecimals]);
+  }, [owner, option]);
 
+  // get Liquidation history
   useMemo(async () => {
     async function updateList() {
       const actions = await getLiquidationHistory(owner);
       const actionsForThisVault = actions.filter(
-        (entry) => entry.vault.optionsContract.address === token,
+        (entry) => entry.vault.optionsContract.address === option.addr,
       ).sort((actionA, actionB) => {
         if (actionA.timestamp > actionB.timestamp) return -1;
         return 1;
@@ -68,7 +68,7 @@ function LiquidationHistory({
       setIsLoading(false);
     }
     updateList();
-  }, [owner, token]);
+  }, [owner, option.addr]);
 
   return (
     <>
@@ -109,9 +109,9 @@ function LiquidationHistory({
                         onClick={() => {
                           const amtToLiquidate = toBaseUnitBN(
                             amountToLiquidate,
-                            tokenDecimals,
+                            option.decimals,
                           ).toString();
-                          liquidate(token, owner, amtToLiquidate);
+                          liquidate(option.addr, owner, amtToLiquidate);
                         }}
                       />
                     </div>
@@ -135,7 +135,7 @@ function LiquidationHistory({
             collateralToPay, liquidator, timestamp, transactionHash,
           }) => [
               <TransactionBadge transaction={transactionHash} />,
-              formatDigits(toTokenUnitsBN(collateralToPay, collateralDecimals), 5),
+              formatDigits(toTokenUnitsBN(collateralToPay, option.collateral.decimals), 5),
               <CustomIdentityBadge entity={liquidator} />,
               timeSince(parseInt(timestamp, 10) * 1000),
             ]}
