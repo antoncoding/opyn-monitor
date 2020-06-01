@@ -17,6 +17,8 @@ export const DAI = '0x6b175474e89094c44da98b954eedeac495271d0f';
 export const USDC = '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48';
 export const KETH = '0x0000000000000000000000000000000000000001';
 
+export const EMPTY_EXCHANGE = '0x0000000000000000000000000000000000000000';
+
 // 0x contracts
 export const ZeroX_Exchange = '0x61935cbdd02287b511119ddb11aeb42f1593b7ef';
 export const ZeroX_ERC20Proxy = '0x95e6f48254609a6ee006f7d493c8e5fb97094cef';

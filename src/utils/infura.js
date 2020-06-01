@@ -2,6 +2,7 @@ import Web3 from 'web3';
 
 import ENS from 'ethereum-ens';
 
+const uniswapFactoryABI = require('../constants/abi/UniswapFactory.json');
 const optionContractABI = require('../constants/abi/OptionContract.json');
 const optionExchangeABI = require('../constants/abi/OptionExchange.json');
 const oracleABI = require('../constants/abi/Oracle.json');
@@ -44,6 +45,11 @@ export const getERC20Symbol = async (erc20Token) => {
   return oTokenContract.methods.symbol().call();
 };
 
+export const getERC20Name = async (erc20Token) => {
+  const oTokenContract = new web3.eth.Contract(optionContractABI, erc20Token);
+  return oTokenContract.methods.name().call();
+};
+
 export const getTotalSupply = async (erc20) => {
   const token = new web3.eth.Contract(optionContractABI, erc20);
   const totalSupply = await token.methods.totalSupply().call();
@@ -52,7 +58,6 @@ export const getTotalSupply = async (erc20) => {
 
 // Option Contract
 
-
 /**
  * Get owner of the oToken
  * @param {string} oToken
@@ -60,12 +65,9 @@ export const getTotalSupply = async (erc20) => {
  */
 export const getOwner = async (oToken) => {
   const oTokenContract = new web3.eth.Contract(optionContractABI, oToken);
-  const owner = await oTokenContract.methods
-    .owner()
-    .call();
+  const owner = await oTokenContract.methods.owner().call();
   return owner;
 };
-
 
 /**
  * Max liquidatable for given vault
@@ -150,6 +152,13 @@ export const getPremiumReceived = async (exchangeAddr, tokenToSell, sellAmt) => 
     .premiumReceived(tokenToSell, payoutToken, sellAmt)
     .call();
   return web3.utils.fromWei(premiumReceived);
+};
+
+export const getUniswapExchangeAddress = async (optionAddress) => {
+  const factoryAddr = '0xc0a47dfe034b400b47bdad5fecda2621de6c4d95';
+  const factory = new web3.eth.Contract(uniswapFactoryABI, factoryAddr);
+  const exchange = await factory.methods.getExchange(optionAddress).call();
+  return exchange;
 };
 
 // uniswapExchange

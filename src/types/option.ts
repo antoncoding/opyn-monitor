@@ -1,3 +1,4 @@
+import BigNumber from "bignumber.js";
 
 export type token = {
   addr: string,
@@ -5,8 +6,21 @@ export type token = {
   symbol: string,
 };
 
+export type optionWithStat = option & {
+  totalCollateral: BigNumber,
+  totalSupply: BigNumber,
+  totalExercised: BigNumber,
+}
+
+export type ethOptionWithStat = ETHOption & {
+  totalCollateral: BigNumber,
+  totalSupply: BigNumber,
+  totalExercised: BigNumber,
+}
+
 export type option = {
   addr: string,
+  type: 'call' | 'put' | 'insurance',
   title: string,
   symbol: string,
   name: string,

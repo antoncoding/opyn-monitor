@@ -4,7 +4,7 @@ import {
   Header, DataView, IdentityBadge, Button, Tabs, Timer
 } from '@aragon/ui';
 
-import { insurances, eth_calls, eth_puts } from '../../constants/options';
+// import { eth_calls, eth_puts } from '../../constants/options';
 import { Comment, CheckBox } from '../common';
 import { getPreference, storePreference } from '../../utils/storage';
 
@@ -12,7 +12,13 @@ import * as types from '../../types'
 
 import tracker from '../../utils/tracker';
 
-function AllContracts() {
+type AllContractsProps = {
+  insurances: types.optionWithStat[],
+  calls: types.ETHOption[],
+  puts: types.ETHOption[],
+}
+
+function AllContracts({insurances, calls, puts}:AllContractsProps) {
   useEffect(() => {
     tracker.pageview('/options/');
   }, []);
@@ -72,13 +78,13 @@ function AllContracts() {
         />}
       {tabSelected === 1 &&
         <OptionList
-          entries={eth_puts}
+          entries={puts}
           showExpired={showExpired}
           goToToken={goToToken}
         />}
       {tabSelected === 2 &&
         <OptionList
-          entries={eth_calls}
+          entries={calls}
           showExpired={showExpired}
           goToToken={goToToken}
         />

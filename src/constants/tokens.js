@@ -1,5 +1,5 @@
 export const USDC = {
-  addr: '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48',
+  addr: '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48',
   decimals: 6,
   symbol: 'USDC',
 };
@@ -11,19 +11,19 @@ export const OPYN_ETH = {
 };
 
 export const cDAI = {
-  addr: '0x5d3a536E4D6DbD6114cc1Ead35777bAB948E3643',
+  addr: '0x5d3a536e4d6dbd6114cc1ead35777bab948e3643',
   decimals: 8,
   symbol: 'cDai',
 };
 
 export const cUSDC = {
-  addr: '0x39AA39c021dfbaE8faC545936693aC917d5E7563',
+  addr: '0x39aa39c021dfbae8fac545936693ac917d5e7563',
   decimals: 8,
   symbol: 'cUSDC',
 };
 
 export const CurveFi = {
-  addr: '0xdF5e0e81Dff6FAF3A7e52BA697820c5e32D806A8',
+  addr: '0xdf5e0e81dff6faf3a7e52ba697820c5e32d806a8',
   decimals: 18,
   symbol: 'yDAI+yUSDC+yUSDT+yTUSD',
 };
@@ -38,4 +38,10 @@ export const DAI = {
   addr: '0x6b175474e89094c44da98b954eedeac495271d0f',
   decimals: 18,
   symbol: 'DAI',
+};
+
+export const yDAI = {
+  addr: '0x16de59092dae5ccf4a1e6439d611fd0653f0bd01',
+  decimals: 18,
+  symbol: 'yDAI',
 };
