@@ -79,12 +79,14 @@ function AllContracts({isInitializing, insurances, calls, puts}:AllContractsProp
         />}
       {tabSelected === 1 &&
         <OptionList
+          typeText="Put Options"
           entries={puts}
           showExpired={showExpired}
           goToToken={goToToken}
         />}
       {tabSelected === 2 &&
         <OptionList
+          typeText="Call Options"
           entries={calls}
           showExpired={showExpired}
           goToToken={goToToken}
@@ -97,10 +99,11 @@ function AllContracts({isInitializing, insurances, calls, puts}:AllContractsProp
 
 export default AllContracts;
 
-function OptionList({ entries, showExpired, goToToken }: { entries: types.ETHOption[], showExpired: boolean, goToToken: Function }) {
+function OptionList({ entries, showExpired, goToToken, typeText }: { typeText: string, entries: types.ETHOption[], showExpired: boolean, goToToken: Function }) {
   const [page, setPage] = useState(0)
   return (
     <DataView
+      statusEmpty={<div>No {typeText} Available</div>}
       fields={['Contract', 'Strike Price', 'Expiration', 'Expires in', '']}
       entries={entries
         .filter((option) => showExpired || option.expiry * 1000 > Date.now())

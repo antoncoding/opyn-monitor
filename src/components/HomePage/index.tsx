@@ -56,9 +56,6 @@ function HomePage() {
               }}
             />
           </Col>
-        </Row>
-
-        <Row>
           <Col md={6} lg={4}>
             <MainButton
               title="Trade"
