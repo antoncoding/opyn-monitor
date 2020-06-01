@@ -4,6 +4,7 @@ import BigNumber from 'bignumber.js';
 
 export const blackList = [
   "0x67904e24b071d1406a63eceddea6ba0f4a79ab1e", // testing yDai insurance
+  "0xc714cea4daaed7fbc66f936b69e79ec0ee998d93", // testing yDai insurance
 ]
 
 export const defaultOption: optionWithStat = {
