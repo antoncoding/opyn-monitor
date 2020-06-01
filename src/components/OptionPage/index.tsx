@@ -26,7 +26,7 @@ function OptionPage({ user, options, isInitializing }: {
   }, [token]);
 
   const [option, setOption] = useState<types.optionWithStat>(defaultOption)
-
+  const [isLoadigVaults, setIsLoadingVaults] = useState(true)
   const [vaults, setVaults] = useState<types.vaultWithoutUnderlying[]>([]);
 
   const collateralIsETH = option!.collateral.addr === ETH_ADDRESS;
@@ -40,6 +40,7 @@ function OptionPage({ user, options, isInitializing }: {
     // Get All vaults once
     const allVaults = await getAllVaultsForOption(token);
     setVaults(allVaults);
+    setIsLoadingVaults(false)
   }, [token]);
 
   return (
@@ -60,7 +61,7 @@ function OptionPage({ user, options, isInitializing }: {
       />
       {/* List of Vaults */}
       <VaultsList
-        isInitializing={isInitializing}
+        isInitializing={isInitializing && isLoadigVaults}
         option={option!}
         user={user}
         vaults={vaults}

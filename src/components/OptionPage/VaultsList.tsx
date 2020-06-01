@@ -43,6 +43,7 @@ function VaultOwnerList({
     let isCancelled = false;
     const updateInfo = async () => {
       if (vaults.length === 0) {
+        setIsLoading(false)
         return
       };
       const {
