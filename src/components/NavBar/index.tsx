@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import styled from 'styled-components'
 import { useHistory } from 'react-router-dom';
 
@@ -21,6 +21,10 @@ function MyBar({
   const history = useHistory();
   const [isHome, updateIsHome] = useState(true);
 
+  const goBack = useCallback(()=>{
+    history.goBack();
+  }, [history])
+
   useEffect(() => {
     const home = history.location.pathname === '/';
     updateIsHome(home);
@@ -32,9 +36,7 @@ function MyBar({
           <>
             <MaxHeightDiv>
               <BackButton
-                onClick={() => {
-                  history.goBack();
-                }}
+                onClick={goBack}
               />
             </MaxHeightDiv>
             <LinkButton
