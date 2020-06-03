@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useHistory } from 'react-router-dom';
 import {
   Header, DataView, IdentityBadge, Button, Tabs, Timer
@@ -31,9 +31,9 @@ function AllContracts({isInitializing, insurances, calls, puts}:AllContractsProp
   const [insurancePage, setInsurancePage] = useState(0)
 
   const history = useHistory();
-  const goToToken = (addr: string) => {
+  const goToToken = useCallback((addr: string) => {
     history.push(`/option/${addr}`);
-  };
+  }, [history]);
 
   return (
     <>
