@@ -29,7 +29,8 @@ function UniswapPool({ user, spotPrice, allOptions }: {user: string, spotPrice:B
   const [option, setOption] = useState<types.option>(defaultOption)
   useEffect(()=>{
     const _option = allOptions.find((o) => o.addr === token) as types.option;
-    setOption(_option)
+    if(_option)
+      setOption(_option)
   }, [allOptions, token])
   
   const {
