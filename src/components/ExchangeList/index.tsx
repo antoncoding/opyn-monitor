@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useHistory } from 'react-router-dom';
 import MesaLogo from '../../imgs/gnosis.png'
 import UniswapLogo from '../../imgs/uniswap.png'
@@ -20,9 +20,9 @@ function TradeLanding({ isInitializing, insurances, eth_options} : { isInitializ
     tracker.pageview('/uniswap/');
   }, []);
 
-  const goToTrade = (addr: string) => {
+  const goToTrade = useCallback((addr: string) => {
     history.push(`/uniswap/${addr}`);
-  };
+  }, [history]);
 
   const [insurancePage, setIPages] = useState(0)
   const [optionPage, setOptionPage] = useState(0)

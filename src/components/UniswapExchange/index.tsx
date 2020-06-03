@@ -36,6 +36,7 @@ function UniswapPool({ user, spotPrice, allOptions }: {user: string, spotPrice:B
     uniswapExchange, decimals,
   } = option!;
 
+  
   const multiplier = option.type === 'call' 
     ? new BigNumber((option as types.ETHOption).strikePriceInUSD) 
     : new BigNumber(1)
@@ -53,6 +54,7 @@ function UniswapPool({ user, spotPrice, allOptions }: {user: string, spotPrice:B
     let isCancelled = false;
 
     async function updatePoolInfo() {
+      if (!uniswapExchange) return
       const [exTokenBalance, exchagneETHBalance, liqTokenTotalSupply] = await Promise.all([
         getTokenBalance(token, uniswapExchange),
         getBalance(uniswapExchange),
