@@ -2,10 +2,11 @@ import React, { useEffect, useState } from 'react';
 
 import Options from './Options'
 import UserData from './UserData';
-
-import { getPremiumToPay } from '../../utils/infura'
 import BigNumber from 'bignumber.js';
 
+import { useOptions } from '../../hooks'
+
+import { getPremiumToPay } from '../../utils/infura'
 import { toTokenUnitsBN, toBaseUnitBN } from '../../utils/number';
 import { getUserOptionBalances } from '../../utils/graph'
 import tracker from '../../utils/tracker';
@@ -16,15 +17,15 @@ const Promise = require('bluebird')
 type TradeUniswapProps = {
   user: string,
   spotPrice: BigNumber,
-  calls: types.ethOptionWithStat[]
-  puts: types.ethOptionWithStat[]
 }
 
-function TradeUniswap({ user, spotPrice, calls, puts }: TradeUniswapProps) {
+function TradeUniswap({ user, spotPrice }: TradeUniswapProps) {
 
   useEffect(() => {
     tracker.pageview(`/trade/uniswap/`);
   }, []);
+
+  const { calls, puts } = useOptions()
   
   // Update token price every 5 secs
   const [tokenPrices, setTokenPrices] = useState<{ oToken: string, price: BigNumber }[]>([])

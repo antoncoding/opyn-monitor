@@ -3,6 +3,8 @@ import { useParams } from 'react-router-dom';
 import { Header } from '@aragon/ui';
 
 import BigNumber from 'bignumber.js';
+import { useOptions } from '../../hooks'
+
 import {
   getTokenBalance, getBalance, getTotalSupply,
 } from '../../utils/infura';
@@ -18,13 +20,15 @@ import RemoveLiquidity from './RemoveLiquidity';
 import tracker from '../../utils/tracker';
 import * as types from '../../types';
 
-function UniswapPool({ user, spotPrice, allOptions }: {user: string, spotPrice:BigNumber, allOptions: types.option[]}) {
+function UniswapPool({ user, spotPrice }: {user: string, spotPrice:BigNumber }) {
   const liquidityTokenDecimals = 18;
   const { token } = useParams();
 
   useEffect(() => {
     tracker.pageview(`/uniswap/${token}`);
   }, [token]);
+
+  const { options: allOptions } = useOptions()
 
   const [option, setOption] = useState<types.option>(defaultOption)
   useEffect(()=>{

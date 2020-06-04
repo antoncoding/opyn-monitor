@@ -6,7 +6,7 @@ import {
 } from '@aragon/ui';
 import NoWalletView from './NoWallet';
 import * as types from '../../types'
-
+import { useOptions } from '../../hooks'
 import {
   SectionTitle, ManageVaultButton, CheckBox,
 } from '../common/index';
@@ -31,10 +31,13 @@ export type vaultWithDetail = {
   ratio: number
 }
 
-function MyVaults({ user, isInitializing, options }: { user: string, isInitializing: boolean, options: types.option[] }) {
+function MyVaults({ user }: { user: string }) {
   useEffect(() => {
     tracker.pageview('/myvaults/');
   }, []);
+
+  const { isInitializing, options } = useOptions()
+
   const [opendVaults, setOpenedVaults] = useState<vaultWithDetail[]>([]);
   const [tokensToOpen, setTokensToOpen] = useState<types.option[]>([]);
 

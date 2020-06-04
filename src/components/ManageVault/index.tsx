@@ -14,7 +14,7 @@ import ExerciseHistory from './Exercise';
 import UnderlyingManagement from './UnderlyingManagement';
 
 import { Comment } from '../common/index';
-
+import { useOptions } from '../../hooks'
 import { toTokenUnitsBN } from '../../utils/number';
 import { calculateRatio, calculateStrikeValueInCollateral } from '../../utils/calculation';
 import { getTokenBalance, getBalance } from '../../utils/infura';
@@ -27,12 +27,14 @@ import * as types from '../../types'
 import tracker from '../../utils/tracker';
 // import { optionWithStat } from '../../types';
 
-function ManageVault({ user, options }: { user: string, options: types.option[] }) {
+function ManageVault({ user }: { user: string }) {
   const { token, owner } = useParams();
   useEffect(() => {
     tracker.pageview(`/manage/${token}`);
   }, [token]);
   
+  const { options } = useOptions()
+
   const [option, setOption] = useState<types.option>(defaultOption)
 
   const multiplier = option.type === 'call' ? new BigNumber((option as types.ETHOption).strikePriceInUSD) : new BigNumber(1)

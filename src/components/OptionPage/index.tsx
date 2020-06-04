@@ -10,20 +10,22 @@ import OptionInfoBox from './OptionInfoBox';
 import { getAllVaultsForOption } from '../../utils/graph';
 import tracker from '../../utils/tracker';
 
+import { useOptions } from '../../hooks'
+
 import { ETH_ADDRESS } from '../../constants/contracts';
 import { defaultOption } from '../../constants/options';
 
 import * as types from '../../types'
 
-function OptionPage({ user, options, isInitializing }: { 
-  user: string, 
-  options: types.optionWithStat[] 
-  isInitializing: boolean
+function OptionPage({ user }: { 
+  user: string
 }) {
   const { token } = useParams();
   useEffect(() => {
     tracker.pageview(`/option/${token}`);
   }, [token]);
+
+  const { options, isInitializing } = useOptions()
 
   const [option, setOption] = useState<types.optionWithStat>(defaultOption)
   const [isLoadigVaults, setIsLoadingVaults] = useState(true)

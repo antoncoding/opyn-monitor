@@ -6,22 +6,21 @@ import {
 
 import { Comment, CheckBox } from '../common';
 import { getPreference, storePreference } from '../../utils/storage';
+import { useOptions } from '../../hooks'
 
 import * as types from '../../types'
 
 import tracker from '../../utils/tracker';
 
-type AllContractsProps = {
-  isInitializing: boolean
-  insurances: types.optionWithStat[],
-  calls: types.ETHOption[],
-  puts: types.ETHOption[],
-}
-
-function AllContracts({isInitializing, insurances, calls, puts}:AllContractsProps) {
+function AllContracts() {
   useEffect(() => {
     tracker.pageview('/options/');
   }, []);
+
+  const { isInitializing,
+    insurances,
+    calls,
+    puts, } = useOptions()
 
   const storedOptionTab = getPreference('optionTab', '0');
   const storedShowExpired = getPreference('showExpired', '0');
@@ -72,7 +71,7 @@ function AllContracts({isInitializing, insurances, calls, puts}:AllContractsProp
           }
           entriesPerPage={6}
           renderEntry={(option: types.option) => [
-            <IdentityBadge label={option.title} entity={option.addr}/>,
+            <IdentityBadge label={option.title} entity={option.addr} />,
             <IdentityBadge label={option.underlying.symbol} entity={option.underlying.addr} />,
             <IdentityBadge label={option.strike.symbol} entity={option.strike.addr} />,
             <IdentityBadge label={option.collateral.symbol} entity={option.collateral.addr} />,

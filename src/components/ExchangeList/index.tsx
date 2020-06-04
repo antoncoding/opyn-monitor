@@ -5,16 +5,16 @@ import UniswapLogo from '../../imgs/uniswap.png'
 import {
   Header, DataView, IdentityBadge, Button,
 } from '@aragon/ui';
-// import { insurances, eth_options } from '../../constants/options';
+import { useOptions } from '../../hooks'
 
 import { Comment, CheckBox } from '../common';
 import { storePreference, getPreference } from '../../utils/storage';
 import tracker from '../../utils/tracker';
 
-import { option } from '../../types'
-
-function TradeLanding({ isInitializing, insurances, eth_options} : { isInitializing: boolean, insurances: option[], eth_options: option[] }) {
+function TradeLanding() {
   const history = useHistory();
+
+  const { isInitializing, insurances, calls, puts } = useOptions()
 
   useEffect(() => {
     tracker.pageview('/uniswap/');
@@ -69,7 +69,7 @@ function TradeLanding({ isInitializing, insurances, eth_options} : { isInitializ
         status={ isInitializing ? 'loading' : 'default' }
         page={optionPage}
         onPageChange={setOptionPage}
-        entries={eth_options.filter((option) => showExpired || option.expiry * 1000 > Date.now())}
+        entries={puts.concat(calls).filter((option) => showExpired || option.expiry * 1000 > Date.now())}
         entriesPerPage={6}
         renderEntry={({ addr, title }) => [
           <>{title}</>,

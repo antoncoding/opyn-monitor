@@ -9,7 +9,7 @@ import { Header, DropDown, Layout } from '@aragon/ui';
 import OptionBoard from './OptionBoard';
 import TabBoard from './TabBoard';
 import BuyAndSell from './BuyAndSell';
-
+import { useOptions } from '../../hooks'
 import { getTokenBalance } from '../../utils/infura';
 import { getOrderBook, isValid } from '../../utils/0x';
 import { defaultOption } from '../../constants/options';
@@ -22,18 +22,16 @@ import { groupByDate, entriesForExpiry } from './utils'
 const quoteAsset = tokens.USDC;
 
 type TradingProps = {
-  user: string,
-  puts: types.ETHOption[],
-  calls: types.ETHOption[]
+  user: string
 }
 
-function OptionTrading({ user, puts, calls }:TradingProps) {
+function OptionTrading({ user }:TradingProps) {
 
   const [selectedExpiryIdx, setExpiryIdx] = useState(0);
   const [optionsByDate, setOptionsByDate] = useState<entriesForExpiry[]>([])
 
   const [baseAsset, setBaseAsset] = useState<types.ETHOption>((defaultOption as types.option) as types.ETHOption);
-
+  const { calls, puts } = useOptions()
   useEffect(()=>{
     const optionsByDate = groupByDate(puts, calls);
     setOptionsByDate(optionsByDate)
