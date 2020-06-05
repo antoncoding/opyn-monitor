@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo, useEffect, useContext } from 'react';
 import { useParams } from 'react-router-dom';
 
 import {
@@ -25,9 +25,12 @@ import { ETH_ADDRESS } from '../../constants/contracts';
 import { defaultOption } from '../../constants/options';
 import * as types from '../../types'
 import tracker from '../../utils/tracker';
-// import { optionWithStat } from '../../types';
+import { userContext } from '../../contexts/userContext'
 
-function ManageVault({ user }: { user: string }) {
+function ManageVault() {
+
+  const { user } = useContext(userContext)
+
   const { token, owner } = useParams();
   useEffect(() => {
     tracker.pageview(`/manage/${token}`);

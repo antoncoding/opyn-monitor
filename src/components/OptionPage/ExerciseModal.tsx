@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useContext } from 'react';
 
 import {
   Header,
@@ -10,7 +10,7 @@ import {
   DataView,
 } from '@aragon/ui';
 import BigNumber from 'bignumber.js';
-
+import { userContext } from '../../contexts/userContext'
 import { exercise } from '../../utils/web3';
 import { PriceSection, CustomIdentityBadge } from '../common';
 import { getUnderlyingRequiredToExercise, getBalance, getTokenBalance } from '../../utils/infura';
@@ -23,15 +23,15 @@ import * as types from '../../types'
 
 type ExerciseModalProps = {
   option: types.option,
-  user: string,
   vaults: types.vaultWithoutUnderlying[]
 }
 
 function ExerciseModal({
-  user,
   vaults,
   option
 }: ExerciseModalProps) {
+
+  const { user } = useContext(userContext)
 
   const underlyingIsETH = option.underlying.addr === ETH_ADDRESS;
   const [userUnderlyingBalance, setUserUnderlyingBalance] = useState(new BigNumber(0));

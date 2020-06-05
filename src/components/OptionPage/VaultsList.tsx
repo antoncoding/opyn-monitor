@@ -1,10 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import BigNumber from 'bignumber.js';
 
 import { DataView, RadioGroup, Radio, Header } from '@aragon/ui';
 import VaultModal from './VaultModal';
 import { RatioTag, CustomIdentityBadge } from '../common';
-
+import { userContext } from '../../contexts/userContext'
 import {
   formatDigits, compareVaultRatio, compareVaultIssued, toTokenUnitsBN,
 } from '../../utils/number';
@@ -16,15 +16,16 @@ import { vaultWithRatio } from '../../types';
 
 type VaultOwnerListProps = {
   isInitializing: boolean
-  user: string,
   option: types.option,
   vaults: types.vaultWithoutUnderlying[],
   collateralIsETH: boolean
 }
 
 function VaultOwnerList({
-  isInitializing, user, option, vaults, collateralIsETH,
+  isInitializing, option, vaults, collateralIsETH,
 }: VaultOwnerListProps) {
+
+  const { user } = useContext(userContext)
 
   const vaultUsesCollateral = option.collateral.addr !== option.strike.addr;
 

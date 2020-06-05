@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import BigNumber from 'bignumber.js';
 import styled from 'styled-components'
 
@@ -15,18 +15,17 @@ import { getOrderBook, isValid } from '../../utils/0x';
 import { defaultOption } from '../../constants/options';
 import * as types from '../../types'
 import * as tokens from '../../constants/tokens';
+import { userContext } from '../../contexts/userContext'
 
 import tracker from '../../utils/tracker';
 import { groupByDate, entriesForExpiry } from './utils'
 
 const quoteAsset = tokens.USDC;
 
-type TradingProps = {
-  user: string
-}
+function OptionTrading() {
 
-function OptionTrading({ user }:TradingProps) {
-
+  const { user } = useContext(userContext)
+  
   const [selectedExpiryIdx, setExpiryIdx] = useState(0);
   const [optionsByDate, setOptionsByDate] = useState<entriesForExpiry[]>([])
 

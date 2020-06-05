@@ -1,12 +1,12 @@
-import React, { useState, useEffect } from 'react';
-import BigNumber from 'bignumber.js'
-
-import { getETHPrice } from './utils/etherscan'
+import React, { useState } from 'react';
 
 import { HashRouter as Router, Switch, Route } from 'react-router-dom';
 import { Main, Layout } from '@aragon/ui';
 import { updateModalMode } from './utils/web3';
 import { storePreference, getPreference } from './utils/storage';
+
+import { userContext } from './contexts/userContext'
+import { useConnectedUser } from './hooks/useConnectedUser'
 
 import NavBar from './components/NavBar';
 import HomePage from './components/HomePage';
@@ -19,14 +19,12 @@ import ExchangeList from './components/ExchangeList/index';
 import UniswapExchanges from './components/UniswapExchange';
 import TradeOnUniswap from './components/TradeUniswap'
 import TradeOn0x from './components/Trade0x';
-import CreateOption from './components/CreateOption'
 import BalancerDemo from './components/Balancer'
 import Footer from './components/Footer';
 
 function App() {
   const storedTheme = getPreference('theme', 'light');
 
-  const [user, setUser] = useState(''); // the current connected user
   const [theme, setTheme] = useState(storedTheme);
 
   const updateTheme = (newTheme: string) => {
@@ -35,34 +33,20 @@ function App() {
     storePreference('theme', newTheme);
   };
 
-  const [spotPrice, setSpot] = useState<BigNumber>(new BigNumber(0))
-
-  useEffect(() => {
-    let canceled = false
-    async function getSpotPrice() {
-      const spot = await getETHPrice()
-      if (!canceled) {
-        setSpot(new BigNumber(spot))
-      }
-    }
-    getSpotPrice()
-    const id = setInterval(getSpotPrice, 10000)
-    return () => {
-      clearInterval(id)
-    }
-  }, [])
+  const userInfo = useConnectedUser()
 
   return (
     <Router>
       <Main assetsUrl={`${process.env.PUBLIC_URL}/aragon-ui/`} theme={theme} layout={false}>
-        <NavBar user={user} setUser={setUser} theme={theme} updateTheme={updateTheme} />
+      <userContext.Provider value={userInfo}>
+        <NavBar theme={theme} updateTheme={updateTheme} />
 
         <Switch>
 
           {/* All Options */}
           <Route path="/option/:token">
             <Layout>
-              <OptionDetail user={user}/>
+              <OptionDetail/>
             </Layout>
           </Route>
           
@@ -75,45 +59,30 @@ function App() {
           {/* My Vaults */}
           <Route path="/myvaults">
             <Layout>
-              <MyVaults user={user}/>
+              <MyVaults/>
             </Layout>
           </Route>
           
           <Route path="/manage/:token/:owner">
             <Layout>
-              <ManageVault user={user} />
+              <ManageVault/>
             </Layout>
           </Route>
 
           {/* Not Using Layout */}
-          <Route path="/trade/0x/">
-            <TradeOn0x
-              user={user}
-            />
-          </Route>
+          <Route path="/trade/0x/"><TradeOn0x/></Route>
 
           <Route path="/trade/uniswap">
             <Layout>
-              <TradeOnUniswap 
-                user={user}
-                spotPrice={spotPrice}
-              />
+              <TradeOnUniswap />
             </Layout>
           </Route>
           {/* <Route path="/trades/test/"><ZEROXTest /></Route> */}
-          <Route path="/uniswap/:token/">
-            <Layout>
-              <UniswapExchanges 
-                user={user} 
-                spotPrice={spotPrice}
-              />
-            </Layout>
-          </Route>
+          <Route path="/uniswap/:token/"><Layout><UniswapExchanges /></Layout></Route>
 
           <Route path="/uniswap/"><Layout><ExchangeList/></Layout></Route>
 
           <Route path="/balancer/"><Layout><BalancerDemo /></Layout></Route>
-          <Route path="/create/"><Layout><CreateOption user={user} /></Layout></Route>
           {/* HomePage */}
           <Route path="/"><Layout><HomePage /></Layout></Route>
           {/* </Layout> */}
@@ -121,6 +90,7 @@ function App() {
         </Switch>
 
         <Footer theme={theme} />
+        </userContext.Provider>
       </Main>
     </Router>
   );

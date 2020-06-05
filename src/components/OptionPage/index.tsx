@@ -17,9 +17,7 @@ import { defaultOption } from '../../constants/options';
 
 import * as types from '../../types'
 
-function OptionPage({ user }: { 
-  user: string
-}) {
+function OptionPage() {
   const { token } = useParams();
   useEffect(() => {
     tracker.pageview(`/option/${token}`);
@@ -51,7 +49,6 @@ function OptionPage({ user }: {
         primary={option && option!.name}
         secondary={(
           <ExerciseModal
-            user={user}
             option={option}
             vaults={vaults}
           />
@@ -65,7 +62,6 @@ function OptionPage({ user }: {
       <VaultsList
         isInitializing={isInitializing && isLoadigVaults}
         option={option!}
-        user={user}
         vaults={vaults}
         collateralIsETH={collateralIsETH}
       />

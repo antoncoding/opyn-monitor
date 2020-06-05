@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 
 import {
   Button, IconConnect, Box, IconPower, LinkBase,
@@ -8,13 +8,10 @@ import { CustomIdentityBadge } from '../common'
 
 import { connect, disconnect } from '../../utils/web3';
 import { checkAddressAndAddToStorage } from '../../utils/storage';
+import { userContext } from '../../contexts/userContext'
 
-type connectButtonProps = {
-  user: string,
-  setUser: Function
-}
-
-function ConnectButton({ user, setUser }: connectButtonProps) {
+function ConnectButton() {
+  const { user, setUser } = useContext(userContext)
   const [isConnected, setIsConnected] = useState(false);
 
   const connectWeb3 = async () => {

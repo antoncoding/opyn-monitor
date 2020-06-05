@@ -11,12 +11,10 @@ import ChangeModeButton from './SwitchTheme';
 type NavbarProps = {
   theme: string,
   updateTheme: Function,
-  user: string,
-  setUser: Function
 }
 
 function MyBar({
-  theme, updateTheme, user, setUser,
+  theme, updateTheme,
 }: NavbarProps) {
   const history = useHistory();
   const [isHome, updateIsHome] = useState(true);
@@ -87,7 +85,7 @@ function MyBar({
       }
       secondary={
         <>
-          <ConnectButton user={user} setUser={setUser} />
+          <ConnectButton />
           <ChangeModeButton theme={theme} updateTheme={updateTheme} />
         </>
       }

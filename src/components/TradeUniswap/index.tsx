@@ -1,10 +1,11 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 
 import Options from './Options'
 import UserData from './UserData';
 import BigNumber from 'bignumber.js';
 
-import { useOptions } from '../../hooks'
+import { useOptions, useETHSpotPrice } from '../../hooks'
+import { userContext } from '../../contexts/userContext'
 
 import { getPremiumToPay } from '../../utils/infura'
 import { toTokenUnitsBN, toBaseUnitBN } from '../../utils/number';
@@ -14,17 +15,14 @@ import * as types from '../../types';
 
 const Promise = require('bluebird')
 
-type TradeUniswapProps = {
-  user: string,
-  spotPrice: BigNumber,
-}
-
-function TradeUniswap({ user, spotPrice }: TradeUniswapProps) {
+function TradeUniswap() {
 
   useEffect(() => {
     tracker.pageview(`/trade/uniswap/`);
   }, []);
 
+  const { user } = useContext(userContext)
+  const spotPrice = useETHSpotPrice()
   const { calls, puts } = useOptions()
   
   // Update token price every 5 secs

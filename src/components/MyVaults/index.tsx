@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo, useEffect, useContext } from 'react';
 
 import BigNumber from 'bignumber.js';
 import {
@@ -7,6 +7,7 @@ import {
 import NoWalletView from './NoWallet';
 import * as types from '../../types'
 import { useOptions } from '../../hooks'
+import { userContext } from '../../contexts/userContext'
 import {
   SectionTitle, ManageVaultButton, CheckBox,
 } from '../common/index';
@@ -31,10 +32,12 @@ export type vaultWithDetail = {
   ratio: number
 }
 
-function MyVaults({ user }: { user: string }) {
+function MyVaults() {
   useEffect(() => {
     tracker.pageview('/myvaults/');
   }, []);
+
+  const { user } = useContext(userContext)
 
   const { isInitializing, options } = useOptions()
 
@@ -102,8 +105,9 @@ function MyVaults({ user }: { user: string }) {
   return (
     <>
       <Header primary="My Vaults" />
-      {hasAddressConnected ? (
+      {hasAddressConnected ? ( 
         <>
+         { (displayVaults.length > 0 || (isInitializing || isLoading)) && 
           <div style={{ paddingBottom: '3%' }}>
             <div style={{ display: 'flex' }}>
               <SectionTitle title="Existing Vaults" />
@@ -147,6 +151,7 @@ function MyVaults({ user }: { user: string }) {
                 ]}
             />
           </div>
+          }
           
           {tokensToOpen.length > 0 && !isWatchMode ? (
             <div>

@@ -1,9 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { useParams } from 'react-router-dom';
 import { Header } from '@aragon/ui';
 
 import BigNumber from 'bignumber.js';
-import { useOptions } from '../../hooks'
+import { useOptions, useETHSpotPrice } from '../../hooks'
+import { userContext } from '../../contexts/userContext'
 
 import {
   getTokenBalance, getBalance, getTotalSupply,
@@ -20,9 +21,12 @@ import RemoveLiquidity from './RemoveLiquidity';
 import tracker from '../../utils/tracker';
 import * as types from '../../types';
 
-function UniswapPool({ user, spotPrice }: {user: string, spotPrice:BigNumber }) {
+function UniswapPool() {
   const liquidityTokenDecimals = 18;
   const { token } = useParams();
+
+  const { user } = useContext(userContext)
+  const spotPrice = useETHSpotPrice()
 
   useEffect(() => {
     tracker.pageview(`/uniswap/${token}`);
