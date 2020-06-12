@@ -133,9 +133,9 @@ const categorizeOptions = (
   const calls: types.ethOptionWithStat[] = [];
 
   options.forEach((option) => {
-    if (option.name === '') return;
+    if (!option.name) return;
     if (option.collateral === USDC && option.strike === USDC && option.underlying === OPYN_ETH) {
-      const strikePriceInUSD = parseInt(option.name.split('$')[1].split(' ')[0], 10);
+      const strikePriceInUSD = parseStrikePriceUSDCFromName(option, 'put')
       const put = {
         ...option,
         type: 'put' as 'put',
@@ -147,7 +147,7 @@ const categorizeOptions = (
       option.strike === OPYN_ETH &&
       option.underlying === USDC
     ) {
-      const strikePriceInUSD = parseInt(option.name.split('$')[1].split(' ')[0], 10);
+      const strikePriceInUSD = parseStrikePriceUSDCFromName(option, 'call')
       const call = {
         ...option,
         type: 'call' as 'call',
@@ -161,6 +161,29 @@ const categorizeOptions = (
 
   return { insurances, puts, calls };
 };
+
+const parseStrikePriceUSDCFromName = (option: types.optionWithStat, type: 'call'|'put') => {
+  let strikePriceInUSD = 0;
+  try {
+    strikePriceInUSD = parseInt(option.name.split('$')[1].split(' ')[0], 10);
+  } catch {
+    if(type === 'call') {
+      strikePriceInUSD = new BigNumber(10)
+        .exponentiatedBy(option.decimals + option.underlying.decimals - option.strike.decimals )
+        .div(option.strikePrice)
+        .integerValue()
+        .toNumber()
+    } else {
+      strikePriceInUSD = new BigNumber(option.strikePrice)
+        .times(new BigNumber(10)
+        .exponentiatedBy(option.decimals))
+        .integerValue()
+        .toNumber()
+    }
+  } finally {
+    return strikePriceInUSD
+  }
+}
 
 export type basicOptionInfo = {
   addr: string;

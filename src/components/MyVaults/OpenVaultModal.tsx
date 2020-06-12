@@ -80,6 +80,18 @@ function OpenVaultModal({ user, option }: openVaultModalProps) {
     setMintTokenAmt(new BigNumber(value));
   };
 
+  // update mint token amount when collateral change
+  useEffect(()=>{
+    if(option.title === 'insurance') return 
+    if(option.type === 'put') {
+      const newAmountMinted = collateralAmt.div((option as types.ETHOption).strikePriceInUSD)
+      setMintTokenAmt(newAmountMinted)
+    } else {
+      const newAmountMinted = collateralAmt.times((option as types.ETHOption).strikePriceInUSD)
+      setMintTokenAmt(newAmountMinted)
+    }
+  }, [option, collateralAmt])
+
   const mint = async () => {
     if (ratio < option.minRatio) {
       toast(`Collateral ratio must > ${option.minRatio}`);
@@ -135,11 +147,11 @@ function OpenVaultModal({ user, option }: openVaultModalProps) {
                 value={mintTokenAmt.toNumber()}
                 onChange={(event: React.ChangeEvent<HTMLInputElement>) => onMintTokenAmtChange(event.target.value)}
                 adornmentPosition="end"
-                adornment={option.symbol}
+                adornment={option.symbol.length > 10 ? option.symbol.split(' ')[0] : option.symbol}
               />
             </div>
           </div>
-          { option.symbol.toLowerCase().includes('call')
+          { option.type === 'call'
             ? <WarningText text={`1 ${option.collateral.symbol} can create ${(option as types.ETHOption).strikePriceInUSD} ${option.symbol}`} />
             : <></>}
           <Button label="Mint" onClick={mint} />
