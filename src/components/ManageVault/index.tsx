@@ -40,7 +40,7 @@ function ManageVault() {
 
   const [option, setOption] = useState<types.option>(defaultOption)
 
-  const multiplier = option.type === 'call' ? new BigNumber((option as types.ETHOption).strikePriceInUSD) : new BigNumber(1)
+  const multiplier = new BigNumber(1) // option.type === 'call' ? new BigNumber((option as types.ETHOption).strikePriceInUSD) : new BigNumber(1)
 
   useEffect(()=>{
     const option = options.find((o) => o.addr === token);

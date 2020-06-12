@@ -147,12 +147,17 @@ function OpenVaultModal({ user, option }: openVaultModalProps) {
                 value={mintTokenAmt.toNumber()}
                 onChange={(event: React.ChangeEvent<HTMLInputElement>) => onMintTokenAmtChange(event.target.value)}
                 adornmentPosition="end"
-                adornment={option.symbol.length > 10 ? option.symbol.split(' ')[0] : option.symbol}
+                adornment={option.type === 'call' 
+                ? 'oETHc' 
+                : option.symbol.length > 10 
+                  ? option.symbol.split(' ')[0] 
+                  : option.symbol
+                }
               />
             </div>
           </div>
           { option.type === 'call'
-            ? <WarningText text={`1 ${option.collateral.symbol} can create ${(option as types.ETHOption).strikePriceInUSD} ${option.symbol}`} />
+            ? <WarningText text={`1 ${option.collateral.symbol} can create ${(option as types.ETHOption).strikePriceInUSD} oETHc`} />
             : <></>}
           <Button label="Mint" onClick={mint} />
           { ratio === Infinity

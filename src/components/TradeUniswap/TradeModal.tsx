@@ -17,9 +17,9 @@ type TradeModalProps = {
 function TradeModal({ oToken, spotPrice, balance }: TradeModalProps) {
 
   const [opened, setOpened] = useState(false)
-  const multiplier = oToken.type === 'call' 
-    ? new BigNumber(oToken.strikePriceInUSD) 
-    : new BigNumber(1)
+  const multiplier = new BigNumber(1) // oToken.type === 'call' 
+    // ? new BigNumber(oToken.strikePriceInUSD) 
+    // : new BigNumber(1)
 
   return (
     <>

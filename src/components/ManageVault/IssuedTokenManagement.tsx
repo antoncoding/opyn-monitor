@@ -166,7 +166,7 @@ function IssuedTokenManagement({
       </div>
       {option.type === 'call' &&
         <WarningText 
-          text={`1 ${option.symbol} gives you the right to buy 1 ${option.collateral.symbol} with ${(option as types.ETHOption).strikePriceInUSD} ${option.underlying.symbol}`} />
+          text={`${(option as types.ETHOption).strikePriceInUSD} oETHc gives buyer the right to buy 1 ${option.collateral.symbol} `} />
       }
     </Box>
   );

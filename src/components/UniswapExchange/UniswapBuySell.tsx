@@ -12,7 +12,7 @@ import { getPremiumToPay, getPremiumReceived } from '../../utils/infura';
 
 
 import { toBaseUnitBN, toTokenUnitsBN } from '../../utils/number';
-import { option } from '../../types';
+import { option, ETHOption } from '../../types';
 
 type UniswapBuySellProps = {
   option: option
@@ -145,7 +145,7 @@ function UniswapBuySell({
       </div>
       { option.type === 'call'
         && 
-        <WarningText text={`Buy 1 ${option.symbol} to hedge 1 ETH.`} /> 
+        <WarningText text={`Buy ${(option as ETHOption).strikePriceInUSD} ${option.symbol} to hedge 1 ETH.`} /> 
       }
     </Box>
   );
