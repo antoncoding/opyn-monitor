@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect, ChangeEvent } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useHistory } from 'react-router-dom';
 
 import {
@@ -37,16 +37,24 @@ function OpenVaultModal({ user, option }: openVaultModalProps) {
 
   const [strikeValueInCollateral, setStrikeValueInCollateral] = useState(new BigNumber(0));
   const [ratio, setRatio] = useState(1);
-
-  useMemo(async () => {
+  
+  useEffect(() => {
     if (!opened) return;
-    const strikeValueInColltrl = await calculateStrikeValueInCollateral(
-      option.collateral.addr,
-      option.strike.addr,
-      option.oracle,
-      option.collateral.decimals,
-    );
-    setStrikeValueInCollateral(strikeValueInColltrl);
+    let isCancelled = false;
+    async function updateStrikeValueInCollateral () {
+      const strikeValueInColltrl = await calculateStrikeValueInCollateral(
+        option.collateral.addr,
+        option.strike.addr,
+        option.oracle,
+        option.collateral.decimals,
+      );
+      if(!isCancelled)
+        setStrikeValueInCollateral(strikeValueInColltrl);
+    }
+    updateStrikeValueInCollateral()
+    return ()=>{
+      isCancelled = true
+    }
   },
   [option, opened]);
 
@@ -63,22 +71,22 @@ function OpenVaultModal({ user, option }: openVaultModalProps) {
   },
   [collateralAmt, mintTokenAmt, strikeValueInCollateral, option]);
 
-  const onCollateralChange = (value) => {
+  const onCollateralChange = useCallback((value) => {
     if (!value) {
       setCollateralAmt(new BigNumber(0));
       return;
     }
     const amtBn = new BigNumber(value);
     setCollateralAmt(amtBn);
-  };
+  }, []);
 
-  const onMintTokenAmtChange = (value) => {
+  const onMintTokenAmtChange = useCallback((value) => {
     if (!value) {
       setMintTokenAmt(new BigNumber(0));
       return;
     }
     setMintTokenAmt(new BigNumber(value));
-  };
+  },[]);
 
   // update mint token amount when collateral change
   useEffect(()=>{
@@ -106,8 +114,9 @@ function OpenVaultModal({ user, option }: openVaultModalProps) {
     history.push(`/manage/${option.addr}/${user}`);
   };
 
-  const open = () => setOpened(true);
-  const close = () => setOpened(false);
+  const open = useCallback(() => setOpened(true), []);
+  const close = useCallback(() => setOpened(false), []);
+  // const close = () => setOpened(false);
 
   return (
     <>
@@ -136,7 +145,7 @@ function OpenVaultModal({ user, option }: openVaultModalProps) {
           <div style={{ display: 'flex', paddingBottom: 15 }}>
             <TextInput
               type="number"
-              value={collateralAmt.toNumber()}
+              value={collateralAmt.toNumber() || 0}
               onChange={(event: React.ChangeEvent<HTMLInputElement>) => onCollateralChange(event.target.value)}
               adornmentPosition="end"
               adornment={option.collateral.symbol}
@@ -144,7 +153,7 @@ function OpenVaultModal({ user, option }: openVaultModalProps) {
             <div style={{ paddingLeft: 15 }}>
               <TextInput
                 type="number"
-                value={mintTokenAmt.toNumber()}
+                value={mintTokenAmt.toNumber() || 0}
                 onChange={(event: React.ChangeEvent<HTMLInputElement>) => onMintTokenAmtChange(event.target.value)}
                 adornmentPosition="end"
                 adornment={option.type === 'call' 
