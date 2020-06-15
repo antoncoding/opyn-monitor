@@ -46,6 +46,7 @@ function ExerciseModal({
     .filter((vault) => parseInt(vault.collateral, 10) > 0)
     .sort(compareVaultIssued);
 
+  const [page, setPage] = useState(0)
   const [selectedIndexes, setSelectedIndexes] = useState([]);
   const [selectedHasEnoughCollateral, setHasEnoughCollateral] = useState(false);
 
@@ -164,6 +165,8 @@ function ExerciseModal({
           entries={nonEmptyVaults}
           entriesPerPage={5}
           selection={selectedIndexes}
+          page={page}
+          onPageChange={setPage}
           onSelectEntries={onSelectEntries}
           renderEntry={({ owner, collateral, oTokensIssued }) => [
             <CustomIdentityBadge entity={owner} />,
@@ -177,7 +180,7 @@ function ExerciseModal({
           disabled={!selectedHasEnoughCollateral}
           wide
           onClick={async () => {
-            const vaultowners = selectedIndexes.map((index) => vaults[index].owner);
+            const vaultowners = selectedIndexes.map((index) => nonEmptyVaults[index].owner);
             exercise(
               option.addr,
               option.underlying.addr,
