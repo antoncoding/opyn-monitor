@@ -81,6 +81,7 @@ function AllContracts() {
         />}
       {tabSelected === 1 &&
         <OptionList
+        isInitializing={isInitializing}
           typeText="Put Options"
           entries={puts}
           showExpired={showExpired}
@@ -88,6 +89,7 @@ function AllContracts() {
         />}
       {tabSelected === 2 &&
         <OptionList
+          isInitializing={isInitializing}
           typeText="Call Options"
           entries={calls}
           showExpired={showExpired}
@@ -101,10 +103,11 @@ function AllContracts() {
 
 export default AllContracts;
 
-function OptionList({ entries, showExpired, goToToken, typeText }: { typeText: string, entries: types.ETHOption[], showExpired: boolean, goToToken: Function }) {
+function OptionList({ isInitializing, entries, showExpired, goToToken, typeText }: { isInitializing:Boolean, typeText: string, entries: types.ETHOption[], showExpired: boolean, goToToken: Function }) {
   const [page, setPage] = useState(0)
   return (
     <DataView
+      status={isInitializing?'loading':'default'}
       statusEmpty={<div>No {typeText} Available</div>}
       fields={['Contract', 'Strike Price', 'Expiration', 'Expires in', '']}
       entries={entries
