@@ -102,6 +102,9 @@ const initOptions = async (): Promise<{
     // Check Local storage or query Infura instead.
     if (_exchange === undefined) {
       const storedInfo = storedErc20InfoAndExchanges.find((entry) => entry.address === option.addr);
+      if (option.addr === '0xbaf6cfa199fbbe8a9e5198f2af20040c5e7b0333' && storedInfo) {
+        storedInfo.name = 'Opyn ETH Call 1/250th share 06/26/20'
+      }
       if (storedInfo !== undefined) {
         _exchange = {
           id: storedInfo.uniswapExchange,
