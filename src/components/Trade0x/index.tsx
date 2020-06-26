@@ -30,7 +30,7 @@ function OptionTrading() {
   const [optionsByDate, setOptionsByDate] = useState<entriesForExpiry[]>([])
 
   const [baseAsset, setBaseAsset] = useState<types.ETHOption>((defaultOption as types.option) as types.ETHOption);
-  const { calls, puts } = useOptions()
+  const { ethCalls: calls, ethPuts: puts } = useOptions()
   useEffect(()=>{
     const optionsByDate = groupByDate(puts, calls);
     setOptionsByDate(optionsByDate)

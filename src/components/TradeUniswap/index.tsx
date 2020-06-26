@@ -23,7 +23,7 @@ function TradeUniswap() {
 
   const { user } = useContext(userContext)
   const spotPrice = useETHSpotPrice()
-  const { calls, puts } = useOptions()
+  const { ethCalls: calls, ethPuts: puts } = useOptions()
   
   // Update token price every 5 secs
   const [tokenPrices, setTokenPrices] = useState<{ oToken: string, price: BigNumber }[]>([])
