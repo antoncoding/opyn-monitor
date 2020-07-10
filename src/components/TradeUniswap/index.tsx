@@ -46,11 +46,17 @@ function TradeUniswap() {
             price: new BigNumber(0)
           }
         }
-        const priceUnit = await getPremiumToPay(
-          option.exchange,
-          option.addr,
-          toBaseUnitBN(1, option.decimals).toString()
-        )
+        let priceUnit = new BigNumber(0);
+        try {
+          priceUnit = await getPremiumToPay(
+            option.exchange,
+            option.addr,
+            toBaseUnitBN(1, option.decimals).toString()
+          )
+        } catch(error) {
+          console.log(`Error Fetching price for ${option.name}`, error.toString());
+        }
+        
         const price = option.type === 'call'
           ? toTokenUnitsBN(priceUnit, 18).times(spotPrice).times(option.strikePriceInUSD) // 250 call tokens = 1 call option
           : toTokenUnitsBN(priceUnit, 18).times(spotPrice)
