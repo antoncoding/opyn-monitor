@@ -19,7 +19,7 @@ export const cDAI = {
   decimals: 8,
   symbol: 'cDai',
   img: imgs.cDAI,
-  protocol: 'compound',
+  protocol: 'Compound',
 };
 
 export const cUSDC = {
@@ -27,7 +27,7 @@ export const cUSDC = {
   decimals: 8,
   symbol: 'cUSDC',
   img: imgs.cUSDC,
-  protocol: 'compound',
+  protocol: 'Compound',
 };
 
 export const CurveFi = {
@@ -59,7 +59,7 @@ export const aUSDC = {
   decimals: 6,
   symbol: 'aUSDC',
   img: imgs.aUSDC,
-  protocol: 'aave',
+  protocol: 'Aave',
 };
 
 export const COMP = {

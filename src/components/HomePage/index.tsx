@@ -35,25 +35,13 @@ function HomePage() {
           <Col md={6} lg={4}>
             <MainButton
               title="All Contracts"
-              description=" Monitor and liquidate vaults."
+              description="Liquidate vaults, Exercise oTokens"
               iconUrl="https://opyn.co/static/media/2.18d22be0.svg"
               onClick={() => {
                 history.push('/options/');
               }}
             />
           </Col>
-          {/* <Col md={6} lg={4}>
-            <div>
-            </div>
-            <MainButton
-              title="Exchanges"
-              description="View all open markets"
-              iconUrl="https://opyn.co/static/media/3.4da8b24d.svg"
-              onClick={() => {
-                history.push('/uniswap/');
-              }}
-            />
-          </Col> */}
           <Col md={6} lg={4}>
             <MainButton
               title="Trade"

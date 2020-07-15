@@ -1,15 +1,14 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useHistory } from 'react-router-dom';
 import {
-  Header, DataView, IdentityBadge, Button, Tabs, Timer, Tag
+  Header, DataView, IdentityBadge, Button, Tabs, Timer
 } from '@aragon/ui';
 
-import { Comment, CheckBox, GoToBalancerButton, GoToUniswapButton, TokenIcon } from '../common';
+import { Comment, CheckBox, GoToBalancerButton, GoToUniswapButton, TokenIcon, ProtocolIcon } from '../common';
 import { getPreference, storePreference } from '../../utils/storage';
 import { useOptions } from '../../hooks'
 
 import * as types from '../../types'
-// import { cDAI, UniswapLogo } from '../../imgs'
 import tracker from '../../utils/tracker';
 
 function AllContracts() {
@@ -64,7 +63,7 @@ function AllContracts() {
       {tabSelected === 0 &&
         <DataView
           status={isInitializing ? 'loading' : 'default'}
-          fields={['Contract', 'Underlying', 'Strike', 'Collateral', 'Expires in', '']}
+          fields={['Contract', 'Protocol', 'Underlying', 'Collateral', 'Expires in', '']}
           page={insurancePage}
           onPageChange={setInsurancePage}
           entries={insurances
@@ -73,17 +72,14 @@ function AllContracts() {
           }
           entriesPerPage={6}
           renderEntry={(option: types.option) => {
-            const isAvve = option.underlying.protocol === 'aave'
+            const isAvve = option.underlying.protocol === 'Aave'
             const Exchange  = isAvve ? <GoToBalancerButton token={option.addr} /> : <GoToUniswapButton token={option.addr} />
-            // const Underlying = option.underlying.img ? <img src={option.underlying.img} height={30} /> : <IdentityBadge label={option.underlying.symbol} entity={option.underlying.addr} />
             return [
-            <IdentityBadge label={<> {option.title} {option.underlying.protocol === 'aave' ? <Tag>New</Tag> : <></> } </>} entity={option.addr} />,
+            <IdentityBadge label={option.title} entity={option.addr} />,
+            <ProtocolIcon protocol={option.underlying.protocol}/>,
             <TokenIcon token={option.underlying}/>,
-            <TokenIcon token={option.strike}/>,
+            // <TokenIcon token={option.strike}/>,
             <TokenIcon token={option.collateral}/>,
-            // <IdentityBadge label={option.underlying.symbol} entity={option.underlying.addr} />,
-            // <IdentityBadge label={option.strike.symbol} entity={option.strike.addr} />,
-            // <IdentityBadge label={option.collateral.symbol} entity={option.collateral.addr} />,
             <Timer end={new Date(option.expiry * 1000)} format='Mdh' />,
             <><Button onClick={() => goToToken(option.addr)}> View Vaults </Button>
             {Exchange}

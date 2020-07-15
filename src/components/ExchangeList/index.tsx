@@ -52,7 +52,7 @@ function TradeLanding() {
         page={insurancePage}
         onPageChange={setIPages}
         renderEntry={({ addr, title, underlying }) => {
-          const isAvve = underlying.protocol === 'aave'
+          const isAvve = underlying.protocol === 'Aave'
           const button  = isAvve ? <GoToBalancerButton token={addr} /> : <GoToUniswapButton token={addr} />
           return [
           <>{title}</>,
