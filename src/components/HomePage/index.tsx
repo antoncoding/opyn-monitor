@@ -5,7 +5,6 @@ import Container from 'react-bootstrap/Container'
 import Row from 'react-bootstrap/Row'
 import Col from 'react-bootstrap/Col'
 
-import MesaLogo from '../../imgs/gnosis.png'
 import UniswapLogo from '../../imgs/uniswap.png'
 
 import {
@@ -43,23 +42,21 @@ function HomePage() {
               }}
             />
           </Col>
-          <Col md={6} lg={4}>
+          {/* <Col md={6} lg={4}>
             <div>
             </div>
             <MainButton
               title="Exchanges"
               description="View all open markets"
-              iconUrl={UniswapLogo}
-              secondImg={MesaLogo}
+              iconUrl="https://opyn.co/static/media/3.4da8b24d.svg"
               onClick={() => {
                 history.push('/uniswap/');
               }}
             />
-          </Col>
+          </Col> */}
           <Col md={6} lg={4}>
             <MainButton
               title="Trade"
-              tag="new"
               description="Trade ETH Options on Uniswap."
               iconUrl={UniswapLogo}
               onClick={() => {
@@ -70,7 +67,6 @@ function HomePage() {
           <Col md={6} lg={4}>
             <MainButton
               title="Trade"
-              tag="new"
               description="Trade ETH Options on 0x"
               iconUrl="https://cdn.worldvectorlogo.com/logos/0x-virtual-money-.svg"
               onClick={() => {

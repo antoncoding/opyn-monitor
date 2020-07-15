@@ -4,7 +4,7 @@ import {
   Header, DataView, IdentityBadge, Button, Tabs, Timer, Tag
 } from '@aragon/ui';
 
-import { Comment, CheckBox } from '../common';
+import { Comment, CheckBox, GoToBalancerButton, GoToUniswapButton } from '../common';
 import { getPreference, storePreference } from '../../utils/storage';
 import { useOptions } from '../../hooks'
 
@@ -53,7 +53,7 @@ function AllContracts() {
         </div>
       </div>
       <Tabs
-        items={['DeFi Insurance', 'ETH Options', <> Other Options <Tag> NEW </Tag> </>]}
+        items={['DeFi Insurance', 'ETH Options', 'Other Options']}
         selected={tabSelected}
         onChange={(choice: number) => {
           setTabSelected(choice);
@@ -72,14 +72,19 @@ function AllContracts() {
             .sort((oa, ob) => oa.expiry > ob.expiry ? -1 : 1)
           }
           entriesPerPage={6}
-          renderEntry={(option: types.option) => [
-            <IdentityBadge label={option.title} entity={option.addr} />,
+          renderEntry={(option: types.option) => {
+            const isAvve = option.underlying.protocol === 'aave'
+            const Exchange  = isAvve ? <GoToBalancerButton token={option.addr} /> : <GoToUniswapButton token={option.addr} />
+            return [
+            <IdentityBadge label={<> {option.title} {option.title.includes('aUSDC') ? <Tag>New</Tag> : <></> } </>} entity={option.addr} />,
             <IdentityBadge label={option.underlying.symbol} entity={option.underlying.addr} />,
             <IdentityBadge label={option.strike.symbol} entity={option.strike.addr} />,
             <IdentityBadge label={option.collateral.symbol} entity={option.collateral.addr} />,
             <Timer end={new Date(option.expiry * 1000)} format='Mdh' />,
-            <Button onClick={() => goToToken(option.addr)}> View Vaults </Button>,
-          ]}
+            <><Button onClick={() => goToToken(option.addr)}> View Vaults </Button>
+            {Exchange}
+            </>
+          ]}}
         />}
       {tabSelected === 1 &&
         <OptionList
@@ -128,7 +133,7 @@ function OptionList({ isInitializing, entries, showExpired, goToToken, typeText 
         <>{option.strikePriceInUSD + ' USD'}</>,
         new Date(option.expiry * 1000).toLocaleDateString("en-US", { timeZone: "UTC" }),
         <Timer end={new Date(option.expiry * 1000)} format='dhm' />,
-        <Button onClick={() => goToToken(option.addr)}> View Vaults </Button>,
+        <><Button onClick={() => goToToken(option.addr)}> View Vaults </Button><GoToUniswapButton token={option.addr} /></>,
       ]}
     />
   )

@@ -14,12 +14,14 @@ export const cDAI = {
   addr: '0x5d3a536e4d6dbd6114cc1ead35777bab948e3643',
   decimals: 8,
   symbol: 'cDai',
+  protocol: 'compound',
 };
 
 export const cUSDC = {
   addr: '0x39aa39c021dfbae8fac545936693ac917d5e7563',
   decimals: 8,
   symbol: 'cUSDC',
+  protocol: 'compound',
 };
 
 export const CurveFi = {
@@ -44,6 +46,13 @@ export const yDAI = {
   addr: '0x16de59092dae5ccf4a1e6439d611fd0653f0bd01',
   decimals: 18,
   symbol: 'yDAI',
+};
+
+export const aUSDC = {
+  addr: '0x9ba00d6856a4edf4665bca2c2309936572473b7e',
+  decimals: 6,
+  symbol: 'aUSDC',
+  protocol: 'aave',
 };
 
 export const COMP = {

@@ -58,13 +58,13 @@ function MyBar({
               }}
               isSelected={history.location.pathname === '/options/'}
             />
-            <LinkButton
+            {/* <LinkButton
               title="Exchanges"
               onClick={() => {
                 history.push('/uniswap/');
               }}
               isSelected={history.location.pathname.includes('/uniswap/') && !history.location.pathname.includes('/trade/')}
-            />
+            /> */}
             <LinkButton
               title="Uniswap Trade"
               onClick={() => {

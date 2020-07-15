@@ -4,6 +4,7 @@ export type token = {
   addr: string,
   decimals: number,
   symbol: string,
+  protocol?:string
 };
 
 export type optionWithStat = option & {
