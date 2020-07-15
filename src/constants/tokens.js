@@ -1,19 +1,24 @@
+import * as imgs from '../imgs';
+
 export const USDC = {
   addr: '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48',
   decimals: 6,
   symbol: 'USDC',
+  img: imgs.USDC,
 };
 
 export const OPYN_ETH = {
   addr: '0x0000000000000000000000000000000000000000',
   decimals: 18,
   symbol: 'ETH',
+  img: imgs.ETH,
 };
 
 export const cDAI = {
   addr: '0x5d3a536e4d6dbd6114cc1ead35777bab948e3643',
   decimals: 8,
   symbol: 'cDai',
+  img: imgs.cDAI,
   protocol: 'compound',
 };
 
@@ -21,6 +26,7 @@ export const cUSDC = {
   addr: '0x39aa39c021dfbae8fac545936693ac917d5e7563',
   decimals: 8,
   symbol: 'cUSDC',
+  img: imgs.cUSDC,
   protocol: 'compound',
 };
 
@@ -52,6 +58,7 @@ export const aUSDC = {
   addr: '0x9ba00d6856a4edf4665bca2c2309936572473b7e',
   decimals: 6,
   symbol: 'aUSDC',
+  img: imgs.aUSDC,
   protocol: 'aave',
 };
 

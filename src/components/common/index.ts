@@ -7,6 +7,7 @@ import HelperText from './HelpText';
 import PriceSection from './PriceSection';
 import WarningText from './Warning';
 import Comment from './Comment';
+import TokenIcon from './TokenIcon';
 import { ManageVaultButton, OpenVaultButton } from './VaultButton';
 import Wrapper from './Wrapper';
 import CheckBox from './CheckBox';
@@ -28,4 +29,5 @@ export {
   Comment,
   Wrapper,
   WarningText,
+  TokenIcon
 };
