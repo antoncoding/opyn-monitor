@@ -1,6 +1,6 @@
 # Opyn Vault Monitor
 
-[![Netlify Status](https://api.netlify.com/api/v1/badges/aff350a5-fd8c-49c8-b8c6-c96bd69d5343/deploy-status)](https://app.netlify.com/sites/heuristic-babbage-d6f109/deploys)
+[![Netlify Status](https://api.netlify.com/api/v1/badges/aff350a5-fd8c-49c8-b8c6-c96bd69d5343/deploy-status)](https://app.netlify.com/sites/opynmoinor/deploys)
 
 This is a frontend for users to easily manage assets on Opyn protocol. Currently hosted on GitHub Page: [opynmonitor.xyz](https://opynmonitor.xyz/#/) For more information about Opyn protocol, Please visit https://opyn.co/
 
