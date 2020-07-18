@@ -7,9 +7,10 @@ import CompoundProtocol from './compound.svg';
 
 import ETH from './eth.png';
 import USDC from './usdc.png';
-// Aave
+import COMP from './comp.svg';
+// Aave tokens
 import aUSDC from './aUSDC.svg';
-// Compound
+// Compound tokens
 import cDAI from './cDAI.svg';
 import cUSDC from './cUSDC.svg';
 
@@ -20,6 +21,7 @@ export {
   AaveProtocol,
   CompoundProtocol,
   ETH,
+  COMP,
   USDC,
   aUSDC,
   cDAI,

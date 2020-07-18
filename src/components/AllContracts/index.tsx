@@ -1,14 +1,15 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useHistory } from 'react-router-dom';
 import {
-  Header, DataView, IdentityBadge, Button, Tabs, Timer
+  Header, Tabs
 } from '@aragon/ui';
 
-import { Comment, CheckBox, GoToBalancerButton, GoToUniswapButton, TokenIcon, ProtocolIcon } from '../common';
+import { Comment, CheckBox } from '../common';
 import { getPreference, storePreference } from '../../utils/storage';
 import { useOptions } from '../../hooks'
-
-import * as types from '../../types'
+import { EthOptionList } from './EthOptionList'
+import { InsuranceList } from './InsuranceList'
+import { OtherOptionList } from './OtherOptionList'
 import tracker from '../../utils/tracker';
 
 function AllContracts() {
@@ -20,7 +21,7 @@ function AllContracts() {
     insurances,
     ethCalls,
     ethPuts,
-    compPuts
+    otherPuts
   } = useOptions()
 
   const storedOptionTab = getPreference('optionTab', '0');
@@ -28,7 +29,7 @@ function AllContracts() {
 
   const [tabSelected, setTabSelected] = useState(parseInt(storedOptionTab, 10));
   const [showExpired, setShowExpired] = useState(storedShowExpired === '1'); // whether to show expired options
-  const [insurancePage, setInsurancePage] = useState(0)
+  // const [insurancePage, setInsurancePage] = useState(0)
 
   const history = useHistory();
   const goToToken = useCallback((addr: string) => {
@@ -61,44 +62,24 @@ function AllContracts() {
       />
 
       {tabSelected === 0 &&
-        <DataView
-          status={isInitializing ? 'loading' : 'default'}
-          fields={['Contract', 'Protocol', 'Underlying', 'Collateral', 'Expires in', '']}
-          page={insurancePage}
-          onPageChange={setInsurancePage}
-          entries={insurances
-            .filter((option) => showExpired || option.expiry * 1000 > Date.now())
-            .sort((oa, ob) => oa.expiry > ob.expiry ? -1 : 1)
-          }
-          entriesPerPage={6}
-          renderEntry={(option: types.option) => {
-            const isAvve = option.underlying.protocol === 'Aave'
-            const Exchange  = isAvve ? <GoToBalancerButton token={option.addr} /> : <GoToUniswapButton token={option.addr} />
-            return [
-            <IdentityBadge label={option.title} entity={option.addr} />,
-            <ProtocolIcon protocol={option.underlying.protocol}/>,
-            <TokenIcon token={option.underlying}/>,
-            // <TokenIcon token={option.strike}/>,
-            <TokenIcon token={option.collateral}/>,
-            <Timer end={new Date(option.expiry * 1000)} format='Mdh' />,
-            <><Button onClick={() => goToToken(option.addr)}> View Vaults </Button>
-            {Exchange}
-            </>
-          ]}}
-        />}
+        <InsuranceList 
+          isInitializing={isInitializing}
+          insurances={insurances}
+          showExpired={showExpired}
+          goToToken={goToToken}
+        />
+      }
       {tabSelected === 1 &&
-        <OptionList
-        isInitializing={isInitializing}
-          typeText="ETH Options"
+        <EthOptionList
+          isInitializing={isInitializing}
           entries={ethCalls.concat(ethPuts)}
           showExpired={showExpired}
           goToToken={goToToken}
         />}
       {tabSelected === 2 &&
-        <OptionList
+        <OtherOptionList
           isInitializing={isInitializing}
-          typeText="Other Options"
-          entries={compPuts}
+          entries={otherPuts}
           showExpired={showExpired}
           goToToken={goToToken}
         />
@@ -109,32 +90,3 @@ function AllContracts() {
 }
 
 export default AllContracts;
-
-function OptionList({ isInitializing, entries, showExpired, goToToken, typeText }: { isInitializing:Boolean, typeText: string, entries: types.ETHOption[], showExpired: boolean, goToToken: Function }) {
-  const [page, setPage] = useState(0)
-  return (
-    <DataView
-      status={isInitializing?'loading':'default'}
-      statusEmpty={<div>No {typeText} Available</div>}
-      fields={['Contract', 'Strike Price', 'Expiration', 'Expires in', '']}
-      entries={entries
-        .filter((option) => showExpired || option.expiry * 1000 > Date.now())
-        .sort((oa, ob) =>  oa.type === ob.type 
-          ? oa.expiry > ob.expiry 
-            ? -1 : 1 
-          : oa.type === 'call' 
-            ? -1 : 1)
-      }
-      page={page}
-      onPageChange={setPage}
-      entriesPerPage={6}
-      renderEntry={(option: types.ETHOption) => [
-        <IdentityBadge label={option.title} entity={option.addr} shorten={false} />,
-        <>{option.strikePriceInUSD + ' USD'}</>,
-        new Date(option.expiry * 1000).toLocaleDateString("en-US", { timeZone: "UTC" }),
-        <Timer end={new Date(option.expiry * 1000)} format='dhm' />,
-        <><Button onClick={() => goToToken(option.addr)}> View Vaults </Button><GoToUniswapButton token={option.addr} /></>,
-      ]}
-    />
-  )
-}

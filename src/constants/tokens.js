@@ -65,5 +65,15 @@ export const aUSDC = {
 export const COMP = {
   addr: '0xc00e94cb662c3520282e6f5717214004a7f26888',
   decimals: 18,
+  img: imgs.COMP,
   symbol: 'COMP',
 };
+
+export const BAL = {
+  addr: '0xba100000625a3754423978a60c9317c58a424e3d',
+  decimals: 18,
+  symbol: 'BAL',
+  img: imgs.BalancerLogo,
+};
+
+export const knownTokens = [USDC, OPYN_ETH, cDAI, cUSDC, CurveFi, WETH, DAI, yDAI, aUSDC, COMP, BAL];

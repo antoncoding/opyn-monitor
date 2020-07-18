@@ -13,7 +13,7 @@ import tracker from '../../utils/tracker';
 function TradeLanding() {
   const history = useHistory();
 
-  const { isInitializing, insurances, ethCalls, ethPuts, compPuts } = useOptions()
+  const { isInitializing, insurances, ethCalls, ethPuts, otherPuts } = useOptions()
 
   useEffect(() => {
     tracker.pageview('/uniswap/');
@@ -70,7 +70,7 @@ function TradeLanding() {
         status={ isInitializing ? 'loading' : 'default' }
         page={optionPage}
         onPageChange={setOptionPage}
-        entries={compPuts.concat(ethCalls).concat(ethPuts).filter((option) => showExpired || option.expiry * 1000 > Date.now())}
+        entries={otherPuts.concat(ethCalls).concat(ethPuts).filter((option) => showExpired || option.expiry * 1000 > Date.now())}
         entriesPerPage={6}
         renderEntry={({ addr, title }) => [
           <>{title}</>,

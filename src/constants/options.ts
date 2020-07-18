@@ -1,5 +1,5 @@
-import * as tokens from '../tokens'
-import { optionWithStat } from '../../types'
+import * as tokens from './tokens'
+import { optionWithStat } from '../types'
 import BigNumber from 'bignumber.js';
 
 export const blackList = [
