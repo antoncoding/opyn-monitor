@@ -1,14 +1,13 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useHistory } from 'react-router-dom';
-import MesaLogo from '../../imgs/gnosis.png'
-import UniswapLogo from '../../imgs/uniswap.png'
 import {
   Header, DataView, IdentityBadge, Button,
 } from '@aragon/ui';
 import { useOptions } from '../../hooks'
 
-import { Comment, CheckBox } from '../common';
+import { Comment, CheckBox, GoToUniswapButton, GoToBalancerButton } from '../common';
 import { storePreference, getPreference } from '../../utils/storage';
+
 import tracker from '../../utils/tracker';
 
 function TradeLanding() {
@@ -52,15 +51,17 @@ function TradeLanding() {
         entriesPerPage={6}
         page={insurancePage}
         onPageChange={setIPages}
-        renderEntry={({ addr, title }) => [
+        renderEntry={({ addr, title, underlying }) => {
+          const isAvve = underlying.protocol === 'Aave'
+          const button  = isAvve ? <GoToBalancerButton token={addr} /> : <GoToUniswapButton token={addr} />
+          return [
           <>{title}</>,
           <IdentityBadge entity={addr} shorten={false} />,
           <div style={{ display: 'flex' }}>
-            <Button onClick={() => goToTrade(addr)}> Start Trading </Button>
-            <GoToUniswapFunction token={addr} />
-            <GoToMesa token={addr} />
+            <Button disabled={isAvve} onClick={() => goToTrade(addr)}> Start Trading </Button>
+            {button}
           </div>,
-        ]}
+        ]}}
       />
       <br />
       <Comment text="Trade Options" />
@@ -76,8 +77,7 @@ function TradeLanding() {
           <IdentityBadge entity={addr} shorten={false} />,
           <div style={{ display: 'flex' }}>
             <Button onClick={() => goToTrade(addr)}> Start Trading </Button>
-            <GoToUniswapFunction token={addr} />
-            <GoToMesa token={addr} />
+            <GoToUniswapButton token={addr} />
           </div>,
 
         ]}
@@ -85,47 +85,6 @@ function TradeLanding() {
     </>
   );
 }
-
-
-
-function GoToUniswapFunction({ token }: { token: string }) {
-  return (
-    <Button onClick={() => {
-      tracker.event({
-        category: 'link',
-        action: 'uniswap',
-      })
-      window.open(
-        `https://v1.uniswap.exchange/swap?inputCurrency=${token}`,
-        '_blank',
-      )
-    }
-    }
-    >
-      <img alt="uniswap" src={UniswapLogo} style={{ padding: 2, height: 32, width: 29 }} />
-    </Button>
-  );
-}
-
-function GoToMesa({ token }: { token: string }) {
-  return (
-    <Button onClick={() => {
-      tracker.event({
-        category: 'link',
-        action: 'mesa',
-      })
-      window.open(
-        `https://mesadev.eth.link/#/trade/DAI-${token}`,
-        '_blank',
-      )
-    }
-    }
-    >
-      <img alt="mesa" src={MesaLogo} style={{ padding: 2, height: 32, width: 32 }} />
-    </Button>
-  );
-}
-
 
 
 

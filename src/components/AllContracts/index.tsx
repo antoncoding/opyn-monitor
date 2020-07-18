@@ -1,15 +1,14 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useHistory } from 'react-router-dom';
 import {
-  Header, DataView, IdentityBadge, Button, Tabs, Timer, Tag
+  Header, DataView, IdentityBadge, Button, Tabs, Timer
 } from '@aragon/ui';
 
-import { Comment, CheckBox } from '../common';
+import { Comment, CheckBox, GoToBalancerButton, GoToUniswapButton, TokenIcon, ProtocolIcon } from '../common';
 import { getPreference, storePreference } from '../../utils/storage';
 import { useOptions } from '../../hooks'
 
 import * as types from '../../types'
-
 import tracker from '../../utils/tracker';
 
 function AllContracts() {
@@ -53,7 +52,7 @@ function AllContracts() {
         </div>
       </div>
       <Tabs
-        items={['DeFi Insurance', 'ETH Options', <> Other Options <Tag> NEW </Tag> </>]}
+        items={['DeFi Insurance', 'ETH Options', 'Other Options']}
         selected={tabSelected}
         onChange={(choice: number) => {
           setTabSelected(choice);
@@ -64,7 +63,7 @@ function AllContracts() {
       {tabSelected === 0 &&
         <DataView
           status={isInitializing ? 'loading' : 'default'}
-          fields={['Contract', 'Underlying', 'Strike', 'Collateral', 'Expires in', '']}
+          fields={['Contract', 'Protocol', 'Underlying', 'Collateral', 'Expires in', '']}
           page={insurancePage}
           onPageChange={setInsurancePage}
           entries={insurances
@@ -72,14 +71,20 @@ function AllContracts() {
             .sort((oa, ob) => oa.expiry > ob.expiry ? -1 : 1)
           }
           entriesPerPage={6}
-          renderEntry={(option: types.option) => [
+          renderEntry={(option: types.option) => {
+            const isAvve = option.underlying.protocol === 'Aave'
+            const Exchange  = isAvve ? <GoToBalancerButton token={option.addr} /> : <GoToUniswapButton token={option.addr} />
+            return [
             <IdentityBadge label={option.title} entity={option.addr} />,
-            <IdentityBadge label={option.underlying.symbol} entity={option.underlying.addr} />,
-            <IdentityBadge label={option.strike.symbol} entity={option.strike.addr} />,
-            <IdentityBadge label={option.collateral.symbol} entity={option.collateral.addr} />,
+            <ProtocolIcon protocol={option.underlying.protocol}/>,
+            <TokenIcon token={option.underlying}/>,
+            // <TokenIcon token={option.strike}/>,
+            <TokenIcon token={option.collateral}/>,
             <Timer end={new Date(option.expiry * 1000)} format='Mdh' />,
-            <Button onClick={() => goToToken(option.addr)}> View Vaults </Button>,
-          ]}
+            <><Button onClick={() => goToToken(option.addr)}> View Vaults </Button>
+            {Exchange}
+            </>
+          ]}}
         />}
       {tabSelected === 1 &&
         <OptionList
@@ -128,7 +133,7 @@ function OptionList({ isInitializing, entries, showExpired, goToToken, typeText 
         <>{option.strikePriceInUSD + ' USD'}</>,
         new Date(option.expiry * 1000).toLocaleDateString("en-US", { timeZone: "UTC" }),
         <Timer end={new Date(option.expiry * 1000)} format='dhm' />,
-        <Button onClick={() => goToToken(option.addr)}> View Vaults </Button>,
+        <><Button onClick={() => goToToken(option.addr)}> View Vaults </Button><GoToUniswapButton token={option.addr} /></>,
       ]}
     />
   )
