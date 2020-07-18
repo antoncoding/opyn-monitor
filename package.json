@@ -34,9 +34,7 @@
     "start": "npm run sync-assets && react-scripts --max_old_space_size=4096 start",
     "build": "npm run sync-assets && react-scripts --max_old_space_size=4096 build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject",
-    "predeploy": "npm run build",
-    "deploy": "gh-pages -d build"
+    "eject": "react-scripts eject"
   },
   "husky": {
     "hooks": {
@@ -67,7 +65,6 @@
     "eslint-plugin-jsx-a11y": "^6.2.3",
     "eslint-plugin-react": "^7.19.0",
     "eslint-plugin-react-hooks": "^2.5.1",
-    "gh-pages": "^2.2.0",
     "husky": "^3.1.0",
     "lint-staged": "^10.0.10"
   }
