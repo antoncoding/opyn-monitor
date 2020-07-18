@@ -37,13 +37,6 @@ function Footer({ theme } : { theme:string }) {
           <Link external href="https://www.kollateral.co/">
             Kollateral
           </Link>
-          {'. '}
-          Hosted on
-          {' '}
-          {' '}
-          <Link external href="https://github.com/antoncoding/opyn-monitor">
-            GitHub
-          </Link>
         </div>
       )
   );
