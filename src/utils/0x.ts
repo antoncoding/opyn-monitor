@@ -127,7 +127,7 @@ export const createOrder = (maker:string, makerAsset:string, takerAsset:string, 
  * Send orders to the mesh node
  * @param {*} orders
  */
-export const broadcastOrders = async (orders: types.order[]) => {
+export const broadcastOrders = async (orders: types.orderToSubmit[]) => {
   const url = `${endpoint}sra/v3/orders`;
   const res = await fetch(url, {
     method: 'POST',

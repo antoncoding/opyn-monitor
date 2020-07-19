@@ -1,4 +1,4 @@
-import React, { useState, useContext } from 'react';
+import React, { useContext } from 'react';
 
 import {
   Button, IconConnect, Box, IconPower, LinkBase,
@@ -12,23 +12,20 @@ import { userContext } from '../../contexts/userContext'
 
 function ConnectButton() {
   const { user, setUser } = useContext(userContext)
-  const [isConnected, setIsConnected] = useState(false);
 
   const connectWeb3 = async () => {
     const address = await connect();
     if (address === false) return;
-    setIsConnected(true);
     setUser(address);
     checkAddressAndAddToStorage(address);
   };
 
   const disconnectWeb3 = async () => {
     await disconnect();
-    setIsConnected(false);
     setUser('');
   };
 
-  return isConnected ? (
+  return user !== '' ? (
     <>
       <div style={{ paddingTop: 5, paddingRight: 5 }}>
         <LinkBase onClick={disconnectWeb3} size="small">

@@ -39,3 +39,23 @@ export type order = {
     remainingFillableTakerAssetAmount: string
   }
 }
+
+export type orderToSubmit = {
+  chainId: number;
+  exchangeAddress: string;
+  makerAddress: string;
+  takerAddress: string;
+  feeRecipientAddress: string;
+  senderAddress: string;
+  makerAssetAmount: BigNumber;
+  takerAssetAmount: BigNumber;
+  makerFee: BigNumber;
+  takerFee: BigNumber;
+  expirationTimeSeconds: BigNumber;
+  salt: BigNumber;
+  makerAssetData: string;
+  takerAssetData: string;
+  makerFeeAssetData: string;
+  takerFeeAssetData: string;
+  signature: string;
+}

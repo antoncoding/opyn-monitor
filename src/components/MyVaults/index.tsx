@@ -137,7 +137,7 @@ function MyVaults() {
               status={isInitializing || isLoading ? 'loading' : 'default'}
               fields={['Token', 'contract', 'collateral', 'Ratio', '']}
               entries={displayVaults}
-              entriesPerPage={6}
+              entriesPerPage={5}
               page={vaultListPage}
               onPageChange={setVPage}
               renderEntry={({
@@ -160,6 +160,7 @@ function MyVaults() {
                 fields={['Token', 'contract', 'manage']}
                 entries={tokensToOpen}
                 page={openVaultPage}
+                entriesPerPage={5}
                 onPageChange={setOPage}
                 renderEntry={(option: types.option) => {
                   return [

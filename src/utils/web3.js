@@ -7,7 +7,7 @@ import Onboard from 'bnc-onboard';
 
 import { notify } from './blockNative.ts';
 import { getAllowance, getPremiumToPay } from './infura';
-import { getPreference } from './storage.ts';
+import { getPreference, storePreference } from './storage.ts';
 import {
   ETH_ADDRESS,
   Kollateral_Liquidator,
@@ -37,33 +37,50 @@ const FORTMATIC_KEY = process.env.REACT_APP_FORTMATIC_KEY;
 
 let web3;
 
-const onboard = Onboard({
-  darkMode: getPreference('theme', 'light') === 'dark',
-  dappId: BLOCKNATIVE_KEY, // [String] The API key created by step one above
-  networkId: 1, // [Integer] The Ethereum network ID your Dapp uses.
-  subscriptions: {
-    wallet: (wallet) => {
-      web3 = new Web3(wallet.provider);
+let onboard;
+
+export const initOnboard = async (setAddressCallback) => {
+  const previouslySelectedWallet = getPreference('selectedWallet', null);
+
+  onboard = Onboard({
+    darkMode: getPreference('theme', 'light') === 'dark',
+    dappId: BLOCKNATIVE_KEY, // [String] The API key created by step one above
+    networkId: 1, // [Integer] The Ethereum network ID your Dapp uses.
+    subscriptions: {
+      address: setAddressCallback,
+      wallet: (wallet) => {
+        storePreference('selectedWallet', wallet.name);
+        web3 = new Web3(wallet.provider);
+      },
     },
-  },
-  walletSelect: {
-    description: 'Please select a wallet to connect to Opyn Monitor',
-    wallets: [
-      { walletName: 'metamask' },
-      {
-        walletName: 'walletConnect',
-        infuraKey: INFURA_KEY,
-      },
-      {
-        walletName: 'fortmatic',
-        apiKey: FORTMATIC_KEY,
-      },
-      { walletName: 'trust' },
-      { walletName: 'coinbase' },
-      { walletName: 'status' },
-    ],
-  },
-});
+    walletSelect: {
+      description: 'Please select a wallet to connect to Opyn Monitor',
+      wallets: [
+        { walletName: 'metamask' },
+        {
+          walletName: 'walletConnect',
+          infuraKey: INFURA_KEY,
+        },
+        {
+          walletName: 'fortmatic',
+          apiKey: FORTMATIC_KEY,
+        },
+        { walletName: 'trust' },
+        { walletName: 'coinbase' },
+        { walletName: 'status' },
+      ],
+    },
+  });
+
+  // call wallet select with that value if it exists
+  if (previouslySelectedWallet != null) {
+    const selected = await onboard.walletSelect(previouslySelectedWallet);
+    if (selected) {
+      const address = onboard.getState().address;
+      setAddressCallback(address);
+    }
+  }
+};
 
 export const updateModalMode = async (theme) => {
   const darkMode = theme === 'dark';
