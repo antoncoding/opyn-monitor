@@ -17,7 +17,7 @@ export const OPYN_ETH = {
 export const cDAI = {
   addr: '0x5d3a536e4d6dbd6114cc1ead35777bab948e3643',
   decimals: 8,
-  symbol: 'cDai',
+  symbol: 'cDAI',
   img: imgs.cDAI,
   protocol: 'Compound',
 };
