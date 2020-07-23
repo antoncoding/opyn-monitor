@@ -10,6 +10,8 @@ import UniswapLogo from '../../imgs/uniswap.png'
 import BalancerLogo from '../../imgs/balancer.png'
 import tracker from '../../utils/tracker';
 
+import { WETH } from '../../constants/contracts'
+
 export function GoToUniswapButton({ token }: { token: string }) {
   return (
     <Button onClick={() => {
@@ -56,7 +58,7 @@ export function GoToBalancerButton({ token }: { token: string }) {
         action: 'balancer',
       })
       window.open(
-        `https://balancer.exchange/#/swap/${token}`,
+        `https://balancer.exchange/#/swap/${WETH}/${token}`,
         '_blank',
       )
     }
