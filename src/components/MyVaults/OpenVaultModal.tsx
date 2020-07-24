@@ -92,7 +92,9 @@ function OpenVaultModal({ user, option }: openVaultModalProps) {
   useEffect(()=>{
     if(option.title === 'insurance') return 
     if(option.type === 'put') {
-      const newAmountMinted = collateralAmt.div((option as types.ETHOption).strikePriceInUSD)
+      const scale = new BigNumber(10).exponentiatedBy(option.decimals)
+      const newAmountMinted = collateralAmt.times(scale)
+        .div((option as types.ETHOption).strikePriceInUSD).integerValue().div(scale)
       setMintTokenAmt(newAmountMinted)
     } else {
       const newAmountMinted = collateralAmt.times((option as types.ETHOption).strikePriceInUSD)
