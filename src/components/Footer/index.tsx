@@ -1,26 +1,33 @@
 import React from 'react';
 import { useHistory } from 'react-router-dom';
-import { Link } from '@aragon/ui';
+import { Link, useTheme } from '@aragon/ui';
 
-function Footer({ theme } : { theme:string }) {
+function Footer({ theme }: { theme: string }) {
   const history = useHistory();
-
+  const themeObj = useTheme();
   return (
     history.location.pathname.includes('/trade/')
       ? <></>
       : (
         <div style={{
-          backgroundColor: theme === 'light' ? '#F8F8F8' : '#35425e',
+          backgroundColor: themeObj.warningSurface,
           textAlign: 'center',
           padding: '12px',
           position: 'fixed',
           left: '0',
           bottom: '0',
-          height: '40px',
+          height: '50px',
           width: '100%',
-          fontSize: '14px'
+          fontSize: '15px'
         }}>
-          Powered By
+          There was a recent vulnerability with the ETH puts. Affected users, please see{' '}
+          <Link
+            external href="https://medium.com/opyn/opyn-eth-put-exploit-c5565c528ad2?postPublishedType=repub"
+          >
+            this post
+                </Link>
+                . Please do not open vaults or buy/sell oETH puts.
+          {/* Powered By
           {' '}
           <Link external href="https://opyn.co/#/">
             Opyn
@@ -40,7 +47,7 @@ function Footer({ theme } : { theme:string }) {
           {'. View source code on '}
           <Link external href="https://github.com/antoncoding/opyn-monitor/">
             GitHub
-          </Link>
+          </Link> */}
         </div>
       )
   );
