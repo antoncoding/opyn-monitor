@@ -1,15 +1,15 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import 'react-widgets/dist/css/react-widgets.css';
-import 'bootstrap/dist/css/bootstrap-grid.css';
+// import 'react-widgets/dist/css/react-widgets.css';
+// import 'bootstrap/dist/css/bootstrap-grid.css';
 import App from './App';
 import * as serviceWorker from './serviceWorker';
 
-import Moment from 'moment'
-import momentLocalizer from 'react-widgets-moment';
+// import Moment from 'moment'
+// import momentLocalizer from 'react-widgets-moment';
 
-Moment.locale('en')
-momentLocalizer()
+// Moment.locale('en')
+// momentLocalizer()
 
 ReactDOM.render(<App />, document.getElementById('root'));
 

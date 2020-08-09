@@ -5,12 +5,12 @@ import {
   Tabs
 } from '@aragon/ui'
 
-import CreateETHOption from './CreateETHOption'
-import CreateCustomOption from './CreateCustomOption'
+// import CreateETHOption from './CreateETHOption'
+// import CreateCustomOption from './CreateCustomOption'
 
-const today = new Date(new Date().toDateString())
-const localOffset = today.getTimezoneOffset() * 60000; // in millisecond
-const tomorrow = new Date(today.getTime() + (24 * 60 * 60 * 1000) + localOffset);
+// const today = new Date(new Date().toDateString())
+// const localOffset = today.getTimezoneOffset() * 60000; // in millisecond
+// const tomorrow = new Date(today.getTime() + (24 * 60 * 60 * 1000) + localOffset);
 
 function CreateOption({ user }: { user: string }) {
 
@@ -28,10 +28,10 @@ function CreateOption({ user }: { user: string }) {
         selected={selectedTab}
         onChange={setSelectedTab}
       />
-      {selectedTab === 0
+      {/* {selectedTab === 0
         ? <CreateETHOption user={user} /> 
         : <CreateCustomOption user={user} localOffset={localOffset} today={today} tomorrow={tomorrow} />
-      }
+      } */}
       
     </>
   )

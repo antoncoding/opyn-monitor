@@ -19,7 +19,6 @@ import ExchangeList from './components/ExchangeList/index';
 import UniswapExchanges from './components/UniswapExchange';
 import TradeOnUniswap from './components/TradeUniswap'
 import TradeOn0x from './components/Trade0x';
-import BalancerDemo from './components/Balancer'
 import Footer from './components/Footer';
 
 function App() {
@@ -82,7 +81,6 @@ function App() {
 
           <Route path="/uniswap/"><Layout><ExchangeList/></Layout></Route>
 
-          <Route path="/balancer/"><Layout><BalancerDemo /></Layout></Route>
           {/* HomePage */}
           <Route path="/"><Layout><HomePage /></Layout></Route>
           {/* </Layout> */}

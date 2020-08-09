@@ -20,11 +20,8 @@
     "react-bootstrap": "^1.0.1",
     "react-dom": "^16.12.0",
     "react-ga": "^2.7.0",
-    "react-items-carousel": "^2.8.0",
     "react-router-dom": "^5.1.2",
     "react-scripts": "3.4.0",
-    "react-widgets": "^4.5.0",
-    "react-widgets-moment": "^4.0.20",
     "styled-components": "^5.1.0",
     "typescript": "^3.8.3",
     "web3": "^1.2.6"

@@ -1,49 +1,49 @@
 import React, { useState } from 'react'
 import BigNumber from 'bignumber.js'
-import ItemsCarousel from 'react-items-carousel';
-import FieldCard from './FieldCard'
-import ConfirmBox from './ConfirmETHOptionBox'
-import DateTimePicker from 'react-widgets/lib/DateTimePicker'
+// import ItemsCarousel from 'react-items-carousel';
+// import FieldCard from './FieldCard'
+// import ConfirmBox from './ConfirmETHOptionBox'
+// import DateTimePicker from 'react-widgets/lib/DateTimePicker'
 
 import {
-  IconArrowRight,
-  IconArrowLeft,
-  Button,
+  // IconArrowRight,
+  // IconArrowLeft,
+  // Button,
   ProgressBar,
-  TextInput,
-  useTheme
+  // TextInput,
+  // useTheme
 } from '@aragon/ui'
-import { GroupButton, GroupButtonWrapper } from './GroupButton'
+// import { GroupButton, GroupButtonWrapper } from './GroupButton'
 
 type CreateOETHProps = {
   user: string
 }
 
-const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone
+// const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone
 
-function CreateOETH({ user }: CreateOETHProps) {
+function CreateOETH() {
 
-  const theme = useTheme()
+  // const theme = useTheme()
   // put or call
-  const [putOrCall, setPutOrCall] = useState<0|1>(0)
-  const [americanOrEuropean, setAmOrEuro] = useState<0|1>(0)
+  // const [putOrCall, setPutOrCall] = useState<0|1>(0)
+  // const [americanOrEuropean, setAmOrEuro] = useState<0|1>(0)
   // strike price
-  const [strikePriceForoETH, setStrikePriceForOETH] = useState<number>(200)
-  const strikePriceIsValid = new BigNumber(strikePriceForoETH).mod(10).eq(0)
+  // const [strikePriceForoETH, setStrikePriceForOETH] = useState<number>(200)
+  // const strikePriceIsValid = new BigNumber(strikePriceForoETH).mod(10).eq(0)
 
-  const [expiration, setExpiration] = useState<Date>(new Date())
+  // const [expiration, setExpiration] = useState<Date>(new Date())
 
   // index of ItemsCarousel
-  const [step, setStep] = useState(3)
-  const [progress, setProgress] = useState(0)
+  // const [step, setStep] = useState(3)
+  // const [progress, setProgress] = useState(0)
 
-  const onChangeDatePicker = (dateTime:Date) => {
-    setExpiration(dateTime)
-  }
+  // const onChangeDatePicker = (dateTime:Date) => {
+    // setExpiration(dateTime)
+  // }
 
   return (
     <>
-      <ItemsCarousel
+      {/* <ItemsCarousel
         requestToChangeActive={setStep}
         activeItemIndex={step}
         numberOfCards={1}
@@ -51,9 +51,9 @@ function CreateOETH({ user }: CreateOETHProps) {
         leftChevron={<Button label="prev" icon={<IconArrowLeft />} display="icon" />}
         outsideChevron={false}
         chevronWidth={40}
-      >
+      > */}
         {/* Option Type */}
-        <FieldCard
+        {/* <FieldCard
           title={'Option Type'}
           description="American or European?"
           child={
@@ -68,9 +68,9 @@ function CreateOETH({ user }: CreateOETHProps) {
                 ))}
               </GroupButtonWrapper>
             </div>}
-        />
+        /> */}
         {/* Call or Put */}
-        <FieldCard
+        {/* <FieldCard
           title={'Option Type'}
           description="Put or Call?"
           child={
@@ -85,9 +85,9 @@ function CreateOETH({ user }: CreateOETHProps) {
                 ))}
               </GroupButtonWrapper>
             </div>}
-        />
+        /> */}
         {/* StrikePrice */}
-        <FieldCard
+        {/* <FieldCard
           title={'Strike Price'}
           description="Enter Strike Price"
           child={
@@ -105,8 +105,8 @@ function CreateOETH({ user }: CreateOETHProps) {
               }
             </div>
           }
-        />
-        <FieldCard
+        /> */}
+        {/* <FieldCard
           title={'Expiration'}
           description={`Choose Expiration Time (${timezone})`}
           child={
@@ -115,8 +115,8 @@ function CreateOETH({ user }: CreateOETHProps) {
                 onChange={onChangeDatePicker}
                 />
             </div>
-          } />
-        <ConfirmBox
+          } /> */}
+        {/* <ConfirmBox
           user={user}
           putOrCall={putOrCall}
           americanOrEuropean={americanOrEuropean}
@@ -124,10 +124,10 @@ function CreateOETH({ user }: CreateOETHProps) {
           strikePriceIsValid={strikePriceIsValid}
           expiration={expiration}
           setProgress={setProgress}
-        />
+        /> */}
 
-      </ItemsCarousel>
-      <ProgressBar value={progress ? progress : step / 5} />
+      {/* </ItemsCarousel> */}
+      {/* <ProgressBar value={progress ? progress : step / 5} /> */}
     </>
   )
 
