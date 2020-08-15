@@ -8,6 +8,8 @@ import CompoundProtocol from './compound.svg';
 import ETH from './eth.png';
 import USDC from './usdc.png';
 import COMP from './comp.svg';
+import YFI from './yearn.svg';
+
 // Aave tokens
 import aUSDC from './aUSDC.svg';
 // Compound tokens
@@ -22,6 +24,7 @@ export {
   CompoundProtocol,
   ETH,
   COMP,
+  YFI,
   USDC,
   aUSDC,
   cDAI,

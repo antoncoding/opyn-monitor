@@ -76,4 +76,11 @@ export const BAL = {
   img: imgs.BalancerLogo,
 };
 
+export const YFI = {
+  addr: '0x0bc529c00c6401aef6d220be8c6ea1667f6ad93e',
+  decimals: 18,
+  symbol: 'YFI',
+  img: imgs.YFI,
+};
+
 export const knownTokens = [USDC, OPYN_ETH, cDAI, cUSDC, CurveFi, WETH, DAI, yDAI, aUSDC, COMP, BAL];
