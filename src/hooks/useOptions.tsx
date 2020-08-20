@@ -6,7 +6,7 @@ import BigNumber from 'bignumber.js';
 import * as types from '../types';
 import { getAllOptions, getUniswapExchanges, optionTheGraph } from '../utils/graph';
 import { getUniswapExchangeAddress, getERC20Symbol, getERC20Name } from '../utils/infura';
-import { knownTokens, COMP, BAL, USDC, OPYN_ETH } from '../constants/tokens';
+import { knownTokens, COMP, BAL, USDC, OPYN_ETH, WETH } from '../constants/tokens';
 import { blackList } from '../constants/options'
 import { EMPTY_EXCHANGE } from '../constants/contracts';
 
@@ -185,14 +185,14 @@ const categorizeOptions = (
 
   options.forEach((option) => {
     if (option.name === '') return;
-    if (option.collateral === USDC && option.strike === USDC && option.underlying === OPYN_ETH) {
-      // const strikePriceInUSD = parseStrikePriceUSDCFromName(option, 'put')
-      // const put = {
-      //   ...option,
-      //   type: 'put' as 'put',
-      //   strikePriceInUSD,
-      // };
-      // ethPuts.push(put);
+    if (option.collateral === USDC && option.strike === USDC && option.underlying === WETH) {
+      const strikePriceInUSD = parseStrikePriceUSDCFromName(option, 'put')
+      const put = {
+        ...option,
+        type: 'put' as 'put',
+        strikePriceInUSD,
+      };
+      ethPuts.push(put);
     } else if (
       option.collateral === OPYN_ETH &&
       option.strike === OPYN_ETH &&
@@ -214,7 +214,7 @@ const categorizeOptions = (
       };
       otherPuts.push(put);
     } else {
-      insurances.push(option);
+      if (option.underlying !== OPYN_ETH) insurances.push(option);
     }
   });
 
