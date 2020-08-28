@@ -6,7 +6,7 @@ import BigNumber from 'bignumber.js';
 import * as types from '../types';
 import { getAllOptions, getUniswapExchanges, optionTheGraph } from '../utils/graph';
 import { getUniswapExchangeAddress, getERC20Symbol, getERC20Name } from '../utils/infura';
-import { knownTokens, COMP, BAL, USDC, OPYN_ETH, WETH, YFI } from '../constants/tokens';
+import { knownTokens, COMP, BAL, USDC, OPYN_ETH, WETH, YFI, CRV } from '../constants/tokens';
 import { blackList } from '../constants/options'
 import { EMPTY_EXCHANGE } from '../constants/contracts';
 
@@ -18,7 +18,7 @@ import Promise from 'bluebird';
 const ERC20InfoAndExchangeKey = 'ERC20InfoAndExchanges';
 
 // Only accept comp or bal options to show in "Other options"
-export const isOtherOptions = (token) => token === COMP || token === BAL || token === YFI;
+export const isOtherOptions = (token) => token === COMP || token === BAL || token === YFI || token === CRV;
 
 type storedERC20Info = {
   address: string;

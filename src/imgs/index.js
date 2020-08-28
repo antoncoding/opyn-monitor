@@ -9,6 +9,7 @@ import ETH from './eth.png';
 import USDC from './usdc.png';
 import COMP from './comp.svg';
 import YFI from './yearn.svg';
+import CRV from './crv.png';
 
 // Aave tokens
 import aUSDC from './aUSDC.svg';
@@ -25,6 +26,7 @@ export {
   ETH,
   COMP,
   YFI,
+  CRV,
   USDC,
   aUSDC,
   cDAI,

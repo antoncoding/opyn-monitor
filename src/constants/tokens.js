@@ -83,4 +83,11 @@ export const YFI = {
   img: imgs.YFI,
 };
 
-export const knownTokens = [USDC, OPYN_ETH, cDAI, cUSDC, CurveFi, WETH, DAI, yDAI, aUSDC, COMP, BAL, YFI];
+export const CRV = {
+  addr: '0xd533a949740bb3306d119cc777fa900ba034cd52',
+  decimals: 18,
+  symbol: 'CRV',
+  img: imgs.CRV,
+};
+
+export const knownTokens = [USDC, OPYN_ETH, cDAI, cUSDC, CurveFi, WETH, DAI, yDAI, aUSDC, COMP, BAL, YFI, CRV];
