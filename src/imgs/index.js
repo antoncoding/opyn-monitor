@@ -10,6 +10,7 @@ import USDC from './usdc.png';
 import COMP from './comp.svg';
 import YFI from './yearn.svg';
 import CRV from './crv.png';
+import UNI from './uni.png';
 
 // Aave tokens
 import aUSDC from './aUSDC.svg';
@@ -27,6 +28,7 @@ export {
   COMP,
   YFI,
   CRV,
+  UNI,
   USDC,
   aUSDC,
   cDAI,

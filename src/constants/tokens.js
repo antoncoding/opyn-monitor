@@ -90,4 +90,11 @@ export const CRV = {
   img: imgs.CRV,
 };
 
-export const knownTokens = [USDC, OPYN_ETH, cDAI, cUSDC, CurveFi, WETH, DAI, yDAI, aUSDC, COMP, BAL, YFI, CRV];
+export const UNI = {
+  addr: '0x1f9840a85d5af5bf1d1762f925bdaddc4201f984',
+  decimals: 18,
+  symbol: 'UNI',
+  img: imgs.UNI,
+};
+
+export const knownTokens = [USDC, OPYN_ETH, cDAI, cUSDC, CurveFi, WETH, DAI, yDAI, aUSDC, COMP, BAL, YFI, CRV, UNI];
