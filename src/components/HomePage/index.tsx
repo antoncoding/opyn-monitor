@@ -40,7 +40,7 @@ function HomePage() {
         <div style={{ width: '30%', marginLeft: '3%', marginRight: '2%' }}>
           <MainButton
             title="Trade"
-            description="Trade ETH Options on Uniswap."
+            description="Trade Options on Uniswap."
             iconUrl={UniswapLogo}
             onClick={() => {
               history.push('/trade/uniswap/');
