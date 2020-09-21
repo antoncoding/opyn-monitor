@@ -58,7 +58,7 @@ export const useOptions = () => {
     let isCancelled = false
 
     if (!isCancelled && InitData){ 
-      setOptions(InitData.insurances.concat(InitData.ethCalls).concat(InitData.ethPuts).concat(InitData.otherPuts))
+      setOptions(InitData.insurances.concat(InitData.ethCalls).concat(InitData.ethPuts).concat(InitData.otherPuts).concat(InitData.otherCalls))
       setInsurances(InitData.insurances)
       setEthCalls(InitData.ethCalls)
       setEthPuts(InitData.ethPuts)

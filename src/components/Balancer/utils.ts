@@ -74,7 +74,6 @@ export function getIVCorrandoMiller(
   const f3 = f2.pow(2)
   const f4 = (ethPrice.minus(strikePrice)).div(PI)
   const iv = f1.times(f2.plus((f3.minus(f4).sqrt())))
-  // console.log(`getIVCorrandoMiller iv`, iv.toNumber())  
   return iv
 }
 
