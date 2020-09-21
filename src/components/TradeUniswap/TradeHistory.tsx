@@ -60,6 +60,7 @@ function TradeHistory({ user, allOptions }: MyPositionsProps) {
         // add this into array so won't double search.
         paymentTokens.push(paymentToken)
       }
+      
       const price = (new BigNumber(buy.premiumPaid) // 1000 dai * dai decimals
         .times(new BigNumber(buy.paymentTokenPrice)) // each dai is 11000000 wei
         .div(new BigNumber(buy.usdcPrice))) // each usd is 11000000 wei

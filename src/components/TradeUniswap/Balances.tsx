@@ -50,7 +50,6 @@ function Balances({ tokenPrices, balances, allOptions }: MyPositionsProps) {
 
   return (
     <>
-      <Box heading="Total USD Value" > {totalValueUSD.toFixed(2)} USD </Box>
       <DataView
         fields={['Token', 'Balance','Price', 'Total value']}
         entries={rows}
@@ -65,6 +64,7 @@ function Balances({ tokenPrices, balances, allOptions }: MyPositionsProps) {
           value.toFixed(3) + ' USD'
         ]}
       />
+      <Box heading="Total USD Value" > {totalValueUSD.toFixed(2)} USD </Box>
     </>
   );
 }

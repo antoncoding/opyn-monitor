@@ -15,7 +15,8 @@ import { getPreference, storePreference } from '../../utils/storage'
 type UserDataProps = {
   user: string,
   allOptions: types.ethOptionWithStat[]
-  spotPrice: BigNumber
+  selectedOptions: types.ethOptionWithStat[]
+  underlyingSpotPrice: BigNumber
   tokenPrices: {
     oToken: string,
     price: BigNumber
@@ -26,7 +27,7 @@ type UserDataProps = {
   }[]
 }
 
-function UserData({ user, spotPrice, tokenPrices, balances, allOptions }: UserDataProps) {
+function UserData({ user, underlyingSpotPrice, tokenPrices, balances, selectedOptions, allOptions }: UserDataProps) {
 
   const [selectedTab, setSelectedTab] = useState(parseInt(getPreference('greekboardtab', '0')))
   
@@ -54,8 +55,8 @@ function UserData({ user, spotPrice, tokenPrices, balances, allOptions }: UserDa
           ? <Comment text="Connect wallet to see more detail"></Comment>
           : (selectedTab === 0 ? <Positions
             user={user}
-            allOptions={allOptions}
-            spotPrice={spotPrice}
+            allOptions={selectedOptions}
+            underlyingSpotPrice={underlyingSpotPrice}
             tokenPrices={tokenPrices}
             balances={balances}
           /> : selectedTab === 1 ? <Balances 
