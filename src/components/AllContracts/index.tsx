@@ -21,7 +21,8 @@ function AllContracts() {
     insurances,
     ethCalls,
     ethPuts,
-    otherPuts
+    otherPuts,
+    otherCalls
   } = useOptions()
 
   const storedOptionTab = getPreference('optionTab', '0');
@@ -79,7 +80,7 @@ function AllContracts() {
       {tabSelected === 2 &&
         <OtherOptionList
           isInitializing={isInitializing}
-          entries={otherPuts}
+          entries={otherCalls.concat(otherPuts)}
           showExpired={showExpired}
           goToToken={goToToken}
         />

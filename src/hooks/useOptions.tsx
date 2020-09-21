@@ -18,7 +18,7 @@ import Promise from 'bluebird';
 const ERC20InfoAndExchangeKey = 'ERC20InfoAndExchanges';
 
 // Only accept comp or bal options to show in "Other options"
-export const isOtherOptions = (token) => 
+export const isValidAsset = (token) => 
   token === COMP || 
   token === BAL || 
   token === YFI || 
@@ -40,12 +40,14 @@ export const useOptions = () => {
   const [ethPuts, setEthPuts] = useState<types.ethOptionWithStat[]>([])
   const [ethCalls, setEthCalls] = useState<types.ethOptionWithStat[]>([])
   const [otherPuts, setOtherPuts] = useState<types.ethOptionWithStat[]>([])
+  const [otherCalls, setOtherCalls] = useState<types.ethOptionWithStat[]>([])
 
   const InitData =  useAsyncMemo <{
     insurances: types.optionWithStat[];
     ethPuts: types.ethOptionWithStat[];
     ethCalls: types.ethOptionWithStat[];
     otherPuts: types.ethOptionWithStat[];
+    otherCalls: types.ethOptionWithStat[];
   } | null > (
     async() => {
       return await initOptions()
@@ -61,6 +63,7 @@ export const useOptions = () => {
       setEthCalls(InitData.ethCalls)
       setEthPuts(InitData.ethPuts)
       setOtherPuts(InitData.otherPuts)
+      setOtherCalls(InitData.otherCalls)
       setInitializing(false)
     }
 
@@ -69,7 +72,7 @@ export const useOptions = () => {
     }
   }, [InitData])
 
-  return {options, insurances, ethPuts, ethCalls, otherPuts, isInitializing}
+  return {options, insurances, ethPuts, ethCalls, otherPuts, otherCalls, isInitializing}
 }
 
 /**
@@ -182,11 +185,13 @@ const categorizeOptions = (
   ethPuts: types.ethOptionWithStat[];
   ethCalls: types.ethOptionWithStat[];
   otherPuts: types.ethOptionWithStat[];
+  otherCalls: types.ethOptionWithStat[];
 } => {
   const insurances: types.optionWithStat[] = [];
   const ethPuts: types.ethOptionWithStat[] = [];
   const ethCalls: types.ethOptionWithStat[] = [];
   const otherPuts: types.ethOptionWithStat[] = [];
+  const otherCalls: types.ethOptionWithStat[] = [];
 
   options.forEach((option) => {
     if (option.name === '') return;
@@ -210,7 +215,7 @@ const categorizeOptions = (
         strikePriceInUSD,
       };
       ethCalls.push(call);
-    }  else if (option.collateral === USDC && option.strike === USDC && isOtherOptions(option.underlying)) {
+    }  else if (option.collateral === USDC && option.strike === USDC && isValidAsset(option.underlying)) {
       const strikePriceInUSD = parseStrikePriceUSDCFromName(option, 'put')
       const put = {
         ...option,
@@ -218,12 +223,20 @@ const categorizeOptions = (
         strikePriceInUSD,
       };
       otherPuts.push(put);
+    } else if (isValidAsset(option.collateral) && isValidAsset(option.strike) && option.underlying === USDC) {
+      const strikePriceInUSD = parseStrikePriceUSDCFromName(option, 'call')
+      const call = {
+        ...option,
+        type: 'call' as 'call',
+        strikePriceInUSD
+      }
+      otherCalls.push(call)
     } else {
       if (option.underlying !== OPYN_ETH) insurances.push(option);
     }
   });
 
-  return { insurances, ethPuts, ethCalls, otherPuts };
+  return { insurances, ethPuts, ethCalls, otherPuts, otherCalls };
 };
 
 const parseStrikePriceUSDCFromName = (option: types.optionWithStat, type: 'call'|'put') => {

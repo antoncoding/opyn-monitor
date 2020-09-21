@@ -29,7 +29,7 @@ export function OtherOptionList({ isInitializing, entries, showExpired, goToToke
       entriesPerPage={6}
       renderEntry={(option: types.ETHOption) => [
         <IdentityBadge label={option.title} entity={option.addr} shorten={false} />,
-        <TokenIcon token={option.underlying}/>,
+        option.type === 'put' ? <TokenIcon token={option.underlying}/> : <TokenIcon token={option.strike}/>,
         <>{option.strikePriceInUSD + ' USD'}</>,
         <Timer end={new Date(option.expiry * 1000)} format='dhm' />,
         <><Button onClick={() => goToToken(option.addr)}> View Vaults </Button><GoToUniswapButton token={option.addr} /></>,
