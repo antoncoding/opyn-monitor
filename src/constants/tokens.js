@@ -97,4 +97,11 @@ export const UNI = {
   img: imgs.UNI,
 };
 
-export const knownTokens = [USDC, OPYN_ETH, cDAI, cUSDC, CurveFi, WETH, DAI, yDAI, aUSDC, COMP, BAL, YFI, CRV, UNI];
+export const SNX = {
+  addr: '0xc011a73ee8576fb46f5e1c5751ca3b9fe0af2a6f',
+  decimals: 18,
+  symbol: 'SNX',
+  img: imgs.SNX,
+};
+
+export const knownTokens = [USDC, OPYN_ETH, cDAI, cUSDC, CurveFi, WETH, DAI, yDAI, aUSDC, COMP, BAL, YFI, CRV, UNI, SNX];
