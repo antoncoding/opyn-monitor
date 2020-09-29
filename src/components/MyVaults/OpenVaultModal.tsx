@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useHistory } from 'react-router-dom';
 
 import {
@@ -120,6 +120,12 @@ function OpenVaultModal({ user, option }: openVaultModalProps) {
   const close = useCallback(() => setOpened(false), []);
   // const close = () => setOpened(false);
 
+  const tokenSymbol = useMemo(() => option.type === 'insurance'
+  ? option.symbol.split(' ')[0]
+  : option.type === 'call' 
+    ? `o${option.strike.symbol}c` 
+    : `o${option.underlying.symbol}p`, [option])
+
   return (
     <>
       {/* Button */}
@@ -158,17 +164,12 @@ function OpenVaultModal({ user, option }: openVaultModalProps) {
                 value={mintTokenAmt.toNumber() || 0}
                 onChange={(event: React.ChangeEvent<HTMLInputElement>) => onMintTokenAmtChange(event.target.value)}
                 adornmentPosition="end"
-                adornment={option.type === 'insurance'
-                ? option.symbol.split(' ')[0]
-                : option.type === 'call' 
-                  ? `o${option.strike.symbol}c` 
-                  : `o${option.underlying.symbol}p` 
-                }
+                adornment={tokenSymbol}
               />
             </div>
           </div>
           { option.type === 'call'
-            ? <WarningText text={`1 ${option.collateral.symbol} can create ${(option as types.ETHOption).strikePriceInUSD} oETHc`} />
+            ? <WarningText text={`1 ${option.collateral.symbol} can create ${(option as types.ETHOption).strikePriceInUSD} ${tokenSymbol}`} />
             : <></>}
           <Button label="Mint" onClick={mint} />
           { ratio === Infinity
