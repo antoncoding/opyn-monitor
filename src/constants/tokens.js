@@ -104,4 +104,11 @@ export const SNX = {
   img: imgs.SNX,
 };
 
-export const knownTokens = [USDC, OPYN_ETH, cDAI, cUSDC, CurveFi, WETH, DAI, yDAI, aUSDC, COMP, BAL, YFI, CRV, UNI, SNX];
+export const WBTC = {
+  addr: '0x2260fac5e5542a773aa44fbcfedf7c193bc2c599',
+  decimals: 8,
+  symbol: 'WBTC',
+  img: imgs.WBTC,
+};
+
+export const knownTokens = [USDC, OPYN_ETH, cDAI, cUSDC, CurveFi, WETH, DAI, yDAI, aUSDC, COMP, BAL, YFI, CRV, UNI, SNX, WBTC];
