@@ -15,6 +15,7 @@ export const blackList = [
   "0x0840fa4a72c5bd400f7f6d0a1496e37f935d0675",
   //
   "0x632882f82c7023f17133fe894263b8b10f6ef2b4", // testing comp
+  "0x06e9061947c592f07fb66e569aa3052fa230b068", // wrong dpi option
 ]
 
 export const defaultOption: optionWithStat = {
