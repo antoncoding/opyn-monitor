@@ -111,4 +111,13 @@ export const WBTC = {
   img: imgs.WBTC,
 };
 
-export const knownTokens = [USDC, OPYN_ETH, cDAI, cUSDC, CurveFi, WETH, DAI, yDAI, aUSDC, COMP, BAL, YFI, CRV, UNI, SNX, WBTC];
+export const DPI = {
+  addr: '0x1494ca1f11d487c2bbe4543e90080aeba4ba3c2b',
+  decimals: 18,
+  symbol: 'DPI',
+  img: imgs.DPI,
+};
+
+export const knownTokens = [
+  USDC, OPYN_ETH, cDAI, cUSDC, CurveFi, WETH, DAI, yDAI, aUSDC, COMP, BAL, YFI, CRV, UNI, SNX, WBTC, DPI,
+];
