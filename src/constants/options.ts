@@ -18,6 +18,10 @@ export const blackList = [
   "0x06e9061947c592f07fb66e569aa3052fa230b068", // wrong dpi option
 ]
 
+export const noPoolList = [
+  "0xe0357e100a1c01e9f86a9ac9cb0b63637d55b7d7"
+]
+
 export const defaultOption: optionWithStat = {
   title: '',
   addr: '',

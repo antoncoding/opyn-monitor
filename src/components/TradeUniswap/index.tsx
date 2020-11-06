@@ -13,6 +13,7 @@ import { getUserOptionBalances } from '../../utils/graph'
 import { WETH, OPYN_ETH } from '../../constants/tokens'
 import tracker from '../../utils/tracker';
 import * as types from '../../types';
+import { noPoolList } from '../../constants/options';
 
 const Promise = require('bluebird')
 
@@ -31,7 +32,9 @@ function TradeUniswap() {
   
   // set all options
   const allOptions = useMemo(()=>{
-    return puts.concat(calls).concat(otherPuts).concat(otherCalls).filter((o) => o.expiry > Date.now() / 1000)
+    return puts.concat(calls).concat(otherPuts).concat(otherCalls)
+      .filter((o) => o.expiry > Date.now() / 1000)
+      .filter((o) => !noPoolList.includes(o.addr))
   }, [puts, calls, otherPuts, otherCalls])
 
   // const [selectedType, setSelectedType] = useState(0)

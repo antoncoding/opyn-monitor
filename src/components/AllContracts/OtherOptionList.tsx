@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
-// import { useHistory } from 'react-router-dom';
+
 import {
-  DataView, IdentityBadge, Button, Timer
+  DataView, IdentityBadge, Button, Timer, IconProhibited
 } from '@aragon/ui';
 
 import { GoToUniswapButton, TokenIcon } from '../common';
-
+import { noPoolList } from '../../constants/options'
 import * as types from '../../types'
 
 
@@ -27,13 +27,17 @@ export function OtherOptionList({ isInitializing, entries, showExpired, goToToke
       page={page}
       onPageChange={setPage}
       entriesPerPage={6}
-      renderEntry={(option: types.ETHOption) => [
-        <IdentityBadge label={option.title} entity={option.addr} shorten={false} />,
-        option.type === 'put' ? <TokenIcon token={option.underlying}/> : <TokenIcon token={option.strike}/>,
-        <>{option.strikePriceInUSD + ' USD'}</>,
-        <Timer end={new Date(option.expiry * 1000)} format='dhm' />,
-        <><Button onClick={() => goToToken(option.addr)}> View Vaults </Button><GoToUniswapButton token={option.addr} /></>,
-      ]}
+      renderEntry={(option: types.ETHOption) => {
+        const excahnge = noPoolList.includes(option.addr) 
+          ? <div style={{width: 77}}><Button wide diabled icon={<IconProhibited/>}/> </div> 
+          : <GoToUniswapButton token={option.addr} />
+        return [
+          <IdentityBadge label={option.title} entity={option.addr} shorten={false} />,
+          option.type === 'put' ? <TokenIcon token={option.underlying}/> : <TokenIcon token={option.strike}/>,
+          <>{option.strikePriceInUSD + ' USD'}</>,
+          <Timer end={new Date(option.expiry * 1000)} format='dhm' />,
+        <><Button onClick={() => goToToken(option.addr)}> View Vaults </Button>{excahnge}</>,
+        ]}}
     />
   )
 }
