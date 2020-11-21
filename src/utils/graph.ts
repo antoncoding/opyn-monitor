@@ -343,7 +343,7 @@ export type optionTheGraph = {
 
 export const getAllOptions = async (): Promise<optionTheGraph[]> => {
   const query = `{
-    optionsContracts {
+    optionsContracts (first: 1000) {
       address
       oracleAddress
       optionsExchangeAddress
