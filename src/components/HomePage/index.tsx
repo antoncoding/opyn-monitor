@@ -3,9 +3,7 @@ import { useHistory } from 'react-router-dom';
 
 import UniswapLogo from '../../imgs/uniswap.png'
 
-import {
-  Header, Box, LinkBase, Tag,
-} from '@aragon/ui';
+import { Header, Box, LinkBase, Tag,  } from '@aragon/ui';
 
 function HomePage() {
   const history = useHistory();
@@ -13,9 +11,14 @@ function HomePage() {
   return (
     <>
       <Header primary="Welcome to Opyn Monitor" />
-      <div style={{ padding: 5, opacity: 0.5 }}> Tools for DeFi Risk Management. </div>
-      <div style={{ padding: '1%', display: 'flex', alignItems: 'center' }}>
-        <div style={{ width: '30%', marginRight: '3%', marginLeft: '2%' }}>
+      <div style={{ padding: 5, opacity: 0.5 }}> Manage you assets on Opyn V1. </div>
+      <div style={{ padding: 5, opacity: 0.5 }}> 
+      <LinkBase external href="https://opynv2-portal.netlify.app/#/">
+      <span role="img" aria-label="celebrate"> 🎉 </span> Try out Opyn V2 on Testnet! <span role="img" aria-label="celebrate">🎉 </span>
+      </LinkBase> </div>
+
+      <div style={{ paddingTop: '1%', display: 'flex', alignItems: 'center' }}>
+        <div style={{ width: '30%', marginRight: '3%' }}>
 
           <MainButton
             title="My Vaults"
@@ -49,7 +52,7 @@ function HomePage() {
         </div>
       </div>
       <div style={{ padding: '1%', display: 'flex', alignItems: 'center' }}>
-        <div style={{ width: '30%', marginLeft: '35%', marginRight: '35%' }}>
+        <div style={{ width: '30%', marginLeft: '33%', marginRight: '35%' }}>
           <MainButton
             title="Trade"
             description="Trade ETH Options on 0x"

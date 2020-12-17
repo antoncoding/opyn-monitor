@@ -1,6 +1,6 @@
 import React from 'react';
 import { useHistory } from 'react-router-dom';
-import { Link, useTheme } from '@aragon/ui';
+import { Link, useTheme, IdentityBadge } from '@aragon/ui';
 
 function Footer({ theme }: { theme: string }) {
   const history = useHistory();
@@ -37,14 +37,13 @@ function Footer({ theme }: { theme: string }) {
           <Link external href="https://www.kollateral.co/">
             Kollateral
           </Link>
-          {', '}
-          <Link external href="https://0x.org/">
-            0x
-          </Link>
-          {'. View source code on '}
+          {'. Code open sourced on '}
           <Link external href="https://github.com/antoncoding/opyn-monitor/">
             GitHub
           </Link>
+          <span style={{paddingLeft: '10px'}}>
+          <IdentityBadge  customLabel="Donations are welcome" icon={'❤️'} entity={"0xD325E15A52B780698C45CA3BdB6c49444fe5B588"} />
+          </span>
         </div>
       )
   );
