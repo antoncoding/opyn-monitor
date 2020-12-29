@@ -14,7 +14,7 @@ function HomePage() {
       <div style={{ padding: 5, opacity: 0.5 }}> Manage you assets on Opyn V1. </div>
       <div style={{ padding: 5, opacity: 0.5 }}> 
       <LinkBase external href="https://opynv2-portal.netlify.app/#/">
-      <span role="img" aria-label="celebrate"> 🎉 </span> Try out Opyn V2 on Testnet! <span role="img" aria-label="celebrate">🎉 </span>
+      <span role="img" aria-label="celebrate"> 🎉 </span> Try out Opyn V2 Now! <span role="img" aria-label="celebrate">🎉 </span>
       </LinkBase> </div>
 
       <div style={{ paddingTop: '1%', display: 'flex', alignItems: 'center' }}>
