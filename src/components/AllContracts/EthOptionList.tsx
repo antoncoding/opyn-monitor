@@ -1,26 +1,33 @@
 import React, { useState } from 'react';
-// import { useHistory } from 'react-router-dom';
-import {
-  DataView, IdentityBadge, Button, Timer
-} from '@aragon/ui';
+import { DataView, IdentityBadge, Button, Timer, LinkBase } from '@aragon/ui';
 
 import { GoToUniswapButton } from '../common';
 
 import * as types from '../../types'
 
-export function EthOptionList({ isInitializing, entries, showExpired, goToToken }: { isInitializing:Boolean, entries: types.ETHOption[], showExpired: boolean, goToToken: Function }) {
+export function EthOptionList({ isInitializing, entries, showExpired, goToToken }: { isInitializing: Boolean, entries: types.ETHOption[], showExpired: boolean, goToToken: Function }) {
   const [page, setPage] = useState(0)
   return (
     <DataView
-      status={isInitializing?'loading':'default'}
-      statusEmpty={<div>No ETH Options Available</div>}
+      status={isInitializing ? 'loading' : 'default'}
+      emptyState={{
+        default: {
+          title: `No ETH Options 🥺`,
+          subtitle: <div>
+            Checkout ETH options on <LinkBase external href="https://gammaportal.xyz/#/">
+              Gamma Portal (Opyn V2) <span role="img" aria-label="celebrate">🎉 </span></LinkBase>
+          </div>,
+          illustration: null,
+        }
+      }
+      }
       fields={['Contract', 'Strike Price', 'Expiration', 'Expires in', '']}
       entries={entries
         .filter((option) => showExpired || option.expiry * 1000 > Date.now())
-        .sort((oa, ob) =>  oa.type === ob.type 
-          ? oa.expiry > ob.expiry 
-            ? -1 : 1 
-          : oa.type === 'call' 
+        .sort((oa, ob) => oa.type === ob.type
+          ? oa.expiry > ob.expiry
+            ? -1 : 1
+          : oa.type === 'call'
             ? -1 : 1)
       }
       page={page}

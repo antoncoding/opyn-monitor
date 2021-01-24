@@ -23,7 +23,7 @@ function HomePage() {
           <MainButton
             title="My Vaults"
             description="Manage collateral, Mint/Burn oTokens"
-            iconUrl="https://opyn.co/static/media/1.68813886.svg"
+            iconUrl="https://v1.opyn.co/static/media/1.68813886.svg"
             onClick={() => {
               history.push('/myvaults');
             }}
@@ -34,7 +34,7 @@ function HomePage() {
           <MainButton
             title="All Contracts"
             description="Liquidate vaults, Exercise oTokens"
-            iconUrl="https://opyn.co/static/media/2.18d22be0.svg"
+            iconUrl="https://v1.opyn.co/static/media/2.18d22be0.svg"
             onClick={() => {
               history.push('/options/');
             }}
